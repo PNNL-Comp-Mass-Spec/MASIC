@@ -192,130 +192,11 @@ namespace MASICPeakFinder
 
                             if (useValleysForPeakWidth)
                             {
-                                // Determine the peak width by looking for the adjacent valleys
-                                // If, while looking, we find peakWidthPointsMinimum / 2 points in a row with intensity values below intensityThreshold, then
-                                // set the edge peakHalfWidth - 1 points closer to the peak maximum
-
-                                if (index > 0)
-                                {
-                                    newPeak.LeftEdge = 0;
-                                    var lowIntensityPointCount = 0;
-                                    for (var compareIndex = index - 1; compareIndex >= 0; compareIndex--)
-                                    {
-                                        if (firstDerivative[compareIndex] <= 0 && firstDerivative[compareIndex + 1] >= 0)
-                                        {
-                                            // Found a valley; this is the left edge
-                                            newPeak.LeftEdge = compareIndex + 1;
-                                            break;
-                                        }
-
-                                        if (yValues[compareIndex] < intensityThreshold)
-                                        {
-                                            lowIntensityPointCount++;
-                                            if (lowIntensityPointCount > peakHalfWidth)
-                                            {
-                                                newPeak.LeftEdge = compareIndex + (peakHalfWidth - 1);
-                                                break;
-                                            }
-                                        }
-                                        else
-                                        {
-                                            lowIntensityPointCount = 0;
-                                        }
-                                    }
-                                }
-                                else
-                                {
-                                    newPeak.LeftEdge = 0;
-                                }
-
-                                if (index < sourceDataCount - 2)
-                                {
-                                    newPeak.RightEdge = sourceDataCount - 1;
-                                    var lowIntensityPointCount = 0;
-                                    for (var compareIndex = index + 1; compareIndex < sourceDataCount - 1; compareIndex++)
-                                    {
-                                        if (firstDerivative[compareIndex] <= 0 && firstDerivative[compareIndex + 1] >= 0)
-                                        {
-                                            // Found a valley; this is the right edge
-                                            newPeak.RightEdge = compareIndex;
-                                            break;
-                                        }
-
-                                        if (yValues[compareIndex] < intensityThreshold)
-                                        {
-                                            lowIntensityPointCount++;
-                                            if (lowIntensityPointCount > peakHalfWidth)
-                                            {
-                                                newPeak.RightEdge = compareIndex - (peakHalfWidth - 1);
-                                                break;
-                                            }
-                                        }
-                                        else
-                                        {
-                                            lowIntensityPointCount = 0;
-                                        }
-                                    }
-                                }
-                                else
-                                {
-                                    newPeak.RightEdge = sourceDataCount - 1;
-                                }
-
-                                if (newPeak.LeftEdge > newPeak.PeakLocation)
-                                {
-                                    Console.WriteLine("Warning: Left edge is > peak center; this is unexpected (clsPeakDetection->DetectPeaks)");
-                                    newPeak.LeftEdge = newPeak.PeakLocation;
-                                }
-
-                                if (newPeak.RightEdge < newPeak.PeakLocation)
-                                {
-                                    Console.WriteLine("Warning: Right edge is < peak center; this is unexpected (clsPeakDetection->DetectPeaks)");
-                                    newPeak.RightEdge = newPeak.PeakLocation;
-                                }
+                                DetectPeaksUseValleys(sourceDataCount, yValues, firstDerivative, newPeak, index, intensityThreshold, peakHalfWidth);
                             }
                             else
                             {
-                                // Examine the Second Derivative to determine peak Width (in points)
-
-                                double sigma;
-
-                                try
-                                {
-                                    // If secondDerivative(index)) is tiny, the following division will fail
-                                    sigma = Math.Sqrt(Math.Abs(-yValues[index] / secondDerivative[index]));
-                                }
-                                catch (Exception)
-                                {
-                                    sigma = 0;
-                                }
-
-                                var widthInPoints = (int)Math.Ceiling(peakWidthInSigma * sigma);
-
-                                if (widthInPoints > 4 * sourceDataCount)
-                                {
-                                    // Predicted width is over 4 times the data count
-                                    // Set it to be 4 times the data count
-                                    widthInPoints = sourceDataCount * 4;
-                                }
-
-                                if (widthInPoints < 2)
-                                    widthInPoints = 2;
-
-                                // If the peak width is odd, then center around index
-                                // Otherwise, offset to the right of index
-                                if (widthInPoints % 2 == 0)
-                                {
-                                    // Even number
-                                    newPeak.LeftEdge = index - (int)Math.Round(widthInPoints / 2.0);
-                                    newPeak.RightEdge = index + (int)Math.Round(widthInPoints / 2.0) - 1;
-                                }
-                                else
-                                {
-                                    // Odd number
-                                    newPeak.LeftEdge = index - (int)Math.Round((widthInPoints - 1) / 2.0);
-                                    newPeak.RightEdge = index + (int)Math.Round((widthInPoints - 1) / 2.0);
-                                }
+                                DetectPeaksSecondDerivative(sourceDataCount, yValues, secondDerivative, newPeak, index, peakWidthInSigma);
                             }
 
                             detectedPeaks.Add(newPeak);
@@ -324,83 +205,13 @@ namespace MASICPeakFinder
                 }
 
                 // Compute the peak areas
-                foreach (var peakItem in detectedPeaks)
+                foreach (var peak in detectedPeaks)
                 {
-                    var thisPeakWidthInPoints = peakItem.RightEdge - peakItem.LeftEdge + 1;
+                    ComputePeakArea(sourceDataCount, xValues, yValues, peak);
 
-                    if (thisPeakWidthInPoints > 0)
+                    if (movePeakLocationToMaxIntensity)
                     {
-                        if (thisPeakWidthInPoints == 1)
-                        {
-                            // I don't think this can happen
-                            // Just in case, we'll set the area equal to the peak intensity
-                            peakItem.PeakArea = yValues[peakItem.PeakLocation];
-                        }
-                        else
-                        {
-                            var xValuesForArea = new double[thisPeakWidthInPoints];
-                            var yValuesForArea = new double[thisPeakWidthInPoints];
-
-                            var thisPeakStartIndex = peakItem.LeftEdge;
-                            var thisPeakEndIndex = peakItem.RightEdge;
-
-                            if (thisPeakStartIndex < 0)
-                            {
-                                // This will happen if the width is too large, or if not all of the peak's data was included in the data arrays
-                                thisPeakStartIndex = 0;
-                            }
-
-                            if (thisPeakEndIndex >= sourceDataCount)
-                            {
-                                // This will happen if the width is too large, or if not all of the peak's data was included in the data arrays
-                                thisPeakEndIndex = sourceDataCount - 1;
-                            }
-
-                            for (var areaValuesCopyIndex = thisPeakStartIndex; areaValuesCopyIndex <= thisPeakEndIndex; areaValuesCopyIndex++)
-                            {
-                                xValuesForArea[areaValuesCopyIndex - thisPeakStartIndex] = xValues[areaValuesCopyIndex];
-                                yValuesForArea[areaValuesCopyIndex - thisPeakStartIndex] = yValues[areaValuesCopyIndex];
-                            }
-
-                            peakItem.PeakArea = FindArea(xValuesForArea, yValuesForArea, thisPeakWidthInPoints);
-                        }
-                    }
-                    else
-                    {
-                        // 0-width peak; this shouldn't happen
-                        Console.WriteLine("Warning: 0-width peak; this shouldn't happen (clsPeakDetection->DetectPeaks)");
-                        peakItem.PeakArea = 0;
-                    }
-                }
-
-                if (movePeakLocationToMaxIntensity)
-                {
-                    foreach (var peakItem in detectedPeaks)
-                    {
-                        // The peak finder often determines the peak center to be a few points away from the peak apex -- check for this
-                        // Define the maximum allowed peak apex shift to be 33% of peakWidthPointsMinimum
-                        var dataIndexCheckStart = peakItem.PeakLocation - (int)Math.Floor(peakWidthPointsMinimum / 3.0);
-                        if (dataIndexCheckStart < 0)
-                            dataIndexCheckStart = 0;
-
-                        var dataIndexCheckEnd = peakItem.PeakLocation + (int)Math.Floor(peakWidthPointsMinimum / 3.0);
-                        if (dataIndexCheckEnd > sourceDataCount - 1)
-                            dataIndexCheckEnd = sourceDataCount - 1;
-
-                        maximumIntensity = yValues[peakItem.PeakLocation];
-                        for (var dataIndexCheck = dataIndexCheckStart; dataIndexCheck <= dataIndexCheckEnd; dataIndexCheck++)
-                        {
-                            if (yValues[dataIndexCheck] > maximumIntensity)
-                            {
-                                peakItem.PeakLocation = dataIndexCheck;
-                                maximumIntensity = yValues[dataIndexCheck];
-                            }
-                        }
-
-                        if (peakItem.PeakLocation < peakItem.LeftEdge)
-                            peakItem.LeftEdge = peakItem.PeakLocation;
-                        if (peakItem.PeakLocation > peakItem.RightEdge)
-                            peakItem.RightEdge = peakItem.PeakLocation;
+                        MovePeakLocationToMax(sourceDataCount, yValues, peak, peakWidthPointsMinimum);
                     }
                 }
             }
@@ -410,6 +221,201 @@ namespace MASICPeakFinder
             }
 
             return detectedPeaks;
+        }
+
+        private void ComputePeakArea(
+            int sourceDataCount,
+            IReadOnlyList<double> xValues,
+            IReadOnlyList<double> yValues,
+            clsPeakInfo peak)
+        {
+            if (peak.PeakWidth == 0)
+            {
+                // 0-width peak; this shouldn't happen
+                Console.WriteLine("Warning: 0-width peak; this shouldn't happen (clsPeakDetection->DetectPeaks)");
+                peak.PeakArea = 0;
+                return;
+            }
+
+            if (peak.PeakWidth == 1)
+            {
+                // I don't think this can happen
+                // Just in case, we'll set the area equal to the peak intensity
+                peak.PeakArea = yValues[peak.PeakLocation];
+                return;
+            }
+
+            var thisPeakStartIndex = peak.LeftEdge;
+            var thisPeakEndIndex = peak.RightEdge;
+
+            if (thisPeakStartIndex < 0)
+            {
+                // This will happen if the width is too large, or if not all of the peak's data was included in the data arrays
+                thisPeakStartIndex = 0;
+            }
+
+            if (thisPeakEndIndex >= sourceDataCount)
+            {
+                // This will happen if the width is too large, or if not all of the peak's data was included in the data arrays
+                thisPeakEndIndex = sourceDataCount - 1;
+            }
+
+            var thisPeakWidthInPoints = thisPeakEndIndex - thisPeakStartIndex + 1;
+            var xValuesForArea = new double[thisPeakWidthInPoints];
+            var yValuesForArea = new double[thisPeakWidthInPoints];
+
+            for (var areaValuesCopyIndex = thisPeakStartIndex; areaValuesCopyIndex <= thisPeakEndIndex; areaValuesCopyIndex++)
+            {
+                xValuesForArea[areaValuesCopyIndex - thisPeakStartIndex] = xValues[areaValuesCopyIndex];
+                yValuesForArea[areaValuesCopyIndex - thisPeakStartIndex] = yValues[areaValuesCopyIndex];
+            }
+
+            peak.PeakArea = FindArea(xValuesForArea, yValuesForArea, thisPeakWidthInPoints);
+        }
+
+        private void DetectPeaksUseValleys(
+            int sourceDataCount,
+            IReadOnlyList<double> yValues,
+            IReadOnlyList<double> firstDerivative,
+            clsPeakInfo newPeak,
+            int index,
+            double intensityThreshold,
+            int peakHalfWidth
+            )
+        {
+            // Determine the peak width by looking for the adjacent valleys
+            // If, while looking, we find peakWidthPointsMinimum / 2 points in a row with intensity values below intensityThreshold, then
+            // set the edge peakHalfWidth - 1 points closer to the peak maximum
+
+            if (index > 0)
+            {
+                newPeak.LeftEdge = 0;
+                var lowIntensityPointCount = 0;
+                for (var compareIndex = index - 1; compareIndex >= 0; compareIndex--)
+                {
+                    if (firstDerivative[compareIndex] <= 0 && firstDerivative[compareIndex + 1] >= 0)
+                    {
+                        // Found a valley; this is the left edge
+                        newPeak.LeftEdge = compareIndex + 1;
+                        break;
+                    }
+
+                    if (yValues[compareIndex] < intensityThreshold)
+                    {
+                        lowIntensityPointCount++;
+                        if (lowIntensityPointCount > peakHalfWidth)
+                        {
+                            newPeak.LeftEdge = compareIndex + (peakHalfWidth - 1);
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        lowIntensityPointCount = 0;
+                    }
+                }
+            }
+            else
+            {
+                newPeak.LeftEdge = 0;
+            }
+
+            if (index < sourceDataCount - 2)
+            {
+                newPeak.RightEdge = sourceDataCount - 1;
+                var lowIntensityPointCount = 0;
+                for (var compareIndex = index + 1; compareIndex < sourceDataCount - 1; compareIndex++)
+                {
+                    if (firstDerivative[compareIndex] <= 0 && firstDerivative[compareIndex + 1] >= 0)
+                    {
+                        // Found a valley; this is the right edge
+                        newPeak.RightEdge = compareIndex;
+                        break;
+                    }
+
+                    if (yValues[compareIndex] < intensityThreshold)
+                    {
+                        lowIntensityPointCount++;
+                        if (lowIntensityPointCount > peakHalfWidth)
+                        {
+                            newPeak.RightEdge = compareIndex - (peakHalfWidth - 1);
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        lowIntensityPointCount = 0;
+                    }
+                }
+            }
+            else
+            {
+                newPeak.RightEdge = sourceDataCount - 1;
+            }
+
+            if (newPeak.LeftEdge > newPeak.PeakLocation)
+            {
+                Console.WriteLine("Warning: Left edge is > peak center; this is unexpected (clsPeakDetection->DetectPeaks)");
+                newPeak.LeftEdge = newPeak.PeakLocation;
+            }
+
+            if (newPeak.RightEdge < newPeak.PeakLocation)
+            {
+                Console.WriteLine("Warning: Right edge is < peak center; this is unexpected (clsPeakDetection->DetectPeaks)");
+                newPeak.RightEdge = newPeak.PeakLocation;
+            }
+        }
+
+        private void DetectPeaksSecondDerivative(
+            int sourceDataCount,
+            IReadOnlyList<double> yValues,
+            IReadOnlyList<double> secondDerivative,
+            clsPeakInfo newPeak,
+            int index,
+            int peakWidthInSigma)
+        {
+            // Examine the Second Derivative to determine peak Width (in points)
+
+            double sigma;
+
+            try
+            {
+                // If secondDerivative[index]) is tiny, the following division will fail
+                sigma = Math.Sqrt(Math.Abs(-yValues[index] / secondDerivative[index]));
+            }
+            catch (Exception)
+            {
+                sigma = 0;
+            }
+
+            var widthInPoints = (int)Math.Ceiling(peakWidthInSigma * sigma);
+
+            if (widthInPoints > 4 * sourceDataCount)
+            {
+                // Predicted width is over 4 times the data count
+                // Set it to be 4 times the data count
+                widthInPoints = sourceDataCount * 4;
+            }
+
+            if (widthInPoints < 2)
+            {
+                widthInPoints = 2;
+            }
+
+            // If the peak width is odd, then center around index
+            // Otherwise, offset to the right of index
+            if (widthInPoints % 2 == 0)
+            {
+                // Even number
+                newPeak.LeftEdge = index - (int)Math.Round(widthInPoints / 2.0);
+                newPeak.RightEdge = index + (int)Math.Round(widthInPoints / 2.0) - 1;
+            }
+            else
+            {
+                // Odd number
+                newPeak.LeftEdge = index - (int)Math.Round((widthInPoints - 1) / 2.0);
+                newPeak.RightEdge = index + (int)Math.Round((widthInPoints - 1) / 2.0);
+            }
         }
 
         /// <summary>
