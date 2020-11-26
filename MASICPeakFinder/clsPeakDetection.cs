@@ -23,7 +23,7 @@ namespace MASICPeakFinder
         // ReSharper disable once CommentTypo
         // Ignore Spelling: cx, struct, lan, pFunc, const, Eols, EoLeast, fn, coef
 
-        private enum eTermFunctionConstants
+        private enum TermFunctionConstants
         {
             One = 0,
             X = 1,
@@ -36,11 +36,12 @@ namespace MASICPeakFinder
             ATanX = 8
         }
 
-        private struct udtLeastSquaresFitEquationTermType
+        private struct LeastSquaresFitEquationTermType
         {
-            public eTermFunctionConstants Func;
+            public TermFunctionConstants Func;
             public double Power;
             public double Coefficient;
+
             public bool Inverse;
 
             /// <summary>
@@ -57,12 +58,17 @@ namespace MASICPeakFinder
         /// <param name="startIndex"></param>
         /// <param name="endIndex"></param>
         /// <returns></returns>
-        public double ComputeSlope(double[] xValues, double[] yValues, int startIndex, int endIndex)
+        public double ComputeSlope(
+            double[] xValues,
+            double[] yValues,
+            int startIndex,
+            int endIndex)
         {
             const int POLYNOMIAL_ORDER = 1;
 
             if (xValues == null || xValues.Length == 0)
                 return 0;
+
             var segmentCount = endIndex - startIndex + 1;
 
             var segmentX = new double[segmentCount];
@@ -423,12 +429,12 @@ namespace MASICPeakFinder
         /// </summary>
         /// <param name="xValues">X values</param>
         /// <param name="yValues">Y values (intensities)</param>
-        /// <param name="arrayCount"></param>
+        /// <param name="dataPointCount"></param>
         /// <returns></returns>
-        private double FindArea(IList<double> xValues, IList<double> yValues, int arrayCount)
+        private double FindArea(IReadOnlyList<double> xValues, IReadOnlyList<double> yValues, int dataPointCount)
         {
             double area = 0;
-            for (var index = 0; index < arrayCount - 1; index++)
+            for (var index = 0; index < dataPointCount - 1; index++)
             {
                 // Area of a trapezoid (turned on its side) is:
                 // 0.5 * d * (h1 + h2)
@@ -437,10 +443,18 @@ namespace MASICPeakFinder
 
                 area += 0.5 * Math.Abs(xValues[index + 1] - xValues[index]) * (yValues[index] + yValues[index + 1]);
             }
+
             return area;
         }
 
-        private void FitSegments(IList<double> xValues, IList<double> yValues, int sourceDataCount, int peakWidthPointsMinimum, int peakWidthMidPoint, ref double[] firstDerivative, ref double[] secondDerivative)
+        private void FitSegments(
+            IReadOnlyList<double> xValues,
+            IReadOnlyList<double> yValues,
+            int sourceDataCount,
+            int peakWidthPointsMinimum,
+            int peakWidthMidPoint,
+            ref double[] firstDerivative,
+            ref double[] secondDerivative)
         {
             const int POLYNOMIAL_ORDER = 2;
 
@@ -469,6 +483,40 @@ namespace MASICPeakFinder
             }
         }
 
+        private void MovePeakLocationToMax(
+            int sourceDataCount,
+            IReadOnlyList<double> yValues,
+            clsPeakInfo peak,
+            int peakWidthPointsMinimum)
+        {
+            // The peak finder often determines the peak center to be a few points away from the peak apex -- check for this
+            // Define the maximum allowed peak apex shift to be 33% of peakWidthPointsMinimum
+            var dataIndexCheckStart = peak.PeakLocation - (int)Math.Floor(peakWidthPointsMinimum / 3.0);
+            if (dataIndexCheckStart < 0)
+                dataIndexCheckStart = 0;
+
+            var dataIndexCheckEnd = peak.PeakLocation + (int)Math.Floor(peakWidthPointsMinimum / 3.0);
+            if (dataIndexCheckEnd > sourceDataCount - 1)
+                dataIndexCheckEnd = sourceDataCount - 1;
+
+            var maximumIntensity = yValues[peak.PeakLocation];
+
+            for (var dataIndexCheck = dataIndexCheckStart; dataIndexCheck <= dataIndexCheckEnd; dataIndexCheck++)
+            {
+                if (yValues[dataIndexCheck] > maximumIntensity)
+                {
+                    peak.PeakLocation = dataIndexCheck;
+                    maximumIntensity = yValues[dataIndexCheck];
+                }
+            }
+
+            if (peak.PeakLocation < peak.LeftEdge)
+                peak.LeftEdge = peak.PeakLocation;
+
+            if (peak.PeakLocation > peak.RightEdge)
+                peak.RightEdge = peak.PeakLocation;
+        }
+
         #region "LinearLeastSquaresFitting"
 
         /// <summary>
@@ -485,15 +533,15 @@ namespace MASICPeakFinder
         /// Code excerpted from the VB6 program FitIt
         /// URL: http://msdn.microsoft.com/library/default.asp?url=/library/en-us/dnhcvb03/html/hcvb03b1.asp
         /// </remarks>
-        private bool LeastSquaresFit(IList<double> xValues, IList<double> yValues, out double[] coefficients, int polynomialOrder)
+        private void LeastSquaresFit(IReadOnlyList<double> xValues, IReadOnlyList<double> yValues, out double[] coefficients, int polynomialOrder)
         {
-            var equationTerms = new udtLeastSquaresFitEquationTermType[polynomialOrder + 1];
+            var equationTerms = new LeastSquaresFitEquationTermType[polynomialOrder + 1];
             coefficients = new double[polynomialOrder + 1];
 
             if (xValues.Count < polynomialOrder + 1)
             {
                 // Not enough data to fit a curve
-                return false;
+                return;
             }
 
             // Define equation for "ax^0 + bx^1 + cx^2", which is the same as "a + bx + cx^2"
@@ -501,18 +549,18 @@ namespace MASICPeakFinder
             {
                 // array of struct: Direct assignment, indexing the array every time, works.
                 equationTerms[term].Coefficient = 1;                        // a, b, c in the above equation
-                equationTerms[term].Func = eTermFunctionConstants.X;        // X
+                equationTerms[term].Func = TermFunctionConstants.X;         // X
                 equationTerms[term].Power = term;                           // Power that X is raised to
                 equationTerms[term].Inverse = false;                        // Whether or not to inverse the entire term
 
                 equationTerms[term].ParamResult = 0;
             }
 
-            var success = LLSqFit(xValues, yValues, ref equationTerms);
+            LLSqFit(xValues, yValues, ref equationTerms);
             for (var term = 0; term <= polynomialOrder; term++)
+            {
                 coefficients[term] = equationTerms[term].ParamResult;
-
-            return success;
+            }
         }
 
         /// <summary>
@@ -522,7 +570,7 @@ namespace MASICPeakFinder
         /// <param name="yValues"></param>
         /// <param name="equationTerms"></param>
         /// <returns></returns>
-        private bool LLSqFit(IList<double> xValues, IList<double> yValues, ref udtLeastSquaresFitEquationTermType[] equationTerms)
+        private void LLSqFit(IReadOnlyList<double> xValues, IReadOnlyList<double> yValues, ref LeastSquaresFitEquationTermType[] equationTerms)
         {
             var beta = new double[xValues.Count];
             var coVariance = new double[equationTerms.Length, equationTerms.Length];
@@ -530,13 +578,16 @@ namespace MASICPeakFinder
 
             for (var i = 0; i < xValues.Count; i++)
             {
-                GetLValues(xValues[i], ref equationTerms, ref pFuncValue);
+                GetLValues(xValues[i], equationTerms, ref pFuncValue);
 
                 var ym = yValues[i];
                 for (var L = 0; L < equationTerms.Length; L++)
                 {
                     for (var m = 0; m <= L; m++)
+                    {
                         coVariance[L, m] += pFuncValue[L] * pFuncValue[m];
+                    }
+
                     beta[L] += ym * pFuncValue[L];
                 }
             }
@@ -544,25 +595,35 @@ namespace MASICPeakFinder
             for (var j = 1; j < equationTerms.Length; j++)
             {
                 for (var k = 0; k < j; k++)
+                {
                     coVariance[k, j] = coVariance[j, k];
+                }
             }
 
-            if (GaussJordan(ref coVariance, ref equationTerms, ref beta))
+            if (GaussJordan(ref coVariance, equationTerms.Length, ref beta))
             {
                 for (var L = 0; L < equationTerms.Length; L++)
+                {
                     equationTerms[L].ParamResult = beta[L];
+                }
 
-                return true;
+                return;
             }
 
             // Error fitting; clear coefficients
             for (var L = 0; L < equationTerms.Length; L++)
+            {
                 equationTerms[L].ParamResult = 0;
-
-            return false;
+            }
         }
 
-        private void GetLValues(double X, ref udtLeastSquaresFitEquationTermType[] equationTerms, ref double[] pFuncValue)
+        /// <summary>
+        /// Get L values
+        /// </summary>
+        /// <param name="X"></param>
+        /// <param name="equationTerms"></param>
+        /// <param name="pFuncValue">LValues (output)</param>
+        private void GetLValues(double X, IReadOnlyList<LeastSquaresFitEquationTermType> equationTerms, ref double[] pFuncValue)
         {
             // Get values for Linear Least Squares
             // equationTerms() is a 0-based array defining the form of each term
@@ -577,21 +638,22 @@ namespace MASICPeakFinder
             // pFuncValue[3] = X * X;
 
             // f = "1,X,Log(X),Log10(X),Exp(X),Sin(X),Cos(X),Tan(X),ATAN(X)"
-            for (var i = 0; i < equationTerms.Length; i++)
+            for (var i = 0; i < equationTerms.Count; i++)
             {
                 // equationTerms is an array of structures: No assignment is performed, we don't need to copy the end value back.
                 var term = equationTerms[i];
+
                 switch (term.Func)
                 {
-                    case eTermFunctionConstants.One:
+                    case TermFunctionConstants.One:
                         v = 1;
                         break;
 
-                    case eTermFunctionConstants.X:
+                    case TermFunctionConstants.X:
                         v = Math.Pow(X, term.Power);
                         break;
 
-                    case eTermFunctionConstants.LogX:
+                    case TermFunctionConstants.LogX:
                         if (term.Coefficient * X <= 0)
                         {
                             v = 0;
@@ -602,7 +664,7 @@ namespace MASICPeakFinder
                         }
                         break;
 
-                    case eTermFunctionConstants.Log10X:
+                    case TermFunctionConstants.Log10X:
                         if (term.Coefficient * X <= 0)
                         {
                             v = 0;
@@ -613,23 +675,23 @@ namespace MASICPeakFinder
                         }
                         break;
 
-                    case eTermFunctionConstants.ExpX:
+                    case TermFunctionConstants.ExpX:
                         v = Math.Pow(Math.Exp(term.Coefficient * X), term.Power);
                         break;
 
-                    case eTermFunctionConstants.SinX:
+                    case TermFunctionConstants.SinX:
                         v = Math.Pow(Math.Sin(term.Coefficient * X), term.Power);
                         break;
 
-                    case eTermFunctionConstants.CosX:
+                    case TermFunctionConstants.CosX:
                         v = Math.Pow(Math.Cos(term.Coefficient * X), term.Power);
                         break;
 
-                    case eTermFunctionConstants.TanX:
+                    case TermFunctionConstants.TanX:
                         v = Math.Pow(Math.Tan(term.Coefficient * X), term.Power);
                         break;
 
-                    case eTermFunctionConstants.ATanX:
+                    case TermFunctionConstants.ATanX:
                         v = Math.Pow(Math.Atan(term.Coefficient * X), term.Power);
                         break;
                 }
@@ -656,31 +718,30 @@ namespace MASICPeakFinder
         /// GaussJordan elimination for LLSq and LM solving
         /// </summary>
         /// <param name="A"></param>
-        /// <param name="equationTerms"></param>
+        /// <param name="termCount"></param>
         /// <param name="b"></param>
         /// <returns>True if success, False if an error</returns>
-        private bool GaussJordan(ref double[,] A, ref udtLeastSquaresFitEquationTermType[] equationTerms, ref double[] b)
+        private bool GaussJordan(ref double[,] A, int termCount, ref double[] b)
         {
-            var n = equationTerms.Length;
-
-            var indexC = new int[n];
-            var indexR = new int[n];
+            var indexC = new int[termCount];
+            var indexR = new int[termCount];
 
             // ReSharper disable once IdentifierTypo
-            var ipiv = new int[n];
+            var ipiv = new int[termCount];
 
-            int columnIndex = 0, rowIndex = 0;
+            var columnIndex = 0;
+            var rowIndex = 0;
 
             try
             {
-                for (var i = 0; i < n; i++)
+                for (var i = 0; i < termCount; i++)
                 {
                     double bigValue = 0;
-                    for (var j = 0; j < n; j++)
+                    for (var j = 0; j < termCount; j++)
                     {
                         if (ipiv[j] != 1)
                         {
-                            for (var k = 0; k < n; k++)
+                            for (var k = 0; k < termCount; k++)
                             {
                                 if (ipiv[k] == 0)
                                 {
@@ -699,7 +760,7 @@ namespace MASICPeakFinder
                     if (rowIndex != columnIndex)
                     {
                         double swapValue;
-                        for (var L = 0; L < n; L++)
+                        for (var L = 0; L < termCount; L++)
                         {
                             swapValue = A[rowIndex, L];
                             A[rowIndex, L] = A[columnIndex, L];
@@ -721,19 +782,19 @@ namespace MASICPeakFinder
 
                     var PivInv = 1 / A[columnIndex, columnIndex];
                     A[columnIndex, columnIndex] = 1;
-                    for (var L = 0; L < n; L++)
+                    for (var L = 0; L < termCount; L++)
                     {
                         A[columnIndex, L] *= PivInv;
                     }
 
                     b[columnIndex] *= PivInv;
-                    for (var ll = 0; ll < n; ll++)
+                    for (var ll = 0; ll < termCount; ll++)
                     {
                         if (ll != columnIndex)
                         {
                             var multiplier = A[ll, columnIndex];
                             A[ll, columnIndex] = 0;
-                            for (var L = 0; L < n; L++)
+                            for (var L = 0; L < termCount; L++)
                             {
                                 A[ll, L] -= A[columnIndex, L] * multiplier;
                             }
@@ -743,11 +804,11 @@ namespace MASICPeakFinder
                     }
                 }
 
-                for (var L = n - 1; L >= 0; L--)
+                for (var L = termCount - 1; L >= 0; L--)
                 {
                     if (indexR[L] != indexC[L])
                     {
-                        for (var k = 0; k < n; k++)
+                        for (var k = 0; k < termCount; k++)
                         {
                             var swapValue = A[k, indexR[L]];
                             A[k, indexR[L]] = A[k, indexC[L]];
