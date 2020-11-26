@@ -29,9 +29,9 @@ namespace MagnitudeConcavityPeakFinder
 
         public int PeakWidthPointsMinimum { get; set; }
 
-        public List<clsPeak> Peaks { get; set; }
+        public List<clsPeakInfo> Peaks { get; set; }
 
-        public clsPeak BestPeak { get; set; }
+        public clsPeakInfo BestPeak { get; set; }
 
         /// <summary>
         /// Constructor

@@ -7,7 +7,7 @@ namespace MagnitudeConcavityPeakFinder
     {
         #region Structures and Enums
 
-        public enum eNoiseThresholdModes
+        public enum NoiseThresholdModes
         {
             AbsoluteThreshold = 0,
             TrimmedMeanByAbundance = 1,
@@ -17,15 +17,15 @@ namespace MagnitudeConcavityPeakFinder
             MeanOfDataInPeakVicinity = 5
         }
 
-        public struct udtBaselineNoiseOptionsType
+        public struct BaselineNoiseOptionsType
         {
             /// <summary>
             /// Method to use to determine the baseline noise level
             /// </summary>
-            public eNoiseThresholdModes BaselineNoiseMode;
+            public NoiseThresholdModes BaselineNoiseMode;
 
             /// <summary>
-            /// Explicitly defined noise intensity; only used if .BaselineNoiseMode = eNoiseThresholdModes.AbsoluteThreshold; 50000 for SIC, 0 for MS/MS spectra
+            /// Explicitly defined noise intensity; only used if .BaselineNoiseMode = NoiseThresholdModes.AbsoluteThreshold; 50000 for SIC, 0 for MS/MS spectra
             /// </summary>
             public float BaselineNoiseLevelAbsolute;
 
@@ -40,12 +40,12 @@ namespace MagnitudeConcavityPeakFinder
             public float MinimumBaselineNoiseLevel;
 
             /// <summary>
-            /// Typically 0.75 for SICs, 0.5 for MS/MS spectra; only used for eNoiseThresholdModes.TrimmedMeanByAbundance, .TrimmedMeanByCount, .TrimmedMedianByAbundance
+            /// Typically 0.75 for SICs, 0.5 for MS/MS spectra; only used for NoiseThresholdModes.TrimmedMeanByAbundance, .TrimmedMeanByCount, .TrimmedMedianByAbundance
             /// </summary>
             public float TrimmedMeanFractionLowIntensityDataToAverage;
 
             /// <summary>
-            /// Typically 5; distance from the mean in standard deviation units (SqrRt(Variance)) to discard data for computing the trimmed mean
+            /// Typically 5; distance from the mean in standard deviation units (SquareRoot(Variance)) to discard data for computing the trimmed mean
             /// </summary>
             public short DualTrimmedMeanStdDevLimits;
 
@@ -55,41 +55,47 @@ namespace MagnitudeConcavityPeakFinder
             public short DualTrimmedMeanMaximumSegments;
         }
 
-        public struct udtBaselineNoiseStatsType
+        public struct BaselineNoiseStatsType
         {
             // Typically the average of the data being sampled to determine the baseline noise estimate
             public double NoiseLevel;
             // Standard Deviation of the data used to compute the baseline estimate
             public double NoiseStDev;
             public int PointsUsed;
-            public eNoiseThresholdModes NoiseThresholdModeUsed;
+            public NoiseThresholdModes NoiseThresholdModeUsed;
         }
 
         #endregion
 
+        /// <summary>
+        /// Computes a trimmed mean or trimmed median using the low intensity data up to baselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage
+        /// Additionally, computes a full median using all data in intensityData
+        /// If ignoreNonPositiveData is True, removes data from intensityData if less than zero and/or less than baselineNoiseOptions.MinimumBaselineNoiseLevel
+        /// Returns True if success, False if error (or no data in intensityData)
+        /// </summary>
+        /// <param name="intensityData"></param>
+        /// <param name="indexStart"></param>
+        /// <param name="indexEnd"></param>
+        /// <param name="baselineNoiseOptions"></param>
+        /// <param name="ignoreNonPositiveData"></param>
+        /// <param name="baselineNoiseStats"></param>
+        /// <returns>True if success, false if an error (or no data in intensityData)</returns>
+        /// <remarks>Replaces values of 0 with the minimum positive value in intensityData()</remarks>
         public bool ComputeTrimmedNoiseLevel(
             double[] intensityData,
             int indexStart,
             int indexEnd,
-            udtBaselineNoiseOptionsType udtBaselineNoiseOptions,
+            BaselineNoiseOptionsType baselineNoiseOptions,
             bool ignoreNonPositiveData,
-            out udtBaselineNoiseStatsType udtBaselineNoiseStats)
+            out BaselineNoiseStatsType baselineNoiseStats)
         {
-            // Computes a trimmed mean or trimmed median using the low intensity data up to udtBaselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage
-            // Additionally, computes a full median using all data in sngData
-            // If blnIgnoreNonPositiveData is True, then removes data from sngData() <= 0 and <= .MinimumBaselineNoiseLevel
-            // Returns True if success, False if error (or no data in sngData)
-
-            // Note: Replaces values of 0 with the minimum positive value in sngData()
-            // Note: You cannot use sngData.Length to determine the length of the array; use intDataCount
-
             double summedIntensity;
 
             int countSummed;
 
-            // Initialize udtBaselineNoiseStats
-            udtBaselineNoiseStats = GetBaselineNoiseStats(udtBaselineNoiseOptions.MinimumBaselineNoiseLevel,
-                                                          udtBaselineNoiseOptions.BaselineNoiseMode);
+            // Initialize baselineNoiseStats
+            baselineNoiseStats = GetBaselineNoiseStats(baselineNoiseOptions.MinimumBaselineNoiseLevel,
+                                                          baselineNoiseOptions.BaselineNoiseMode);
 
             if (intensityData == null || indexEnd - indexStart < 0)
             {
@@ -147,21 +153,21 @@ namespace MagnitudeConcavityPeakFinder
             // ReSharper disable once UnusedVariable
             var minimumPositiveValue = ReplaceSortedDataWithMinimumPositiveValue(dataSortedCount, sortedData);
 
-            switch (udtBaselineNoiseOptions.BaselineNoiseMode)
+            switch (baselineNoiseOptions.BaselineNoiseMode)
             {
-                case eNoiseThresholdModes.TrimmedMeanByAbundance:
-                case eNoiseThresholdModes.TrimmedMeanByCount:
+                case NoiseThresholdModes.TrimmedMeanByAbundance:
+                case NoiseThresholdModes.TrimmedMeanByCount:
 
-                    if (udtBaselineNoiseOptions.BaselineNoiseMode == eNoiseThresholdModes.TrimmedMeanByAbundance)
+                    if (baselineNoiseOptions.BaselineNoiseMode == NoiseThresholdModes.TrimmedMeanByAbundance)
                     {
                         // TrimmedMeanByAbundance
-                        countSummed = ComputeTrimmedMeanByAbundance(sortedData, dataSortedCount, udtBaselineNoiseOptions,
+                        countSummed = ComputeTrimmedMeanByAbundance(sortedData, dataSortedCount, baselineNoiseOptions,
                                                                     out indexEnd, out summedIntensity);
                     }
                     else
                     {
                         // TrimmedMeanByCount
-                        countSummed = ComputeTrimmedMeanByCount(sortedData, dataSortedCount, udtBaselineNoiseOptions,
+                        countSummed = ComputeTrimmedMeanByCount(sortedData, dataSortedCount, baselineNoiseOptions,
                                                                 out indexEnd, out summedIntensity);
                     }
 
@@ -169,21 +175,21 @@ namespace MagnitudeConcavityPeakFinder
                     {
                         // No data to average; define the noise level to be the minimum intensity
 
-                        udtBaselineNoiseStats.NoiseLevel = sortedData[0];
-                        udtBaselineNoiseStats.NoiseStDev = 0;
-                        udtBaselineNoiseStats.PointsUsed = 1;
+                        baselineNoiseStats.NoiseLevel = sortedData[0];
+                        baselineNoiseStats.NoiseStDev = 0;
+                        baselineNoiseStats.PointsUsed = 1;
                         break;
                     }
 
                     // Compute the average
                     // Note that countSummed will be used below in the variance computation
 
-                    udtBaselineNoiseStats.NoiseLevel = summedIntensity / countSummed;
-                    udtBaselineNoiseStats.PointsUsed = countSummed;
+                    baselineNoiseStats.NoiseLevel = summedIntensity / countSummed;
+                    baselineNoiseStats.PointsUsed = countSummed;
 
                     if (countSummed <= 1)
                     {
-                        udtBaselineNoiseStats.NoiseStDev = 0;
+                        baselineNoiseStats.NoiseStDev = 0;
                         break;
                     }
 
@@ -191,24 +197,24 @@ namespace MagnitudeConcavityPeakFinder
                     summedIntensity = 0;
                     for (var intIndex = 0; intIndex <= indexEnd; intIndex++)
                     {
-                        summedIntensity += Math.Pow((sortedData[intIndex] - udtBaselineNoiseStats.NoiseLevel), 2);
+                        summedIntensity += Math.Pow((sortedData[intIndex] - baselineNoiseStats.NoiseLevel), 2);
                     }
-                    udtBaselineNoiseStats.NoiseStDev = Math.Sqrt(summedIntensity / (countSummed - 1));
+                    baselineNoiseStats.NoiseStDev = Math.Sqrt(summedIntensity / (countSummed - 1));
 
                     break;
 
-                case eNoiseThresholdModes.TrimmedMedianByAbundance:
-                    if (udtBaselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage >= 1)
+                case NoiseThresholdModes.TrimmedMedianByAbundance:
+                    if (baselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage >= 1)
                     {
                         indexEnd = dataSortedCount - 1;
                     }
                     else
                     {
                         //Find the median of the data that has intensity values less than
-                        //  Minimum + udtBaselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage * (Maximum - Minimum)
+                        //  Minimum + baselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage * (Maximum - Minimum)
 
                         var dblIntensityThreshold = sortedData[0] +
-                                                       udtBaselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage *
+                                                       baselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage *
                                                        (sortedData[dataSortedCount - 1] -
                                                         sortedData[0]);
 
@@ -227,7 +233,7 @@ namespace MagnitudeConcavityPeakFinder
                     if (indexEnd % 2 == 0)
                     {
                         // Even value
-                        udtBaselineNoiseStats.NoiseLevel = sortedData[indexEnd / 2];
+                        baselineNoiseStats.NoiseLevel = sortedData[indexEnd / 2];
                     }
                     else
                     {
@@ -242,43 +248,43 @@ namespace MagnitudeConcavityPeakFinder
                             intIndex = dataSortedCount - 1;
                         summedIntensity += sortedData[intIndex];
 
-                        udtBaselineNoiseStats.NoiseLevel = summedIntensity / 2.0;
+                        baselineNoiseStats.NoiseLevel = summedIntensity / 2.0;
                     }
 
                     // Compute the variance
                     summedIntensity = 0;
                     for (var intIndex = 0; intIndex <= indexEnd; intIndex++)
                     {
-                        summedIntensity += Math.Pow((sortedData[intIndex] - udtBaselineNoiseStats.NoiseLevel), 2);
+                        summedIntensity += Math.Pow((sortedData[intIndex] - baselineNoiseStats.NoiseLevel), 2);
                     }
 
                     countSummed = indexEnd + 1;
                     if (countSummed > 0)
                     {
-                        udtBaselineNoiseStats.NoiseStDev = Math.Sqrt(summedIntensity / (countSummed - 1));
+                        baselineNoiseStats.NoiseStDev = Math.Sqrt(summedIntensity / (countSummed - 1));
                     }
                     else
                     {
-                        udtBaselineNoiseStats.NoiseStDev = 0;
+                        baselineNoiseStats.NoiseStDev = 0;
                     }
-                    udtBaselineNoiseStats.PointsUsed = countSummed;
+                    baselineNoiseStats.PointsUsed = countSummed;
 
                     break;
                 default:
                     // Unknown mode
                     throw new Exception("Unknown Noise Threshold Mode encountered: " +
-                                        udtBaselineNoiseOptions.BaselineNoiseMode);
+                                        baselineNoiseOptions.BaselineNoiseMode);
             }
 
             // Assure that .NoiseLevel is >= .MinimumBaselineNoiseLevel
 
-            if (udtBaselineNoiseStats.NoiseLevel < udtBaselineNoiseOptions.MinimumBaselineNoiseLevel &&
-                udtBaselineNoiseOptions.MinimumBaselineNoiseLevel > 0)
+            if (baselineNoiseStats.NoiseLevel < baselineNoiseOptions.MinimumBaselineNoiseLevel &&
+                baselineNoiseOptions.MinimumBaselineNoiseLevel > 0)
             {
-                udtBaselineNoiseStats.NoiseLevel = udtBaselineNoiseOptions.MinimumBaselineNoiseLevel;
+                baselineNoiseStats.NoiseLevel = baselineNoiseOptions.MinimumBaselineNoiseLevel;
 
                 // Set this to 0 since we have overridden .NoiseLevel
-                udtBaselineNoiseStats.NoiseStDev = 0;
+                baselineNoiseStats.NoiseStDev = 0;
             }
 
             return true;
@@ -287,13 +293,13 @@ namespace MagnitudeConcavityPeakFinder
         private static int ComputeTrimmedMeanByCount(
             IList<double> sortedData,
             int dataSortedCount,
-            udtBaselineNoiseOptionsType udtBaselineNoiseOptions,
+            BaselineNoiseOptionsType baselineNoiseOptions,
             out int indexEnd,
             out double summedIntensity)
         {
-            // Find the index of the data point at intDataSortedCount * udtBaselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage and
+            // Find the index of the data point at intDataSortedCount * baselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage and
             //  average the data from the start to that index
-            indexEnd = (int) Math.Round((dataSortedCount - 1) * udtBaselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage, 0);
+            indexEnd = (int) Math.Round((dataSortedCount - 1) * baselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage, 0);
 
             var countSummed = indexEnd + 1;
 
@@ -309,15 +315,15 @@ namespace MagnitudeConcavityPeakFinder
         private int ComputeTrimmedMeanByAbundance(
             IList<double> sortedData,
             int dataSortedCount,
-            udtBaselineNoiseOptionsType udtBaselineNoiseOptions,
+            BaselineNoiseOptionsType baselineNoiseOptions,
             out int indexEnd,
             out double summedIntensity)
         {
             // Average the data that has intensity values less than
-            //  Minimum + udtBaselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage * (Maximum - Minimum)
+            //  Minimum + baselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage * (Maximum - Minimum)
 
             var dblIntensityThreshold = sortedData[0] +
-                                           udtBaselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage *
+                                           baselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage *
                                            (sortedData[dataSortedCount - 1] - sortedData[0]);
 
             // Initialize countSummed to intDataSortedCount for now, in case all data is within the intensity threshold
@@ -344,11 +350,11 @@ namespace MagnitudeConcavityPeakFinder
             return countSummed;
         }
 
-        public udtBaselineNoiseStatsType GetBaselineNoiseStats(
+        public BaselineNoiseStatsType GetBaselineNoiseStats(
             float sngMinimumBaselineNoiseLevel,
-            eNoiseThresholdModes eNoiseThresholdMode)
+            NoiseThresholdModes eNoiseThresholdMode)
         {
-            var udtBaselineNoiseStats = new udtBaselineNoiseStatsType
+            var baselineNoiseStats = new BaselineNoiseStatsType
             {
                 NoiseLevel = sngMinimumBaselineNoiseLevel,
                 NoiseStDev = 0,
@@ -356,7 +362,7 @@ namespace MagnitudeConcavityPeakFinder
                 NoiseThresholdModeUsed = eNoiseThresholdMode
             };
 
-            return udtBaselineNoiseStats;
+            return baselineNoiseStats;
         }
 
         /// <summary>
@@ -397,11 +403,11 @@ namespace MagnitudeConcavityPeakFinder
 
         #region Default Options
 
-        public static udtBaselineNoiseOptionsType GetDefaultNoiseThresholdOptions()
+        public static BaselineNoiseOptionsType GetDefaultNoiseThresholdOptions()
         {
-            var udtBaselineNoiseOptions = new udtBaselineNoiseOptionsType
+            var baselineNoiseOptions = new BaselineNoiseOptionsType
             {
-                BaselineNoiseMode = eNoiseThresholdModes.TrimmedMedianByAbundance,
+                BaselineNoiseMode = NoiseThresholdModes.TrimmedMedianByAbundance,
                 BaselineNoiseLevelAbsolute = 0,
                 MinimumSignalToNoiseRatio = 0,                    // Someday: Figure out how best to use this when > 0; for now, the SICNoiseMinimumSignalToNoiseRatio property ignores any attempts to set this value
                 MinimumBaselineNoiseLevel = 1,
@@ -410,7 +416,7 @@ namespace MagnitudeConcavityPeakFinder
                 DualTrimmedMeanMaximumSegments = 3
             };
 
-            return udtBaselineNoiseOptions;
+            return baselineNoiseOptions;
         }
 
         #endregion

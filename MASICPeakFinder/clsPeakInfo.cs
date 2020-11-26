@@ -40,19 +40,22 @@
         }
 
         /// <summary>
+        /// Peak width (in points)
+        /// </summary>
+        public int PeakWidth => RightEdge - LeftEdge + 1;
+
+        /// <summary>
         /// Duplicate an instance of this class
         /// </summary>
         public clsPeakInfo Clone()
         {
-            var newPeak = new clsPeakInfo(PeakLocation)
+            return new clsPeakInfo(PeakLocation)
             {
                 LeftEdge = LeftEdge,
                 RightEdge = RightEdge,
                 PeakArea = PeakArea,
                 PeakIsValid = PeakIsValid
             };
-
-            return newPeak;
         }
 
         /// <summary>
@@ -60,7 +63,7 @@
         /// </summary>
         public override string ToString()
         {
-            return string.Format("Peak Index {0}, Area {1:E1}", PeakLocation, PeakArea);
+            return string.Format("Center Index {0}, from {1} to {2}; Area {3:E1}", PeakLocation, LeftEdge, RightEdge, PeakArea);
         }
     }
 }
