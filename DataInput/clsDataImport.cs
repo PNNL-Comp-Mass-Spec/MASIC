@@ -349,15 +349,14 @@ namespace MASIC.DataInput
                 // ReSharper disable once ConditionIsAlwaysTrueOrFalse
                 if (writeDebugData)
                 {
-                    using (var postFilterWriter = new StreamWriter(new FileStream(Path.Combine(mOptions.OutputDirectoryPath, "DataDump_" + msSpectrum.ScanNumber.ToString() + "_PostFilter.txt"), FileMode.Create, FileAccess.Write, FileShare.Read)))
-                    {
-                        postFilterWriter.WriteLine("{0}\t{1}", "m/z", "Intensity");
+                    using var postFilterWriter = new StreamWriter(new FileStream(Path.Combine(mOptions.OutputDirectoryPath, "DataDump_" + msSpectrum.ScanNumber.ToString() + "_PostFilter.txt"), FileMode.Create, FileAccess.Write, FileShare.Read));
 
-                        // Store the intensity values in filterDataArray
-                        for (var ionIndex = 0; ionIndex < msSpectrum.IonCount; ionIndex++)
-                        {
-                            postFilterWriter.WriteLine("{0:F3}\t{1:F0}", msSpectrum.IonsMZ[ionIndex], msSpectrum.IonsIntensity[ionIndex]);
-                        }
+                    postFilterWriter.WriteLine("{0}\t{1}", "m/z", "Intensity");
+
+                    // Store the intensity values in filterDataArray
+                    for (var ionIndex = 0; ionIndex < msSpectrum.IonCount; ionIndex++)
+                    {
+                        postFilterWriter.WriteLine("{0:F3}\t{1:F0}", msSpectrum.IonsMZ[ionIndex], msSpectrum.IonsIntensity[ionIndex]);
                     }
                 }
             }

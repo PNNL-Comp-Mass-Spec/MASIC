@@ -50,40 +50,39 @@ namespace MASIC.Plots
 
             try
             {
-                using (var writer = new StreamWriter(new FileStream(exportFile.FullName, FileMode.Create, FileAccess.Write, FileShare.ReadWrite)))
+                using var writer = new StreamWriter(new FileStream(exportFile.FullName, FileMode.Create, FileAccess.Write, FileShare.ReadWrite));
+
+                // Plot options: set of square brackets with semicolon separated key/value pairs
+                writer.WriteLine("[" + GetPlotOptions() + "]");
+
+                // Column options: semicolon separated key/value pairs for each column, with options for each column separated by a tab
+                // Note: these options aren't actually used by the Python plotting library
+
+                // Example XAxis options: Autoscale=false;Minimum=0;Maximum=12135006;StringFormat=#,##0;MinorGridlineThickness=1
+                // Example YAxis options: Autoscale=true;StringFormat=0.00E+00;MinorGridlineThickness=1
+
+                writer.WriteLine("{0}\t{1}", XAxisInfo.GetOptions(), YAxisInfo.GetOptions());
+
+                // Column names
+                var xAxisTitle = string.IsNullOrWhiteSpace(XAxisInfo.Title) ? "Label" : XAxisInfo.Title;
+                writer.WriteLine("{0}\t{1}", xAxisTitle, YAxisInfo.Title);
+
+                var intensityValues = new StringBuilder();
+
+                for (var i = 0; i < XAxisLabels.Count; i++)
                 {
-                    // Plot options: set of square brackets with semicolon separated key/value pairs
-                    writer.WriteLine("[" + GetPlotOptions() + "]");
+                    intensityValues.Clear();
 
-                    // Column options: semicolon separated key/value pairs for each column, with options for each column separated by a tab
-                    // Note: these options aren't actually used by the Python plotting library
-
-                    // Example XAxis options: Autoscale=false;Minimum=0;Maximum=12135006;StringFormat=#,##0;MinorGridlineThickness=1
-                    // Example YAxis options: Autoscale=true;StringFormat=0.00E+00;MinorGridlineThickness=1
-
-                    writer.WriteLine("{0}\t{1}", XAxisInfo.GetOptions(), YAxisInfo.GetOptions());
-
-                    // Column names
-                    var xAxisTitle = string.IsNullOrWhiteSpace(XAxisInfo.Title) ? "Label" : XAxisInfo.Title;
-                    writer.WriteLine("{0}\t{1}", xAxisTitle, YAxisInfo.Title);
-
-                    var intensityValues = new StringBuilder();
-
-                    for (var i = 0; i < XAxisLabels.Count; i++)
+                    // Data: the first column is the box label; the second column is a comma separated list of intensities for the box
+                    for (var j =0 ; j < Data[i].Count; j++)
                     {
-                        intensityValues.Clear();
+                        if (j > 0)
+                            intensityValues.Append(",");
 
-                        // Data: the first column is the box label; the second column is a comma separated list of intensities for the box
-                        for (var j =0 ; j < Data[i].Count; j++)
-                        {
-                            if (j > 0)
-                                intensityValues.Append(",");
-
-                            intensityValues.Append(Data[i][j]);
-                        }
-
-                        writer.WriteLine("{0}\t{1}", XAxisLabels[i], intensityValues);
+                        intensityValues.Append(Data[i][j]);
                     }
+
+                    writer.WriteLine("{0}\t{1}", XAxisLabels[i], intensityValues);
                 }
             }
             catch (Exception ex)

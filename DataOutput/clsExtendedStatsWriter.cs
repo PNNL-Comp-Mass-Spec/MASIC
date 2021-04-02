@@ -388,31 +388,30 @@ namespace MASIC.DataOutput
                     constantExtendedHeaderValues = string.Empty;
 
                 // Write the constant extended stats values to a text file
-                using (var writer = new StreamWriter(extendedConstantHeaderOutputFilePath, false))
+                using (var constantHeaderWriter = new StreamWriter(extendedConstantHeaderOutputFilePath, false))
                 {
-                    writer.WriteLine(constantExtendedHeaderValues);
+                    constantHeaderWriter.WriteLine(constantExtendedHeaderValues);
                 }
 
                 // Now open another output file for the non-constant extended stats
-                using (var writer = new StreamWriter(extendedNonConstantHeaderOutputFilePath, false))
+                using var writer = new StreamWriter(extendedNonConstantHeaderOutputFilePath, false);
+
+                if (includeHeaders)
                 {
-                    if (includeHeaders)
+                    var headerNames = ConstructExtendedStatsHeaders();
+                    writer.WriteLine(string.Join(TAB_DELIMITER.ToString(), headerNames));
+                }
+
+                for (var scanIndex = 0; scanIndex < scanList.MasterScanOrderCount; scanIndex++)
+                {
+                    var currentScan = GetScanByMasterScanIndex(scanList, scanIndex);
+
+                    var dataColumns = ConcatenateExtendedStats(nonConstantHeaderIDs, mOptions.SICOptions.DatasetID, currentScan.ScanNumber, currentScan.ExtendedHeaderInfo);
+                    writer.WriteLine(string.Join(TAB_DELIMITER.ToString(), dataColumns));
+
+                    if (scanIndex % 100 == 0)
                     {
-                        var headerNames = ConstructExtendedStatsHeaders();
-                        writer.WriteLine(string.Join(TAB_DELIMITER.ToString(), headerNames));
-                    }
-
-                    for (var scanIndex = 0; scanIndex < scanList.MasterScanOrderCount; scanIndex++)
-                    {
-                        var currentScan = GetScanByMasterScanIndex(scanList, scanIndex);
-
-                        var dataColumns = ConcatenateExtendedStats(nonConstantHeaderIDs, mOptions.SICOptions.DatasetID, currentScan.ScanNumber, currentScan.ExtendedHeaderInfo);
-                        writer.WriteLine(string.Join(TAB_DELIMITER.ToString(), dataColumns));
-
-                        if (scanIndex % 100 == 0)
-                        {
-                            UpdateProgress((short)(scanIndex / (double)(scanList.MasterScanOrderCount - 1) * 100));
-                        }
+                        UpdateProgress((short)(scanIndex / (double)(scanList.MasterScanOrderCount - 1) * 100));
                     }
                 }
             }

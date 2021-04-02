@@ -298,10 +298,9 @@ namespace MASIC.DatasetStats
 
                 // If CreateDatasetInfoXML() used a StringBuilder to cache the XML data, we would have to use System.Encoding.Unicode
                 // However, CreateDatasetInfoXML() now uses a MemoryStream, so we're able to use UTF8
-                using (var writer = new StreamWriter(new FileStream(datasetInfoFilePath, FileMode.Create, FileAccess.Write, FileShare.Read), Encoding.UTF8))
-                {
-                    writer.WriteLine(CreateDatasetInfoXML(datasetName, scanStats, datasetInfo, oSampleInfo));
-                }
+                using var writer = new StreamWriter(new FileStream(datasetInfoFilePath, FileMode.Create, FileAccess.Write, FileShare.Read), Encoding.UTF8);
+
+                writer.WriteLine(CreateDatasetInfoXML(datasetName, scanStats, datasetInfo, oSampleInfo));
 
                 return true;
             }
@@ -432,17 +431,17 @@ namespace MASIC.DatasetStats
 
                 // We could cache the text using a StringBuilder, like this:
                 //
-                // var sbDatasetInfo = new StringBuilder();
-                // var stringWriter = new StringWriter(sbDatasetInfo);
+                // var datasetInfo = new StringBuilder();
+                // var stringWriter = new StringWriter(datasetInfo);
                 // var writer = new System.Xml.XmlTextWriter(stringWriter);
                 // writer.Formatting = System.Xml.Formatting.Indented;
                 // writer.Indentation = 2;
 
                 // However, when you send the output to a StringBuilder it is always encoded as Unicode (UTF-16)
                 // since this is the only character encoding used in the .NET Framework for String values,
-                // and thus you'll see the attribute encoding="utf-16" in the opening XML declaration
+                // and thus you'll see the attribute encoding="UTF-16" in the opening XML declaration
                 // The alternative is to use a MemoryStream.  Here, the stream encoding is set by the XmlWriter
-                // and so you see the attribute encoding="utf-8" in the opening XML declaration encoding
+                // and so you see the attribute encoding="UTF-8" in the opening XML declaration encoding
                 // (since we used xmlSettings.Encoding = System.Encoding.UTF8)
                 //
                 var memStream = new MemoryStream();
@@ -588,67 +587,66 @@ namespace MASIC.DatasetStats
 
                 ErrorMessage = string.Empty;
 
-                using (var scanStatsWriter = new StreamWriter(new FileStream(scanStatsFilePath, FileMode.Create, FileAccess.Write, FileShare.Read)))
+                using var scanStatsWriter = new StreamWriter(new FileStream(scanStatsFilePath, FileMode.Create, FileAccess.Write, FileShare.Read));
+
+                // Write the headers
+                var headerNames = new List<string>()
                 {
-                    // Write the headers
-                    var headerNames = new List<string>()
-                    {
-                        "Dataset",
-                        "ScanNumber",
-                        "ScanTime",
-                        "ScanType",
-                        "TotalIonIntensity",
-                        "BasePeakIntensity",
-                        "BasePeakMZ",
-                        "BasePeakSignalToNoiseRatio",
-                        "IonCount",
-                        "IonCountRaw",
-                        "ScanTypeName"
-                    };
+                    "Dataset",
+                    "ScanNumber",
+                    "ScanTime",
+                    "ScanType",
+                    "TotalIonIntensity",
+                    "BasePeakIntensity",
+                    "BasePeakMZ",
+                    "BasePeakSignalToNoiseRatio",
+                    "IonCount",
+                    "IonCountRaw",
+                    "ScanTypeName"
+                };
 
-                    scanStatsWriter.WriteLine(string.Join("\t", headerNames));
+                scanStatsWriter.WriteLine(string.Join("\t", headerNames));
 
-                    var dataValues = new List<string>(12);
+                var dataValues = new List<string>(12);
 
-                    foreach (var scanStatsEntry in scanStats)
-                    {
-                        dataValues.Clear();
+                foreach (var scanStatsEntry in scanStats)
+                {
+                    dataValues.Clear();
 
-                        // Dataset ID
-                        dataValues.Add(DATASET_ID.ToString());
+                    // Dataset ID
+                    dataValues.Add(DATASET_ID.ToString());
 
-                        // Scan number
-                        dataValues.Add(scanStatsEntry.ScanNumber.ToString());
+                    // Scan number
+                    dataValues.Add(scanStatsEntry.ScanNumber.ToString());
 
-                        // Scan time (minutes)
-                        dataValues.Add(scanStatsEntry.ElutionTime);
+                    // Scan time (minutes)
+                    dataValues.Add(scanStatsEntry.ElutionTime);
 
-                        // Scan type (1 for MS, 2 for MS2, etc.)
-                        dataValues.Add(scanStatsEntry.ScanType.ToString());
+                    // Scan type (1 for MS, 2 for MS2, etc.)
+                    dataValues.Add(scanStatsEntry.ScanType.ToString());
 
-                        // Total ion intensity
-                        dataValues.Add(scanStatsEntry.TotalIonIntensity);
+                    // Total ion intensity
+                    dataValues.Add(scanStatsEntry.TotalIonIntensity);
 
-                        // Base peak ion intensity
-                        dataValues.Add(scanStatsEntry.BasePeakIntensity);
+                    // Base peak ion intensity
+                    dataValues.Add(scanStatsEntry.BasePeakIntensity);
 
-                        // Base peak ion m/z
-                        dataValues.Add(scanStatsEntry.BasePeakMZ);
+                    // Base peak ion m/z
+                    dataValues.Add(scanStatsEntry.BasePeakMZ);
 
-                        // Base peak signal to noise ratio
-                        dataValues.Add(scanStatsEntry.BasePeakSignalToNoiseRatio);
+                    // Base peak signal to noise ratio
+                    dataValues.Add(scanStatsEntry.BasePeakSignalToNoiseRatio);
 
-                        // Number of peaks (aka ions) in the spectrum
-                        dataValues.Add(scanStatsEntry.IonCount.ToString());
+                    // Number of peaks (aka ions) in the spectrum
+                    dataValues.Add(scanStatsEntry.IonCount.ToString());
 
-                        // Number of peaks (aka ions) in the spectrum prior to any filtering
-                        dataValues.Add(scanStatsEntry.IonCountRaw.ToString());
+                    // Number of peaks (aka ions) in the spectrum prior to any filtering
+                    dataValues.Add(scanStatsEntry.IonCountRaw.ToString());
 
-                        // Scan type name
-                        dataValues.Add(scanStatsEntry.ScanTypeName);
+                    // Scan type name
+                    dataValues.Add(scanStatsEntry.ScanTypeName);
 
-                        scanStatsWriter.WriteLine(string.Join("\t", dataValues));
-                    }
+                    scanStatsWriter.WriteLine(string.Join("\t", dataValues));
                 }
 
                 return true;
@@ -700,7 +698,7 @@ namespace MASIC.DatasetStats
         {
             var matchFound = false;
 
-            // Look for scan scanNumber in mDatasetScanStats
+            // Look for scanNumber in mDatasetScanStats
             foreach (var scan in mDatasetScanStats)
             {
                 if (scan.ScanNumber != scanNumber)
@@ -781,48 +779,47 @@ namespace MASIC.DatasetStats
                 }
 
                 // Create or open the output file
-                using (var writer = new StreamWriter(new FileStream(datasetStatsFilePath, FileMode.Append, FileAccess.Write, FileShare.Read)))
+                using var writer = new StreamWriter(new FileStream(datasetStatsFilePath, FileMode.Append, FileAccess.Write, FileShare.Read));
+
+                if (writeHeaders)
                 {
-                    if (writeHeaders)
+                    // Write the header line
+                    var headerNames = new List<string>()
                     {
-                        // Write the header line
-                        var headerNames = new List<string>()
-                        {
-                            "Dataset",
-                            "ScanCount",
-                            "ScanCountMS",
-                            "ScanCountMSn",
-                            "Elution_Time_Max",
-                            "AcqTimeMinutes",
-                            "StartTime",
-                            "EndTime",
-                            "FileSizeBytes",
-                            "SampleName",
-                            "Comment1",
-                            "Comment2"
-                        };
-
-                        writer.WriteLine(string.Join("\t", headerNames));
-                    }
-
-                    var dataValues = new List<string>()
-                    {
-                        datasetName,
-                        (summaryStats.MSStats.ScanCount + summaryStats.MSnStats.ScanCount).ToString(),
-                        summaryStats.MSStats.ScanCount.ToString(),
-                        summaryStats.MSnStats.ScanCount.ToString(),
-                        summaryStats.ElutionTimeMax.ToString("0.00"),
-                        datasetInfo.AcqTimeEnd.Subtract(datasetInfo.AcqTimeStart).TotalMinutes.ToString("0.00"),
-                        datasetInfo.AcqTimeStart.ToString(DATE_TIME_FORMAT_STRING),
-                        datasetInfo.AcqTimeEnd.ToString(DATE_TIME_FORMAT_STRING),
-                        datasetInfo.FileSizeBytes.ToString(),
-                        FixNull(oSampleInfo.SampleName),
-                        FixNull(oSampleInfo.Comment1),
-                        FixNull(oSampleInfo.Comment2)
+                        "Dataset",
+                        "ScanCount",
+                        "ScanCountMS",
+                        "ScanCountMSn",
+                        "Elution_Time_Max",
+                        "AcqTimeMinutes",
+                        "StartTime",
+                        "EndTime",
+                        "FileSizeBytes",
+                        "SampleName",
+                        "Comment1",
+                        "Comment2"
                     };
 
-                    writer.WriteLine(string.Join("\t", dataValues));
+                    writer.WriteLine(string.Join("\t", headerNames));
                 }
+
+                var dataValues = new List<string>()
+                {
+                    datasetName,
+                    (summaryStats.MSStats.ScanCount + summaryStats.MSnStats.ScanCount).ToString(),
+                    summaryStats.MSStats.ScanCount.ToString(),
+                    summaryStats.MSnStats.ScanCount.ToString(),
+                    summaryStats.ElutionTimeMax.ToString("0.00"),
+                    datasetInfo.AcqTimeEnd.Subtract(datasetInfo.AcqTimeStart).TotalMinutes.ToString("0.00"),
+                    datasetInfo.AcqTimeStart.ToString(DATE_TIME_FORMAT_STRING),
+                    datasetInfo.AcqTimeEnd.ToString(DATE_TIME_FORMAT_STRING),
+                    datasetInfo.FileSizeBytes.ToString(),
+                    FixNull(oSampleInfo.SampleName),
+                    FixNull(oSampleInfo.Comment1),
+                    FixNull(oSampleInfo.Comment2)
+                };
+
+                writer.WriteLine(string.Join("\t", dataValues));
 
                 return true;
             }

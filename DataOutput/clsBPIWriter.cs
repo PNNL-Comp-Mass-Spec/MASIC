@@ -91,29 +91,28 @@ namespace MASIC.DataOutput
             var scansWritten = 0;
             var lastStatus = DateTime.UtcNow;
 
-            using (var writer = new StreamWriter(outputFilePath))
+            using var writer = new StreamWriter(outputFilePath);
+
+            // Write the file headers
+            WriteDecon2LSScanFileHeaders(writer);
+
+            // Step through the scans and write each one
+            foreach (var scanItem in scanList)
             {
-                // Write the file headers
-                WriteDecon2LSScanFileHeaders(writer);
+                WriteDecon2LSScanFileEntry(writer, scanItem, spectraCache);
 
-                // Step through the scans and write each one
-                foreach (var scanItem in scanList)
+                if (scansWritten % 250 == 0)
                 {
-                    WriteDecon2LSScanFileEntry(writer, scanItem, spectraCache);
+                    UpdateCacheStats(spectraCache);
 
-                    if (scansWritten % 250 == 0)
+                    if (DateTime.UtcNow.Subtract(lastStatus).TotalSeconds >= 30)
                     {
-                        UpdateCacheStats(spectraCache);
-
-                        if (DateTime.UtcNow.Subtract(lastStatus).TotalSeconds >= 30)
-                        {
-                            lastStatus = DateTime.UtcNow;
-                            ReportMessage(string.Format("  {0} / {1} scans processed", scansWritten, scanList.Count));
-                        }
+                        lastStatus = DateTime.UtcNow;
+                        ReportMessage(string.Format("  {0} / {1} scans processed", scansWritten, scanList.Count));
                     }
-
-                    scansWritten++;
                 }
+
+                scansWritten++;
             }
         }
 

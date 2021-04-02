@@ -67,34 +67,33 @@ namespace MASIC.Plots
 
                 var outputFilePath = Path.Combine(outputDirectory.FullName, "index.html");
 
-                using (var writer = new StreamWriter(new FileStream(outputFilePath, FileMode.Create, FileAccess.Write, FileShare.Read)))
+                using var writer = new StreamWriter(new FileStream(outputFilePath, FileMode.Create, FileAccess.Write, FileShare.Read));
+
+                // Add HTML headers and <table>
+                AppendHTMLHeader(writer, DatasetName);
+
+                // Add the SIC peak stats histograms (X vs. Y plots)
+                AppendPlots(writer, PlotContainerBase.PlotCategories.SelectedIonChromatogramPeakStats);
+
+                // Add the bar charts (if defined)
+                AppendPlots(writer, PlotContainerBase.PlotCategories.ReporterIonObservationRate);
+
+                // Add the reporter ion intensity stats box plot and histogram of observation count by channel (if defined)
+                var intensityStatPlotCount = AppendPlots(
+                    writer,
+                    PlotContainerBase.PlotCategories.ReporterIonIntensityStats,
+                    DatasetName,
+                    outputDirectoryPath);
+
+                // If this dataset has reporter ions, the ReporterIonIntensityStats row will include a plot on the left and a link to the dataset on the right
+                // Otherwise, if there are no reporter ions, we need to append another row with a link to DMS
+                if (intensityStatPlotCount == 0)
                 {
-                    // Add HTML headers and <table>
-                    AppendHTMLHeader(writer, DatasetName);
-
-                    // Add the SIC peak stats histograms (X vs. Y plots)
-                    AppendPlots(writer, PlotContainerBase.PlotCategories.SelectedIonChromatogramPeakStats);
-
-                    // Add the bar charts (if defined)
-                    AppendPlots(writer, PlotContainerBase.PlotCategories.ReporterIonObservationRate);
-
-                    // Add the reporter ion intensity stats box plot and histogram of observation count by channel (if defined)
-                    var intensityStatPlotCount = AppendPlots(
-                        writer,
-                        PlotContainerBase.PlotCategories.ReporterIonIntensityStats,
-                        DatasetName,
-                        outputDirectoryPath);
-
-                    // If this dataset has reporter ions, the ReporterIonIntensityStats row will include a plot on the left and a link to the dataset on the right
-                    // Otherwise, if there are no reporter ions, we need to append another row with a link to DMS
-                    if (intensityStatPlotCount == 0)
-                    {
-                        AppendDatasetInfo(writer, DatasetName, outputDirectoryPath);
-                    }
-
-                    // Add </table> and HTML footers
-                    AppendHTMLFooter(writer);
+                    AppendDatasetInfo(writer, DatasetName, outputDirectoryPath);
                 }
+
+                // Add </table> and HTML footers
+                AppendHTMLFooter(writer);
 
                 return true;
             }

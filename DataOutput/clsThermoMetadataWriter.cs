@@ -45,17 +45,16 @@ namespace MASIC.DataOutput
 
                     outputFilePath = dataOutputHandler.OutputFileHandles.MSMethodFilePathBase + methodNum + ".txt";
 
-                    using (var writer = new StreamWriter(outputFilePath, false))
-                    {
-                        var fileInfo = rawFileReader.FileInfo;
-                        writer.WriteLine("Instrument model: " + fileInfo.InstModel);
-                        writer.WriteLine("Instrument name: " + fileInfo.InstName);
-                        writer.WriteLine("Instrument description: " + fileInfo.InstrumentDescription);
-                        writer.WriteLine("Instrument serial number: " + fileInfo.InstSerialNumber);
-                        writer.WriteLine();
+                    using var writer = new StreamWriter(outputFilePath, false);
 
-                        writer.WriteLine(rawFileReader.FileInfo.InstMethods[index]);
-                    }
+                    var fileInfo = rawFileReader.FileInfo;
+                    writer.WriteLine("Instrument model: " + fileInfo.InstModel);
+                    writer.WriteLine("Instrument name: " + fileInfo.InstName);
+                    writer.WriteLine("Instrument description: " + fileInfo.InstrumentDescription);
+                    writer.WriteLine("Instrument serial number: " + fileInfo.InstSerialNumber);
+                    writer.WriteLine();
+
+                    writer.WriteLine(rawFileReader.FileInfo.InstMethods[index]);
                 }
             }
             catch (Exception ex)
@@ -107,14 +106,13 @@ namespace MASIC.DataOutput
 
                     outputFilePath = dataOutputHandler.OutputFileHandles.MSTuneFilePathBase + tuneInfoNum + ".txt";
 
-                    using (var writer = new StreamWriter(outputFilePath, false))
-                    {
-                        writer.WriteLine("Category" + TAB_DELIMITER + "Name" + TAB_DELIMITER + "Value");
+                    using var writer = new StreamWriter(outputFilePath, false);
 
-                        foreach (var setting in rawFileReader.FileInfo.TuneMethods[index].Settings)
-                            writer.WriteLine(setting.Category + TAB_DELIMITER + setting.Name + TAB_DELIMITER + setting.Value);
-                        writer.WriteLine();
-                    }
+                    writer.WriteLine("Category" + TAB_DELIMITER + "Name" + TAB_DELIMITER + "Value");
+
+                    foreach (var setting in rawFileReader.FileInfo.TuneMethods[index].Settings)
+                        writer.WriteLine(setting.Category + TAB_DELIMITER + setting.Name + TAB_DELIMITER + setting.Value);
+                    writer.WriteLine();
                 }
             }
             catch (Exception ex)

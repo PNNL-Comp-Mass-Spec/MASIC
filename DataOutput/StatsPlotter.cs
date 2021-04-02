@@ -490,13 +490,12 @@ namespace MASIC.DataOutput
                 var outputFilePath = Path.Combine(outputDirectory, string.Format("{0}_{1}.txt", datasetName, fileSuffix));
                 OnDebugEvent("Saving " + PathUtils.CompactPathString(outputFilePath, 120));
 
-                using (var writer = new StreamWriter(new FileStream(outputFilePath, FileMode.Create, FileAccess.Write, FileShare.ReadWrite)))
+                using var writer = new StreamWriter(new FileStream(outputFilePath, FileMode.Create, FileAccess.Write, FileShare.ReadWrite));
+
+                writer.WriteLine("{0}\t{1}", dataColumnHeader, "Count");
+                foreach (var dataPoint in histogramData)
                 {
-                    writer.WriteLine("{0}\t{1}", dataColumnHeader, "Count");
-                    foreach (var dataPoint in histogramData)
-                    {
-                        writer.WriteLine("{0:0.0#}\t{1}", dataPoint.Key, dataPoint.Value);
-                    }
+                    writer.WriteLine("{0:0.0#}\t{1}", dataPoint.Key, dataPoint.Value);
                 }
 
                 return true;
@@ -544,42 +543,41 @@ namespace MASIC.DataOutput
 
                 columnWidths.Add("Reporter_Ion", "Reporter_Ion".Length);
 
-                using (var writer = new StreamWriter(new FileStream(outputFilePath, FileMode.Create, FileAccess.Write, FileShare.ReadWrite)))
+                using var writer = new StreamWriter(new FileStream(outputFilePath, FileMode.Create, FileAccess.Write, FileShare.ReadWrite));
+
+                for (var i = 0; i < 2; i++)
                 {
-                    for (var i = 0; i < 2; i++)
+                    if (i > 0)
+                        writer.WriteLine();
+
+                    // Write the header line
+                    var dataLine = new List<string> {
+                        "Reporter_Ion"
+                    };
+
+                    var statNameSuffix = i == 0 ? statNameSuffixTopNPct : string.Empty;
+
+                    foreach (var statName in statNames)
                     {
-                        if (i > 0)
-                            writer.WriteLine();
+                        var columnName = string.Format("{0}{1}", statName, statNameSuffix);
+                        var totalWidth = columnWidths[columnName];
+                        dataLine.Add(columnName.PadRight(totalWidth));
+                    }
+                    writer.WriteLine(string.Join("\t", dataLine));
 
-                        // Write the header line
-                        var dataLine = new List<string> {
-                            "Reporter_Ion"
-                        };
+                    foreach (var reporterIonIndex in reporterIonNames.Keys)
+                    {
+                        dataLine.Clear();
+                        dataLine.Add(reporterIonNames[reporterIonIndex].PadRight("Reporter_Ion".Length));
 
-                        var statNameSuffix = i == 0 ? statNameSuffixTopNPct : string.Empty;
+                        AppendReporterIonStats(
+                            dataLine,
+                            i == 0 ? reporterIonIntensityStatsHighAbundance : reporterIonIntensityStats,
+                            reporterIonIndex,
+                            columnWidths,
+                            statNameSuffixTopNPct);
 
-                        foreach (var statName in statNames)
-                        {
-                            var columnName = string.Format("{0}{1}", statName, statNameSuffix);
-                            var totalWidth = columnWidths[columnName];
-                            dataLine.Add(columnName.PadRight(totalWidth));
-                        }
                         writer.WriteLine(string.Join("\t", dataLine));
-
-                        foreach (var reporterIonIndex in reporterIonNames.Keys)
-                        {
-                            dataLine.Clear();
-                            dataLine.Add(reporterIonNames[reporterIonIndex].PadRight("Reporter_Ion".Length));
-
-                            AppendReporterIonStats(
-                                dataLine,
-                                i == 0 ? reporterIonIntensityStatsHighAbundance : reporterIonIntensityStats,
-                                reporterIonIndex,
-                                columnWidths,
-                                statNameSuffixTopNPct);
-
-                            writer.WriteLine(string.Join("\t", dataLine));
-                        }
                     }
                 }
 
@@ -605,18 +603,17 @@ namespace MASIC.DataOutput
                 var outputFilePath = Path.Combine(outputDirectory, string.Format("{0}_{1}", datasetName, fileSuffix));
                 OnDebugEvent("Saving " + PathUtils.CompactPathString(outputFilePath, 120));
 
-                using (var writer = new StreamWriter(new FileStream(outputFilePath, FileMode.Create, FileAccess.Write, FileShare.ReadWrite)))
-                {
-                    var observationRateHighAbundance = string.Format("Observation_Rate_Top{0}Pct", Options.PlotOptions.ReporterIonObservationRateTopNPct);
+                using var writer = new StreamWriter(new FileStream(outputFilePath, FileMode.Create, FileAccess.Write, FileShare.ReadWrite));
 
-                    writer.WriteLine("{0}\t{1}\t{2}", "Reporter_Ion", "Observation_Rate", observationRateHighAbundance);
-                    foreach (var reporterIonIndex in reporterIonNames.Keys)
-                    {
-                        writer.WriteLine("{0,-12}\t{1,-16:0.0##}\t{2:0.0##}",
-                            reporterIonNames[reporterIonIndex],
-                            reporterIonObservationRateData[reporterIonIndex],
-                            reporterIonObservationRateHighAbundanceData[reporterIonIndex]);
-                    }
+                var observationRateHighAbundance = string.Format("Observation_Rate_Top{0}Pct", Options.PlotOptions.ReporterIonObservationRateTopNPct);
+
+                writer.WriteLine("{0}\t{1}\t{2}", "Reporter_Ion", "Observation_Rate", observationRateHighAbundance);
+                foreach (var reporterIonIndex in reporterIonNames.Keys)
+                {
+                    writer.WriteLine("{0,-12}\t{1,-16:0.0##}\t{2:0.0##}",
+                        reporterIonNames[reporterIonIndex],
+                        reporterIonObservationRateData[reporterIonIndex],
+                        reporterIonObservationRateHighAbundanceData[reporterIonIndex]);
                 }
 
                 return true;

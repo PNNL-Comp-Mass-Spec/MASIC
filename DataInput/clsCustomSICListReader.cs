@@ -116,135 +116,134 @@ namespace MASIC.DataInput
                 // GetColumnValue will simply return the default value
                 DataTableUtils.GetColumnValueThrowExceptions = false;
 
-                using (var reader = new StreamReader(new FileStream(customSICValuesFileName, FileMode.Open, FileAccess.Read, FileShare.Read)))
-                {
-                    var linesRead = 0;
-                    while (!reader.EndOfStream)
-                    {
-                        var dataLine = reader.ReadLine();
-                        if (dataLine == null)
-                            continue;
+                using var reader = new StreamReader(new FileStream(customSICValuesFileName, FileMode.Open, FileAccess.Read, FileShare.Read));
 
-                        if (linesRead == 0 && !dataLine.Contains("\t"))
+                var linesRead = 0;
+                while (!reader.EndOfStream)
+                {
+                    var dataLine = reader.ReadLine();
+                    if (dataLine == null)
+                        continue;
+
+                    if (linesRead == 0 && !dataLine.Contains("\t"))
+                    {
+                        // Split on commas instead of tab characters
+                        delimiterList = new[] { ',' };
+                    }
+
+                    var dataCols = dataLine.Split(delimiterList);
+
+                    if (dataCols.Length == 0)
+                        continue;
+
+                    linesRead++;
+
+                    if (linesRead == 1)
+                    {
+                        // This is the first non-blank line; parse the headers
+
+                        DataTableUtils.GetColumnMappingFromHeaderLine(columnMap, dataLine, columnNamesByIdentifier);
+
+                        // Make sure that, at a minimum, the MZ column is present
+                        if (DataTableUtils.GetColumnIndex(columnMap, CustomSICFileColumns.MZ) < 0 )
                         {
-                            // Split on commas instead of tab characters
-                            delimiterList = new[] { ',' };
+                            var errorMessage = "Custom M/Z List file " + customSICValuesFileName + "does not have a column header named " + CUSTOM_SIC_COLUMN_MZ + " in the first row; this header is required (valid column headers are: " + GetCustomMZFileColumnHeaders() + ")";
+                            ReportError(errorMessage);
+
+                            mCustomSICList.CustomMZSearchValues.Clear();
+                            return false;
                         }
 
-                        var dataCols = dataLine.Split(delimiterList);
-
-                        if (dataCols.Length == 0)
-                            continue;
-
-                        linesRead++;
-
-                        if (linesRead == 1)
+                        if (DataTableUtils.GetColumnIndex(columnMap, CustomSICFileColumns.ScanTime) >= 0 &&
+                            DataTableUtils.GetColumnIndex(columnMap, CustomSICFileColumns.TimeTolerance) >= 0)
                         {
-                            // This is the first non-blank line; parse the headers
+                            forceAcquisitionTimeMode = true;
+                            mCustomSICList.ScanToleranceType = clsCustomSICList.CustomSICScanTypeConstants.AcquisitionTime;
+                        }
+                        else
+                        {
+                            forceAcquisitionTimeMode = false;
+                        }
 
-                            DataTableUtils.GetColumnMappingFromHeaderLine(columnMap, dataLine, columnNamesByIdentifier);
+                        continue;
+                    }
 
-                            // Make sure that, at a minimum, the MZ column is present
-                            if (DataTableUtils.GetColumnIndex(columnMap, CustomSICFileColumns.MZ) < 0 )
+                    // Parse this line's data if dataCols(0) is numeric
+                    if (!clsUtilities.IsNumber(dataCols[0]))
+                    {
+                        continue;
+                    }
+
+                    var mzSearchSpec = new clsCustomMZSearchSpec(0)
+                    {
+                        MZToleranceDa = 0,
+                        ScanOrAcqTimeCenter = 0,
+                        ScanOrAcqTimeTolerance = 0
+                    };
+
+                    var mzTarget = DataTableUtils.GetColumnValue(dataCols, columnMap, CustomSICFileColumns.MZ, string.Empty, out var mzValuePresent);
+                    if (mzValuePresent)
+                    {
+                        mzSearchSpec.MZ = ParseDouble(mzTarget, "MZ", linesRead);
+                    }
+
+                    var mzToleranceDa = DataTableUtils.GetColumnValue(dataCols, columnMap, CustomSICFileColumns.MZToleranceDa, string.Empty, out var mzTolerancePresent);
+                    if (mzTolerancePresent)
+                    {
+                        mzSearchSpec.MZToleranceDa = ParseDouble(mzToleranceDa, "MZToleranceDa", linesRead);
+                    }
+
+                    var scanCenter = DataTableUtils.GetColumnValue(dataCols, columnMap, CustomSICFileColumns.ScanCenter, string.Empty, out var scanCenterPresent);
+                    if (scanCenterPresent)
+                    {
+                        // Do not use this value if both the ScanTime and the TimeTolerance columns were present
+                        if (!forceAcquisitionTimeMode)
+                        {
+                            mzSearchSpec.ScanOrAcqTimeCenter = (float)ParseDouble(scanCenter, "ScanCenter", linesRead);
+                        }
+                    }
+
+                    var scanTolerance = DataTableUtils.GetColumnValue(dataCols, columnMap, CustomSICFileColumns.ScanTolerance, string.Empty, out var scanTolPresent);
+                    if (scanTolPresent)
+                    {
+                        // Do not use this value if both the ScanTime and the TimeTolerance columns were present
+                        if (!forceAcquisitionTimeMode)
+                        {
+                            if (mCustomSICList.ScanToleranceType == clsCustomSICList.CustomSICScanTypeConstants.Absolute)
                             {
-                                var errorMessage = "Custom M/Z List file " + customSICValuesFileName + "does not have a column header named " + CUSTOM_SIC_COLUMN_MZ + " in the first row; this header is required (valid column headers are: " + GetCustomMZFileColumnHeaders() + ")";
-                                ReportError(errorMessage);
-
-                                mCustomSICList.CustomMZSearchValues.Clear();
-                                return false;
-                            }
-
-                            if (DataTableUtils.GetColumnIndex(columnMap, CustomSICFileColumns.ScanTime) >= 0 &&
-                                DataTableUtils.GetColumnIndex(columnMap, CustomSICFileColumns.TimeTolerance) >= 0)
-                            {
-                                forceAcquisitionTimeMode = true;
-                                mCustomSICList.ScanToleranceType = clsCustomSICList.CustomSICScanTypeConstants.AcquisitionTime;
+                                mzSearchSpec.ScanOrAcqTimeTolerance = int.Parse(scanTolerance);
                             }
                             else
                             {
-                                forceAcquisitionTimeMode = false;
-                            }
-
-                            continue;
-                        }
-
-                        // Parse this line's data if dataCols(0) is numeric
-                        if (!clsUtilities.IsNumber(dataCols[0]))
-                        {
-                            continue;
-                        }
-
-                        var mzSearchSpec = new clsCustomMZSearchSpec(0)
-                        {
-                            MZToleranceDa = 0,
-                            ScanOrAcqTimeCenter = 0,
-                            ScanOrAcqTimeTolerance = 0
-                        };
-
-                        var mzTarget = DataTableUtils.GetColumnValue(dataCols, columnMap, CustomSICFileColumns.MZ, string.Empty, out var mzValuePresent);
-                        if (mzValuePresent)
-                        {
-                            mzSearchSpec.MZ = ParseDouble(mzTarget, "MZ", linesRead);
-                        }
-
-                        var mzToleranceDa = DataTableUtils.GetColumnValue(dataCols, columnMap, CustomSICFileColumns.MZToleranceDa, string.Empty, out var mzTolerancePresent);
-                        if (mzTolerancePresent)
-                        {
-                            mzSearchSpec.MZToleranceDa = ParseDouble(mzToleranceDa, "MZToleranceDa", linesRead);
-                        }
-
-                        var scanCenter = DataTableUtils.GetColumnValue(dataCols, columnMap, CustomSICFileColumns.ScanCenter, string.Empty, out var scanCenterPresent);
-                        if (scanCenterPresent)
-                        {
-                            // Do not use this value if both the ScanTime and the TimeTolerance columns were present
-                            if (!forceAcquisitionTimeMode)
-                            {
-                                mzSearchSpec.ScanOrAcqTimeCenter = (float)ParseDouble(scanCenter, "ScanCenter", linesRead);
+                                // Includes .Relative and .AcquisitionTime
+                                mzSearchSpec.ScanOrAcqTimeTolerance = (float)ParseDouble(scanTolerance, "ScanTolerance", linesRead);
                             }
                         }
-
-                        var scanTolerance = DataTableUtils.GetColumnValue(dataCols, columnMap, CustomSICFileColumns.ScanTolerance, string.Empty, out var scanTolPresent);
-                        if (scanTolPresent)
-                        {
-                            // Do not use this value if both the ScanTime and the TimeTolerance columns were present
-                            if (!forceAcquisitionTimeMode)
-                            {
-                                if (mCustomSICList.ScanToleranceType == clsCustomSICList.CustomSICScanTypeConstants.Absolute)
-                                {
-                                    mzSearchSpec.ScanOrAcqTimeTolerance = int.Parse(scanTolerance);
-                                }
-                                else
-                                {
-                                    // Includes .Relative and .AcquisitionTime
-                                    mzSearchSpec.ScanOrAcqTimeTolerance = (float)ParseDouble(scanTolerance, "ScanTolerance", linesRead);
-                                }
-                            }
-                        }
-
-                        var scanTime = DataTableUtils.GetColumnValue(dataCols, columnMap, CustomSICFileColumns.ScanTime, string.Empty, out var scanTimePresent);
-                        if (scanTimePresent)
-                        {
-                            // Only use this value if both the ScanTime and the TimeTolerance columns were present
-                            if (forceAcquisitionTimeMode)
-                            {
-                                mzSearchSpec.ScanOrAcqTimeCenter = (float)ParseDouble(scanTime, "ScanTime", linesRead);
-                            }
-                        }
-
-                        var timeTolerance = DataTableUtils.GetColumnValue(dataCols, columnMap, CustomSICFileColumns.TimeTolerance, string.Empty, out var timeTolerancePresent);
-                        if (timeTolerancePresent)
-                        {
-                            // Only use this value if both the ScanTime and the TimeTolerance columns were present
-                            if (forceAcquisitionTimeMode)
-                            {
-                                mzSearchSpec.ScanOrAcqTimeTolerance = (float)ParseDouble(timeTolerance, "TimeTolerance", linesRead);
-                            }
-                        }
-
-                        mzSearchSpec.Comment = DataTableUtils.GetColumnValue(dataCols, columnMap, CustomSICFileColumns.Comment);
-
-                        mCustomSICList.AddMzSearchTarget(mzSearchSpec);
                     }
+
+                    var scanTime = DataTableUtils.GetColumnValue(dataCols, columnMap, CustomSICFileColumns.ScanTime, string.Empty, out var scanTimePresent);
+                    if (scanTimePresent)
+                    {
+                        // Only use this value if both the ScanTime and the TimeTolerance columns were present
+                        if (forceAcquisitionTimeMode)
+                        {
+                            mzSearchSpec.ScanOrAcqTimeCenter = (float)ParseDouble(scanTime, "ScanTime", linesRead);
+                        }
+                    }
+
+                    var timeTolerance = DataTableUtils.GetColumnValue(dataCols, columnMap, CustomSICFileColumns.TimeTolerance, string.Empty, out var timeTolerancePresent);
+                    if (timeTolerancePresent)
+                    {
+                        // Only use this value if both the ScanTime and the TimeTolerance columns were present
+                        if (forceAcquisitionTimeMode)
+                        {
+                            mzSearchSpec.ScanOrAcqTimeTolerance = (float)ParseDouble(timeTolerance, "TimeTolerance", linesRead);
+                        }
+                    }
+
+                    mzSearchSpec.Comment = DataTableUtils.GetColumnValue(dataCols, columnMap, CustomSICFileColumns.Comment);
+
+                    mCustomSICList.AddMzSearchTarget(mzSearchSpec);
                 }
             }
             catch (Exception ex)

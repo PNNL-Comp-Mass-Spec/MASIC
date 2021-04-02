@@ -644,96 +644,95 @@ namespace MASIC.DataOutput
 
                 var reporterIonMzMatcher = new Regex(@"^Ion_(?<Mz>[0-9.]+)(?<ReporterIonIndex>_\d+)?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
-                using (var reader = new StreamReader(new FileStream(reporterIonsFile.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)))
+                using var reader = new StreamReader(new FileStream(reporterIonsFile.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite));
+
+                var linesRead = 0;
+
+                while (!reader.EndOfStream)
                 {
-                    var linesRead = 0;
+                    var dataLine = reader.ReadLine();
+                    if (dataLine == null)
+                        continue;
 
-                    while (!reader.EndOfStream)
+                    var dataValues = dataLine.Split('\t');
+
+                    if (dataValues.Length == 0)
+                        continue;
+
+                    linesRead++;
+
+                    if (linesRead == 1)
                     {
-                        var dataLine = reader.ReadLine();
-                        if (dataLine == null)
-                            continue;
+                        // This is the first non-blank line; parse the headers
+                        DbUtils.GetColumnMappingFromHeaderLine(columnMap, dataLine, columnNamesByIdentifier);
 
-                        var dataValues = dataLine.Split('\t');
-
-                        if (dataValues.Length == 0)
-                            continue;
-
-                        linesRead++;
-
-                        if (linesRead == 1)
+                        // Assure that required columns are present
+                        foreach (var columnId in requiredColumns)
                         {
-                            // This is the first non-blank line; parse the headers
-                            DbUtils.GetColumnMappingFromHeaderLine(columnMap, dataLine, columnNamesByIdentifier);
-
-                            // Assure that required columns are present
-                            foreach (var columnId in requiredColumns)
+                            if (DbUtils.GetColumnIndex(columnMap, columnId) < 0)
                             {
-                                if (DbUtils.GetColumnIndex(columnMap, columnId) < 0)
-                                {
-                                    OnWarningEvent(string.Format("File {0} is missing required column {1}", reporterIonsFile.FullName, columnId));
-                                    return false;
-                                }
+                                OnWarningEvent(string.Format("File {0} is missing required column {1}", reporterIonsFile.FullName, columnId));
+                                return false;
                             }
-
-                            // Determine the column indices of the reporter ion abundance columns
-
-                            // Reporter ion column names are of the form:
-                            // Ion_126.128 or Ion_116
-
-                            // If there is a name conflict due to two reporter ions having the same rounded mass,
-                            // a uniquifier will have been appended, e.g. Ion_116_2
-
-                            for (var columnIndex = 0; columnIndex < dataValues.Length; columnIndex++)
-                            {
-                                var columnName = dataValues[columnIndex];
-
-                                if (columnMap.ContainsValue(columnIndex) || !columnName.StartsWith(clsReporterIonProcessor.REPORTER_ION_COLUMN_PREFIX))
-                                    continue;
-
-                                var reporterIonMatch = reporterIonMzMatcher.Match(columnName);
-
-                                if (!reporterIonMatch.Success)
-                                {
-                                    // Although this column starts with Ion_, it is not a reporter ion intensity column
-                                    // Example columns that are skipped:
-                                    // Ion_126.128_ObsMZ
-                                    // Ion_126.128_OriginalIntensity
-                                    // Ion_126.128_SignalToNoise
-                                    // Ion_126.128_Resolution
-                                    continue;
-                                }
-
-                                var reporterIonMz = double.Parse(reporterIonMatch.Groups["Mz"].Value);
-                                var reporterIon = new clsReporterIonInfo(reporterIonMz);
-
-                                mReporterIonInfo.Add(columnIndex, reporterIon);
-                                mReporterIonAbundances.Add(columnIndex, new Dictionary<int, double>());
-
-                                ReporterIonNames.Add(columnIndex, columnName);
-                            }
-
-                            continue;
                         }
 
-                        var scanNumber = DbUtils.GetColumnValue(dataValues, columnMap, ReporterIonsColumns.ScanNumber, 0);
-                        // Skip: var collisionMode = DbUtils.GetColumnValue(dataValues, columnMap, ReporterIonsColumns.CollisionMode);
-                        // Skip: var parentIonMZ = DbUtils.GetColumnValue(dataValues, columnMap, ReporterIonsColumns.ParentIonMZ, 0.0);
-                        // Skip: var basePeakIntensity = DbUtils.GetColumnValue(dataValues, columnMap, ReporterIonsColumns.BasePeakIntensity, 0.0);
-                        // Skip: var basePeakMZ = DbUtils.GetColumnValue(dataValues, columnMap, ReporterIonsColumns.BasePeakMZ, 0.0);
-                        // Skip: var reporterIonIntensityMax = DbUtils.GetColumnValue(dataValues, columnMap, ReporterIonsColumns.ReporterIonIntensityMax, 0.0);
-                        // Skip: var weightedAvgPctIntensityCorrection = DbUtils.GetColumnValue(dataValues, columnMap, ReporterIonsColumns.WeightedAvgPctIntensityCorrection, 0.0);
+                        // Determine the column indices of the reporter ion abundance columns
 
-                        foreach (var columnIndex in mReporterIonInfo.Keys)
+                        // Reporter ion column names are of the form:
+                        // Ion_126.128 or Ion_116
+
+                        // If there is a name conflict due to two reporter ions having the same rounded mass,
+                        // a uniquifier will have been appended, e.g. Ion_116_2
+
+                        for (var columnIndex = 0; columnIndex < dataValues.Length; columnIndex++)
                         {
-                            if (double.TryParse(dataValues[columnIndex], out var reporterIonAbundance))
+                            var columnName = dataValues[columnIndex];
+
+                            if (columnMap.ContainsValue(columnIndex) || !columnName.StartsWith(clsReporterIonProcessor.REPORTER_ION_COLUMN_PREFIX))
+                                continue;
+
+                            var reporterIonMatch = reporterIonMzMatcher.Match(columnName);
+
+                            if (!reporterIonMatch.Success)
                             {
-                                mReporterIonAbundances[columnIndex].Add(scanNumber, reporterIonAbundance);
+                                // Although this column starts with Ion_, it is not a reporter ion intensity column
+                                // Example columns that are skipped:
+                                // Ion_126.128_ObsMZ
+                                // Ion_126.128_OriginalIntensity
+                                // Ion_126.128_SignalToNoise
+                                // Ion_126.128_Resolution
+                                continue;
                             }
-                            else
-                            {
-                                mReporterIonAbundances[columnIndex].Add(scanNumber, 0);
-                            }
+
+                            var reporterIonMz = double.Parse(reporterIonMatch.Groups["Mz"].Value);
+                            var reporterIon = new clsReporterIonInfo(reporterIonMz);
+
+                            mReporterIonInfo.Add(columnIndex, reporterIon);
+                            mReporterIonAbundances.Add(columnIndex, new Dictionary<int, double>());
+
+                            ReporterIonNames.Add(columnIndex, columnName);
+                        }
+
+                        continue;
+                    }
+
+                    var scanNumber = DbUtils.GetColumnValue(dataValues, columnMap, ReporterIonsColumns.ScanNumber, 0);
+                    // Skip: var collisionMode = DbUtils.GetColumnValue(dataValues, columnMap, ReporterIonsColumns.CollisionMode);
+                    // Skip: var parentIonMZ = DbUtils.GetColumnValue(dataValues, columnMap, ReporterIonsColumns.ParentIonMZ, 0.0);
+                    // Skip: var basePeakIntensity = DbUtils.GetColumnValue(dataValues, columnMap, ReporterIonsColumns.BasePeakIntensity, 0.0);
+                    // Skip: var basePeakMZ = DbUtils.GetColumnValue(dataValues, columnMap, ReporterIonsColumns.BasePeakMZ, 0.0);
+                    // Skip: var reporterIonIntensityMax = DbUtils.GetColumnValue(dataValues, columnMap, ReporterIonsColumns.ReporterIonIntensityMax, 0.0);
+                    // Skip: var weightedAvgPctIntensityCorrection = DbUtils.GetColumnValue(dataValues, columnMap, ReporterIonsColumns.WeightedAvgPctIntensityCorrection, 0.0);
+
+                    foreach (var columnIndex in mReporterIonInfo.Keys)
+                    {
+                        if (double.TryParse(dataValues[columnIndex], out var reporterIonAbundance))
+                        {
+                            mReporterIonAbundances[columnIndex].Add(scanNumber, reporterIonAbundance);
+                        }
+                        else
+                        {
+                            mReporterIonAbundances[columnIndex].Add(scanNumber, 0);
                         }
                     }
                 }
@@ -785,71 +784,70 @@ namespace MASIC.DataOutput
                     ScanStatsColumns.ScanTime,
                 };
 
-                using (var reader = new StreamReader(new FileStream(scanStatsFile.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)))
+                using var reader = new StreamReader(new FileStream(scanStatsFile.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite));
+
+                var linesRead = 0;
+
+                while (!reader.EndOfStream)
                 {
-                    var linesRead = 0;
+                    var dataLine = reader.ReadLine();
+                    if (dataLine == null)
+                        continue;
 
-                    while (!reader.EndOfStream)
+                    var dataValues = dataLine.Split('\t');
+
+                    if (dataValues.Length == 0)
+                        continue;
+
+                    linesRead++;
+
+                    if (linesRead == 1)
                     {
-                        var dataLine = reader.ReadLine();
-                        if (dataLine == null)
-                            continue;
+                        // This is the first non-blank line; parse the headers
+                        DbUtils.GetColumnMappingFromHeaderLine(columnMap, dataLine, columnNamesByIdentifier);
 
-                        var dataValues = dataLine.Split('\t');
-
-                        if (dataValues.Length == 0)
-                            continue;
-
-                        linesRead++;
-
-                        if (linesRead == 1)
+                        // Assure that required columns are present
+                        foreach (var columnId in requiredColumns)
                         {
-                            // This is the first non-blank line; parse the headers
-                            DbUtils.GetColumnMappingFromHeaderLine(columnMap, dataLine, columnNamesByIdentifier);
-
-                            // Assure that required columns are present
-                            foreach (var columnId in requiredColumns)
+                            if (DbUtils.GetColumnIndex(columnMap, columnId) < 0)
                             {
-                                if (DbUtils.GetColumnIndex(columnMap, columnId) < 0)
-                                {
-                                    OnWarningEvent(string.Format("File {0} is missing required column {1}", scanStatsFile.FullName, columnId));
-                                    return false;
-                                }
+                                OnWarningEvent(string.Format("File {0} is missing required column {1}", scanStatsFile.FullName, columnId));
+                                return false;
                             }
-                            continue;
                         }
-
-                        var scanNumber = DbUtils.GetColumnValue(dataValues, columnMap, ScanStatsColumns.ScanNumber, 0);
-                        var scanTime = DbUtils.GetColumnValue(dataValues, columnMap, ScanStatsColumns.ScanTime, 0.0);
-                        // Skip: var scanType = DbUtils.GetColumnValue(dataValues, columnMap, ScanStatsColumns.ScanType, 0);
-                        var totalIonIntensity = DbUtils.GetColumnValue(dataValues, columnMap, ScanStatsColumns.TotalIonIntensity, 0.0);
-                        var basePeakIntensity = DbUtils.GetColumnValue(dataValues, columnMap, ScanStatsColumns.BasePeakIntensity, 0.0);
-                        var basePeakMZ = DbUtils.GetColumnValue(dataValues, columnMap, ScanStatsColumns.BasePeakMZ, 0.0);
-                        // Skip: var basePeakSignalToNoiseRatio = DbUtils.GetColumnValue(dataValues, columnMap, ScanStatsColumns.BasePeakSignalToNoiseRatio, 0.0);
-                        var ionCount = DbUtils.GetColumnValue(dataValues, columnMap, ScanStatsColumns.IonCount, 0);
-                        var ionCountRaw = DbUtils.GetColumnValue(dataValues, columnMap, ScanStatsColumns.IonCountRaw, 0);
-                        var scanTypeName = DbUtils.GetColumnValue(dataValues, columnMap, ScanStatsColumns.ScanTypeName);
-
-                        var scanInfo = new clsScanInfo()
-                        {
-                            ScanNumber = scanNumber,
-                            ScanTime = (float)scanTime,
-                            ScanTypeName = scanTypeName,
-                            TotalIonIntensity = totalIonIntensity,
-                            BasePeakIonIntensity = basePeakIntensity,
-                            BasePeakIonMZ = basePeakMZ,
-                            IonCount = ionCount,
-                            IonCountRaw = ionCountRaw
-                        };
-
-                        if (mScanList.ContainsKey(scanNumber))
-                        {
-                            OnWarningEvent(string.Format("Ignoring duplicate scan {0} found in {1}", scanNumber, scanStatsFile.Name));
-                            continue;
-                        }
-
-                        mScanList.Add(scanNumber, scanInfo);
+                        continue;
                     }
+
+                    var scanNumber = DbUtils.GetColumnValue(dataValues, columnMap, ScanStatsColumns.ScanNumber, 0);
+                    var scanTime = DbUtils.GetColumnValue(dataValues, columnMap, ScanStatsColumns.ScanTime, 0.0);
+                    // Skip: var scanType = DbUtils.GetColumnValue(dataValues, columnMap, ScanStatsColumns.ScanType, 0);
+                    var totalIonIntensity = DbUtils.GetColumnValue(dataValues, columnMap, ScanStatsColumns.TotalIonIntensity, 0.0);
+                    var basePeakIntensity = DbUtils.GetColumnValue(dataValues, columnMap, ScanStatsColumns.BasePeakIntensity, 0.0);
+                    var basePeakMZ = DbUtils.GetColumnValue(dataValues, columnMap, ScanStatsColumns.BasePeakMZ, 0.0);
+                    // Skip: var basePeakSignalToNoiseRatio = DbUtils.GetColumnValue(dataValues, columnMap, ScanStatsColumns.BasePeakSignalToNoiseRatio, 0.0);
+                    var ionCount = DbUtils.GetColumnValue(dataValues, columnMap, ScanStatsColumns.IonCount, 0);
+                    var ionCountRaw = DbUtils.GetColumnValue(dataValues, columnMap, ScanStatsColumns.IonCountRaw, 0);
+                    var scanTypeName = DbUtils.GetColumnValue(dataValues, columnMap, ScanStatsColumns.ScanTypeName);
+
+                    var scanInfo = new clsScanInfo()
+                    {
+                        ScanNumber = scanNumber,
+                        ScanTime = (float)scanTime,
+                        ScanTypeName = scanTypeName,
+                        TotalIonIntensity = totalIonIntensity,
+                        BasePeakIonIntensity = basePeakIntensity,
+                        BasePeakIonMZ = basePeakMZ,
+                        IonCount = ionCount,
+                        IonCountRaw = ionCountRaw
+                    };
+
+                    if (mScanList.ContainsKey(scanNumber))
+                    {
+                        OnWarningEvent(string.Format("Ignoring duplicate scan {0} found in {1}", scanNumber, scanStatsFile.Name));
+                        continue;
+                    }
+
+                    mScanList.Add(scanNumber, scanInfo);
                 }
 
                 return true;
@@ -901,94 +899,93 @@ namespace MASIC.DataOutput
 
                 var duplicateParentIonIndices = new SortedSet<int>();
 
-                using (var reader = new StreamReader(new FileStream(sicStatsFile.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)))
+                using var reader = new StreamReader(new FileStream(sicStatsFile.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite));
+
+                var linesRead = 0;
+
+                while (!reader.EndOfStream)
                 {
-                    var linesRead = 0;
+                    var dataLine = reader.ReadLine();
+                    if (dataLine == null)
+                        continue;
 
-                    while (!reader.EndOfStream)
+                    var dataValues = dataLine.Split('\t');
+
+                    if (dataValues.Length == 0)
+                        continue;
+
+                    linesRead++;
+
+                    if (linesRead == 1)
                     {
-                        var dataLine = reader.ReadLine();
-                        if (dataLine == null)
-                            continue;
+                        // This is the first non-blank line; parse the headers
+                        DbUtils.GetColumnMappingFromHeaderLine(columnMap, dataLine, columnNamesByIdentifier);
 
-                        var dataValues = dataLine.Split('\t');
-
-                        if (dataValues.Length == 0)
-                            continue;
-
-                        linesRead++;
-
-                        if (linesRead == 1)
+                        // Assure that required columns are present
+                        foreach (var columnId in requiredColumns)
                         {
-                            // This is the first non-blank line; parse the headers
-                            DbUtils.GetColumnMappingFromHeaderLine(columnMap, dataLine, columnNamesByIdentifier);
-
-                            // Assure that required columns are present
-                            foreach (var columnId in requiredColumns)
+                            if (DbUtils.GetColumnIndex(columnMap, columnId) < 0)
                             {
-                                if (DbUtils.GetColumnIndex(columnMap, columnId) < 0)
-                                {
-                                    OnWarningEvent(string.Format("File {0} is missing required column {1}", sicStatsFile.FullName, columnId));
-                                    return false;
-                                }
+                                OnWarningEvent(string.Format("File {0} is missing required column {1}", sicStatsFile.FullName, columnId));
+                                return false;
                             }
-                            continue;
                         }
-
-                        var parentIonIndex = DbUtils.GetColumnValue(dataValues, columnMap, SICStatsColumns.ParentIonIndex, 0);
-                        var parentIonMz = DbUtils.GetColumnValue(dataValues, columnMap, SICStatsColumns.Mz, 0.0);
-                        var surveyScanNumber = DbUtils.GetColumnValue(dataValues, columnMap, SICStatsColumns.SurveyScanNumber, 0);
-                        var fragScanNumber = DbUtils.GetColumnValue(dataValues, columnMap, SICStatsColumns.FragScanNumber, 0);
-                        var optimalPeakApexScanNumber = DbUtils.GetColumnValue(dataValues, columnMap, SICStatsColumns.OptimalPeakApexScanNumber, 0);
-                        var peakSignalToNoiseRatio = DbUtils.GetColumnValue(dataValues, columnMap, SICStatsColumns.PeakSignalToNoiseRatio, 0.0);
-                        var fwhmInScans = DbUtils.GetColumnValue(dataValues, columnMap, SICStatsColumns.FWHMinScans, 0);
-                        var peakArea = DbUtils.GetColumnValue(dataValues, columnMap, SICStatsColumns.PeakArea, 0.0);
-                        var parentIonIntensity = DbUtils.GetColumnValue(dataValues, columnMap, SICStatsColumns.ParentIonIntensity, 0.0);
-
-                        var parentIon = new clsParentIonInfo(parentIonMz)
-                        {
-                            OptimalPeakApexScanNumber = optimalPeakApexScanNumber
-                        };
-
-                        // MASIC typically tracks scans using ScanIndex values
-                        // Instead, we're storing scan numbers here
-                        parentIon.FragScanIndices.Add(fragScanNumber);
-                        parentIon.SurveyScanIndex = surveyScanNumber;
-
-                        parentIon.SICStats.Peak.ParentIonIntensity = parentIonIntensity;
-                        parentIon.SICStats.Peak.SignalToNoiseRatio = peakSignalToNoiseRatio;
-                        parentIon.SICStats.Peak.FWHMScanWidth = fwhmInScans;
-                        parentIon.SICStats.Peak.Area = peakArea;
-
-                        if (!mParentIons.ContainsKey(parentIonIndex))
-                        {
-                            mParentIons.Add(parentIonIndex, parentIon);
-                            continue;
-                        }
-
-                        // Duplicate parent ion index
-                        // This is not typically seen, but it is possible if the same parent ion is fragmented using multiple fragmentation modes
-                        // For example, see Angiotensin_AllScans.raw at https://github.com/PNNL-Comp-Mass-Spec/MASIC/tree/master/Docs/Lumos_Example
-
-                        if (duplicateParentIonIndices.Contains(parentIonIndex))
-                            continue;
-
-                        duplicateParentIonIndices.Add(parentIonIndex);
-                        if (duplicateParentIonIndices.Count > 5)
-                            continue;
-
-                        OnWarningEvent(string.Format(
-                            "Ignoring duplicate parent ion index {0} found in {1}", parentIonIndex, sicStatsFile.Name));
+                        continue;
                     }
 
-                    if (duplicateParentIonIndices.Count > 5)
+                    var parentIonIndex = DbUtils.GetColumnValue(dataValues, columnMap, SICStatsColumns.ParentIonIndex, 0);
+                    var parentIonMz = DbUtils.GetColumnValue(dataValues, columnMap, SICStatsColumns.Mz, 0.0);
+                    var surveyScanNumber = DbUtils.GetColumnValue(dataValues, columnMap, SICStatsColumns.SurveyScanNumber, 0);
+                    var fragScanNumber = DbUtils.GetColumnValue(dataValues, columnMap, SICStatsColumns.FragScanNumber, 0);
+                    var optimalPeakApexScanNumber = DbUtils.GetColumnValue(dataValues, columnMap, SICStatsColumns.OptimalPeakApexScanNumber, 0);
+                    var peakSignalToNoiseRatio = DbUtils.GetColumnValue(dataValues, columnMap, SICStatsColumns.PeakSignalToNoiseRatio, 0.0);
+                    var fwhmInScans = DbUtils.GetColumnValue(dataValues, columnMap, SICStatsColumns.FWHMinScans, 0);
+                    var peakArea = DbUtils.GetColumnValue(dataValues, columnMap, SICStatsColumns.PeakArea, 0.0);
+                    var parentIonIntensity = DbUtils.GetColumnValue(dataValues, columnMap, SICStatsColumns.ParentIonIntensity, 0.0);
+
+                    var parentIon = new clsParentIonInfo(parentIonMz)
                     {
-                        OnWarningEvent(string.Format(
-                            // ReSharper disable once StringLiteralTypo
-                            "Ignored {0} lines in the _SICstats.txt file due to a duplicate parent ion index\n" +
-                            "This typically indicates that the same parent ion was fragmented " +
-                            "using multiple fragmentation modes, and is thus not an error", duplicateParentIonIndices.Count));
+                        OptimalPeakApexScanNumber = optimalPeakApexScanNumber
+                    };
+
+                    // MASIC typically tracks scans using ScanIndex values
+                    // Instead, we're storing scan numbers here
+                    parentIon.FragScanIndices.Add(fragScanNumber);
+                    parentIon.SurveyScanIndex = surveyScanNumber;
+
+                    parentIon.SICStats.Peak.ParentIonIntensity = parentIonIntensity;
+                    parentIon.SICStats.Peak.SignalToNoiseRatio = peakSignalToNoiseRatio;
+                    parentIon.SICStats.Peak.FWHMScanWidth = fwhmInScans;
+                    parentIon.SICStats.Peak.Area = peakArea;
+
+                    if (!mParentIons.ContainsKey(parentIonIndex))
+                    {
+                        mParentIons.Add(parentIonIndex, parentIon);
+                        continue;
                     }
+
+                    // Duplicate parent ion index
+                    // This is not typically seen, but it is possible if the same parent ion is fragmented using multiple fragmentation modes
+                    // For example, see Angiotensin_AllScans.raw at https://github.com/PNNL-Comp-Mass-Spec/MASIC/tree/master/Docs/Lumos_Example
+
+                    if (duplicateParentIonIndices.Contains(parentIonIndex))
+                        continue;
+
+                    duplicateParentIonIndices.Add(parentIonIndex);
+                    if (duplicateParentIonIndices.Count > 5)
+                        continue;
+
+                    OnWarningEvent(string.Format(
+                        "Ignoring duplicate parent ion index {0} found in {1}", parentIonIndex, sicStatsFile.Name));
+                }
+
+                if (duplicateParentIonIndices.Count > 5)
+                {
+                    OnWarningEvent(string.Format(
+                        // ReSharper disable once StringLiteralTypo
+                        "Ignored {0} lines in the _SICstats.txt file due to a duplicate parent ion index\n" +
+                        "This typically indicates that the same parent ion was fragmented " +
+                        "using multiple fragmentation modes, and is thus not an error", duplicateParentIonIndices.Count));
                 }
 
                 return true;

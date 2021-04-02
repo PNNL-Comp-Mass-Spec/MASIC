@@ -658,7 +658,7 @@ namespace MASIC
         {
             // Prompts the user to select a file to load the options from
 
-            using (var fileSelector = new OpenFileDialog()
+            using var fileSelector = new OpenFileDialog()
             {
                 AddExtension = true,
                 CheckFileExists = true,
@@ -669,43 +669,41 @@ namespace MASIC
                 ValidateNames = true,
                 Filter = "Settings files (*.xml)|*.xml|All files (*.*)|*.*",
                 FilterIndex = 1
-            })
-            {
-                var filePath = mXmlSettingsFilePath;
+            };
+            var filePath = mXmlSettingsFilePath;
 
-                if (filePath.Length > 0)
+            if (filePath.Length > 0)
+            {
+                try
                 {
-                    try
-                    {
-                        fileSelector.InitialDirectory = Directory.GetParent(filePath).ToString();
-                    }
-                    catch
-                    {
-                        fileSelector.InitialDirectory = ProcessFilesOrDirectoriesBase.GetAppDirectoryPath();
-                    }
+                    fileSelector.InitialDirectory = Directory.GetParent(filePath).ToString();
                 }
-                else
+                catch
                 {
                     fileSelector.InitialDirectory = ProcessFilesOrDirectoriesBase.GetAppDirectoryPath();
                 }
+            }
+            else
+            {
+                fileSelector.InitialDirectory = ProcessFilesOrDirectoriesBase.GetAppDirectoryPath();
+            }
 
-                if (File.Exists(filePath))
-                {
-                    fileSelector.FileName = Path.GetFileName(filePath);
-                }
+            if (File.Exists(filePath))
+            {
+                fileSelector.FileName = Path.GetFileName(filePath);
+            }
 
-                fileSelector.Title = "Specify file to load options from";
+            fileSelector.Title = "Specify file to load options from";
 
-                var result = fileSelector.ShowDialog();
-                if (result == DialogResult.Cancel)
-                    return;
+            var result = fileSelector.ShowDialog();
+            if (result == DialogResult.Cancel)
+                return;
 
-                if (fileSelector.FileName.Length > 0)
-                {
-                    mXmlSettingsFilePath = fileSelector.FileName;
+            if (fileSelector.FileName.Length > 0)
+            {
+                mXmlSettingsFilePath = fileSelector.FileName;
 
-                    IniFileLoadOptions(mXmlSettingsFilePath, updateIOPaths);
-                }
+                IniFileLoadOptions(mXmlSettingsFilePath, updateIOPaths);
             }
         }
 
@@ -808,7 +806,7 @@ namespace MASIC
         {
             // Prompts the user to select a file to load the options from
 
-            using (var fileSelector = new SaveFileDialog()
+            using var fileSelector = new SaveFileDialog()
             {
                 AddExtension = true,
                 CheckFileExists = false,
@@ -819,42 +817,40 @@ namespace MASIC
                 ValidateNames = true,
                 Filter = "Settings files (*.xml)|*.xml|All files (*.*)|*.*",
                 FilterIndex = 1
-            })
+            };
+            var filePath = mXmlSettingsFilePath;
+            if (filePath.Length > 0)
             {
-                var filePath = mXmlSettingsFilePath;
-                if (filePath.Length > 0)
+                try
                 {
-                    try
-                    {
-                        fileSelector.InitialDirectory = Directory.GetParent(filePath).ToString();
-                    }
-                    catch
-                    {
-                        fileSelector.InitialDirectory = ProcessFilesOrDirectoriesBase.GetAppDirectoryPath();
-                    }
+                    fileSelector.InitialDirectory = Directory.GetParent(filePath).ToString();
                 }
-                else
+                catch
                 {
                     fileSelector.InitialDirectory = ProcessFilesOrDirectoriesBase.GetAppDirectoryPath();
                 }
+            }
+            else
+            {
+                fileSelector.InitialDirectory = ProcessFilesOrDirectoriesBase.GetAppDirectoryPath();
+            }
 
-                if (File.Exists(filePath))
-                {
-                    fileSelector.FileName = Path.GetFileName(filePath);
-                }
+            if (File.Exists(filePath))
+            {
+                fileSelector.FileName = Path.GetFileName(filePath);
+            }
 
-                fileSelector.Title = "Specify file to save options to";
+            fileSelector.Title = "Specify file to save options to";
 
-                var result = fileSelector.ShowDialog();
-                if (result == DialogResult.Cancel)
-                    return;
+            var result = fileSelector.ShowDialog();
+            if (result == DialogResult.Cancel)
+                return;
 
-                if (fileSelector.FileName.Length > 0)
-                {
-                    mXmlSettingsFilePath = fileSelector.FileName;
+            if (fileSelector.FileName.Length > 0)
+            {
+                mXmlSettingsFilePath = fileSelector.FileName;
 
-                    IniFileSaveOptions(mXmlSettingsFilePath, false);
-                }
+                IniFileSaveOptions(mXmlSettingsFilePath, false);
             }
         }
 
@@ -1495,7 +1491,7 @@ namespace MASIC
 
         private void SelectDatasetLookupFile()
         {
-            using (var fileSelector = new OpenFileDialog()
+            using var fileSelector = new OpenFileDialog()
             {
                 AddExtension = true,
                 CheckFileExists = true,
@@ -1506,40 +1502,38 @@ namespace MASIC
                 ValidateNames = true,
                 Filter = "Text files (*.txt)|*.txt|All files (*.*)|*.*",
                 FilterIndex = 1
-            })
+            };
+            if (txtDatasetLookupFilePath.TextLength > 0)
             {
-                if (txtDatasetLookupFilePath.TextLength > 0)
+                try
                 {
-                    try
-                    {
-                        fileSelector.InitialDirectory = Directory.GetParent(txtDatasetLookupFilePath.Text).ToString();
-                    }
-                    catch
-                    {
-                        fileSelector.InitialDirectory = ProcessFilesOrDirectoriesBase.GetAppDirectoryPath();
-                    }
+                    fileSelector.InitialDirectory = Directory.GetParent(txtDatasetLookupFilePath.Text).ToString();
                 }
-                else
+                catch
                 {
                     fileSelector.InitialDirectory = ProcessFilesOrDirectoriesBase.GetAppDirectoryPath();
                 }
+            }
+            else
+            {
+                fileSelector.InitialDirectory = ProcessFilesOrDirectoriesBase.GetAppDirectoryPath();
+            }
 
-                fileSelector.Title = "Select dataset lookup file";
+            fileSelector.Title = "Select dataset lookup file";
 
-                var result = fileSelector.ShowDialog();
-                if (result == DialogResult.Cancel)
-                    return;
+            var result = fileSelector.ShowDialog();
+            if (result == DialogResult.Cancel)
+                return;
 
-                if (fileSelector.FileName.Length > 0)
-                {
-                    txtDatasetLookupFilePath.Text = fileSelector.FileName;
-                }
+            if (fileSelector.FileName.Length > 0)
+            {
+                txtDatasetLookupFilePath.Text = fileSelector.FileName;
             }
         }
 
         private void SelectCustomSICFile()
         {
-            using (var fileSelector = new OpenFileDialog()
+            using var fileSelector = new OpenFileDialog()
             {
                 AddExtension = true,
                 CheckFileExists = true,
@@ -1551,60 +1545,58 @@ namespace MASIC
                 Filter = "Text files (*.txt)|*.txt|" +
                          "CSV files (*.csv)|*.csv|" +
                          "All files (*.*)|*.*"
-            })
+            };
+            var fileExtension = ".txt";
+
+            if (txtCustomSICFileName.TextLength > 0)
             {
-                var fileExtension = ".txt";
+                fileExtension = Path.GetExtension(txtCustomSICFileName.Text);
+            }
 
-                if (txtCustomSICFileName.TextLength > 0)
-                {
-                    fileExtension = Path.GetExtension(txtCustomSICFileName.Text);
-                }
+            switch (fileExtension.ToLower())
+            {
+                case ".txt":
+                    fileSelector.FilterIndex = 1;
+                    break;
+                case "csv":
+                    fileSelector.FilterIndex = 2;
+                    break;
+                default:
+                    fileSelector.FilterIndex = 1;
+                    break;
+            }
 
-                switch (fileExtension.ToLower())
+            if (txtCustomSICFileName.TextLength > 0)
+            {
+                try
                 {
-                    case ".txt":
-                        fileSelector.FilterIndex = 1;
-                        break;
-                    case "csv":
-                        fileSelector.FilterIndex = 2;
-                        break;
-                    default:
-                        fileSelector.FilterIndex = 1;
-                        break;
+                    fileSelector.InitialDirectory = Directory.GetParent(txtCustomSICFileName.Text).ToString();
                 }
-
-                if (txtCustomSICFileName.TextLength > 0)
-                {
-                    try
-                    {
-                        fileSelector.InitialDirectory = Directory.GetParent(txtCustomSICFileName.Text).ToString();
-                    }
-                    catch
-                    {
-                        fileSelector.InitialDirectory = ProcessFilesOrDirectoriesBase.GetAppDirectoryPath();
-                    }
-                }
-                else
+                catch
                 {
                     fileSelector.InitialDirectory = ProcessFilesOrDirectoriesBase.GetAppDirectoryPath();
                 }
+            }
+            else
+            {
+                fileSelector.InitialDirectory = ProcessFilesOrDirectoriesBase.GetAppDirectoryPath();
+            }
 
-                fileSelector.Title = "Select custom SIC values file";
+            fileSelector.Title = "Select custom SIC values file";
 
-                var result = fileSelector.ShowDialog();
-                if (result == DialogResult.Cancel)
-                    return;
+            var result = fileSelector.ShowDialog();
+            if (result == DialogResult.Cancel)
+                return;
 
-                if (fileSelector.FileName.Length > 0)
-                {
-                    txtCustomSICFileName.Text = fileSelector.FileName;
-                }
+            if (fileSelector.FileName.Length > 0)
+            {
+                txtCustomSICFileName.Text = fileSelector.FileName;
             }
         }
 
         private void SelectInputFile()
         {
-            using (var fileSelector = new OpenFileDialog()
+            using var fileSelector = new OpenFileDialog()
             {
                 AddExtension = true,
                 CheckFileExists = true,
@@ -1620,75 +1612,73 @@ namespace MASIC
                          "Mascot Generic Format files (*.mgf)|*.mgf|" +
                          "CDF files (*.cdf)|*.cdf|" +
                          "All files (*.*)|*.*"
-            })
+            };
+            var fileExtension = string.Copy(mPreferredInputFileExtension);
+
+            if (txtInputFilePath.TextLength > 0)
             {
-                var fileExtension = string.Copy(mPreferredInputFileExtension);
+                fileExtension = Path.GetExtension(txtInputFilePath.Text);
+            }
 
-                if (txtInputFilePath.TextLength > 0)
+            int filterIndex;
+            switch (fileExtension.ToLower())
+            {
+                // ReSharper disable StringLiteralTypo
+                case ".mzxml":
+                    filterIndex = 2;
+                    break;
+
+                case "mzml":
+                    filterIndex = 3;
+                    break;
+
+                case ".mzdata":
+                    filterIndex = 4;
+                    break;
+
+                case ".mgf":
+                    filterIndex = 5;
+                    break;
+
+                case ".cdf":
+                    filterIndex = 6;
+                    break;
+
+                default:
+                    filterIndex = 1;
+                    break;
+
+                // ReSharper restore StringLiteralTypo
+            }
+
+            fileSelector.FilterIndex = filterIndex;
+
+            if (txtInputFilePath.TextLength > 0)
+            {
+                try
                 {
-                    fileExtension = Path.GetExtension(txtInputFilePath.Text);
+                    fileSelector.InitialDirectory = Directory.GetParent(txtInputFilePath.Text).ToString();
                 }
-
-                int filterIndex;
-                switch (fileExtension.ToLower())
-                {
-                    // ReSharper disable StringLiteralTypo
-                    case ".mzxml":
-                        filterIndex = 2;
-                        break;
-
-                    case "mzml":
-                        filterIndex = 3;
-                        break;
-
-                    case ".mzdata":
-                        filterIndex = 4;
-                        break;
-
-                    case ".mgf":
-                        filterIndex = 5;
-                        break;
-
-                    case ".cdf":
-                        filterIndex = 6;
-                        break;
-
-                    default:
-                        filterIndex = 1;
-                        break;
-
-                        // ReSharper restore StringLiteralTypo
-                }
-
-                fileSelector.FilterIndex = filterIndex;
-
-                if (txtInputFilePath.TextLength > 0)
-                {
-                    try
-                    {
-                        fileSelector.InitialDirectory = Directory.GetParent(txtInputFilePath.Text).ToString();
-                    }
-                    catch
-                    {
-                        fileSelector.InitialDirectory = ProcessFilesOrDirectoriesBase.GetAppDirectoryPath();
-                    }
-                }
-                else
+                catch
                 {
                     fileSelector.InitialDirectory = ProcessFilesOrDirectoriesBase.GetAppDirectoryPath();
                 }
+            }
+            else
+            {
+                fileSelector.InitialDirectory = ProcessFilesOrDirectoriesBase.GetAppDirectoryPath();
+            }
 
-                fileSelector.Title = "Select input file";
+            fileSelector.Title = "Select input file";
 
-                var result = fileSelector.ShowDialog();
-                if (result == DialogResult.Cancel)
-                    return;
+            var result = fileSelector.ShowDialog();
+            if (result == DialogResult.Cancel)
+                return;
 
-                if (fileSelector.FileName.Length > 0)
-                {
-                    txtInputFilePath.Text = fileSelector.FileName;
-                    mPreferredInputFileExtension = Path.GetExtension(fileSelector.FileName);
-                }
+            if (fileSelector.FileName.Length > 0)
+            {
+                txtInputFilePath.Text = fileSelector.FileName;
+                mPreferredInputFileExtension = Path.GetExtension(fileSelector.FileName);
             }
         }
 

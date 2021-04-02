@@ -124,91 +124,90 @@ namespace MASIC.DataOutput
                 SICStatsFilePath = clsDataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, clsDataOutput.OutputFileTypeConstants.SICStatsFlatFile);
                 ReportMessage("Saving SIC flat file to disk: " + Path.GetFileName(SICStatsFilePath));
 
-                using (var writer = new StreamWriter(SICStatsFilePath, false))
+                using var writer = new StreamWriter(SICStatsFilePath, false);
+
+                // Write the SIC stats to the output file
+                // The file is tab delimited
+
+                var includeScanTimesInSICStatsFile = masicOptions.IncludeScanTimesInSICStatsFile;
+
+                if (masicOptions.IncludeHeadersInExportFile)
                 {
-                    // Write the SIC stats to the output file
-                    // The file is tab delimited
+                    writer.WriteLine(dataOutputHandler.GetHeadersForOutputFile(scanList, clsDataOutput.OutputFileTypeConstants.SICStatsFlatFile, TAB_DELIMITER));
+                }
 
-                    var includeScanTimesInSICStatsFile = masicOptions.IncludeScanTimesInSICStatsFile;
-
-                    if (masicOptions.IncludeHeadersInExportFile)
+                if (scanList.SurveyScans.Count == 0 && scanList.ParentIons.Count == 0)
+                {
+                    // Write out fake values to the _SICStats.txt file so that downstream software can still access some of the information
+                    for (var fragScanIndex = 0; fragScanIndex < scanList.FragScans.Count; fragScanIndex++)
                     {
-                        writer.WriteLine(dataOutputHandler.GetHeadersForOutputFile(scanList, clsDataOutput.OutputFileTypeConstants.SICStatsFlatFile, TAB_DELIMITER));
+                        var fakeParentIon = GetFakeParentIonForFragScan(scanList, fragScanIndex);
+                        const int parentIonIndex = 0;
+
+                        const int surveyScanNumber = 0;
+                        const float surveyScanTime = 0;
+
+                        WriteSICStatsFlatFileEntry(writer, TAB_DELIMITER, masicOptions.SICOptions, scanList,
+                            fakeParentIon, parentIonIndex, surveyScanNumber, surveyScanTime,
+                            0, includeScanTimesInSICStatsFile);
                     }
-
-                    if (scanList.SurveyScans.Count == 0 && scanList.ParentIons.Count == 0)
+                }
+                else
+                {
+                    for (var parentIonIndex = 0; parentIonIndex < scanList.ParentIons.Count; parentIonIndex++)
                     {
-                        // Write out fake values to the _SICStats.txt file so that downstream software can still access some of the information
-                        for (var fragScanIndex = 0; fragScanIndex < scanList.FragScans.Count; fragScanIndex++)
+                        bool includeParentIon;
+
+                        if (masicOptions.CustomSICList.LimitSearchToCustomMZList)
                         {
-                            var fakeParentIon = GetFakeParentIonForFragScan(scanList, fragScanIndex);
-                            const int parentIonIndex = 0;
-
-                            const int surveyScanNumber = 0;
-                            const float surveyScanTime = 0;
-
-                            WriteSICStatsFlatFileEntry(writer, TAB_DELIMITER, masicOptions.SICOptions, scanList,
-                                                       fakeParentIon, parentIonIndex, surveyScanNumber, surveyScanTime,
-                                                       0, includeScanTimesInSICStatsFile);
+                            includeParentIon = scanList.ParentIons[parentIonIndex].CustomSICPeak;
                         }
-                    }
-                    else
-                    {
-                        for (var parentIonIndex = 0; parentIonIndex < scanList.ParentIons.Count; parentIonIndex++)
+                        else
                         {
-                            bool includeParentIon;
+                            includeParentIon = true;
+                        }
 
-                            if (masicOptions.CustomSICList.LimitSearchToCustomMZList)
+                        if (includeParentIon)
+                        {
+                            for (var fragScanIndex = 0; fragScanIndex < scanList.ParentIons[parentIonIndex].FragScanIndices.Count; fragScanIndex++)
                             {
-                                includeParentIon = scanList.ParentIons[parentIonIndex].CustomSICPeak;
-                            }
-                            else
-                            {
-                                includeParentIon = true;
-                            }
+                                var parentIon = scanList.ParentIons[parentIonIndex];
+                                int surveyScanNumber;
+                                float surveyScanTime;
 
-                            if (includeParentIon)
-                            {
-                                for (var fragScanIndex = 0; fragScanIndex < scanList.ParentIons[parentIonIndex].FragScanIndices.Count; fragScanIndex++)
+                                if (parentIon.SurveyScanIndex >= 0 && parentIon.SurveyScanIndex < scanList.SurveyScans.Count)
                                 {
-                                    var parentIon = scanList.ParentIons[parentIonIndex];
-                                    int surveyScanNumber;
-                                    float surveyScanTime;
-
-                                    if (parentIon.SurveyScanIndex >= 0 && parentIon.SurveyScanIndex < scanList.SurveyScans.Count)
-                                    {
-                                        surveyScanNumber = scanList.SurveyScans[parentIon.SurveyScanIndex].ScanNumber;
-                                        surveyScanTime = scanList.SurveyScans[parentIon.SurveyScanIndex].ScanTime;
-                                    }
-                                    else
-                                    {
-                                        surveyScanNumber = -1;
-                                        surveyScanTime = 0;
-                                    }
-
-                                    WriteSICStatsFlatFileEntry(writer, TAB_DELIMITER, masicOptions.SICOptions, scanList,
-                                                               parentIon, parentIonIndex, surveyScanNumber, surveyScanTime,
-                                                               fragScanIndex, includeScanTimesInSICStatsFile);
+                                    surveyScanNumber = scanList.SurveyScans[parentIon.SurveyScanIndex].ScanNumber;
+                                    surveyScanTime = scanList.SurveyScans[parentIon.SurveyScanIndex].ScanTime;
                                 }
-                            }
-
-                            if (scanList.ParentIons.Count > 1)
-                            {
-                                if (parentIonIndex % 100 == 0)
+                                else
                                 {
-                                    UpdateProgress((short)(parentIonIndex / (double)(scanList.ParentIons.Count - 1) * 100));
+                                    surveyScanNumber = -1;
+                                    surveyScanTime = 0;
                                 }
-                            }
-                            else
-                            {
-                                UpdateProgress(1);
-                            }
 
-                            if (masicOptions.AbortProcessing)
-                            {
-                                scanList.ProcessingIncomplete = true;
-                                break;
+                                WriteSICStatsFlatFileEntry(writer, TAB_DELIMITER, masicOptions.SICOptions, scanList,
+                                    parentIon, parentIonIndex, surveyScanNumber, surveyScanTime,
+                                    fragScanIndex, includeScanTimesInSICStatsFile);
                             }
+                        }
+
+                        if (scanList.ParentIons.Count > 1)
+                        {
+                            if (parentIonIndex % 100 == 0)
+                            {
+                                UpdateProgress((short)(parentIonIndex / (double)(scanList.ParentIons.Count - 1) * 100));
+                            }
+                        }
+                        else
+                        {
+                            UpdateProgress(1);
+                        }
+
+                        if (masicOptions.AbortProcessing)
+                        {
+                            scanList.ProcessingIncomplete = true;
+                            break;
                         }
                     }
                 }

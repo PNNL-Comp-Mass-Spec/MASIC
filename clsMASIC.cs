@@ -1301,68 +1301,66 @@ namespace MASIC
                 // Instantiate the SpectraCache
                 // ---------------------------------------------------------
 
-                using (var spectraCache = new clsSpectraCache(Options.CacheOptions)
+                using var spectraCache = new clsSpectraCache(Options.CacheOptions)
                 {
                     DiskCachingAlwaysDisabled = Options.CacheOptions.DiskCachingAlwaysDisabled,
                     CacheDirectoryPath = Options.CacheOptions.DirectoryPath,
                     CacheSpectraToRetainInMemory = Options.CacheOptions.SpectraToRetainInMemory
-                })
+                };
+                RegisterEvents(spectraCache);
+
+                spectraCache.InitializeSpectraPool();
+
+                var scanList = new clsScanList();
+                RegisterEvents(scanList);
+
+                var parentIonProcessor = new clsParentIonProcessing(Options.ReporterIons);
+                RegisterEvents(parentIonProcessor);
+
+                var scanTracking = new clsScanTracking(Options.ReporterIons, mMASICPeakFinder);
+                RegisterEvents(scanTracking);
+
+                // ---------------------------------------------------------
+                // Load the mass spectral data
+                // ---------------------------------------------------------
+
+                var dataLoadSuccess = LoadData(inputFilePath,
+                    outputDirectoryPath,
+                    dataOutputHandler,
+                    parentIonProcessor,
+                    scanTracking,
+                    scanList,
+                    spectraCache,
+                    out var dataImporterBase,
+                    out var datasetFileInfo);
+
+                // Record that the file is finished loading
+                mProcessingStats.FileLoadEndTime = DateTime.UtcNow;
+                if (!dataLoadSuccess)
                 {
-                    RegisterEvents(spectraCache);
-
-                    spectraCache.InitializeSpectraPool();
-
-                    var scanList = new clsScanList();
-                    RegisterEvents(scanList);
-
-                    var parentIonProcessor = new clsParentIonProcessing(Options.ReporterIons);
-                    RegisterEvents(parentIonProcessor);
-
-                    var scanTracking = new clsScanTracking(Options.ReporterIons, mMASICPeakFinder);
-                    RegisterEvents(scanTracking);
-
-                    // ---------------------------------------------------------
-                    // Load the mass spectral data
-                    // ---------------------------------------------------------
-
-                    var dataLoadSuccess = LoadData(inputFilePath,
-                        outputDirectoryPath,
-                        dataOutputHandler,
-                        parentIonProcessor,
-                        scanTracking,
-                        scanList,
-                        spectraCache,
-                        out var dataImporterBase,
-                        out var datasetFileInfo);
-
-                    // Record that the file is finished loading
-                    mProcessingStats.FileLoadEndTime = DateTime.UtcNow;
-                    if (!dataLoadSuccess)
+                    if (string.IsNullOrEmpty(StatusMessage))
                     {
-                        if (string.IsNullOrEmpty(StatusMessage))
-                        {
-                            StatusMessage = "Unable to parse file; unknown error";
-                        }
-                        else
-                        {
-                            StatusMessage = "Unable to parse file: " + StatusMessage;
-                        }
-
-                        ShowErrorMessage(StatusMessage);
-                        return false;
+                        StatusMessage = "Unable to parse file; unknown error";
+                    }
+                    else
+                    {
+                        StatusMessage = "Unable to parse file: " + StatusMessage;
                     }
 
-                    // ---------------------------------------------------------
-                    // Find the Selected Ion Chromatograms, reporter ions, etc. and write the results to disk
-                    // ---------------------------------------------------------
-
-                    var success = FindSICsAndWriteOutput(
-                        inputFilePath, outputDirectoryPath,
-                        scanList, spectraCache, dataOutputHandler, scanTracking,
-                        datasetFileInfo, parentIonProcessor, dataImporterBase);
-
-                    return success;
+                    ShowErrorMessage(StatusMessage);
+                    return false;
                 }
+
+                // ---------------------------------------------------------
+                // Find the Selected Ion Chromatograms, reporter ions, etc. and write the results to disk
+                // ---------------------------------------------------------
+
+                var success = FindSICsAndWriteOutput(
+                    inputFilePath, outputDirectoryPath,
+                    scanList, spectraCache, dataOutputHandler, scanTracking,
+                    datasetFileInfo, parentIonProcessor, dataImporterBase);
+
+                return success;
             }
             catch (Exception ex)
             {

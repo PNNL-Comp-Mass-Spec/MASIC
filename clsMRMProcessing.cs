@@ -268,177 +268,177 @@ namespace MASIC
                 // Write out the MRM Settings
                 var mrmSettingsFilePath = clsDataOutput.ConstructOutputFilePath(
                     inputFileName, outputDirectoryPath, clsDataOutput.OutputFileTypeConstants.MRMSettingsFile);
-                using (var settingsWriter = new StreamWriter(mrmSettingsFilePath))
+
+                using var settingsWriter = new StreamWriter(mrmSettingsFilePath);
+
+                settingsWriter.WriteLine(mDataOutputHandler.GetHeadersForOutputFile(scanList, clsDataOutput.OutputFileTypeConstants.MRMSettingsFile));
+
+                var dataColumns = new List<string>(7);
+
+                for (var mrmInfoIndex = 0; mrmInfoIndex < mrmSettings.Count; mrmInfoIndex++)
                 {
-                    settingsWriter.WriteLine(mDataOutputHandler.GetHeadersForOutputFile(scanList, clsDataOutput.OutputFileTypeConstants.MRMSettingsFile));
-
-                    var dataColumns = new List<string>(7);
-
-                    for (var mrmInfoIndex = 0; mrmInfoIndex < mrmSettings.Count; mrmInfoIndex++)
+                    var mrmSetting = mrmSettings[mrmInfoIndex];
+                    for (var mrmMassIndex = 0; mrmMassIndex < mrmSetting.MRMMassCount; mrmMassIndex++)
                     {
-                        var mrmSetting = mrmSettings[mrmInfoIndex];
-                        for (var mrmMassIndex = 0; mrmMassIndex < mrmSetting.MRMMassCount; mrmMassIndex++)
-                        {
-                            dataColumns.Clear();
+                        dataColumns.Clear();
 
-                            dataColumns.Add(mrmInfoIndex.ToString());
-                            dataColumns.Add(mrmSetting.ParentIonMZ.ToString("0.000"));
-                            dataColumns.Add(mrmSetting.MRMMassList[mrmMassIndex].CentralMass.ToString("0.000"));
-                            dataColumns.Add(mrmSetting.MRMMassList[mrmMassIndex].StartMass.ToString("0.000"));
-                            dataColumns.Add(mrmSetting.MRMMassList[mrmMassIndex].EndMass.ToString("0.000"));
-                            dataColumns.Add(mrmSetting.ScanCount.ToString());
+                        dataColumns.Add(mrmInfoIndex.ToString());
+                        dataColumns.Add(mrmSetting.ParentIonMZ.ToString("0.000"));
+                        dataColumns.Add(mrmSetting.MRMMassList[mrmMassIndex].CentralMass.ToString("0.000"));
+                        dataColumns.Add(mrmSetting.MRMMassList[mrmMassIndex].StartMass.ToString("0.000"));
+                        dataColumns.Add(mrmSetting.MRMMassList[mrmMassIndex].EndMass.ToString("0.000"));
+                        dataColumns.Add(mrmSetting.ScanCount.ToString());
 
-                            settingsWriter.WriteLine(string.Join(TAB_DELIMITER.ToString(), dataColumns));
-                        }
+                        settingsWriter.WriteLine(string.Join(TAB_DELIMITER.ToString(), dataColumns));
+                    }
+                }
+                    
+                if (mOptions.WriteMRMDataList || mOptions.WriteMRMIntensityCrosstab)
+                {
+                    // Populate srmKeyToIndexMap
+                    var srmKeyToIndexMap = new Dictionary<string, int>();
+                    for (var srmIndex = 0; srmIndex < srmList.Count; srmIndex++)
+                        srmKeyToIndexMap.Add(ConstructSRMMapKey(srmList[srmIndex]), srmIndex);
+
+                    if (mOptions.WriteMRMDataList)
+                    {
+                        // Write out the raw MRM Data
+                        var dataFilePath = clsDataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, clsDataOutput.OutputFileTypeConstants.MRMDatafile);
+                        dataWriter = new StreamWriter(dataFilePath);
+
+                        // Write the file headers
+                        dataWriter.WriteLine(mDataOutputHandler.GetHeadersForOutputFile(scanList, clsDataOutput.OutputFileTypeConstants.MRMDatafile));
                     }
 
-                    if (mOptions.WriteMRMDataList || mOptions.WriteMRMIntensityCrosstab)
+                    if (mOptions.WriteMRMIntensityCrosstab)
                     {
-                        // Populate srmKeyToIndexMap
-                        var srmKeyToIndexMap = new Dictionary<string, int>();
-                        for (var srmIndex = 0; srmIndex < srmList.Count; srmIndex++)
-                            srmKeyToIndexMap.Add(ConstructSRMMapKey(srmList[srmIndex]), srmIndex);
+                        // Write out the raw MRM Data
+                        var crosstabFilePath = clsDataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, clsDataOutput.OutputFileTypeConstants.MRMCrosstabFile);
+                        crosstabWriter = new StreamWriter(crosstabFilePath);
 
-                        if (mOptions.WriteMRMDataList)
+                        // Initialize the crosstab header variable using the data in udtSRMList()
+
+                        var headerNames = new List<string>(srmList.Count + 2)
                         {
-                            // Write out the raw MRM Data
-                            var dataFilePath = clsDataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, clsDataOutput.OutputFileTypeConstants.MRMDatafile);
-                            dataWriter = new StreamWriter(dataFilePath);
+                            "Scan_First",
+                            "ScanTime"
+                        };
 
-                            // Write the file headers
-                            dataWriter.WriteLine(mDataOutputHandler.GetHeadersForOutputFile(scanList, clsDataOutput.OutputFileTypeConstants.MRMDatafile));
+                        foreach (var srmEntry in srmList)
+                            headerNames.Add(ConstructSRMMapKey(srmEntry));
+
+                        crosstabWriter.WriteLine(string.Join(TAB_DELIMITER.ToString(), headerNames));
+                    }
+
+                    var scanFirst = int.MinValue;
+                    float scanTimeFirst = 0;
+                    var srmIndexLast = 0;
+
+                    var crosstabColumnValue = new double[srmList.Count];
+                    var crosstabColumnFlag = new bool[srmList.Count];
+
+                    // For scanIndex = 0 To scanList.FragScanCount - 1
+                    foreach (var fragScan in scanList.FragScans)
+                    {
+                        if (fragScan.MRMScanType != MRMScanTypeConstants.SRM)
+                        {
+                            continue;
                         }
 
-                        if (mOptions.WriteMRMIntensityCrosstab)
+                        if (scanFirst == int.MinValue)
                         {
-                            // Write out the raw MRM Data
-                            var crosstabFilePath = clsDataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, clsDataOutput.OutputFileTypeConstants.MRMCrosstabFile);
-                            crosstabWriter = new StreamWriter(crosstabFilePath);
-
-                            // Initialize the crosstab header variable using the data in udtSRMList()
-
-                            var headerNames = new List<string>(srmList.Count + 2)
-                            {
-                                "Scan_First",
-                                "ScanTime"
-                            };
-
-                            foreach (var srmEntry in srmList)
-                                headerNames.Add(ConstructSRMMapKey(srmEntry));
-
-                            crosstabWriter.WriteLine(string.Join(TAB_DELIMITER.ToString(), headerNames));
+                            scanFirst = fragScan.ScanNumber;
+                            scanTimeFirst = fragScan.ScanTime;
                         }
 
-                        var scanFirst = int.MinValue;
-                        float scanTimeFirst = 0;
-                        var srmIndexLast = 0;
-
-                        var crosstabColumnValue = new double[srmList.Count];
-                        var crosstabColumnFlag = new bool[srmList.Count];
-
-                        // For scanIndex = 0 To scanList.FragScanCount - 1
-                        foreach (var fragScan in scanList.FragScans)
+                        // Look for each of the m/z values specified in fragScan.MRMScanInfo.MRMMassList
+                        for (var mrmMassIndex = 0; mrmMassIndex < fragScan.MRMScanInfo.MRMMassCount; mrmMassIndex++)
                         {
-                            if (fragScan.MRMScanType != MRMScanTypeConstants.SRM)
+                            // Find the maximum value between fragScan.StartMass and fragScan.EndMass
+                            // Need to define a tolerance to account for numeric rounding artifacts in the variables
+
+                            var mzStart = fragScan.MRMScanInfo.MRMMassList[mrmMassIndex].StartMass;
+                            var mzEnd = fragScan.MRMScanInfo.MRMMassList[mrmMassIndex].EndMass;
+                            var mrmToleranceHalfWidth = Math.Round((mzEnd - mzStart) / 2, 6);
+                            if (mrmToleranceHalfWidth < 0.001)
                             {
-                                continue;
+                                mrmToleranceHalfWidth = 0.001;
                             }
 
-                            if (scanFirst == int.MinValue)
+                            var matchFound = mDataAggregation.FindMaxValueInMZRange(
+                                spectraCache, fragScan,
+                                mzStart - mrmToleranceHalfWidth,
+                                mzEnd + mrmToleranceHalfWidth,
+                                out _, out var matchIntensity);
+
+                            if (mOptions.WriteMRMDataList)
                             {
-                                scanFirst = fragScan.ScanNumber;
-                                scanTimeFirst = fragScan.ScanTime;
-                            }
+                                dataColumns.Clear();
+                                dataColumns.Add(fragScan.ScanNumber.ToString());
+                                dataColumns.Add(fragScan.MRMScanInfo.ParentIonMZ.ToString("0.000"));
 
-                            // Look for each of the m/z values specified in fragScan.MRMScanInfo.MRMMassList
-                            for (var mrmMassIndex = 0; mrmMassIndex < fragScan.MRMScanInfo.MRMMassCount; mrmMassIndex++)
-                            {
-                                // Find the maximum value between fragScan.StartMass and fragScan.EndMass
-                                // Need to define a tolerance to account for numeric rounding artifacts in the variables
-
-                                var mzStart = fragScan.MRMScanInfo.MRMMassList[mrmMassIndex].StartMass;
-                                var mzEnd = fragScan.MRMScanInfo.MRMMassList[mrmMassIndex].EndMass;
-                                var mrmToleranceHalfWidth = Math.Round((mzEnd - mzStart) / 2, 6);
-                                if (mrmToleranceHalfWidth < 0.001)
+                                if (matchFound)
                                 {
-                                    mrmToleranceHalfWidth = 0.001;
-                                }
-
-                                var matchFound = mDataAggregation.FindMaxValueInMZRange(
-                                    spectraCache, fragScan,
-                                    mzStart - mrmToleranceHalfWidth,
-                                    mzEnd + mrmToleranceHalfWidth,
-                                    out _, out var matchIntensity);
-
-                                if (mOptions.WriteMRMDataList)
-                                {
-                                    dataColumns.Clear();
-                                    dataColumns.Add(fragScan.ScanNumber.ToString());
-                                    dataColumns.Add(fragScan.MRMScanInfo.ParentIonMZ.ToString("0.000"));
-
-                                    if (matchFound)
-                                    {
-                                        dataColumns.Add(fragScan.MRMScanInfo.MRMMassList[mrmMassIndex].CentralMass.ToString("0.000"));
-                                        dataColumns.Add(matchIntensity.ToString("0.000"));
-                                    }
-                                    else
-                                    {
-                                        dataColumns.Add(fragScan.MRMScanInfo.MRMMassList[mrmMassIndex].CentralMass.ToString("0.000"));
-                                        dataColumns.Add("0");
-                                    }
-
-                                    dataWriter?.WriteLine(string.Join(TAB_DELIMITER.ToString(), dataColumns));
-                                }
-
-                                if (!mOptions.WriteMRMIntensityCrosstab)
-                                    continue;
-
-                                var srmMapKey = ConstructSRMMapKey(fragScan.MRMScanInfo.ParentIonMZ, fragScan.MRMScanInfo.MRMMassList[mrmMassIndex].CentralMass);
-
-                                // Use srmKeyToIndexMap to determine the appropriate column index for srmMapKey
-                                if (srmKeyToIndexMap.TryGetValue(srmMapKey, out var srmIndex))
-                                {
-                                    if (crosstabColumnFlag[srmIndex] ||
-                                        srmIndex == 0 && srmIndexLast == srmList.Count - 1)
-                                    {
-                                        // Either the column is already populated, or the SRMIndex has cycled back to zero
-                                        // Write out the current crosstab line and reset the crosstab column arrays
-                                        ExportMRMDataWriteLine(crosstabWriter, scanFirst, scanTimeFirst,
-                                            crosstabColumnValue,
-                                            crosstabColumnFlag,
-                                            TAB_DELIMITER, true);
-
-                                        scanFirst = fragScan.ScanNumber;
-                                        scanTimeFirst = fragScan.ScanTime;
-                                    }
-
-                                    if (matchFound)
-                                    {
-                                        crosstabColumnValue[srmIndex] = matchIntensity;
-                                    }
-
-                                    crosstabColumnFlag[srmIndex] = true;
-                                    srmIndexLast = srmIndex;
+                                    dataColumns.Add(fragScan.MRMScanInfo.MRMMassList[mrmMassIndex].CentralMass.ToString("0.000"));
+                                    dataColumns.Add(matchIntensity.ToString("0.000"));
                                 }
                                 else
                                 {
-                                    // Unknown combination of parent ion m/z and daughter m/z; this is unexpected
-                                    // We won't write this entry out
+                                    dataColumns.Add(fragScan.MRMScanInfo.MRMMassList[mrmMassIndex].CentralMass.ToString("0.000"));
+                                    dataColumns.Add("0");
                                 }
+
+                                dataWriter?.WriteLine(string.Join(TAB_DELIMITER.ToString(), dataColumns));
                             }
 
-                            UpdateCacheStats(spectraCache);
-                            if (mOptions.AbortProcessing)
+                            if (!mOptions.WriteMRMIntensityCrosstab)
+                                continue;
+
+                            var srmMapKey = ConstructSRMMapKey(fragScan.MRMScanInfo.ParentIonMZ, fragScan.MRMScanInfo.MRMMassList[mrmMassIndex].CentralMass);
+
+                            // Use srmKeyToIndexMap to determine the appropriate column index for srmMapKey
+                            if (srmKeyToIndexMap.TryGetValue(srmMapKey, out var srmIndex))
                             {
-                                break;
+                                if (crosstabColumnFlag[srmIndex] ||
+                                    srmIndex == 0 && srmIndexLast == srmList.Count - 1)
+                                {
+                                    // Either the column is already populated, or the SRMIndex has cycled back to zero
+                                    // Write out the current crosstab line and reset the crosstab column arrays
+                                    ExportMRMDataWriteLine(crosstabWriter, scanFirst, scanTimeFirst,
+                                        crosstabColumnValue,
+                                        crosstabColumnFlag,
+                                        TAB_DELIMITER, true);
+
+                                    scanFirst = fragScan.ScanNumber;
+                                    scanTimeFirst = fragScan.ScanTime;
+                                }
+
+                                if (matchFound)
+                                {
+                                    crosstabColumnValue[srmIndex] = matchIntensity;
+                                }
+
+                                crosstabColumnFlag[srmIndex] = true;
+                                srmIndexLast = srmIndex;
+                            }
+                            else
+                            {
+                                // Unknown combination of parent ion m/z and daughter m/z; this is unexpected
+                                // We won't write this entry out
                             }
                         }
 
-                        if (mOptions.WriteMRMIntensityCrosstab)
+                        UpdateCacheStats(spectraCache);
+                        if (mOptions.AbortProcessing)
                         {
-                            // Write out any remaining crosstab values
-                            ExportMRMDataWriteLine(crosstabWriter, scanFirst, scanTimeFirst, crosstabColumnValue, crosstabColumnFlag, TAB_DELIMITER, false);
+                            break;
                         }
+                    }
+
+                    if (mOptions.WriteMRMIntensityCrosstab)
+                    {
+                        // Write out any remaining crosstab values
+                        ExportMRMDataWriteLine(crosstabWriter, scanFirst, scanTimeFirst, crosstabColumnValue, crosstabColumnFlag, TAB_DELIMITER, false);
                     }
                 }
 

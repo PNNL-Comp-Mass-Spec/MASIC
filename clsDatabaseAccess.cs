@@ -191,39 +191,38 @@ namespace MASIC
 
             try
             {
-                using (var reader = new StreamReader(datasetLookupFilePath))
+                using var reader = new StreamReader(datasetLookupFilePath);
+
+                while (!reader.EndOfStream)
                 {
-                    while (!reader.EndOfStream)
+                    var dataLine = reader.ReadLine();
+                    if (string.IsNullOrWhiteSpace(dataLine))
                     {
-                        var dataLine = reader.ReadLine();
-                        if (string.IsNullOrWhiteSpace(dataLine))
-                        {
-                            continue;
-                        }
-
-                        if (dataLine.Length < datasetName.Length)
-                        {
-                            continue;
-                        }
-
-                        var dataValues = dataLine.Split(delimiterList);
-                        if (dataValues.Length < 2)
-                        {
-                            continue;
-                        }
-
-                        if (!string.Equals(dataValues[0], datasetName, StringComparison.OrdinalIgnoreCase))
-                        {
-                            continue;
-                        }
-
-                        if (int.TryParse(dataValues[1], out newDatasetId))
-                        {
-                            return true;
-                        }
-
-                        ReportError("Error converting Dataset ID '" + dataValues[1] + "' to an integer", clsMASIC.MasicErrorCodes.InvalidDatasetID);
+                        continue;
                     }
+
+                    if (dataLine.Length < datasetName.Length)
+                    {
+                        continue;
+                    }
+
+                    var dataValues = dataLine.Split(delimiterList);
+                    if (dataValues.Length < 2)
+                    {
+                        continue;
+                    }
+
+                    if (!string.Equals(dataValues[0], datasetName, StringComparison.OrdinalIgnoreCase))
+                    {
+                        continue;
+                    }
+
+                    if (int.TryParse(dataValues[1], out newDatasetId))
+                    {
+                        return true;
+                    }
+
+                    ReportError("Error converting Dataset ID '" + dataValues[1] + "' to an integer", clsMASIC.MasicErrorCodes.InvalidDatasetID);
                 }
 
                 return false;

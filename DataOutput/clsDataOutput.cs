@@ -818,25 +818,24 @@ namespace MASIC.DataOutput
                 outputFilePath = ConstructOutputFilePath(inputFileName, outputDirectoryPath, OutputFileTypeConstants.HeaderGlossary);
                 ReportMessage("Saving Header Glossary to " + Path.GetFileName(outputFilePath));
 
-                using (var writer = new StreamWriter(outputFilePath, false))
+                using var writer = new StreamWriter(outputFilePath, false);
+
+                // ScanStats
+                writer.WriteLine(ConstructOutputFilePath(string.Empty, string.Empty, OutputFileTypeConstants.ScanStatsFlatFile) + ":");
+                writer.WriteLine(GetHeadersForOutputFile(scanList, OutputFileTypeConstants.ScanStatsFlatFile));
+                writer.WriteLine();
+
+                // SICStats
+                writer.WriteLine(ConstructOutputFilePath(string.Empty, string.Empty, OutputFileTypeConstants.SICStatsFlatFile) + ":");
+                writer.WriteLine(GetHeadersForOutputFile(scanList, OutputFileTypeConstants.SICStatsFlatFile));
+                writer.WriteLine();
+
+                // ScanStatsExtended
+                var headers = GetHeadersForOutputFile(scanList, OutputFileTypeConstants.ScanStatsExtendedFlatFile);
+                if (!string.IsNullOrWhiteSpace(headers))
                 {
-                    // ScanStats
-                    writer.WriteLine(ConstructOutputFilePath(string.Empty, string.Empty, OutputFileTypeConstants.ScanStatsFlatFile) + ":");
-                    writer.WriteLine(GetHeadersForOutputFile(scanList, OutputFileTypeConstants.ScanStatsFlatFile));
-                    writer.WriteLine();
-
-                    // SICStats
-                    writer.WriteLine(ConstructOutputFilePath(string.Empty, string.Empty, OutputFileTypeConstants.SICStatsFlatFile) + ":");
-                    writer.WriteLine(GetHeadersForOutputFile(scanList, OutputFileTypeConstants.SICStatsFlatFile));
-                    writer.WriteLine();
-
-                    // ScanStatsExtended
-                    var headers = GetHeadersForOutputFile(scanList, OutputFileTypeConstants.ScanStatsExtendedFlatFile);
-                    if (!string.IsNullOrWhiteSpace(headers))
-                    {
-                        writer.WriteLine(ConstructOutputFilePath(string.Empty, string.Empty, OutputFileTypeConstants.ScanStatsExtendedFlatFile) + ":");
-                        writer.WriteLine(headers);
-                    }
+                    writer.WriteLine(ConstructOutputFilePath(string.Empty, string.Empty, OutputFileTypeConstants.ScanStatsExtendedFlatFile) + ":");
+                    writer.WriteLine(headers);
                 }
             }
             catch (Exception ex)

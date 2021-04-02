@@ -113,153 +113,152 @@ namespace MASIC
                     outputDirectoryPath,
                     clsDataOutput.OutputFileTypeConstants.ReporterIonsFile);
 
-                using (var writer = new StreamWriter(outputFilePath))
+                using var writer = new StreamWriter(outputFilePath);
+
+                // Write the file headers
+                var reporterIonMZsUnique = new SortedSet<string>();
+                var headerColumns = new List<string>(7 + reporterIons.Length + 1)
                 {
-                    // Write the file headers
-                    var reporterIonMZsUnique = new SortedSet<string>();
-                    var headerColumns = new List<string>(7 + reporterIons.Length + 1)
+                    "Dataset",
+                    "ScanNumber",
+                    "Collision Mode",
+                    "ParentIonMZ",
+                    "BasePeakIntensity",
+                    "BasePeakMZ",
+                    "ReporterIonIntensityMax"
+                };
+
+                var obsMZHeaders = new List<string>(reporterIons.Length);
+                var uncorrectedIntensityHeaders = new List<string>(reporterIons.Length);
+                var ftmsSignalToNoise = new List<string>(reporterIons.Length);
+                var ftmsResolution = new List<string>(reporterIons.Length);
+                //var ftmsLabelDataMz = new List<string>(reporterIons.Length);
+
+                var saveUncorrectedIntensities =
+                    mOptions.ReporterIons.ReporterIonApplyAbundanceCorrection && mOptions.ReporterIons.ReporterIonSaveUncorrectedIntensities;
+
+                var dataAggregation = new clsDataAggregation();
+                RegisterEvents(dataAggregation);
+
+                for (var reporterIonIndex= 0; reporterIonIndex < reporterIons.Length; reporterIonIndex++)
+                {
+                    var reporterIon = reporterIons[reporterIonIndex];
+
+                    if (reporterIon.ContaminantIon && !saveUncorrectedIntensities)
+                        continue;
+
+                    // Construct the reporter ion intensity header
+                    // We skip contaminant ions, unless saveUncorrectedIntensities is True, then we include them
+
+                    string mzValue;
+                    if (mOptions.ReporterIons.ReporterIonMassMode == clsReporterIons.ReporterIonMassModeConstants.TMTTenMZ ||
+                        mOptions.ReporterIons.ReporterIonMassMode == clsReporterIons.ReporterIonMassModeConstants.TMTElevenMZ ||
+                        mOptions.ReporterIons.ReporterIonMassMode == clsReporterIons.ReporterIonMassModeConstants.TMTSixteenMZ)
                     {
-                        "Dataset",
-                        "ScanNumber",
-                        "Collision Mode",
-                        "ParentIonMZ",
-                        "BasePeakIntensity",
-                        "BasePeakMZ",
-                        "ReporterIonIntensityMax"
-                    };
-
-                    var obsMZHeaders = new List<string>(reporterIons.Length);
-                    var uncorrectedIntensityHeaders = new List<string>(reporterIons.Length);
-                    var ftmsSignalToNoise = new List<string>(reporterIons.Length);
-                    var ftmsResolution = new List<string>(reporterIons.Length);
-                    //var ftmsLabelDataMz = new List<string>(reporterIons.Length);
-
-                    var saveUncorrectedIntensities =
-                        mOptions.ReporterIons.ReporterIonApplyAbundanceCorrection && mOptions.ReporterIons.ReporterIonSaveUncorrectedIntensities;
-
-                    var dataAggregation = new clsDataAggregation();
-                    RegisterEvents(dataAggregation);
-
-                    for (var reporterIonIndex= 0; reporterIonIndex < reporterIons.Length; reporterIonIndex++)
+                        mzValue = reporterIon.MZ.ToString("#0.000");
+                    }
+                    else
                     {
-                        var reporterIon = reporterIons[reporterIonIndex];
-
-                        if (reporterIon.ContaminantIon && !saveUncorrectedIntensities)
-                            continue;
-
-                        // Construct the reporter ion intensity header
-                        // We skip contaminant ions, unless saveUncorrectedIntensities is True, then we include them
-
-                        string mzValue;
-                        if (mOptions.ReporterIons.ReporterIonMassMode == clsReporterIons.ReporterIonMassModeConstants.TMTTenMZ ||
-                            mOptions.ReporterIons.ReporterIonMassMode == clsReporterIons.ReporterIonMassModeConstants.TMTElevenMZ ||
-                            mOptions.ReporterIons.ReporterIonMassMode == clsReporterIons.ReporterIonMassModeConstants.TMTSixteenMZ)
-                        {
-                            mzValue = reporterIon.MZ.ToString("#0.000");
-                        }
-                        else
-                        {
-                            mzValue = ((int)Math.Round(reporterIon.MZ, 0)).ToString();
-                        }
-
-                        if (reporterIonMZsUnique.Contains(mzValue))
-                        {
-                            // Uniquify the m/z value
-                            mzValue += "_" + reporterIonIndex;
-                        }
-
-                        try
-                        {
-                            reporterIonMZsUnique.Add(mzValue);
-                        }
-                        catch (Exception)
-                        {
-                            // Error updating the SortedSet;
-                            // this shouldn't happen based on the .ContainsKey test above
-                        }
-
-                        // Append the reporter ion intensity title to the headers
-                        headerColumns.Add(REPORTER_ION_COLUMN_PREFIX + mzValue);
-
-                        // This string will only be included in the header line if mOptions.ReporterIons.ReporterIonSaveObservedMasses is true
-                        obsMZHeaders.Add(REPORTER_ION_COLUMN_PREFIX + mzValue + "_ObsMZ");
-
-                        // This string will be included in the header line if saveUncorrectedIntensities is true
-                        uncorrectedIntensityHeaders.Add(REPORTER_ION_COLUMN_PREFIX + mzValue + "_OriginalIntensity");
-
-                        // This string will be included in the header line if includeFtmsColumns is true
-                        ftmsSignalToNoise.Add(REPORTER_ION_COLUMN_PREFIX + mzValue + "_SignalToNoise");
-                        ftmsResolution.Add(REPORTER_ION_COLUMN_PREFIX + mzValue + "_Resolution");
-
-                        // Uncomment to include the label data m/z value in the _ReporterIons.txt file
-                        // This string will only be included in the header line if mOptions.ReporterIons.ReporterIonSaveObservedMasses is true
-                        //ftmsLabelDataMz.Add(REPORTER_ION_COLUMN_PREFIX + mzValue + "_LabelDataMZ");
+                        mzValue = ((int)Math.Round(reporterIon.MZ, 0)).ToString();
                     }
 
-                    headerColumns.Add("Weighted Avg Pct Intensity Correction");
-
-                    if (mOptions.ReporterIons.ReporterIonSaveObservedMasses)
+                    if (reporterIonMZsUnique.Contains(mzValue))
                     {
-                        headerColumns.AddRange(obsMZHeaders);
+                        // Uniquify the m/z value
+                        mzValue += "_" + reporterIonIndex;
                     }
 
-                    if (saveUncorrectedIntensities)
+                    try
                     {
-                        headerColumns.AddRange(uncorrectedIntensityHeaders);
+                        reporterIonMZsUnique.Add(mzValue);
+                    }
+                    catch (Exception)
+                    {
+                        // Error updating the SortedSet;
+                        // this shouldn't happen based on the .ContainsKey test above
                     }
 
-                    if (includeFtmsColumns)
+                    // Append the reporter ion intensity title to the headers
+                    headerColumns.Add(REPORTER_ION_COLUMN_PREFIX + mzValue);
+
+                    // This string will only be included in the header line if mOptions.ReporterIons.ReporterIonSaveObservedMasses is true
+                    obsMZHeaders.Add(REPORTER_ION_COLUMN_PREFIX + mzValue + "_ObsMZ");
+
+                    // This string will be included in the header line if saveUncorrectedIntensities is true
+                    uncorrectedIntensityHeaders.Add(REPORTER_ION_COLUMN_PREFIX + mzValue + "_OriginalIntensity");
+
+                    // This string will be included in the header line if includeFtmsColumns is true
+                    ftmsSignalToNoise.Add(REPORTER_ION_COLUMN_PREFIX + mzValue + "_SignalToNoise");
+                    ftmsResolution.Add(REPORTER_ION_COLUMN_PREFIX + mzValue + "_Resolution");
+
+                    // Uncomment to include the label data m/z value in the _ReporterIons.txt file
+                    // This string will only be included in the header line if mOptions.ReporterIons.ReporterIonSaveObservedMasses is true
+                    //ftmsLabelDataMz.Add(REPORTER_ION_COLUMN_PREFIX + mzValue + "_LabelDataMZ");
+                }
+
+                headerColumns.Add("Weighted Avg Pct Intensity Correction");
+
+                if (mOptions.ReporterIons.ReporterIonSaveObservedMasses)
+                {
+                    headerColumns.AddRange(obsMZHeaders);
+                }
+
+                if (saveUncorrectedIntensities)
+                {
+                    headerColumns.AddRange(uncorrectedIntensityHeaders);
+                }
+
+                if (includeFtmsColumns)
+                {
+                    headerColumns.AddRange(ftmsSignalToNoise);
+                    headerColumns.AddRange(ftmsResolution);
+                    // Uncomment to include the label data m/z value in the _ReporterIons.txt file
+                    // If mOptions.ReporterIons.ReporterIonSaveObservedMasses Then
+                    // headerColumns.AddRange(ftmsLabelDataMz)
+                    // End If
+                }
+
+                // Write the headers to the output file, separated by tabs
+                writer.WriteLine(string.Join(TAB_DELIMITER.ToString(), headerColumns));
+
+                UpdateProgress(0, "Searching for reporter ions");
+
+                for (var masterOrderIndex = 0; masterOrderIndex < scanList.MasterScanOrderCount; masterOrderIndex++)
+                {
+                    var scanPointer = scanList.MasterScanOrder[masterOrderIndex].ScanIndexPointer;
+                    if (scanList.MasterScanOrder[masterOrderIndex].ScanType == clsScanList.ScanTypeConstants.SurveyScan)
                     {
-                        headerColumns.AddRange(ftmsSignalToNoise);
-                        headerColumns.AddRange(ftmsResolution);
-                        // Uncomment to include the label data m/z value in the _ReporterIons.txt file
-                        // If mOptions.ReporterIons.ReporterIonSaveObservedMasses Then
-                        // headerColumns.AddRange(ftmsLabelDataMz)
-                        // End If
+                        // Skip Survey Scans
+                        continue;
                     }
 
-                    // Write the headers to the output file, separated by tabs
-                    writer.WriteLine(string.Join(TAB_DELIMITER.ToString(), headerColumns));
+                    FindReporterIonsWork(
+                        rawFileReader,
+                        dataAggregation,
+                        includeFtmsColumns,
+                        mOptions.SICOptions,
+                        scanList,
+                        spectraCache,
+                        scanList.FragScans[scanPointer],
+                        writer,
+                        reporterIons,
+                        TAB_DELIMITER,
+                        saveUncorrectedIntensities,
+                        mOptions.ReporterIons.ReporterIonSaveObservedMasses);
 
-                    UpdateProgress(0, "Searching for reporter ions");
-
-                    for (var masterOrderIndex = 0; masterOrderIndex < scanList.MasterScanOrderCount; masterOrderIndex++)
+                    if (scanList.MasterScanOrderCount > 1)
                     {
-                        var scanPointer = scanList.MasterScanOrder[masterOrderIndex].ScanIndexPointer;
-                        if (scanList.MasterScanOrder[masterOrderIndex].ScanType == clsScanList.ScanTypeConstants.SurveyScan)
-                        {
-                            // Skip Survey Scans
-                            continue;
-                        }
+                        UpdateProgress((short)(masterOrderIndex / (double)(scanList.MasterScanOrderCount - 1) * 100));
+                    }
+                    else
+                    {
+                        UpdateProgress(0);
+                    }
 
-                        FindReporterIonsWork(
-                            rawFileReader,
-                            dataAggregation,
-                            includeFtmsColumns,
-                            mOptions.SICOptions,
-                            scanList,
-                            spectraCache,
-                            scanList.FragScans[scanPointer],
-                            writer,
-                            reporterIons,
-                            TAB_DELIMITER,
-                            saveUncorrectedIntensities,
-                            mOptions.ReporterIons.ReporterIonSaveObservedMasses);
-
-                        if (scanList.MasterScanOrderCount > 1)
-                        {
-                            UpdateProgress((short)(masterOrderIndex / (double)(scanList.MasterScanOrderCount - 1) * 100));
-                        }
-                        else
-                        {
-                            UpdateProgress(0);
-                        }
-
-                        UpdateCacheStats(spectraCache);
-                        if (mOptions.AbortProcessing)
-                        {
-                            break;
-                        }
+                    UpdateCacheStats(spectraCache);
+                    if (mOptions.AbortProcessing)
+                    {
+                        break;
                     }
                 }
 

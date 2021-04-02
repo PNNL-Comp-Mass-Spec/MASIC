@@ -44,27 +44,26 @@ namespace MASIC.Plots
 
             try
             {
-                using (var writer = new StreamWriter(new FileStream(exportFile.FullName, FileMode.Create, FileAccess.Write, FileShare.ReadWrite)))
+                using var writer = new StreamWriter(new FileStream(exportFile.FullName, FileMode.Create, FileAccess.Write, FileShare.ReadWrite));
+
+                // Plot options: set of square brackets with semicolon separated key/value pairs
+                writer.WriteLine("[" + GetPlotOptions() + "]");
+
+                // Column options: semicolon separated key/value pairs for each column, with options for each column separated by a tab
+                // Note: these options aren't actually used by the Python plotting library
+
+                // Example XAxis options: Autoscale=false;Minimum=0;Maximum=12135006;StringFormat=#,##0;MinorGridlineThickness=1
+                // Example YAxis options: Autoscale=true;StringFormat=0.00E+00;MinorGridlineThickness=1
+
+                writer.WriteLine("{0}\t{1}", XAxisInfo.GetOptions(), YAxisInfo.GetOptions());
+
+                // Column names
+                writer.WriteLine("{0}\t{1}", XAxisInfo.Title, YAxisInfo.Title);
+
+                // Data
+                foreach (var dataPoint in Data)
                 {
-                    // Plot options: set of square brackets with semicolon separated key/value pairs
-                    writer.WriteLine("[" + GetPlotOptions() + "]");
-
-                    // Column options: semicolon separated key/value pairs for each column, with options for each column separated by a tab
-                    // Note: these options aren't actually used by the Python plotting library
-
-                    // Example XAxis options: Autoscale=false;Minimum=0;Maximum=12135006;StringFormat=#,##0;MinorGridlineThickness=1
-                    // Example YAxis options: Autoscale=true;StringFormat=0.00E+00;MinorGridlineThickness=1
-
-                    writer.WriteLine("{0}\t{1}", XAxisInfo.GetOptions(), YAxisInfo.GetOptions());
-
-                    // Column names
-                    writer.WriteLine("{0}\t{1}", XAxisInfo.Title, YAxisInfo.Title);
-
-                    // Data
-                    foreach (var dataPoint in Data)
-                    {
-                        writer.WriteLine("{0}\t{1}", dataPoint.Key, dataPoint.Value);
-                    }
+                    writer.WriteLine("{0}\t{1}", dataPoint.Key, dataPoint.Value);
                 }
             }
             catch (Exception ex)
