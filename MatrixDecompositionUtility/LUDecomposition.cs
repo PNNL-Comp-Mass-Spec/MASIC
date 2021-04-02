@@ -7,23 +7,23 @@ namespace MatrixDecompositionUtility
     {
         public double[] ProcessData(double[,] a, int n, double[] b)
         {
-            var indx = new int[n];
+            var index = new int[n];
 
-            var MatrixA = (double[,])a.Clone();
-            var MatrixB = (double[])b.Clone();
+            var matrixA = (double[,])a.Clone();
+            var matrixB = (double[])b.Clone();
 
             // Solve the system of linear equations by first calling ludcmp and then calling lubksb
             // The goal is to solve for X in A.X = B
             // Solve, to get X = B Inverse A
 
             // First invert matrix A
-            ludcmp(MatrixA, n, indx);
+            ludcmp(matrixA, n, index);
 
             // Now multiply inverted A by B
-            lubksb(MatrixA, n, indx, MatrixB);
+            lubksb(matrixA, n, index, matrixB);
 
             // Return the results
-            return MatrixB;
+            return matrixB;
         }
 
         // Linear equation solution, back substitution
@@ -34,7 +34,7 @@ namespace MatrixDecompositionUtility
             double sum;
             var ii = -1;
             for (i = 0; i < n; i++) {
-                var ip = indx[i];
+                var ip = index[i];
                 sum = b[ip];
                 b[ip] = b[i];
                 if (ii > -1) {
@@ -63,7 +63,7 @@ namespace MatrixDecompositionUtility
         {
             int j;
             double big;
-            var imax = 0;
+            var iMax = 0;
             var vv = new double[n];
             var d = 1.0;
             var i = 0;
@@ -78,14 +78,14 @@ namespace MatrixDecompositionUtility
                     j++;
                 }
                 if (Math.Abs(big) < double.Epsilon) {
-                    Console.WriteLine("Singular matrix in routing ludcmp!!");
+                    Console.WriteLine("Singular matrix in routine ludcmp!!");
                 }
                 vv[i] = 1.0 / big;
                 i++;
             }
             for (j = 0; j < n; j++) {
                 int k;
-                double dum;
+                double temp;
                 double sum;
                 i = 0;
                 while (i < j) {
@@ -108,35 +108,35 @@ namespace MatrixDecompositionUtility
                         k++;
                     }
                     a[i, j] = sum;
-                    if ((dum = vv[i] * Math.Abs(sum)) >= big) {
-                        big = dum;
-                        imax = i;
+                    if ((temp = vv[i] * Math.Abs(sum)) >= big) {
+                        big = temp;
+                        iMax = i;
                     }
                     i++;
                 }
-                if (j != imax) {
+                if (j != iMax) {
                     for (k = 0; k < n; k++) {
-                        dum = a[imax, k];
-                        a[imax, k] = a[j, k];
-                        a[j, k] = dum;
+                        temp = a[iMax, k];
+                        a[iMax, k] = a[j, k];
+                        a[j, k] = temp;
                     }
                     d = -d;
-                    vv[imax] = vv[j];
+                    vv[iMax] = vv[j];
                 }
-                indx[j] = imax;
+                index[j] = iMax;
                 if (Math.Abs(a[j, j]) < double.Epsilon) {
                     a[j, j] = double.MinValue;
                 }
                 if (j != n) {
-                    dum = 1.0 / a[j, j];
+                    temp = 1.0 / a[j, j];
                     for (i = j + 1; i < n; i++) {
-                        a[i, j] *= dum;
+                        a[i, j] *= temp;
                     }
                 }
             }
         }
 
-        private void printData(double[,] a, int n, IReadOnlyList<int> indx, IReadOnlyList<double> b)
+        private void PrintData(double[,] a, int n, IReadOnlyList<int> index, IReadOnlyList<double> b)
         {
             for (var i = 0; i < n; i++) {
                 for (var m = 0; m < n; m++) {
@@ -145,9 +145,9 @@ namespace MatrixDecompositionUtility
                 Console.WriteLine("");
             }
             Console.WriteLine("N is {0}", n);
-            Console.Write("indx[]: ");
+            Console.Write("index[]: ");
             for (var j = 0; j < n; j++) {
-                Console.Write("{0}\t", indx[j]);
+                Console.Write("{0}\t", index[j]);
             }
             Console.WriteLine("");
             Console.Write("B matrix: ");
