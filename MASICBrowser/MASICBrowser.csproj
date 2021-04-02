@@ -105,7 +105,7 @@
       <Version>1.1.7</Version>
     </PackageReference>
     <PackageReference Include="PRISM-Library">
-      <Version>2.6.22</Version>
+      <Version>2.6.26</Version>
     </PackageReference>
     <PackageReference Include="PRISMWin-Library">
       <Version>1.0.14</Version>

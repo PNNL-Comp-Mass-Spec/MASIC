@@ -191,10 +191,10 @@
       <Version>1.1.7</Version>
     </PackageReference>
     <PackageReference Include="PRISM-Library">
-      <Version>2.6.22</Version>
+      <Version>2.6.26</Version>
     </PackageReference>
     <PackageReference Include="PSI_Interface">
-      <Version>2.3.1</Version>
+      <Version>2.4.1</Version>
     </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
