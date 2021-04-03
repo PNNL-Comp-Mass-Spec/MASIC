@@ -26,8 +26,8 @@ namespace MASIC.DataInput
 
         private int mMostRecentPrecursorScan;
 
-        private readonly List<double> mCentroidedPrecursorIonsMz = new List<double>();
-        private readonly List<double> mCentroidedPrecursorIonsIntensity = new List<double>();
+        private readonly List<double> mCentroidedPrecursorIonsMz = new();
+        private readonly List<double> mCentroidedPrecursorIonsIntensity = new();
 
         #endregion
 

@@ -277,7 +277,7 @@ namespace MASIC
             }
         }
 
-        private readonly clsITraqIntensityCorrection intensityCorrector = new clsITraqIntensityCorrection(
+        private readonly clsITraqIntensityCorrection intensityCorrector = new(
             clsReporterIons.ReporterIonMassModeConstants.CustomOrNone,
             clsITraqIntensityCorrection.CorrectionFactorsiTRAQ4Plex.ABSciex);
 
