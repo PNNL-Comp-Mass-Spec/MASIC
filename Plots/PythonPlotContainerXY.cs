@@ -10,6 +10,8 @@ namespace MASIC.Plots
     /// </summary>
     internal class PythonPlotContainerXY : PythonPlotContainer
     {
+        // Ignore Spelling: Autoscale, Gridline
+
         public List<DataPoint> Data { get; private set; }
 
         /// <summary>

@@ -24,6 +24,8 @@ namespace MASIC.DatasetStats
 {
     public class clsDatasetStatsSummarizer : EventNotifier
     {
+        // Ignore Spelling: AcqTime, yyyy-MM-dd, hh:mm:ss tt
+
         #region "Constants and Enums"
 
         public const string SCAN_TYPE_STATS_SEP_CHAR = "::###::";

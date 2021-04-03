@@ -5,6 +5,8 @@ namespace MatrixDecompositionUtility
 {
     public class LUDecomposition
     {
+        // Ignore Spelling: ludcmp, lubksb
+
         public double[] ProcessData(double[,] a, int n, double[] b)
         {
             var index = new int[n];

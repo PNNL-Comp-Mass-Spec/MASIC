@@ -41,7 +41,7 @@ namespace MASICBrowser
     /// </summary>
     public partial class frmBrowser : Form
     {
-        // Ignore Spelling: similarFragScan, Const
+        // Ignore Spelling: cancelled, similarFragScan, Const
 
         private const string PROGRAM_DATE = "June 9, 2020";
 
