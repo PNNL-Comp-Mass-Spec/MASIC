@@ -32,7 +32,7 @@ namespace MASIC
 
     public static class Program
     {
-        public const string PROGRAM_DATE = "April 2, 2021";
+        public const string PROGRAM_DATE = "April 3, 2021";
 
         private static string mInputFilePath;
         private static string mOutputDirectoryPath;                         // Optional
