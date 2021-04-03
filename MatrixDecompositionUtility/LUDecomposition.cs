@@ -151,6 +151,7 @@ namespace MatrixDecompositionUtility
             }
         }
 
+        // ReSharper disable once UnusedMember.Local
         private void PrintData(double[,] a, int n, IReadOnlyList<int> index, IReadOnlyList<double> b)
         {
             for (var i = 0; i < n; i++) {

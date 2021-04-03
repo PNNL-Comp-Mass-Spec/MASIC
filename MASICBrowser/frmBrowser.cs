@@ -1179,7 +1179,9 @@ namespace MASICBrowser
                 lstParentIonData.SelectedIndex--;
             }
             else if (mAutoStepEnabled)
+            {
                 ToggleAutoStep(true);
+            }
         }
 
         /// <summary>
@@ -3310,7 +3312,7 @@ namespace MASICBrowser
                 success = true;
             }
 
-            if ((success && xmlReader.NodeType != XmlNodeType.Whitespace) && xmlReader.HasValue)
+            if (success && xmlReader.NodeType != XmlNodeType.Whitespace && xmlReader.HasValue)
             {
                 value = xmlReader.Value;
             }

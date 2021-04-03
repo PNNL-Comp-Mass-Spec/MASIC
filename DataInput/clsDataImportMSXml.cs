@@ -107,7 +107,7 @@ namespace MASIC.DataInput
                 }
             }
 
-            if (mzMLSpectrum.Precursors.Count > 0 && mzMLSpectrum.Precursors[0].SelectedIons != null && mzMLSpectrum.Precursors[0].SelectedIons.Count > 0)
+            if (mzMLSpectrum.Precursors.Count > 0 && mzMLSpectrum.Precursors[0].SelectedIons?.Count > 0)
             {
                 foreach (var cvParam in mzMLSpectrum.Precursors[0].SelectedIons[0].CVParams)
                 {
@@ -905,26 +905,20 @@ namespace MASIC.DataInput
                 isMzXML = false;
             }
 
-            bool success;
-
             // Determine if this was an MS/MS scan
             // If yes, determine the scan number of the survey scan
             if (spectrumInfo.MSLevel <= 1)
             {
                 // Survey Scan
-                success = ExtractSurveyScan(scanList, spectraCache, dataOutputHandler,
+                return ExtractSurveyScan(scanList, spectraCache, dataOutputHandler,
                                             spectrumInfo, msSpectrum, sicOptions,
                                             isMzXML, mzXmlSourceSpectrum);
             }
-            else
-            {
-                // Fragmentation Scan
-                success = ExtractFragmentationScan(scanList, spectraCache, dataOutputHandler,
-                                                   spectrumInfo, msSpectrum, sicOptions,
-                                                   isMzXML, mzXmlSourceSpectrum, mzMLSpectrum);
-            }
 
-            return success;
+            // Fragmentation Scan
+            return ExtractFragmentationScan(scanList, spectraCache, dataOutputHandler,
+                spectrumInfo, msSpectrum, sicOptions,
+                isMzXML, mzXmlSourceSpectrum, mzMLSpectrum);
         }
 
         /// <summary>
@@ -1022,7 +1016,7 @@ namespace MASIC.DataInput
 
             if (msSpectrum.IonsMZ != null && msSpectrum.IonsIntensity != null)
             {
-                if (mzXmlSourceSpectrum != null && mzXmlSourceSpectrum.Centroided)
+                if (mzXmlSourceSpectrum?.Centroided == true)
                 {
                     // Data is already centroided
                     UpdateCachedPrecursorScanData(scanInfo.ScanNumber, msSpectrum);
@@ -1447,12 +1441,7 @@ namespace MASIC.DataInput
 
         private bool IsHighResolutionSpectrum(string filterString)
         {
-            if (filterString.IndexOf("FTMS", StringComparison.OrdinalIgnoreCase) >= 0)
-            {
-                return true;
-            }
-
-            return false;
+            return filterString.IndexOf("FTMS", StringComparison.OrdinalIgnoreCase) >= 0;
         }
 
         private static bool IsSrmChromatogram(SimpleMzMLReader.ParamData chromatogramItem)

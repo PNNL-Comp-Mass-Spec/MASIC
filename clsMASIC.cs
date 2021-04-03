@@ -630,12 +630,10 @@ namespace MASIC
         /// <returns></returns>
         public override string GetErrorMessage()
         {
-            string errorMessage;
-
             if (ErrorCode == ProcessFilesErrorCodes.LocalizedError ||
                 ErrorCode == ProcessFilesErrorCodes.NoError)
             {
-                errorMessage = LocalErrorCode switch
+                return LocalErrorCode switch
                 {
                     MasicErrorCodes.NoError => string.Empty,
                     MasicErrorCodes.InvalidDatasetLookupFilePath => "Invalid dataset lookup file path",
@@ -660,12 +658,8 @@ namespace MASIC
                     _ => "Unknown error state"
                 };
             }
-            else
-            {
-                errorMessage = GetBaseClassErrorMessage();
-            }
 
-            return errorMessage;
+            return GetBaseClassErrorMessage();
         }
 
         /// <summary>

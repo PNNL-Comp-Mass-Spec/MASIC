@@ -84,17 +84,12 @@ namespace MASIC.Plots
             if (pngFile == null)
                 throw new ArgumentNullException(nameof(pngFile), "PNG file instance cannot be blank");
 
-            bool success;
             if (!string.Equals(pngFile.Extension, ".png", StringComparison.OrdinalIgnoreCase))
             {
-                success = SaveToFileLoop(new FileInfo(pngFile.FullName + ".png"), ImageFileFormat.PNG, width, height, resolution);
-            }
-            else
-            {
-                success = SaveToFileLoop(pngFile, ImageFileFormat.PNG, width, height, resolution);
+                return SaveToFileLoop(new FileInfo(pngFile.FullName + ".png"), ImageFileFormat.PNG, width, height, resolution);
             }
 
-            return success;
+            return SaveToFileLoop(pngFile, ImageFileFormat.PNG, width, height, resolution);
         }
 
         // ReSharper disable once UnusedMember.Global
@@ -103,17 +98,12 @@ namespace MASIC.Plots
             if (jpgFile == null)
                 throw new ArgumentNullException(nameof(jpgFile), "JPG file instance cannot be blank");
 
-            bool success;
             if (!string.Equals(jpgFile.Extension, ".jpg", StringComparison.OrdinalIgnoreCase))
             {
-                success = SaveToFileLoop(new FileInfo(jpgFile.FullName + ".jpg"), ImageFileFormat.JPG, width, height, resolution);
-            }
-            else
-            {
-                success = SaveToFileLoop(jpgFile, ImageFileFormat.JPG, width, height, resolution);
+                return SaveToFileLoop(new FileInfo(jpgFile.FullName + ".jpg"), ImageFileFormat.JPG, width, height, resolution);
             }
 
-            return success;
+            return SaveToFileLoop(jpgFile, ImageFileFormat.JPG, width, height, resolution);
         }
 
         private bool SaveToFileLoop(FileInfo imageFile, ImageFileFormat fileFormat, int width, int height, int resolution)
@@ -134,7 +124,7 @@ namespace MASIC.Plots
 
                     foreach (var axis in Plot.Axes)
                     {
-                        if (!(axis is LinearColorAxis colorAxis))
+                        if (axis is not LinearColorAxis colorAxis)
                         {
                             continue;
                         }
@@ -228,8 +218,7 @@ namespace MASIC.Plots
                 _ => throw new ArgumentOutOfRangeException(fileFormat.ToString(), "Unrecognized value: " + fileFormat)
             };
 
-            // ReSharper disable once UnusedVariable
-            var bitMap = BitmapFrame.Create(target);
+            _ = BitmapFrame.Create(target);
 
             encoder.Frames.Add(BitmapFrame.Create(target));
 
@@ -313,8 +302,7 @@ namespace MASIC.Plots
         // ReSharper disable once UnusedMember.Local
         private double PointSizeToEm(int fontSizePoints)
         {
-            var fontSizeEm = fontSizePoints / 12;
-            return fontSizeEm;
+            return fontSizePoints / 12;
         }
 
         // ReSharper disable once UnusedMember.Local

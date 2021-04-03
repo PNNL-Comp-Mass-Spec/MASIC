@@ -68,7 +68,7 @@ namespace MASIC
             // Returns false if the dataset does not have MRM data, or if an error occurs
 
             mrmSettings = new List<clsMRMScanInfo>(200);
-            srmList = new List<SRMListType>(600); // Assume there are 3 frag masses for each parent mass
+            srmList = new List<SRMListType>(600); // Assume there are 3 fragmentation masses for each parent mass
 
             try
             {
@@ -292,7 +292,7 @@ namespace MASIC
                         settingsWriter.WriteLine(string.Join(TAB_DELIMITER.ToString(), dataColumns));
                     }
                 }
-                    
+
                 if (mOptions.WriteMRMDataList || mOptions.WriteMRMIntensityCrosstab)
                 {
                     // Populate srmKeyToIndexMap
@@ -316,7 +316,7 @@ namespace MASIC
                         var crosstabFilePath = clsDataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, clsDataOutput.OutputFileTypeConstants.MRMCrosstabFile);
                         crosstabWriter = new StreamWriter(crosstabFilePath);
 
-                        // Initialize the crosstab header variable using the data in udtSRMList()
+                        // Initialize the crosstab header variable using the data in srmList()
 
                         var headerNames = new List<string>(srmList.Count + 2)
                         {
@@ -514,10 +514,13 @@ namespace MASIC
             var hashValue = mrmScanInfo.ParentIonMZ + "_" + mrmScanInfo.MRMMassCount;
 
             for (var index = 0; index < mrmScanInfo.MRMMassCount; index++)
+            {
                 hashValue += "_" +
                     mrmScanInfo.MRMMassList[index].CentralMass.ToString("0.000") + "_" +
                     mrmScanInfo.MRMMassList[index].StartMass.ToString("0.000") + "_" +
                     mrmScanInfo.MRMMassList[index].EndMass.ToString("0.000");
+            }
+
             return hashValue;
         }
 
@@ -541,13 +544,8 @@ namespace MASIC
         {
             const double COMPARISON_TOLERANCE = 0.01;
 
-            if (Math.Abs(parentIonMZ1 - parentIonMZ2) <= COMPARISON_TOLERANCE &&
-                Math.Abs(mrmDaughterMZ1 - mrmDaughterMZ2) <= COMPARISON_TOLERANCE)
-            {
-                return true;
-            }
-
-            return false;
+            return Math.Abs(parentIonMZ1 - parentIonMZ2) <= COMPARISON_TOLERANCE &&
+                   Math.Abs(mrmDaughterMZ1 - mrmDaughterMZ2) <= COMPARISON_TOLERANCE;
         }
 
         /// <summary>
@@ -658,7 +656,7 @@ namespace MASIC
                         }
                     }
 
-                    // Compute the minimum potential peak area in the entire SIC, populating udtSICPotentialAreaStatsInFullSIC
+                    // Compute the minimum potential peak area in the entire SIC, populating potentialAreaStatsInFullSIC
                     peakFinder.FindPotentialPeakArea(sicDetails.SICData,
                                                      out var potentialAreaStatsInFullSIC,
                                                      mOptions.SICOptions.SICPeakFinderOptions);
@@ -670,7 +668,7 @@ namespace MASIC
 
                     var parentIon = scanList.ParentIons[parentIonIndex];
 
-                    // Clear udtSICPotentialAreaStatsForPeak
+                    // Clear potentialAreaStatsForPeak
                     parentIon.SICStats.SICPotentialAreaStatsForPeak = new clsSICPotentialAreaStats();
 
                     var peakIsValid = peakFinder.FindSICPeakAndArea(sicDetails.SICData,

@@ -7,31 +7,36 @@ namespace MASICBrowser
     /// The InputBox class is used to show a prompt in a dialog box using the static method Show().
     /// </summary>
     /// <remarks>
+    /// <para>
     /// https://www.reflectionit.nl/blog/2003/c-inputbox
     /// Copyright © 2003 Reflection IT
-    ///
+    /// </para>
+    /// <para>
     /// This software is provided 'as-is', without any express or implied warranty.
     /// In no event will the authors be held liable for any damages arising from the
     /// use of this software.
-    ///
+    /// </para>
+    /// <para>
     /// Permission is granted to anyone to use this software for any purpose,
     /// including commercial applications, subject to the following restrictions:
-    ///
+    /// </para>
+    /// <para>
     /// 1. The origin of this software must not be misrepresented; you must not claim
     /// that you wrote the original software.
-    ///
+    /// </para>
+    /// <para>
     /// 2. No substantial portion of the source code of this library may be redistributed
     /// without the express written permission of the copyright holders, where
     /// "substantial" is defined as enough code to be recognizably from this library.
-    ///
+    /// </para>
     /// </remarks>
-    public class InputBox : Form
+    public sealed class InputBox : Form
     {
-        protected Button buttonOK;
-        protected Button buttonCancel;
-        protected Label labelPrompt;
-        protected TextBox textBoxText;
-        protected ErrorProvider errorProviderText;
+        private Button buttonOK;
+        private Button buttonCancel;
+        private Label labelPrompt;
+        private TextBox textBoxText;
+        private ErrorProvider errorProviderText;
 
         /// <summary>
         /// Required designer variable.
@@ -84,7 +89,7 @@ namespace MASICBrowser
             this.buttonOK.Name = "buttonOK";
             this.buttonOK.TabIndex = 2;
             this.buttonOK.Text = "OK";
-            this.buttonOK.Click += new System.EventHandler(this.buttonOK_Click);
+            this.buttonOK.Click += this.ButtonOK_Click;
             //
             // buttonCancel
             //
@@ -95,7 +100,7 @@ namespace MASICBrowser
             this.buttonCancel.Name = "buttonCancel";
             this.buttonCancel.TabIndex = 3;
             this.buttonCancel.Text = "Cancel";
-            this.buttonCancel.Click += new System.EventHandler(this.buttonCancel_Click);
+            this.buttonCancel.Click += this.ButtonCancel_Click;
             //
             // textBoxText
             //
@@ -104,8 +109,8 @@ namespace MASICBrowser
             this.textBoxText.Size = new System.Drawing.Size(416, 20);
             this.textBoxText.TabIndex = 1;
             this.textBoxText.Text = "";
-            this.textBoxText.Validating += new System.ComponentModel.CancelEventHandler(this.textBoxText_Validating);
-            this.textBoxText.TextChanged += new System.EventHandler(this.textBoxText_TextChanged);
+            this.textBoxText.Validating += this.textBoxText_Validating;
+            this.textBoxText.TextChanged += this.textBoxText_TextChanged;
             //
             // labelPrompt
             //
@@ -140,13 +145,13 @@ namespace MASICBrowser
         }
         #endregion
 
-        private void buttonCancel_Click(object sender, EventArgs e)
+        private void ButtonCancel_Click(object sender, EventArgs e)
         {
             this.Validator = null;
             this.Close();
         }
 
-        private void buttonOK_Click(object sender, EventArgs e)
+        private void ButtonOK_Click(object sender, EventArgs e)
         {
             this.Close();
         }
@@ -221,7 +226,7 @@ namespace MASICBrowser
         {
             if (Validator != null)
             {
-                var args = new InputBoxValidatingArgs {Text = textBoxText.Text};
+                var args = new InputBoxValidatingArgs { Text = textBoxText.Text };
                 Validator(this, args);
                 if (args.Cancel)
                 {
@@ -234,7 +239,7 @@ namespace MASICBrowser
         /// <summary>
         /// Delegate used to validate the object
         /// </summary>
-        protected InputBoxValidatingHandler Validator { get; set; }
+        private InputBoxValidatingHandler Validator { get; set; }
     }
 
     /// <summary>
