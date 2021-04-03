@@ -10,3 +10,5 @@ using System.Diagnostics.CodeAnalysis;
 
 [assembly: SuppressMessage("Readability", "RCS1123:Add parentheses when necessary.", Justification = "Parentheses aren't needed", Scope = "module")]
 [assembly: SuppressMessage("Usage", "RCS1246:Use element access.", Justification = "Prefer to use .First()", Scope = "module")]
+[assembly: SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "Legacy Name", Scope = "type", Target = "~T:MASICPeakFinder.clsPeakDetection")]
+[assembly: SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "Legacy Name", Scope = "type", Target = "~T:MASICPeakFinder.clsPeakInfo")]

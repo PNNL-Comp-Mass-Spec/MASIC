@@ -48,6 +48,7 @@
     <Compile Include="clsDatabaseTests.cs" />
     <Compile Include="clsPeakFinderTests.cs" />
     <Compile Include="clsTests.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

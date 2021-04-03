@@ -56,6 +56,7 @@
     <Compile Include="clsPeakDataContainer.cs" />
     <Compile Include="clsPeakFinder.cs" />
     <Compile Include="clsPeakDetector.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
