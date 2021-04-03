@@ -10,6 +10,8 @@ namespace MASIC.DataOutput
 {
     public class clsSICStatsWriter : clsMasicEventNotifier
     {
+        // Ignore Spelling: Frag
+
         public string SICStatsFilePath { get; private set; } = string.Empty;
 
         private clsParentIonInfo GetFakeParentIonForFragScan(clsScanList scanList, int fragScanIndex)
