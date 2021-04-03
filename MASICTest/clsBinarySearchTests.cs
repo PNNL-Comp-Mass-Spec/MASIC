@@ -45,7 +45,7 @@ namespace MASICTest
                     writer.WriteLine("Data_Index" + "\t" + "Data_Value");
                     for (var index = 0; index < dataPoints.Count; index++)
                     {
-                        writer.WriteLine(index.ToString() + "\t" + dataPoints[index]);
+                        writer.WriteLine(index + "\t" + dataPoints[index]);
                     }
 
                     writer.WriteLine();
@@ -146,7 +146,7 @@ namespace MASICTest
                     writer.WriteLine("Data_Index" + "\t" + "Data_Value");
                     for (var index = 0; index < dataPoints.Count; index++)
                     {
-                        writer.WriteLine(index.ToString() + "\t" + dataPoints[index].ToString(CultureInfo.InvariantCulture));
+                        writer.WriteLine(index + "\t" + dataPoints[index].ToString(CultureInfo.InvariantCulture));
                     }
 
                     writer.WriteLine();
