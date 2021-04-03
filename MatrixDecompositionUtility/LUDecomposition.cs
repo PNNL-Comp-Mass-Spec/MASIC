@@ -28,8 +28,15 @@ namespace MatrixDecompositionUtility
             return matrixB;
         }
 
-        // Linear equation solution, back substitution
-        private void lubksb(double[,] a, int n, IReadOnlyList<int> indx, IList<double> b)
+        /// <summary>
+        /// Linear equation solution, back substitution
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="n"></param>
+        /// <param name="index"></param>
+        /// <param name="b"></param>
+        /// <remarks>From Numerical Recipes in C</remarks>
+        private void lubksb(double[,] a, int n, IReadOnlyList<int> index, IList<double> b)
         {
             int i;
             int j;
@@ -60,8 +67,14 @@ namespace MatrixDecompositionUtility
             }
         }
 
-        // Linear equation solution, LU decomposition
-        private void ludcmp(double[,] a, int n, IList<int> indx)
+        /// <summary>
+        /// Linear equation solution, LU decomposition
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="n"></param>
+        /// <param name="index"></param>
+        /// <remarks>From Numerical Recipes in C</remarks>
+        private void ludcmp(double[,] a, int n, IList<int> index)
         {
             int j;
             double big;

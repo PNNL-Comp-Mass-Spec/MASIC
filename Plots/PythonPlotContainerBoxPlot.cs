@@ -36,7 +36,7 @@ namespace MASIC.Plots
         }
 
         /// <summary>
-        /// Save the plot, along with any defined annotations, to a png file
+        /// Save the plot, along with any defined annotations, to a PNG file
         /// </summary>
         /// <param name="pngFile">Output PNG file</param>
         /// <param name="width">PNG file width, in pixels</param>
