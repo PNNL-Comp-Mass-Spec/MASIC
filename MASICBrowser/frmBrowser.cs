@@ -252,23 +252,20 @@ namespace MASICBrowser
         {
             try
             {
-                var eSortOrder = (SortOrderConstants)cboSortOrder.SelectedIndex;
+                var sortOrder = (SortOrderConstants)cboSortOrder.SelectedIndex;
 
-                switch (eSortOrder)
+                chkSortDescending.Checked = sortOrder switch
                 {
-                    case SortOrderConstants.SortByMz:
-                    case SortOrderConstants.SortByPeakIndex:
-                    case SortOrderConstants.SortByScanOptimalPeakCenter:
-                    case SortOrderConstants.SortByScanPeakCenter:
-                    case SortOrderConstants.SortByPeakSkew:
-                    case SortOrderConstants.SortByKSStat:
-                        chkSortDescending.Checked = false;
-                        break;
-                    default:
-                        // Sort the others descending by default
-                        chkSortDescending.Checked = true;
-                        break;
-                }
+                    // Set SortDescending to false to sort these ascending
+                    SortOrderConstants.SortByMz => false,
+                    SortOrderConstants.SortByPeakIndex => false,
+                    SortOrderConstants.SortByScanOptimalPeakCenter => false,
+                    SortOrderConstants.SortByScanPeakCenter => false,
+                    SortOrderConstants.SortByPeakSkew => false,
+                    SortOrderConstants.SortByKSStat => false,
+                    // Sort the others descending by default
+                    _ => true
+                };
             }
             catch (Exception)
             {

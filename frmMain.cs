@@ -1553,18 +1553,12 @@ namespace MASIC
                 fileExtension = Path.GetExtension(txtCustomSICFileName.Text);
             }
 
-            switch (fileExtension.ToLower())
+            fileSelector.FilterIndex = fileExtension.ToLower() switch
             {
-                case ".txt":
-                    fileSelector.FilterIndex = 1;
-                    break;
-                case "csv":
-                    fileSelector.FilterIndex = 2;
-                    break;
-                default:
-                    fileSelector.FilterIndex = 1;
-                    break;
-            }
+                ".txt" => 1,
+                "csv" => 2,
+                _ => 1
+            };
 
             if (txtCustomSICFileName.TextLength > 0)
             {
@@ -1620,38 +1614,17 @@ namespace MASIC
                 fileExtension = Path.GetExtension(txtInputFilePath.Text);
             }
 
-            int filterIndex;
-            switch (fileExtension.ToLower())
+            // ReSharper disable StringLiteralTypo
+            fileSelector.FilterIndex = fileExtension.ToLower() switch
             {
-                // ReSharper disable StringLiteralTypo
-                case ".mzxml":
-                    filterIndex = 2;
-                    break;
-
-                case "mzml":
-                    filterIndex = 3;
-                    break;
-
-                case ".mzdata":
-                    filterIndex = 4;
-                    break;
-
-                case ".mgf":
-                    filterIndex = 5;
-                    break;
-
-                case ".cdf":
-                    filterIndex = 6;
-                    break;
-
-                default:
-                    filterIndex = 1;
-                    break;
-
-                // ReSharper restore StringLiteralTypo
-            }
-
-            fileSelector.FilterIndex = filterIndex;
+                ".mzxml" => 2,
+                "mzml" => 3,
+                ".mzdata" => 4,
+                ".mgf" => 5,
+                ".cdf" => 6,
+                _ => 1
+            };
+            // ReSharper restore StringLiteralTypo
 
             if (txtInputFilePath.TextLength > 0)
             {

@@ -221,19 +221,12 @@ namespace MASIC.Plots
             var target = new RenderTargetBitmap(width, height, DPI, DPI, PixelFormats.Default);
             target.Render(drawVisual);
 
-            BitmapEncoder encoder;
-
-            switch (fileFormat)
+            BitmapEncoder encoder = fileFormat switch
             {
-                case ImageFileFormat.PNG:
-                    encoder = new PngBitmapEncoder();
-                    break;
-                case ImageFileFormat.JPG:
-                    encoder = new JpegBitmapEncoder();
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(fileFormat.ToString(), "Unrecognized value: " + fileFormat);
-            }
+                ImageFileFormat.PNG => new PngBitmapEncoder(),
+                ImageFileFormat.JPG => new JpegBitmapEncoder(),
+                _ => throw new ArgumentOutOfRangeException(fileFormat.ToString(), "Unrecognized value: " + fileFormat)
+            };
 
             // ReSharper disable once UnusedVariable
             var bitMap = BitmapFrame.Create(target);

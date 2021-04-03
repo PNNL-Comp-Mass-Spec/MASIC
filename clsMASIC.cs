@@ -635,71 +635,30 @@ namespace MASIC
             if (ErrorCode == ProcessFilesErrorCodes.LocalizedError ||
                 ErrorCode == ProcessFilesErrorCodes.NoError)
             {
-                switch (LocalErrorCode)
+                errorMessage = LocalErrorCode switch
                 {
-                    case MasicErrorCodes.NoError:
-                        errorMessage = string.Empty;
-                        break;
-                    case MasicErrorCodes.InvalidDatasetLookupFilePath:
-                        errorMessage = "Invalid dataset lookup file path";
-                        break;
-                    case MasicErrorCodes.UnknownFileExtension:
-                        errorMessage = "Unknown file extension";
-                        break;
-                    case MasicErrorCodes.InputFileAccessError:
-                        errorMessage = "Input file access error";
-                        break;
-                    case MasicErrorCodes.InvalidDatasetID:
-                        errorMessage = "Invalid dataset number";
-                        break;
-                    case MasicErrorCodes.CreateSICsError:
-                        // ReSharper disable once StringLiteralTypo
-                        errorMessage = "Create SIC's error";
-                        break;
-                    case MasicErrorCodes.FindSICPeaksError:
-                        errorMessage = "Error finding SIC peaks";
-                        break;
-                    case MasicErrorCodes.InvalidCustomSICValues:
-                        errorMessage = "Invalid custom SIC values";
-                        break;
-                    case MasicErrorCodes.NoParentIonsFoundInInputFile:
-                        errorMessage = "No parent ions were found in the input file (additionally, no custom SIC values were defined)";
-                        break;
-                    case MasicErrorCodes.NoSurveyScansFoundInInputFile:
-                        errorMessage = "No survey scans were found in the input file (do you have a Scan Range filter defined?)";
-                        break;
-                    case MasicErrorCodes.FindSimilarParentIonsError:
-                        errorMessage = "Find similar parent ions error";
-                        break;
-                    case MasicErrorCodes.InputFileDataReadError:
-                        errorMessage = "Error reading data from input file";
-                        break;
-                    case MasicErrorCodes.OutputFileWriteError:
-                        errorMessage = "Error writing data to output file";
-                        break;
-                    case MasicErrorCodes.FileIOPermissionsError:
-                        errorMessage = "File IO Permissions Error";
-                        break;
-                    case MasicErrorCodes.ErrorCreatingSpectrumCacheDirectory:
-                        errorMessage = "Error creating spectrum cache directory";
-                        break;
-                    case MasicErrorCodes.ErrorCachingSpectrum:
-                        errorMessage = "Error caching spectrum";
-                        break;
-                    case MasicErrorCodes.ErrorUncachingSpectrum:
-                        errorMessage = "Error uncaching spectrum";
-                        break;
-                    case MasicErrorCodes.ErrorDeletingCachedSpectrumFiles:
-                        errorMessage = "Error deleting cached spectrum files";
-                        break;
-                    case MasicErrorCodes.UnspecifiedError:
-                        errorMessage = "Unspecified localized error";
-                        break;
-                    default:
-                        // This shouldn't happen
-                        errorMessage = "Unknown error state";
-                        break;
-                }
+                    MasicErrorCodes.NoError => string.Empty,
+                    MasicErrorCodes.InvalidDatasetLookupFilePath => "Invalid dataset lookup file path",
+                    MasicErrorCodes.UnknownFileExtension => "Unknown file extension",
+                    MasicErrorCodes.InputFileAccessError => "Input file access error",
+                    MasicErrorCodes.InvalidDatasetID => "Invalid dataset number",
+                    // ReSharper disable once StringLiteralTypo
+                    MasicErrorCodes.CreateSICsError => "Create SIC's error",
+                    MasicErrorCodes.FindSICPeaksError => "Error finding SIC peaks",
+                    MasicErrorCodes.InvalidCustomSICValues => "Invalid custom SIC values",
+                    MasicErrorCodes.NoParentIonsFoundInInputFile => "No parent ions were found in the input file (additionally, no custom SIC values were defined)",
+                    MasicErrorCodes.NoSurveyScansFoundInInputFile => "No survey scans were found in the input file (do you have a Scan Range filter defined?)",
+                    MasicErrorCodes.FindSimilarParentIonsError => "Find similar parent ions error",
+                    MasicErrorCodes.InputFileDataReadError => "Error reading data from input file",
+                    MasicErrorCodes.OutputFileWriteError => "Error writing data to output file",
+                    MasicErrorCodes.FileIOPermissionsError => "File IO Permissions Error",
+                    MasicErrorCodes.ErrorCreatingSpectrumCacheDirectory => "Error creating spectrum cache directory",
+                    MasicErrorCodes.ErrorCachingSpectrum => "Error caching spectrum",
+                    MasicErrorCodes.ErrorUncachingSpectrum => "Error uncaching spectrum",
+                    MasicErrorCodes.ErrorDeletingCachedSpectrumFiles => "Error deleting cached spectrum files",
+                    MasicErrorCodes.UnspecifiedError => "Unspecified localized error",
+                    _ => "Unknown error state"
+                };
             }
             else
             {
