@@ -40,18 +40,18 @@ namespace MASICTest
                 var outputFolderPath = GetOutputFolderPath();
                 var outputFile = new FileInfo(Path.Combine(outputFolderPath, "BinarySearch_Test_Int_" + eMissingDataMode + ".txt"));
 
-                using (var srOutFile = new StreamWriter(outputFile.FullName, false))
+                using (var writer = new StreamWriter(outputFile.FullName, false))
                 {
-                    srOutFile.WriteLine("Data_Index" + "\t" + "Data_Value");
+                    writer.WriteLine("Data_Index" + "\t" + "Data_Value");
                     for (var index = 0; index < dataPoints.Count; index++)
                     {
-                        srOutFile.WriteLine(index.ToString() + "\t" + dataPoints[index]);
+                        writer.WriteLine(index.ToString() + "\t" + dataPoints[index]);
                     }
 
-                    srOutFile.WriteLine();
+                    writer.WriteLine();
 
                     // Write the headers
-                    srOutFile.WriteLine("Search Value" + "\t" + "Match Value" + "\t" + "Match Index");
+                    writer.WriteLine("Search Value" + "\t" + "Match Value" + "\t" + "Match Index");
 
                     const int searchValueStart = -10;
                     var searchValueEnd = maxDataValue + 10;
@@ -71,7 +71,7 @@ namespace MASICTest
 
                         searchResults.Add(dataPointToFind, dataPoints[indexMatch]);
 
-                        srOutFile.WriteLine("{0}\t{1}\t{2}", dataPointToFind, dataPoints[indexMatch], indexMatch);
+                        writer.WriteLine("{0}\t{1}\t{2}", dataPointToFind, dataPoints[indexMatch], indexMatch);
                     }
 
                     // Verify some of the results
@@ -141,18 +141,18 @@ namespace MASICTest
                 var outputFolderPath = GetOutputFolderPath();
                 var outputFile = new FileInfo(Path.Combine(outputFolderPath, "BinarySearch_Test_Double_" + eMissingDataMode + ".txt"));
 
-                using (var srOutFile = new StreamWriter(outputFile.FullName, false))
+                using (var writer = new StreamWriter(outputFile.FullName, false))
                 {
-                    srOutFile.WriteLine("Data_Index" + "\t" + "Data_Value");
+                    writer.WriteLine("Data_Index" + "\t" + "Data_Value");
                     for (var index = 0; index < dataPoints.Count; index++)
                     {
-                        srOutFile.WriteLine(index.ToString() + "\t" + dataPoints[index].ToString(CultureInfo.InvariantCulture));
+                        writer.WriteLine(index.ToString() + "\t" + dataPoints[index].ToString(CultureInfo.InvariantCulture));
                     }
 
-                    srOutFile.WriteLine();
+                    writer.WriteLine();
 
                     // Write the headers
-                    srOutFile.WriteLine("Search Value" + "\t" + "Match Value" + "\t" + "Match Index");
+                    writer.WriteLine("Search Value" + "\t" + "Match Value" + "\t" + "Match Index");
 
                     const int searchValueStart = -10;
                     var searchValueEnd = maxDataValue + 11;
@@ -169,7 +169,7 @@ namespace MASICTest
                         var indexMatch = clsBinarySearch.BinarySearchFindNearest(dataPoints, dataPointToFind, eMissingDataMode);
                         searchResults.Add(dataPointToFind, dataPoints[indexMatch]);
 
-                        srOutFile.WriteLine("{0}\t{1}\t{2}", dataPointToFind, dataPoints[indexMatch], indexMatch);
+                        writer.WriteLine("{0}\t{1}\t{2}", dataPointToFind, dataPoints[indexMatch], indexMatch);
                     }
 
                     // Verify some of the results
