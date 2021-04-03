@@ -52,7 +52,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="NUnit">
-      <Version>3.12.0</Version>
+      <Version>3.13.1</Version>
     </PackageReference>
     <PackageReference Include="PRISM-Library">
       <Version>2.6.26</Version>
