@@ -98,6 +98,55 @@ then the values in those columns will be treated as AcquisitionTime values,
 regardless of the global custom SIC Tolerance Type setting defined in the GUI
 or in the XML parameter file.
 
+## Output File Columns
+
+### _ScanStats.txt file columns
+
+| Column Name                | Description                      |
+|----------------------------|----------------------------------|
+| Dataset                    | Dataset name                     |
+| ScanNumber                 | Scan number                      |
+| ScanTime                   | Elution time (minutes)           |
+| ScanType                   | 1 for MS1, 2 for MS2             |
+| TotalIonIntensity          | Total Ion Intensity (TIC)        |
+| BasePeakIntensity          | Base Peak Intensity (BPI)        |
+| BasePeakMZ                 | m/z value of the base peak       |
+| BasePeakSignalToNoiseRatio | S/N of the base peak             |
+| IonCount                   | Number of ions (after filtering) |
+| IonCountRaw                | Number of ions                   |
+| ScanTypeName               | HMS, HCD-HMSn, CID-MSn, etc.     |
+
+### _SICStats.txt file columns
+
+| Column Name                     | Description                                                 |
+|---------------------------------|-------------------------------------------------------------|
+| Dataset                         | Dataset name                                                |
+| ParentIonIndex                  | Index                                                       |
+| MZ                              | Parent ion m/z                                              |
+| SurveyScanNumber                | Precursor scan number                                       |
+| FragScanNumber                  | MS2 scan number                                             |
+| OptimalPeakApexScanNumber       | Scan number of the peak apex                                |
+| PeakApexOverrideParentIonIndex  | Index of the parent ion that this SIC inherits from; -1 if not inherited |
+| CustomSICPeak                   | 1 if a peak for a custom m/z search value                   |
+| PeakScanStart                   | SIC peak start scan number                                  |
+| PeakScanEnd                     | SIC peak end scan number                                    |
+| PeakScanMaxIntensity            | SIC peak center scan number                                 |
+| PeakMaxIntensity                | Maximum intensity of the SIC peak                           |
+| PeakSignalToNoiseRatio          | Signal to noise ratio (S/N)                                 |
+| FWHMInScans                     | Full width half max, in scans                               |
+| PeakArea                        | Area of the SIC peak                                        |
+| ParentIonIntensity              | Intensity of the parent ion                                 |
+| PeakBaselineNoiseLevel          | Baseline noise level surrounding the peak                   |
+| PeakBaselineNoiseStDev          | Baseline noise Standard Deviation                           |
+| PeakBaselinePointsUsed          | Number of points used to determine the baseline noise level |
+| StatMomentsArea                 | Area, as computed using statistical moments                 |
+| CenterOfMassScan                | Central scan number, as determined via the center of mass (from statistical moments)  |
+| PeakStDev                       | Standard deviation, from statistical moments                |
+| PeakSkew                        | Skew, from statistical moments                              |
+| PeakKSStat                      | KSStat, from statistical moments                            |
+| StatMomentsDataCountUsed        | Data points used by statistical moments calculations        |
+| InterferenceScore               | Parent ion interference score, measuring the fraction of observed peaks in the parent ion isolation window that are from the precursor |
+
 ## Reporter Ions
 
 Enable the "Generate Reporter Ion Stats" option to instruct MASIC to look 
