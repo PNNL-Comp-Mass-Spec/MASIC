@@ -146,8 +146,7 @@ namespace MagnitudeConcavityPeakFinder
 
             // Look for the minimum positive value and replace all data in sortedData with that value
 
-            // ReSharper disable once UnusedVariable
-            var minimumPositiveValue = ReplaceSortedDataWithMinimumPositiveValue(dataSortedCount, sortedData);
+            ReplaceSortedDataWithMinimumPositiveValue(dataSortedCount, sortedData);
 
             switch (baselineNoiseOptions.BaselineNoiseMode)
             {
