@@ -22,7 +22,7 @@ namespace MASICBrowser
     // in compliance with the License.  You may obtain a copy of the License at
     // https://opensource.org/licenses/BSD-2-Clause
 
-    static class Program
+    internal static class Program
     {
         public const string PROGRAM_DATE = "August 13, 2021";
 

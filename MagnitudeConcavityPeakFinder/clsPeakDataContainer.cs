@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace MagnitudeConcavityPeakFinder
 {
-    class PeakDataContainer
+    internal class PeakDataContainer
     {
         private int mOriginalPeakLocationIndex;
 
