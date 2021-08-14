@@ -87,7 +87,8 @@ namespace MASIC
 
             try
             {
-                var connectionStringToUse = DbToolsFactory.AddApplicationNameToConnectionString(masicOptions.DatabaseConnectionString, "MASIC");
+                var applicationName = string.Format("MASIC_{0}", datasetName);
+                var connectionStringToUse = DbToolsFactory.AddApplicationNameToConnectionString(masicOptions.DatabaseConnectionString, applicationName);
 
                 var dbTools = DbToolsFactory.GetDBTools(connectionStringToUse);
 
