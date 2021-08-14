@@ -202,7 +202,7 @@ namespace MASIC
                         }
 
                         // This is a custom SIC-based parent ion
-                        // Prior to August 2014, we set .FragScanIndices(0) = 0, which made it appear that the fragmentation scan was the first MS2 spectrum in the dataset for all custom SICs
+                        // Prior to August 2014, we set .FragScanIndices[0] = 0, which made it appear that the fragmentation scan was the first MS2 spectrum in the dataset for all custom SICs
                         // This caused undesirable display results in MASIC browser, so we now set it to the next MS2 scan that occurs after the survey scan (parent scan)
                         if (scanList.MasterScanOrder[fragScanIndexMatch].ScanType == clsScanList.ScanTypeConstants.FragScan)
                         {
