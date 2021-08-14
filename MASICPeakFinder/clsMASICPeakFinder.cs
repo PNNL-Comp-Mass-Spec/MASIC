@@ -514,8 +514,8 @@ namespace MASICPeakFinder
 
             // Recompute the average using only the data between intensityThresholdMin and intensityThresholdMax in dataListSorted
             sum = 0;
-            var sortedIndex = dataSortedIndexStart;
-            while (sortedIndex <= dataSortedIndexEnd)
+
+            for (var sortedIndex = dataSortedIndexStart; sortedIndex <= dataSortedIndexEnd; sortedIndex++)
             {
                 if (dataListSorted[sortedIndex] >= intensityThresholdMin)
                 {
@@ -535,8 +535,6 @@ namespace MASICPeakFinder
                         sortedIndex++;
                     }
                 }
-
-                sortedIndex++;
             }
 
             dataUsedCount = dataSortedIndexEnd - dataSortedIndexStart + 1;
