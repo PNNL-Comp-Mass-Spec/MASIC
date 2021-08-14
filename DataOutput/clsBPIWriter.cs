@@ -8,6 +8,12 @@ namespace MASIC.DataOutput
 {
     public class clsBPIWriter : clsMasicEventNotifier
     {
+        // ReSharper disable CommentTypo
+
+        // Ignore Spelling: Appodization, Extrel, fwhm, Hanning, Parzen, Welch, xtitle, ytitle
+
+        // ReSharper restore CommentTypo
+
         private string DynamicValueToString(double value)
         {
             if (value < 100)

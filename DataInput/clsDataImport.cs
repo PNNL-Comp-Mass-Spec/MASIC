@@ -10,6 +10,8 @@ namespace MASIC.DataInput
 {
     public abstract class clsDataImport : clsMasicEventNotifier
     {
+        // Ignore Spelling: centroided
+
         /// <summary>
         /// Thermo .raw file extension
         /// </summary>

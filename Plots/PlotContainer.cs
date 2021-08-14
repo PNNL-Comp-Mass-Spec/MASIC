@@ -20,6 +20,8 @@ namespace MASIC.Plots
     /// </summary>
     internal class PlotContainer : PlotContainerBase
     {
+        // Ignore Spelling: Arial, png
+
         private const double PIXELS_PER_DIP = 1.25;
 
         public const int DEFAULT_BASE_FONT_SIZE = 16;

@@ -32,6 +32,11 @@ namespace MASIC
 
     public static class Program
     {
+        // Ignore Spelling: bool
+
+        /// <summary>
+        /// Program date
+        /// </summary>
         public const string PROGRAM_DATE = "April 3, 2021";
 
         private static string mInputFilePath;
@@ -310,7 +315,7 @@ namespace MASIC
                     }
                     else if (!string.IsNullOrWhiteSpace(datasetIdOrLookupFile))
                     {
-                        // Assume the user specified a dataset number lookup file comma, space, or tab delimited delimited file specifying the dataset number for each input file)
+                        // Assume the user specified a dataset number lookup file comma, space, or tab delimited file specifying the dataset number for each input file)
                         mDatasetLookupFilePath = datasetIdOrLookupFile;
                         mDatasetID = 0;
                     }
@@ -489,7 +494,7 @@ namespace MASIC
                 Console.WriteLine();
 
                 Console.WriteLine(ConsoleMsgUtils.WrapParagraph(
-                    "Use /SF to specify the name to use for the Masic Status file (default is " + MASICOptions.DEFAULT_MASIC_STATUS_FILE_NAME + ")."));
+                    "Use /SF to specify the name to use for the MASIC Status file (default is " + MASICOptions.DEFAULT_MASIC_STATUS_FILE_NAME + ")."));
                 Console.WriteLine();
 
                 Console.WriteLine("Use /CreateParamFile to create an example parameter file named MASIC_ExampleSettings.xml");

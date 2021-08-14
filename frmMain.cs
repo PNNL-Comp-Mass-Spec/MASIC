@@ -38,8 +38,12 @@ namespace MASIC
     /// </summary>
     public partial class frmMain : Form
     {
-        // ReSharper disable once CommentTypo
-        // Ignore Spelling: dpi, Da, CrLf, iTraq, frmMain, csv, Savitzky, Golay, Xcalibur, Acq, Checkbox, Combobox, Textbox
+        // ReSharper disable CommentTypo
+
+        // Ignore Spelling: Acet, Acq, Acetylated, amine, Checkbox, Combobox, CrLf, csv, Da, dpi, fracking frmMain
+        // Ignore Spelling: Golay, immonium, iTraq, Lys, mzml, Orbitrap Savitzky, Textbox, Xcalibur
+
+        // ReSharper restore CommentTypo
 
         /// <summary>
         /// Constructor
@@ -1279,7 +1283,7 @@ namespace MASIC
                 // Import Options
                 txtParentIonDecoyMassDa.Text = masicOptions.ParentIonDecoyMassDa.ToString(CultureInfo.InvariantCulture);
 
-                // Masic Export Options
+                // MASIC Export Options
                 chkIncludeHeaders.Checked = masicOptions.IncludeHeadersInExportFile;
                 chkIncludeScanTimesInSICStatsFile.Checked = masicOptions.IncludeScanTimesInSICStatsFile;
 
@@ -1810,7 +1814,7 @@ namespace MASIC
                 if (parseError)
                     return false;
 
-                // Masic Export Options
+                // MASIC Export Options
                 masicOptions.IncludeHeadersInExportFile = chkIncludeHeaders.Checked;
                 masicOptions.IncludeScanTimesInSICStatsFile = chkIncludeScanTimesInSICStatsFile.Checked;
 

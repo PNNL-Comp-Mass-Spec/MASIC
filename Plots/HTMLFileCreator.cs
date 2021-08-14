@@ -10,6 +10,8 @@ namespace MASIC.Plots
 {
     internal class HTMLFileCreator : EventNotifier
     {
+        // Ignore Spelling: href, html
+
         public string DatasetName { get; }
 
         public PlotOptions Options { get; }

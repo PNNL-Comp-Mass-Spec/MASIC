@@ -10,6 +10,8 @@ namespace MASIC
 {
     public class clsReporterIonProcessor : clsMasicEventNotifier
     {
+        // Ignore Spelling: Uniquify
+
         public const string REPORTER_ION_COLUMN_PREFIX = "Ion_";
 
         private readonly MASICOptions mOptions;
@@ -44,7 +46,7 @@ namespace MASIC
 
             try
             {
-                // Use Xraw to read the .Raw files
+                // Use XrawFileIO to read the .Raw files
                 var readerOptions = new ThermoReaderOptions()
                 {
                     LoadMSMethodInfo = false,
@@ -59,7 +61,7 @@ namespace MASIC
                 if (inputFilePathFull.EndsWith(DataInput.clsDataImport.THERMO_RAW_FILE_EXTENSION, StringComparison.OrdinalIgnoreCase))
                 {
                     // Processing a thermo .Raw file
-                    // Check whether any of the frag scans has IsFTMS true
+                    // Check whether any of the fragmentation scans has IsFTMS true
                     for (var masterOrderIndex = 0; masterOrderIndex < scanList.MasterScanOrderCount; masterOrderIndex++)
                     {
                         var scanPointer = scanList.MasterScanOrder[masterOrderIndex].ScanIndexPointer;
@@ -474,7 +476,7 @@ namespace MASIC
                             (reporterIntensitiesCorrected[reporterIonIndex] - reporterIntensities[reporterIonIndex]) /
                             reporterIntensities[reporterIonIndex];
 
-                        // Using Absolute Value here to prevent negative changes from cancelling out positive changes
+                        // Using Absolute Value here to prevent negative changes from canceling out positive changes
                         pctChangeSum += Math.Abs(pctChange * reporterIntensities[reporterIonIndex]);
                     }
 
@@ -509,7 +511,7 @@ namespace MASIC
                             Math.Abs(reporterIons[reporterIonIndex].Resolution) < float.Epsilon &&
                             Math.Abs(reporterIons[reporterIonIndex].LabelDataMZ) < float.Epsilon)
                         {
-                            // A match was not found in the label data; display blanks (not zeroes)
+                            // A match was not found in the label data; display blanks (not zeros)
                             ftmsSignalToNoise.Add(string.Empty);
                             ftmsResolution.Add(string.Empty);
                             //ftmsLabelDataMz.Add(string.Empty);

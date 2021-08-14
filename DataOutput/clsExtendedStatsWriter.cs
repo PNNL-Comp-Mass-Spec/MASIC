@@ -226,7 +226,7 @@ namespace MASIC.DataOutput
                 }
             }
 
-            // Examine the values in .ExtendedHeaderInfo() in the frag scans and compare them
+            // Examine the values in .ExtendedHeaderInfo() in the fragmentation scans and compare them
             // to the values in consolidatedValuesByID, looking to see if they match
             foreach (var fragScan in fragScans)
             {
@@ -332,7 +332,7 @@ namespace MASIC.DataOutput
                         break;
 
                     case clsScanList.ScanTypeConstants.FragScan:
-                        // Frag Scan
+                        // Fragmentation Scan
                         currentScan = scanList.FragScans[scanList.MasterScanOrder[masterScanIndex].ScanIndexPointer];
                         break;
 

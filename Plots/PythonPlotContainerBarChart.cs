@@ -6,6 +6,8 @@ namespace MASIC.Plots
 {
     internal class PythonPlotContainerBarChart : PythonPlotContainer
     {
+        // Ignore Spelling: autoscale, png
+
         public List<KeyValuePair<string, double>> Data { get; private set; }
 
         /// <summary>

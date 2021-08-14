@@ -32,6 +32,8 @@ namespace MASICBrowser
     /// </remarks>
     public sealed class InputBox : Form
     {
+        // Ignore Spelling: Validator
+
         private Button buttonOK;
         private Button buttonCancel;
         private Label labelPrompt;

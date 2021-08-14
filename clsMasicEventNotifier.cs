@@ -5,6 +5,8 @@ namespace MASIC
 {
     public abstract class clsMasicEventNotifier : EventNotifier
     {
+        // Ignore Spelling: uncache
+
         private short mLastPercentComplete;
 
         /// <summary>

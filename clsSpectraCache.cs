@@ -10,6 +10,8 @@ namespace MASIC
     /// </summary>
     public class clsSpectraCache : clsMasicEventNotifier, IDisposable
     {
+        // Ignore Spelling: uncache, uncached
+
         /// <summary>
         /// Constructor
         /// </summary>
@@ -49,8 +51,6 @@ namespace MASIC
             LoadedFromCache = 2
         }
 
-
-
         /// <summary>
         /// Pool (collection) of currently loaded spectra
         /// </summary>
@@ -69,7 +69,6 @@ namespace MASIC
         /// Records the byte offset of the data in the page file for a given scan number
         /// </summary>
         private Dictionary<int, long> mSpectrumByteOffset;
-
 
         /// <summary>
         /// Number of cache events
@@ -214,7 +213,7 @@ namespace MASIC
             var initialOffset = mPageFileWriter.BaseStream.Position;
 
             // Write the spectrum to the page file
-            // Record the current offset in the hashtable
+            // Record the current offset in the hash table
             mSpectrumByteOffset.Add(scanNumber, mPageFileWriter.BaseStream.Position);
             if (mSpectrumByteOffset.Count > SpectrumCount)
                 SpectrumCount = mSpectrumByteOffset.Count;
@@ -500,7 +499,7 @@ namespace MASIC
             if (!UnCacheSpectrumWork(scanNumber, msSpectrum))
             {
                 // Scan not found; use a blank mass spectrum
-                // Its cache state will be set to LoadedFromCache, which is ok, since we don't need to cache it to disk
+                // Its cache state will be set to LoadedFromCache, which is OK, since we don't need to cache it to disk
                 msSpectrum.Clear(scanNumber);
             }
 

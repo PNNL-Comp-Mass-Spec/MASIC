@@ -10,6 +10,8 @@ namespace MASICTest
     [TestFixture]
     public class clsBinarySearchTests
     {
+        // Ignore Spelling: \username
+
         private const string OUTPUT_FOLDER = @"\\proto-2\UnitTest_Files\MASIC\Results";
 
         [Test]

@@ -2,6 +2,8 @@
 {
     public class ScanStatsEntry
     {
+        // Ignore Spelling: centroiding
+
         /// <summary>
         /// Scan number
         /// </summary>

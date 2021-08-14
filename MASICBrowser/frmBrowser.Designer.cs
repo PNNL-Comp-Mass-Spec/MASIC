@@ -1,15 +1,11 @@
-﻿using System;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.Drawing;
-using System.Runtime.CompilerServices;
-using System.Timers;
-using System.Windows.Forms;
+﻿using System.Windows.Forms;
 
 namespace MASICBrowser
 {
     partial class frmBrowser
     {
+        // Ignore Spelling: butterworth, Golay, Savitzky
+
         /// <summary>
         /// Required designer variable.
         /// </summary>
