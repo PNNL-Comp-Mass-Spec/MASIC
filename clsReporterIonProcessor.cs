@@ -10,17 +10,9 @@ namespace MASIC
 {
     public class clsReporterIonProcessor : clsMasicEventNotifier
     {
-        #region "Constants"
-
         public const string REPORTER_ION_COLUMN_PREFIX = "Ion_";
 
-        #endregion
-
-        #region "Class wide variables"
-
         private readonly MASICOptions mOptions;
-
-        #endregion
 
         /// <summary>
         /// Constructor

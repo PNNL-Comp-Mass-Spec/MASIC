@@ -57,8 +57,6 @@ namespace MASIC.Plots
 
         protected StreamWriter mLogWriter;
 
-        #region "Properties"
-
         public string AnnotationBottomLeft { get; set; }
 
         public string AnnotationBottomRight { get; set; }
@@ -68,8 +66,6 @@ namespace MASIC.Plots
         public PlotCategories PlotCategory { get; protected set; }
 
         public abstract int SeriesCount { get; }
-
-        #endregion
 
         /// <summary>
         /// Constructor

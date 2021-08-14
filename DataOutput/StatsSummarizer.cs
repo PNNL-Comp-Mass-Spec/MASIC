@@ -12,8 +12,6 @@ namespace MASIC.DataOutput
 {
     public class StatsSummarizer : EventNotifier
     {
-        #region "Constants and Enums"
-
         private const string UNDEFINED_UNITS = "Undefined Units";
 
         private enum ReporterIonsColumns
@@ -57,10 +55,6 @@ namespace MASIC.DataOutput
             ParentIonIntensity = 9
         }
 
-        #endregion
-
-        #region "Member variables"
-
         /// <summary>
         /// Parent ions loaded from the SICStats file
         /// </summary>
@@ -87,10 +81,6 @@ namespace MASIC.DataOutput
         /// Values are a dictionary of scan number and abundance
         /// </remarks>
         private readonly Dictionary<int, Dictionary<int, double>> mReporterIonAbundances;
-
-        #endregion
-
-        #region "Properties"
 
         /// <summary>
         /// MASIC Options
@@ -169,8 +159,6 @@ namespace MASIC.DataOutput
         /// Keys are column index (corresponding to <see cref="ReporterIonNames"/> and <see cref="mReporterIonInfo"/>)
         /// Values are box plot stats, by channel
         public Dictionary<int, BoxPlotStats> ReporterIonIntensityStatsHighAbundanceData { get; set; }
-
-        #endregion
 
         /// <summary>
         /// Constructor

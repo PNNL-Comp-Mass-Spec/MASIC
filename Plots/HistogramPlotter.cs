@@ -11,15 +11,9 @@ namespace MASIC.Plots
 {
     public class HistogramPlotter : EventNotifier
     {
-        #region "Member variables"
-
         private readonly HistogramInfo mHistogram;
 
         private readonly bool mWriteDebug;
-
-        #endregion
-
-        #region "Properties"
 
         /// <summary>
         /// When true, autoscale the Y axis
@@ -60,8 +54,6 @@ namespace MASIC.Plots
         /// When true, remove zeroes from the start and end of the data
         /// </summary>
         public bool RemoveZeroesFromEnds { get; set; }
-
-        #endregion
 
         /// <summary>
         /// Constructor

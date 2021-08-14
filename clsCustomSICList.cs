@@ -14,8 +14,6 @@ namespace MASIC
     {
         // Ignore Spelling: frag, acq, Da
 
-        #region "Constants and Enums"
-
         /// <summary>
         /// Keyword corresponding to CustomSICScanTypeConstants.Absolute
         /// </summary>
@@ -56,10 +54,6 @@ namespace MASIC
             /// </summary>
             Undefined = 3
         }
-
-        #endregion
-
-        #region "Properties"
 
         /// <summary>
         /// Custom SIC list filename
@@ -122,13 +116,7 @@ namespace MASIC
         /// </summary>
         public string RawTextScanOrAcqTimeToleranceList { get; set; }
 
-        #endregion
-
-        #region "Class wide variables"
-
         private string mCustomSICListFileName;
-
-        #endregion
 
         /// <summary>
         /// Constructor

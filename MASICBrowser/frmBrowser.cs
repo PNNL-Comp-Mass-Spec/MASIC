@@ -58,8 +58,6 @@ namespace MASICBrowser
             InitializeControls();
         }
 
-        #region "Constants and Enums"
-
         private const string REG_APP_NAME = "MASICBrowser";
         private const string REG_SECTION_NAME = "Options";
 
@@ -152,15 +150,7 @@ namespace MASICBrowser
             ParentIons = 3
         }
 
-        #endregion
-
-        #region "Properties"
-
         public string FileToAutoLoad { get; set; }
-
-        #endregion
-
-        #region "Class wide Variables"
 
         private Spectrum mSpectrum;
 
@@ -190,8 +180,6 @@ namespace MASICBrowser
         private DateTime mLastErrorNotification;
 
         private System.Windows.Forms.Timer mFileLoadTimer;
-
-        #endregion
 
         /// <summary>
         /// Look for a corresponding Synopsis or First hits file in the same folder as masicFilePath
@@ -3329,8 +3317,6 @@ namespace MASICBrowser
             }
         }
 
-        #region "Checkboxes"
-
         private void chkFilterByIntensity_CheckedChanged(object sender, EventArgs e)
         {
             SortData();
@@ -3381,10 +3367,6 @@ namespace MASICBrowser
             UpdateStatsAndPlot();
         }
 
-        #endregion
-
-        #region "Command Buttons"
-
         private void cmdAutoStep_Click(object sender, EventArgs e)
         {
             ToggleAutoStep();
@@ -3410,10 +3392,6 @@ namespace MASICBrowser
             JumpToScan();
         }
 
-        #endregion
-
-        #region "ListBoxes and Comboboxes"
-
         private void lstParentIonData_SelectedIndexChanged(object sender, EventArgs e)
         {
             UpdateStatsAndPlot();
@@ -3430,10 +3408,6 @@ namespace MASICBrowser
             SortData();
             lstParentIonData.Focus();
         }
-
-        #endregion
-
-        #region "Option buttons"
 
         private void optDoNotResmooth_CheckedChanged(object sender, EventArgs e)
         {
@@ -3452,10 +3426,6 @@ namespace MASICBrowser
             EnableDisableControls();
             UpdateStatsAndPlot();
         }
-
-        #endregion
-
-        #region "Textboxes"
 
         private void txtAutoStep_TextChanged(object sender, EventArgs e)
         {
@@ -3648,10 +3618,6 @@ namespace MASICBrowser
             }
         }
 
-        #endregion
-
-        #region "Menubar"
-
         private void mnuHelpAbout_Click(object sender, EventArgs e)
         {
             ShowAboutBox();
@@ -3676,8 +3642,6 @@ namespace MASICBrowser
         {
             Close();
         }
-
-        #endregion
 
         private void frmBrowser_Closing(object sender, FormClosingEventArgs e)
         {

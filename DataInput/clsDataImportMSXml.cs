@@ -18,7 +18,6 @@ namespace MASIC.DataInput
     /// </summary>
     public class clsDataImportMSXml : clsDataImport
     {
-        #region "Member variables"
 
         // ReSharper disable once IdentifierTypo
         private readonly Centroider mCentroider;
@@ -28,8 +27,6 @@ namespace MASIC.DataInput
 
         private readonly List<double> mCentroidedPrecursorIonsMz = new();
         private readonly List<double> mCentroidedPrecursorIonsIntensity = new();
-
-        #endregion
 
         /// <summary>
         /// Constructor

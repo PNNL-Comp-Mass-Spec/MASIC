@@ -7,8 +7,6 @@ namespace MASIC
     {
         private short mLastPercentComplete;
 
-        #region "Events"
-
         /// <summary>
         /// Provides information on the number of cache and uncache events in spectraCache
         /// </summary>
@@ -29,8 +27,6 @@ namespace MASIC
         public event UpdateErrorCodeEventEventHandler UpdateErrorCodeEvent;
 
         public delegate void UpdateErrorCodeEventEventHandler(clsMASIC.MasicErrorCodes eNewErrorCode, bool leaveExistingErrorCodeUnchanged);
-
-        #endregion
 
         private void OnUpdateCacheStats(int cacheEventCount, int unCacheEventCount, int spectraPoolHitEventCount)
         {
@@ -124,8 +120,6 @@ namespace MASIC
             OnProgressUpdate(progressMessage, percentComplete);
         }
 
-        #region "Event Handlers"
-
         private void UpdatedCacheStatsEventHandler(int cacheEventCount, int unCacheEventCount, int spectraPoolHitEventCount)
         {
             OnUpdateCacheStats(cacheEventCount, unCacheEventCount, spectraPoolHitEventCount);
@@ -140,6 +134,5 @@ namespace MASIC
         {
             SetLocalErrorCode(eErrorCode, leaveExistingErrorCodeUnchanged);
         }
-        #endregion
     }
 }

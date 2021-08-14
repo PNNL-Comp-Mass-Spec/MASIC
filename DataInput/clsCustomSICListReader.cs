@@ -7,8 +7,6 @@ namespace MASIC.DataInput
 {
     public class clsCustomSICListReader : clsMasicEventNotifier
     {
-        #region "Constants and Enums"
-
         public const string CUSTOM_SIC_COLUMN_MZ = "MZ";
         public const string CUSTOM_SIC_COLUMN_MZ_TOLERANCE = "MZToleranceDa";
         public const string CUSTOM_SIC_COLUMN_SCAN_CENTER = "ScanCenter";
@@ -28,13 +26,7 @@ namespace MASIC.DataInput
             Comment = 6
         }
 
-        #endregion
-
-        #region "Class wide Variables"
-
         private readonly clsCustomSICList mCustomSICList;
-
-        #endregion
 
         /// <summary>
         /// Get the default header names for a custom SIC list file

@@ -12,15 +12,9 @@ namespace MASIC.Plots
 {
     public class BarChartPlotter : EventNotifier
     {
-        #region "Member variables"
-
         private readonly BarChartInfo mBarChart;
 
         private readonly bool mWriteDebug;
-
-        #endregion
-
-        #region "Properties"
 
         /// <summary>
         /// When true, autoscale the Y axis
@@ -51,8 +45,6 @@ namespace MASIC.Plots
         /// Y-axis label
         /// </summary>
         public string YAxisLabel { get; set; } = "Intensity";
-
-        #endregion
 
         /// <summary>
         /// Constructor

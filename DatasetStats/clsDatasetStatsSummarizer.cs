@@ -26,8 +26,6 @@ namespace MASIC.DatasetStats
     {
         // Ignore Spelling: AcqTime, yyyy-MM-dd, hh:mm:ss tt
 
-        #region "Constants and Enums"
-
         public const string SCAN_TYPE_STATS_SEP_CHAR = "::###::";
 
         // ReSharper disable once UnusedMember.Global
@@ -41,20 +39,12 @@ namespace MASIC.DatasetStats
         /// </summary>
         public const string DATE_TIME_FORMAT_STRING = "yyyy-MM-dd hh:mm:ss tt";
 
-        #endregion
-
-        #region "Class wide Variables"
-
         private string mDatasetStatsSummaryFileName;
 
         private readonly List<ScanStatsEntry> mDatasetScanStats;
 
         private bool mDatasetSummaryStatsUpToDate;
         private DatasetSummaryStats mDatasetSummaryStats;
-
-        #endregion
-
-        #region "Properties"
 
         // ReSharper disable once UnusedMember.Global
         public string DatasetStatsSummaryFileName
@@ -92,8 +82,6 @@ namespace MASIC.DatasetStats
         /// </summary>
         /// <returns></returns>
         public SampleInfo SampleInfo { get; }
-
-        #endregion
 
         /// <summary>
         /// Constructor

@@ -12,15 +12,9 @@ namespace MASIC.Plots
 {
     internal class BoxPlotPlotter : EventNotifier
     {
-        #region "Member variables"
-
         private readonly BoxPlotInfo mBoxPlot;
 
         private readonly bool mWriteDebug;
-
-        #endregion
-
-        #region "Properties"
 
         /// <summary>
         /// Reporter ion column names
@@ -49,8 +43,6 @@ namespace MASIC.Plots
         /// Y-axis label
         /// </summary>
         public string YAxisLabel { get; set; } = "Intensity";
-
-        #endregion
 
         /// <summary>
         /// Constructor

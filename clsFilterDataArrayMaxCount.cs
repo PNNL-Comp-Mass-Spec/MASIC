@@ -28,8 +28,6 @@ namespace MASIC
 
         public delegate void ProgressChangedEventHandler(float progressVal);
 
-        #region "Properties"
-
         public int DataCount { get; private set; }
 
         public int MaximumDataCountToKeep { get; set; }
@@ -45,8 +43,6 @@ namespace MASIC
         public bool TotalIntensityPercentageFilterEnabled { get; set; }
 
         public float TotalIntensityPercentageFilter { get; set; }
-
-        #endregion
 
         /// <summary>
         /// Constructor

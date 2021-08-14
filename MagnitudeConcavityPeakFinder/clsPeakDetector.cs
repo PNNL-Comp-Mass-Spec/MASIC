@@ -14,7 +14,6 @@ namespace MagnitudeConcavityPeakFinder
 
         private const int MINIMUM_PEAK_WIDTH = 3;
 
-        #region Structures
 
         public struct SICPeakFinderOptionsType
         {
@@ -113,7 +112,6 @@ namespace MagnitudeConcavityPeakFinder
             public int PeakCountBasisForMinimumPotentialArea;
         }
 
-        #endregion
 
         public List<clsPeakInfo> FindPeaks(
            SICPeakFinderOptionsType peakFinderOptions,

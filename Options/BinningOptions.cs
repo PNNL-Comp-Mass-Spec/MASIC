@@ -2,8 +2,6 @@
 {
     public class BinningOptions
     {
-        #region "Properties"
-
         public float StartX { get; set; }
 
         public float EndX { get; set; }
@@ -51,15 +49,9 @@
             }
         }
 
-        #endregion
-
-        #region "Class wide variables"
-
         private float mBinSize = 1;
         private float mIntensityPrecisionPercent = 1;
         private int mMaximumBinCount = 100000;
-
-        #endregion
 
         /// <summary>
         /// Reset binning options to default

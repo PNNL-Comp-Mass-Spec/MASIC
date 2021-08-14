@@ -9,8 +9,6 @@ namespace MASIC.DataOutput
 {
     public class clsDataOutput : clsMasicEventNotifier
     {
-        #region "Constants and Enums"
-
         public const string SCAN_STATS_FILE_SUFFIX = "_ScanStats.txt";
 
         public const string SIC_STATS_FILE_SUFFIX = "_SICstats.txt";
@@ -46,16 +44,12 @@ namespace MASIC.DataOutput
             DatasetInfoFile = 24,
             SICDataFile = 25
         }
-        #endregion
 
-        #region "Properties"
         private readonly MASICOptions mOptions;
 
         public clsOutputFileHandles OutputFileHandles { get; }
 
         public clsExtendedStatsWriter ExtendedStatsWriter { get; }
-
-        #endregion
 
         /// <summary>
         /// Constructor

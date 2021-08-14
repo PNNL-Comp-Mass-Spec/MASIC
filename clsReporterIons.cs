@@ -5,8 +5,6 @@ namespace MASIC
 {
     public class clsReporterIons
     {
-        #region "Constants and Enums"
-
         public const double REPORTER_ION_TOLERANCE_DA_DEFAULT = 0.5;
         public const double REPORTER_ION_TOLERANCE_DA_MINIMUM = 0.001;
 
@@ -36,17 +34,9 @@ namespace MASIC
             NativeOGlcNAc = 19
         }
 
-        #endregion
-
-        #region "Class wide Variables"
-
         private double mReporterIonToleranceDaDefault;
 
         private ReporterIonMassModeConstants mReporterIonMassMode;
-
-        #endregion
-
-        #region "Properties"
 
         /// <summary>
         /// When ReporterIonStatsEnabled = True, MZIntensityFilterIgnoreRangeStart and MZIntensityFilterIgnoreRangeEnd
@@ -99,8 +89,6 @@ namespace MASIC
                 mReporterIonToleranceDaDefault = value;
             }
         }
-
-        #endregion
 
         /// <summary>
         /// Constructor

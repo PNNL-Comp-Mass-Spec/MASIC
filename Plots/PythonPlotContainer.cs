@@ -198,7 +198,6 @@ namespace MASIC.Plots
                     runtimeExceeded = true;
                     break;
                 }
-
             }
             catch (Exception ex)
             {

@@ -3,8 +3,6 @@ namespace MASIC.Options
 {
     public class PlotOptions
     {
-        #region "Properties"
-
         /// <summary>
         /// When true, create plots using the SIC data
         /// If reporter ion abundances were extracted, also create reporter ion observation rate plots
@@ -71,8 +69,5 @@ namespace MASIC.Options
         /// When true, create a text file with reporter ion observation rate stats
         /// </summary>
         public bool SaveReporterIonObservationRateData { get; set; } = true;
-
-        #endregion
-
     }
 }

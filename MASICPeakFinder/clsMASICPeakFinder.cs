@@ -18,7 +18,6 @@ namespace MASICPeakFinder
 
     public class clsMASICPeakFinder : PRISM.EventNotifier
     {
-        #region "Constants and Enums"
 
         public string PROGRAM_DATE = "November 25, 2020";
 
@@ -48,10 +47,6 @@ namespace MASICPeakFinder
             // ReSharper restore UnusedMember.Global
         }
 
-        #endregion
-
-        #region "Class wide Variables"
-
         private string mStatusMessage;
 
         /// <summary>
@@ -62,10 +57,6 @@ namespace MASICPeakFinder
         /// </summary>
         private readonly double[] TTestConfidenceLevels = new[] { 1.886, 2.92, 4.303, 6.965, 9.925, 14.089, 22.327, 31.598 };
 
-        #endregion
-
-        #region "Properties"
-
         // ReSharper disable once UnusedMember.Global
         public string ProgramDate => PROGRAM_DATE;
 
@@ -73,8 +64,6 @@ namespace MASICPeakFinder
 
         // ReSharper disable once UnusedMember.Global
         public string StatusMessage => mStatusMessage;
-
-        #endregion
 
         /// <summary>
         /// Constructor

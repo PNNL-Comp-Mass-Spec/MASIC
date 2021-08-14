@@ -60,8 +60,6 @@ namespace MASIC
             RegisterEvents(mMasic);
         }
 
-        #region "Constants and Enums"
-
         private const string XML_SETTINGS_FILE_NAME = "MASICParameters.xml";
 
         private const string CUSTOM_SIC_VALUES_DATA_TABLE = "PeakMatchingThresholds";
@@ -73,20 +71,12 @@ namespace MASIC
         private const string COL_NAME_SCAN_COMMENT = "Scan_Comment";
         private const string COL_NAME_CUSTOM_SIC_VALUE_ROW_ID = "UniqueRowID";
 
-        #endregion
-
-        #region "Structures"
-
         private struct CustomSICEntryType
         {
             public double MZ;
             public float ScanCenter;
             public string Comment;
         }
-
-        #endregion
-
-        #region "Class wide Variables"
 
         private DataSet mCustomSICValuesDataset;
 
@@ -119,10 +109,6 @@ namespace MASIC
 
         private readonly Dictionary<int, clsReporterIons.ReporterIonMassModeConstants> mReporterIonIndexToModeMap;
 
-        #endregion
-
-        #region "Properties"
-
         private clsReporterIons.ReporterIonMassModeConstants SelectedReporterIonMode
         {
             get
@@ -143,10 +129,6 @@ namespace MASIC
                 }
             }
         }
-
-        #endregion
-
-        #region "Procedures"
 
         private void AddCustomSICRow(
             double mz,
@@ -2181,10 +2163,6 @@ namespace MASIC
             return true;
         }
 
-        #endregion
-
-        #region "Combobox Handlers"
-
         private void cboMassSpectraNoiseThresholdMode_SelectedIndexChanged(object sender, EventArgs e)
         {
             EnableDisableControls();
@@ -2199,10 +2177,6 @@ namespace MASIC
         {
             EnableDisableControls();
         }
-
-        #endregion
-
-        #region "Button Handlers"
 
         private void cmdClearAllRangeFilters_Click(object sender, EventArgs e)
         {
@@ -2254,10 +2228,6 @@ namespace MASIC
             SetConnectionStringToPNNLServer();
         }
 
-        #endregion
-
-        #region "Checkbox Events"
-
         private void chkExportRawDataOnly_CheckedChanged(object sender, EventArgs e)
         {
             EnableDisableControls();
@@ -2298,10 +2268,6 @@ namespace MASIC
             EnableDisableControls();
         }
 
-        #endregion
-
-        #region "Radio Button Events"
-
         private void optUseButterworthSmooth_CheckedChanged(object sender, EventArgs e)
         {
             EnableDisableControls();
@@ -2326,10 +2292,6 @@ namespace MASIC
         {
             UpdateCustomSICDataGridTableStyle();
         }
-
-        #endregion
-
-        #region "Textbox Events"
 
         private void txtMassSpectraNoiseThresholdIntensity_KeyPress(object sender, KeyPressEventArgs e)
         {
@@ -2514,10 +2476,6 @@ namespace MASIC
             TextBoxUtils.TextBoxKeyPressHandler(txtTimeStart, e, true, true);
         }
 
-        #endregion
-
-        #region "Menu Handlers"
-
         private void mnuFileSelectInputFile_Click(object sender, EventArgs e)
         {
             SelectInputFile();
@@ -2562,10 +2520,6 @@ namespace MASIC
         {
             ShowAboutBox();
         }
-
-        #endregion
-
-        #region "Form and Masic Class Events"
 
         private void frmMain_Load(object sender, EventArgs e)
         {
@@ -2634,8 +2588,5 @@ namespace MASIC
             AppendToLog(EventLogEntryType.Warning, message);
             ConsoleMsgUtils.ShowWarning(message);
         }
-
-        #endregion
-
     }
 }

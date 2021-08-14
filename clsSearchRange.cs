@@ -19,8 +19,6 @@ namespace MASIC
             InitializeLocalVariables();
         }
 
-        #region "Constants and Enums"
-
         private enum eDataTypeToUse
         {
             NoDataPresent = 0,
@@ -28,10 +26,6 @@ namespace MASIC
             FloatType = 2,
             DoubleType = 3
         }
-
-        #endregion
-
-        #region "Class wide Variables"
 
         private eDataTypeToUse mDataType;
 
@@ -45,10 +39,6 @@ namespace MASIC
         private int[] mPointerIndices;
 
         private bool mPointerArrayIsValid;
-
-        #endregion
-
-        #region "Interface Functions"
 
         public int DataCount
         {
@@ -105,10 +95,6 @@ namespace MASIC
         /// Set this to false to conserve memory usage
         /// </summary>
         public bool UsePointerIndexArray { get; set; }
-
-        #endregion
-
-        #region "Binary Search Range"
 
         /// <summary>
         /// Recursively search for the given integer, +/- tolerance
@@ -329,8 +315,6 @@ namespace MASIC
             }
         }
 
-        #endregion
-
         private void ClearUnusedData()
         {
             if (mDataType != eDataTypeToUse.IntegerType)
@@ -357,8 +341,6 @@ namespace MASIC
             mDataType = eDataTypeToUse.NoDataPresent;
             ClearUnusedData();
         }
-
-        #region "Fill with Data"
 
         /// <summary>
         /// Store data to search (integers)
@@ -500,10 +482,6 @@ namespace MASIC
 
             return success;
         }
-
-        #endregion
-
-        #region "Find Value Range"
 
         /// <summary>
         /// Searches the loaded data for searchValue with a tolerance of +/-toleranceHalfWidth
@@ -706,10 +684,6 @@ namespace MASIC
             return matchFound;
         }
 
-        #endregion
-
-        #region "Get Value by Index"
-
         /// <summary>
         /// Get the value stored at the given index
         /// </summary>
@@ -778,9 +752,6 @@ namespace MASIC
                 return 0;
             }
         }
-        #endregion
-
-        #region "Get Value by Original Index"
 
         /// <summary>
         /// Get the value stored at the given original index
@@ -857,7 +828,6 @@ namespace MASIC
                 return 0;
             }
         }
-        #endregion
 
         private void InitializeLocalVariables()
         {

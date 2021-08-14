@@ -9,17 +9,11 @@ namespace MASIC
     /// </summary>
     public class clsScanList : clsMasicEventNotifier
     {
-        #region "Constants and Enums"
-
         public enum ScanTypeConstants
         {
             SurveyScan = 0,
             FragScan = 1
         }
-
-        #endregion
-
-        #region "Structures"
 
         public struct ScanOrderPointerType
         {
@@ -31,8 +25,6 @@ namespace MASIC
                 return ScanIndexPointer + ": " + ScanType.ToString();
             }
         }
-
-        #endregion
 
         // Note: We're keeping the Survey Scans separate from the Fragmentation Scans to make the creation of the
         // survey scan based SIC's easier (and faster)

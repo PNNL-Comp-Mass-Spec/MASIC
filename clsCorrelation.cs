@@ -16,14 +16,10 @@ namespace MASIC
     /// </summary>
     public class clsCorrelation : EventNotifier
     {
-        #region "Class wide variables"
-
         /// <summary>
         /// Coefficients used by GammaLn
         /// </summary>
         private readonly double[] mCoefficients;
-
-        #endregion
 
         /// <summary>
         /// Constructor
@@ -43,8 +39,6 @@ namespace MASIC
                                     0.001208650973866179, -0.000005395239384953 };
         }
 
-        #region "Constants and Structures"
-
         private const int MIN_NON_ZERO_ION_COUNT = 5;
 
         public enum cmCorrelationMethodConstants
@@ -54,15 +48,7 @@ namespace MASIC
             Kendall = 2
         }
 
-        #endregion
-
-        #region "Local Member Variables"
-
         private BinningOptions mBinningOptions;
-
-        #endregion
-
-        #region "Property Interface Functions"
 
         public float BinStartX
         {
@@ -124,8 +110,6 @@ namespace MASIC
                 mBinningOptions.MaximumBinCount = value;
             }
         }
-
-        #endregion
 
         private double BetaCF(double a, double b, double x)
         {
@@ -453,7 +437,7 @@ namespace MASIC
         /// <param name="probabilityOfSignificance"></param>
         /// <param name="fishersZ"></param>
         private void CorrelatePearson(
-            IReadOnlyList<float> dataList1, 
+            IReadOnlyList<float> dataList1,
             IReadOnlyList<float> dataList2,
             out float rValue,
             out float probabilityOfSignificance, out float fishersZ)

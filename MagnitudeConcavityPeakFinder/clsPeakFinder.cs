@@ -517,8 +517,6 @@ namespace MagnitudeConcavityPeakFinder
                 peak.RightEdge = peak.PeakLocation;
         }
 
-        #region "LinearLeastSquaresFitting"
-
         /// <summary>
         /// Least squares fit
         /// </summary>
@@ -824,7 +822,5 @@ namespace MagnitudeConcavityPeakFinder
 
             return true;
         }
-
-        #endregion
     }
 }

@@ -2,14 +2,8 @@
 {
     public class SICOptions
     {
-        #region "Constants and Enums"
-
         public const double DEFAULT_COMPRESS_TOLERANCE_DIVISOR_FOR_DA = 5;
         public const double DEFAULT_COMPRESS_TOLERANCE_DIVISOR_FOR_PPM = 3;
-
-        #endregion
-
-        #region "Properties"
 
         /// <summary>
         /// Provided by the user at the command line or obtained from the database (if a connection string is defined)
@@ -182,14 +176,8 @@
             }
         }
 
-        #endregion
-
-        #region "Class wide Variables"
-
         private float mMaxSICPeakWidthMinutesBackward;
         private float mMaxSICPeakWidthMinutesForward;
-
-        #endregion
 
         public double GetSICTolerance()
         {
@@ -275,11 +263,8 @@
             return string.Format("SIC Tolerance: {0:F2} {1}", SICTolerance, toleranceUnits);
         }
 
-        #region "Class wide variables"
         private float mSimilarIonMZToleranceHalfWidth = 0.1F;
         private float mSimilarIonToleranceHalfWidthMinutes = 5;
         private float mSpectrumSimilarityMinimum = 0.8F;
-
-        #endregion
     }
 }

@@ -2,7 +2,6 @@
 {
     public class clsCustomMZSearchSpec
     {
-        #region "Properties"
         public double MZ { get; set; }
 
         /// <summary>
@@ -24,8 +23,6 @@
         public float ScanOrAcqTimeTolerance { get; set; }
 
         public string Comment { get; set; }
-
-        #endregion
 
         /// <summary>
         /// Constructor

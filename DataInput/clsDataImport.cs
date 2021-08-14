@@ -10,8 +10,6 @@ namespace MASIC.DataInput
 {
     public abstract class clsDataImport : clsMasicEventNotifier
     {
-        #region "Constants and Enums"
-
         /// <summary>
         /// Thermo .raw file extension
         /// </summary>
@@ -34,10 +32,6 @@ namespace MASIC.DataInput
         private const int ISOLATION_WIDTH_NOT_FOUND_WARNINGS_TO_SHOW = 5;
 
         protected const int PRECURSOR_NOT_FOUND_WARNINGS_TO_SHOW = 5;
-
-        #endregion
-
-        #region "Class wide Variables"
 
         protected readonly MASICOptions mOptions;
 
@@ -67,15 +61,7 @@ namespace MASIC.DataInput
 
         protected int mScansOutOfRange;
 
-        #endregion
-
-        #region "Properties"
-
         public DatasetFileInfo DatasetFileInfo => mDatasetFileInfo;
-
-        #endregion
-
-        #region "Events"
 
         /// <summary>
         /// This event is used to signify to the calling class that it should update the status of the available memory usage
@@ -88,8 +74,6 @@ namespace MASIC.DataInput
         {
             UpdateMemoryUsageEvent?.Invoke();
         }
-
-        #endregion
 
         /// <summary>
         /// Constructor

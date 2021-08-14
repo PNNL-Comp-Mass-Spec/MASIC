@@ -16,8 +16,6 @@ namespace MASIC
     {
         // Ignore Spelling: mrm, srm
 
-        #region "Structures"
-
         private struct SRMListType
         {
             public double ParentIonMZ;
@@ -29,15 +27,9 @@ namespace MASIC
             }
         }
 
-        #endregion
-
-        #region "Class wide variables"
-
         private readonly MASICOptions mOptions;
         private readonly clsDataAggregation mDataAggregation;
         private readonly clsDataOutput mDataOutputHandler;
-
-        #endregion
 
         /// <summary>
         /// Constructor

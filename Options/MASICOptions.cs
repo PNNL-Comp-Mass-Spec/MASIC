@@ -15,8 +15,6 @@ namespace MASIC.Options
     {
         // Ignore Spelling: Sql, Da, plex, Butterworth, SavitzkyGolay, Zeroes, html
 
-        #region "Constants and Enums"
-
         public const string XML_SECTION_DATABASE_SETTINGS = "MasicDatabaseSettings";
         public const string XML_SECTION_IMPORT_OPTIONS = "MasicImportOptions";
         public const string XML_SECTION_EXPORT_OPTIONS = "MasicExportOptions";
@@ -27,10 +25,6 @@ namespace MASIC.Options
         public const string XML_SECTION_CUSTOM_SIC_VALUES = "CustomSICValues";
 
         public const string DEFAULT_MASIC_STATUS_FILE_NAME = "MasicStatus.xml";
-
-        #endregion
-
-        #region "Class wide Variables"
 
         /// <summary>
         /// SIC processing options
@@ -132,13 +126,7 @@ namespace MASIC.Options
 
         public DateTime LastParentIonProcessingLogTime { get; set; }
 
-        #endregion
-
-        #region "Properties"
-
         public string StatusMessage { get; set; }
-
-        #endregion
 
         /// <summary>
         /// Constructor

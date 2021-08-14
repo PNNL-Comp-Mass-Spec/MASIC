@@ -5,8 +5,6 @@ namespace MagnitudeConcavityPeakFinder
 {
     public class NoiseLevelAnalyzer
     {
-        #region Structures and Enums
-
         public enum NoiseThresholdModes
         {
             AbsoluteThreshold = 0,
@@ -64,8 +62,6 @@ namespace MagnitudeConcavityPeakFinder
             public int PointsUsed;
             public NoiseThresholdModes NoiseThresholdModeUsed;
         }
-
-        #endregion
 
         /// <summary>
         /// Computes a trimmed mean or trimmed median using the low intensity data up to baselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage
@@ -299,7 +295,7 @@ namespace MagnitudeConcavityPeakFinder
         {
             // Find the index of the data point at intDataSortedCount * baselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage and
             //  average the data from the start to that index
-            indexEnd = (int) Math.Round((dataSortedCount - 1) * baselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage, 0);
+            indexEnd = (int)Math.Round((dataSortedCount - 1) * baselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage, 0);
 
             var countSummed = indexEnd + 1;
 
@@ -401,8 +397,6 @@ namespace MagnitudeConcavityPeakFinder
             return minimumPositiveValue;
         }
 
-        #region Default Options
-
         public static BaselineNoiseOptionsType GetDefaultNoiseThresholdOptions()
         {
             var baselineNoiseOptions = new BaselineNoiseOptionsType
@@ -418,7 +412,5 @@ namespace MagnitudeConcavityPeakFinder
 
             return baselineNoiseOptions;
         }
-
-        #endregion
     }
 }

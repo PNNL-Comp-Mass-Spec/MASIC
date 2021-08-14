@@ -26,7 +26,6 @@ namespace MASIC
             DeleteSpectrumCacheFiles();
         }
 
-        #region "Constants and Enums"
         private const string SPECTRUM_CACHE_FILE_PREFIX = "$SpecCache";
         private const string SPECTRUM_CACHE_FILE_BASENAME_TERMINATOR = "_Temp";
 
@@ -50,9 +49,7 @@ namespace MASIC
             LoadedFromCache = 2
         }
 
-        #endregion
 
-        #region "Class wide Variables"
 
         /// <summary>
         /// Pool (collection) of currently loaded spectra
@@ -73,7 +70,6 @@ namespace MASIC
         /// </summary>
         private Dictionary<int, long> mSpectrumByteOffset;
 
-        #endregion
 
         /// <summary>
         /// Number of cache events

@@ -7,8 +7,6 @@ namespace MASIC
 {
     public class clsDatabaseAccess : clsMasicEventNotifier
     {
-        #region "Constants and Enums"
-
         // frmMain uses these constants
 
         // ReSharper disable UnusedMember.Global
@@ -18,13 +16,7 @@ namespace MASIC
 
         // ReSharper restore UnusedMember.Global
 
-        #endregion
-
-        #region "Class wide Variables"
-
         private readonly MASICOptions mOptions;
-
-        #endregion
 
         /// <summary>
         /// Constructor

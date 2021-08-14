@@ -58,8 +58,6 @@ namespace MASIC
             RegisterEvents(Options);
         }
 
-        #region "Constants and Enums"
-
         /// <summary>
         /// Enabling this will result in SICs with less noise, which will hurt noise determination after finding the SICs
         /// </summary>
@@ -117,19 +115,11 @@ namespace MASIC
             UnspecifiedError = -1
         }
 
-        #endregion
-
-        #region "Class wide Variables"
-
         private bool mLoggedMASICVersion;
 
         private readonly MASICPeakFinder.clsMASICPeakFinder mMASICPeakFinder;
 
         private readonly clsProcessingStats mProcessingStats;
-
-        #endregion
-
-        #region "Events"
 
         /// <summary>
         /// Use RaiseEvent MyBase.ProgressChanged when updating the overall progress
@@ -145,10 +135,6 @@ namespace MASIC
         public event ProgressResetKeypressAbortEventHandler ProgressResetKeypressAbort;
 
         public delegate void ProgressResetKeypressAbortEventHandler();
-
-        #endregion
-
-        #region "Processing Options and File Path Interface Functions"
 
         /// <summary>
         /// Local error code
@@ -194,8 +180,6 @@ namespace MASIC
         /// Subtask description
         /// </summary>
         public string SubtaskDescription { get; private set; } = string.Empty;
-
-        #endregion
 
         /// <summary>
         /// Call this method to abort processing
@@ -1570,8 +1554,6 @@ namespace MASIC
             }
         }
 
-        #region "Event Handlers"
-
         private void MessageEventHandler(string message)
         {
             LogMessage(message);
@@ -1632,7 +1614,5 @@ namespace MASIC
                 mProcessingStats.MemoryUsageMBDuringLoad = memoryUsageMB;
             }
         }
-
-        #endregion
     }
 }

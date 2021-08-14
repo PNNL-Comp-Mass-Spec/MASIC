@@ -517,8 +517,6 @@ namespace MASICPeakFinder
                 peak.RightEdge = peak.PeakLocation;
         }
 
-        #region "LinearLeastSquaresFitting"
-
         /// <summary>
         /// Least squares fit
         /// </summary>
@@ -824,9 +822,6 @@ namespace MASICPeakFinder
 
             return true;
         }
-        #endregion
-
-        #region "EolsDll_LeastSquaresFitting"
 
         //private const int EODOUBLE = 1;
         //private const int EOFLOAT = 2;
@@ -884,6 +879,5 @@ namespace MASICPeakFinder
         //    }
         //}
 
-        #endregion
     }
 }

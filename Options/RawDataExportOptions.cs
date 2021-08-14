@@ -2,15 +2,11 @@
 {
     public class RawDataExportOptions
     {
-        #region "Constants and Enums"
-
         public enum eExportRawDataFileFormatConstants
         {
             PEKFile = 0,
             CSVFile = 1
         }
-
-        #endregion
 
         public bool ExportEnabled { get; set; }
         public eExportRawDataFileFormatConstants FileFormat { get; set; }

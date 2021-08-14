@@ -4,8 +4,6 @@ namespace MASIC.Options
 {
     public class SpectrumCacheOptions
     {
-        #region "Properties"
-
         /// <summary>
         /// If True, then spectra will never be cached to disk and the spectra pool will consequently be increased as needed
         /// </summary>
@@ -36,13 +34,7 @@ namespace MASIC.Options
         [Obsolete("Legacy parameter; no longer used")]
         public float MaximumMemoryUsageMB { get; set; }
 
-        #endregion
-
-        #region "Class wide variables"
-
         private int mSpectraToRetainInMemory = 1000;
-
-        #endregion
 
         /// <summary>
         /// Reset the options
