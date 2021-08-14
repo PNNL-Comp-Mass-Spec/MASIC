@@ -466,59 +466,59 @@ namespace MagnitudeConcavityPeakFinder
             var resultsFilePath = Path.Combine(fiDataFile.Directory.FullName,
                                                Path.GetFileNameWithoutExtension(fiDataFile.Name) + "_Peaks" +
                                                fiDataFile.Extension);
-            using (var writer = new StreamWriter(new FileStream(resultsFilePath, FileMode.Create, FileAccess.Write, FileShare.Read)))
-            {
-                var outputData = new List<string>(50);
 
-                writer.Write("Scan\tIntensity\tSmoothedIntensity\t");
-                for (var peakIndex = 0; peakIndex < detectedPeaks.Count; peakIndex++)
+            using var writer = new StreamWriter(new FileStream(resultsFilePath, FileMode.Create, FileAccess.Write, FileShare.Read));
+
+            var outputData = new List<string>(50);
+
+            writer.Write("Scan\tIntensity\tSmoothedIntensity\t");
+            for (var peakIndex = 0; peakIndex < detectedPeaks.Count; peakIndex++)
+            {
+                writer.Write("Peak " + (peakIndex + 1));
+                if (peakIndex < detectedPeaks.Count - 1)
                 {
-                    writer.Write("Peak " + (peakIndex + 1));
-                    if (peakIndex < detectedPeaks.Count - 1)
+                    writer.Write("\t");
+                }
+            }
+            writer.WriteLine();
+
+            for (var dataValueIndex = 0; dataValueIndex < xyData.Count; dataValueIndex++)
+            {
+                var dataPoint = xyData[dataValueIndex];
+
+                outputData.Clear();
+                outputData.Add(dataPoint.Key.ToString("0"));
+                outputData.Add(dataPoint.Value.ToString("0.000"));
+
+                if (dataValueIndex < smoothedYData.Count)
+                    outputData.Add(smoothedYData[dataValueIndex].ToString("0.000"));
+                else
+                    outputData.Add("");
+
+                foreach (var peak in detectedPeaks)
+                {
+                    if (dataValueIndex >= peak.LeftEdge && dataValueIndex <= peak.RightEdge)
                     {
-                        writer.Write("\t");
+                        outputData.Add(dataPoint.Value.ToString("0.000"));
+                    }
+                    else
+                    {
+                        outputData.Add(string.Empty);
+                    }
+                }
+
+                if (outputData.Count > 0)
+                {
+                    for (var columnIndex = 0; columnIndex < outputData.Count; columnIndex++)
+                    {
+                        writer.Write(outputData[columnIndex]);
+                        if (columnIndex < outputData.Count - 1)
+                        {
+                            writer.Write("\t");
+                        }
                     }
                 }
                 writer.WriteLine();
-
-                for (var dataValueIndex = 0; dataValueIndex < xyData.Count; dataValueIndex++)
-                {
-                    var dataPoint = xyData[dataValueIndex];
-
-                    outputData.Clear();
-                    outputData.Add(dataPoint.Key.ToString("0"));
-                    outputData.Add(dataPoint.Value.ToString("0.000"));
-
-                    if (dataValueIndex < smoothedYData.Count)
-                        outputData.Add(smoothedYData[dataValueIndex].ToString("0.000"));
-                    else
-                        outputData.Add("");
-
-                    foreach (var peak in detectedPeaks)
-                    {
-                        if (dataValueIndex >= peak.LeftEdge && dataValueIndex <= peak.RightEdge)
-                        {
-                            outputData.Add(dataPoint.Value.ToString("0.000"));
-                        }
-                        else
-                        {
-                            outputData.Add(string.Empty);
-                        }
-                    }
-
-                    if (outputData.Count > 0)
-                    {
-                        for (var columnIndex = 0; columnIndex < outputData.Count; columnIndex++)
-                        {
-                            writer.Write(outputData[columnIndex]);
-                            if (columnIndex < outputData.Count - 1)
-                            {
-                                writer.Write("\t");
-                            }
-                        }
-                    }
-                    writer.WriteLine();
-                }
             }
         }
 
