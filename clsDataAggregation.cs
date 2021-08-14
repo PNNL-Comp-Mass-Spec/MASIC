@@ -237,18 +237,14 @@ namespace MASIC
                 SumIonsBinarySearchRangeDbl(dataValues, searchValue, toleranceHalfWidth, ref matchIndexStart, ref matchIndexEnd);
             }
 
-            if (matchIndexStart > matchIndexEnd)
+            if (matchIndexStart <= matchIndexEnd)
             {
-                matchIndexStart = -1;
-                matchIndexEnd = -1;
-                matchFound = false;
-            }
-            else
-            {
-                matchFound = true;
+                return true;
             }
 
-            return matchFound;
+            matchIndexStart = -1;
+            matchIndexEnd = -1;
+            return false;
         }
 
         private void SumIonsBinarySearchRangeDbl(

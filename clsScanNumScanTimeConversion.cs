@@ -21,27 +21,21 @@ namespace MASIC
         {
             try
             {
-                int scanIndexMatch;
-
-                if (scanType == clsCustomSICList.CustomSICScanTypeConstants.Absolute || scanType == clsCustomSICList.CustomSICScanTypeConstants.Relative)
+                if (scanType is clsCustomSICList.CustomSICScanTypeConstants.Absolute or clsCustomSICList.CustomSICScanTypeConstants.Relative)
                 {
                     var absoluteScanNumber = ScanOrAcqTimeToAbsolute(scanList, scanOrAcqTime, scanType, false);
-                    scanIndexMatch = clsBinarySearch.BinarySearchFindNearest(
+                    return clsBinarySearch.BinarySearchFindNearest(
                         scanList.MasterScanNumList,
                         absoluteScanNumber,
                         clsBinarySearch.eMissingDataModeConstants.ReturnClosestPoint);
                 }
-                else
-                {
-                    // scanType = CustomSICScanTypeConstants.AcquisitionTime
-                    // Find the closest match in scanList.MasterScanTimeList
-                    scanIndexMatch = clsBinarySearch.BinarySearchFindNearest(
-                        scanList.MasterScanTimeList,
-                        scanOrAcqTime,
-                        clsBinarySearch.eMissingDataModeConstants.ReturnClosestPoint);
-                }
 
-                return scanIndexMatch;
+                // scanType = CustomSICScanTypeConstants.AcquisitionTime
+                // Find the closest match in scanList.MasterScanTimeList
+                return clsBinarySearch.BinarySearchFindNearest(
+                    scanList.MasterScanTimeList,
+                    scanOrAcqTime,
+                    clsBinarySearch.eMissingDataModeConstants.ReturnClosestPoint);
             }
             catch (Exception ex)
             {

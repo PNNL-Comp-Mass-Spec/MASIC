@@ -740,7 +740,7 @@ namespace MagnitudeConcavityPeakFinder
         }
 
         /// <summary>
-        ///
+        /// Find peaks
         /// </summary>
         /// <param name="peakDetector"></param>
         /// <param name="scanNumbers"></param>
@@ -754,8 +754,6 @@ namespace MagnitudeConcavityPeakFinder
             SICPeakFinderOptionsType peakFinderOptions)
         {
             const float peakMaximum = 0;
-
-            bool validPeakFound;
 
             // Smooth the Y data, and store in peakData.SmoothedYData
             // Note that if using a Butterworth filter, then we increase peakData.PeakWidthPointsMinimum if too small, compared to 1/SamplingFrequency
@@ -952,16 +950,7 @@ namespace MagnitudeConcavityPeakFinder
                 }
             }
 
-            if (peakData.BestPeak != null)
-            {
-                validPeakFound = true;
-            }
-            else
-            {
-                validPeakFound = false;
-            }
-
-            return validPeakFound;
+            return peakData.BestPeak != null;
         }
 
         private bool SmoothData(
@@ -995,17 +984,9 @@ namespace MagnitudeConcavityPeakFinder
                 return false;
             }
 
-            bool success;
-            if (peakFinderOptions.UseButterworthSmooth)
-            {
-                success = SmoothDataButterworth(smoothedYData, dataCount, peakFinderOptions, ref peakWidthPointsMinimum, out errorMessage);
-            }
-            else
-            {
-                success = SmoothDataSavitzkyGolay(smoothedYData, dataCount, peakFinderOptions, peakWidthPointsMinimum, out errorMessage);
-            }
-
-            return success;
+            return peakFinderOptions.UseButterworthSmooth ?
+                SmoothDataButterworth(smoothedYData, dataCount, peakFinderOptions, ref peakWidthPointsMinimum, out errorMessage) :
+                SmoothDataSavitzkyGolay(smoothedYData, dataCount, peakFinderOptions, peakWidthPointsMinimum, out errorMessage);
         }
 
         private static bool SmoothDataButterworth(
