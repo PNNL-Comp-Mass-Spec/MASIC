@@ -18,6 +18,7 @@ namespace MASIC.DataInput
     /// </summary>
     public class clsDataImportMSXml : clsDataImport
     {
+        // Ignore Spelling: centroided
 
         // ReSharper disable once IdentifierTypo
         private readonly Centroider mCentroider;
@@ -210,6 +211,16 @@ namespace MASIC.DataInput
             return precursorInterference;
         }
 
+        /// <summary>
+        /// Read spectra metadata from a .mzML file
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <param name="scanList"></param>
+        /// <param name="spectraCache"></param>
+        /// <param name="dataOutputHandler"></param>
+        /// <param name="keepRawSpectra"></param>
+        /// <param name="keepMSMSSpectra"></param>
+        /// <returns>True if successful, false if an error</returns>
         public bool ExtractScanInfoFromMzMLDataFile(
             string filePath,
             clsScanList scanList,
@@ -232,6 +243,16 @@ namespace MASIC.DataInput
             }
         }
 
+        /// <summary>
+        /// Read spectra metadata from a .mzXML file
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <param name="scanList"></param>
+        /// <param name="spectraCache"></param>
+        /// <param name="dataOutputHandler"></param>
+        /// <param name="keepRawSpectra"></param>
+        /// <param name="keepMSMSSpectra"></param>
+        /// <returns>True if successful, false if an error</returns>
         public bool ExtractScanInfoFromMzXMLDataFile(
             string filePath,
             clsScanList scanList,
@@ -253,6 +274,16 @@ namespace MASIC.DataInput
             }
         }
 
+        /// <summary>
+        /// Read spectra metadata from a .mzData file
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <param name="scanList"></param>
+        /// <param name="spectraCache"></param>
+        /// <param name="dataOutputHandler"></param>
+        /// <param name="keepRawSpectra"></param>
+        /// <param name="keepMSMSSpectra"></param>
+        /// <returns>True if successful, false if an error</returns>
         public bool ExtractScanInfoFromMzDataFile(
             string filePath,
             clsScanList scanList,
@@ -576,7 +607,7 @@ namespace MASIC.DataInput
                             }
                         }
 
-                        // Compute the median time diff in scanTimeDiffs
+                        // Compute the median time difference in scanTimeDiffs
                         var medianScanTimeDiffThisChromatogram = clsUtilities.ComputeMedian(scanTimeDiffs);
 
                         // Store in scanTimeDiffMedians, which tracks the median scan time difference for each chromatogram
@@ -586,7 +617,7 @@ namespace MASIC.DataInput
                     // Construct a mapping between elution time and scan number
                     // This is a bit of a challenge since chromatogram data only tracks elution time, and not scan number
 
-                    // First, compute the overall median time diff, e.g. 0.0216
+                    // First, compute the overall median time difference, e.g. 0.0216
                     var medianScanTimeDiff = clsUtilities.ComputeMedian(scanTimeDiffMedians);
                     if (Math.Abs(medianScanTimeDiff) < 0.000001)
                     {
@@ -1222,7 +1253,7 @@ namespace MASIC.DataInput
             {
                 var precursorScanNumber = scanList.SurveyScans[mLastNonZoomSurveyScanIndex].ScanNumber;
 
-                // Compute the interference of the parent ion in the MS1 spectrum for this frag scan
+                // Compute the interference of the parent ion in the MS1 spectrum for this fragmentation scan
                 scanInfo.FragScanInfo.InterferenceScore = ComputeInterference(mzMLSpectrum, scanInfo, precursorScanNumber);
             }
 

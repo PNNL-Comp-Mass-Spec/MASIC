@@ -16,8 +16,12 @@ namespace MASICPeakFinder
     // in compliance with the License.  You may obtain a copy of the License at
     // https://opensource.org/licenses/BSD-2-Clause
 
+    /// <summary>
+    /// MASIC peak finder
+    /// </summary>
     public class clsMASICPeakFinder : PRISM.EventNotifier
     {
+        // Ignore Spelling: Butterworth, fwhm, Golay, pdf, prepend, Savitzky, unsmoothed
 
         public string PROGRAM_DATE = "November 25, 2020";
 
@@ -756,11 +760,11 @@ namespace MASICPeakFinder
             const int scanAtApex = 20;
             const double fwhm = 25;
 
+            // Sigma = fwhm / 2.35482 = fwhm / (2 * Sqrt(2 * NaturalLog(2)))
             const double peakMean = scanAtApex;
-            // fwhm / 2.35482 = fwhm / (2 * Sqrt(2 * Ln(2)))
 
-            const double peakStDev = fwhm / 2.35482;
             // peakStDev = 28.8312
+            const double peakStDev = fwhm / 2.35482;
 
             ComputeKSStatistic(scanNumbers.Length, scanNumbers, intensities, peakMean, peakStDev);
 
@@ -1686,7 +1690,7 @@ namespace MASICPeakFinder
 #pragma warning disable 162
                 {
                     peakMean = sicData[sicPeak.IndexMax].ScanNumber;
-                    // fwhm / 2.35482 = fwhm / (2 * Sqrt(2 * Ln(2)))
+                    // Sigma = fwhm / 2.35482 = fwhm / (2 * Sqrt(2 * NaturalLog(2)))
                     peakStDev = sicPeak.FWHMScanWidth / 2.35482;
                 }
 #pragma warning restore 162
@@ -1997,7 +2001,7 @@ namespace MASICPeakFinder
             else
             {
                 // Compute the peak width
-                // Note: Sigma = fwhm / 2.35482 = fwhm / (2 * Sqrt(2 * Ln(2)))
+                // Note: Sigma = fwhm / 2.35482 = fwhm / (2 * Sqrt(2 * NaturalLog(2)))
                 var sigmaBasedWidth = (int)Math.Round(sigmaValueForBase * sicPeakFWHMScans / 2.35482);
 
                 if (sigmaBasedWidth <= 0)

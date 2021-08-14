@@ -41,9 +41,9 @@ namespace MASICBrowser
     /// </summary>
     public partial class frmBrowser : Form
     {
-        // Ignore Spelling: cancelled, similarFragScan, Const
+        // Ignore Spelling: cancelled, const, Ctrl, frag, fragscan, Golay, Loc, resmooth, Savitzky, similarFragScan
 
-        private const string PROGRAM_DATE = "April 3, 2021";
+        private const string PROGRAM_DATE = "August 13, 2021";
 
         /// <summary>
         /// Constructor
@@ -167,7 +167,7 @@ namespace MASICBrowser
         private int mParentIonPointerArrayCount;
 
         /// <summary>
-        /// Pointer array used for de-referencing cboParentIon.SelectedItem to mParentIonStats
+        /// Pointer array used for dereferencing cboParentIon.SelectedItem to mParentIonStats
         /// </summary>
         private int[] mParentIonPointerArray = new int[0];
 
@@ -566,7 +566,7 @@ namespace MASICBrowser
                 var similarFragScans = new SortedSet<int>();
                 var parentIonCount = mParentIonStats.Count;
 
-                // Populate a dictionary mapping frag scan to parent ion stats
+                // Populate a dictionary mapping fragmentation scan to parent ion stats
                 // Using a TreeDictionary since it supports RangeFromTo
                 var fragScanObservedToParentIonMap = new TreeDictionary<int, List<clsParentIonStats>>();
 
@@ -711,7 +711,7 @@ namespace MASICBrowser
                             {
                                 if (similarFragScan <= currentParentIon.SICData[matchIndex].ScanNumber)
                                 {
-                                    // Frag scan is at or before the first scan number in .SICData()
+                                    // Fragmentation scan is at or before the first scan number in .SICData()
                                     // Use the intensity at .SICData(0)
                                     interpolatedYValue = currentParentIon.SICData[0].Intensity;
                                 }
@@ -733,7 +733,7 @@ namespace MASICBrowser
                             }
                             else
                             {
-                                // Frag scan is at or after the last scan number in .SICData()
+                                // Fragmentation scan is at or after the last scan number in .SICData()
                                 // Use the last data point in .SICData()
                                 interpolatedYValue = currentParentIon.SICData.Last().Intensity;
                             }
@@ -1259,7 +1259,7 @@ namespace MASICBrowser
                         smoothedYData[index] = sicStats.SICSmoothedYData[index];
                 }
 
-                // Populate Series 3 with the similar frag scan values
+                // Populate Series 3 with the similar fragmentation scan values
                 for (var index = 0; index < currentParentIon.SimilarFragScans.Count; index++)
                 {
                     xDataSeries3[index] = currentParentIon.SimilarFragScans[index].ScanNumber;
@@ -1272,7 +1272,7 @@ namespace MASICBrowser
                     {
                         if (currentParentIon.SICData[index].ScanNumber <= currentParentIon.FragScanObserved && currentParentIon.SICData[index + 1].ScanNumber >= currentParentIon.FragScanObserved)
                         {
-                            // Use the survey scan data to calculate the appropriate intensity for the Frag Scan cursor
+                            // Use the survey scan data to calculate the appropriate intensity for the Fragmentation Scan cursor
 
                             if (InterpolateY(out var interpolatedYValue, currentParentIon.SICData[index].ScanNumber, currentParentIon.SICData[index + 1].ScanNumber, currentParentIon.SICData[index].Intensity, currentParentIon.SICData[index + 1].Intensity, currentParentIon.FragScanObserved))
                             {
