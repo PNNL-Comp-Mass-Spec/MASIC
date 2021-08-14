@@ -3564,11 +3564,9 @@ namespace MASICPeakFinder
             {
                 if (noiseStatsSegments == null || noiseStatsSegments.Count < 1)
                 {
-                    baselineNoiseStats = InitializeBaselineNoiseStats(
+                    return InitializeBaselineNoiseStats(
                         GetDefaultNoiseThresholdOptions().MinimumBaselineNoiseLevel,
                         NoiseThresholdModes.DualTrimmedMeanByAbundance);
-
-                    return baselineNoiseStats;
                 }
 
                 if (noiseStatsSegments.Count <= 1)
