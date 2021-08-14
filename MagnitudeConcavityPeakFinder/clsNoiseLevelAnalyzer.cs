@@ -367,8 +367,8 @@ namespace MagnitudeConcavityPeakFinder
         /// </summary>
         /// <param name="dataCount"></param>
         /// <param name="sortedData"></param>
-        /// <returns>The minimum positive value</returns>
         /// <remarks>Assumes sortedData[] is sorted ascending</remarks>
+        /// <returns>The minimum positive value</returns>
         private double ReplaceSortedDataWithMinimumPositiveValue(int dataCount, IList<double> sortedData)
         {
             // Find the minimum positive value in sortedData

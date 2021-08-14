@@ -69,13 +69,17 @@ namespace MASIC
         }
 
         /// <summary>
+        /// <para>
         /// Add the parent ion, or associate the fragmentation scan with an existing parent ion
-        ///
+        /// </para>
+        /// <para>
         /// Checks to see if the parent ion specified by surveyScanIndex and parentIonMZ exists in .ParentIons()
         /// If mrmDaughterMZ is > 0, also considers that value when determining uniqueness
-        ///
+        /// </para>
+        /// <para>
         /// If the parent ion entry already exists, adds an entry to .FragScanIndices()
         /// If it does not exist, adds a new entry to .ParentIons()
+        /// </para>
         /// </summary>
         /// <param name="scanList"></param>
         /// <param name="surveyScanIndex">

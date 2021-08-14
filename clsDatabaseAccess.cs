@@ -74,7 +74,7 @@ namespace MASIC
         /// <param name="masicOptions"></param>
         /// <param name="datasetName"></param>
         /// <param name="newDatasetID"></param>
-        /// <returns></returns>
+        /// <returns>Dataset ID</returns>
         private bool GetDatasetIDFromDatabase(MASICOptions masicOptions, string datasetName, out int newDatasetID)
         {
             const string avoidErrorMessage =

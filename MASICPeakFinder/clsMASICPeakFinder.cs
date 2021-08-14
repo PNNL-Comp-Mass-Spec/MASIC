@@ -2997,11 +2997,14 @@ namespace MASICPeakFinder
         }
 
         /// <summary>
+        /// <para>
         /// Compute the potential peak area for a given SIC
         /// Stores the value in potentialAreaStats.MinimumPotentialPeakArea
-        ///
+        /// </para>
+        /// <para>
         /// However, the summed intensity is not stored if the number of points
         /// greater than or equal to .SICBaselineNoiseOptions.MinimumBaselineNoiseLevel is less than Minimum_Peak_Width
+        /// </para>
         /// </summary>
         /// <param name="sicData"></param>
         /// <param name="potentialAreaStats"></param>

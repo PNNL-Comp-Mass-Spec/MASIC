@@ -7,12 +7,15 @@ using PRISM;
 namespace MASIC
 {
     /// <summary>
+    /// <para>
     /// This class can be used to correlate two lists of numbers (typically mass spectra) to determine their similarity
     /// The lists of numbers must have the same number of values
     /// Use the BinData function to bin a list of X,Y pairs into bins ranging from .BinStartX to .BinEndX
-    ///
+    /// </para>
+    /// <para>
     /// These functions were originally written in VB6 and required the use of a C DLL
-    /// They have since been ported to VB.NET
+    /// They were later ported to VB.NET, then to C#
+    /// </para>
     /// </summary>
     public class clsCorrelation : EventNotifier
     {
