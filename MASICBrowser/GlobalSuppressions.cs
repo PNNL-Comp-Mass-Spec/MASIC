@@ -5,6 +5,8 @@
 
 using System.Diagnostics.CodeAnalysis;
 
+[assembly: SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "Keep for reference", Scope = "member", Target = "~M:MASICBrowser.frmBrowser.FindSimilarParentIon(ProgressFormNET.frmProgress)")]
+[assembly: SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "Keep for reference", Scope = "member", Target = "~M:MASICBrowser.frmBrowser.TestValueToString")]
 [assembly: SuppressMessage("Design", "RCS1075:Avoid empty catch clause that catches System.Exception.", Justification = "This design pattern is used to silently handle several types of non-fatal errors", Scope = "module")]
 [assembly: SuppressMessage("Readability", "RCS1123:Add parentheses when necessary.", Justification = "Parentheses are not needed", Scope = "module")]
 [assembly: SuppressMessage("Usage", "RCS1246:Use element access.", Justification = "Prefer to use .First()", Scope = "member", Target = "~M:MASICBrowser.frmBrowser.FindSimilarParentIon(System.Double,ProgressFormNET.frmProgress)")]
@@ -63,5 +65,3 @@ using System.Diagnostics.CodeAnalysis;
 [assembly: SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "Legacy Name", Scope = "member", Target = "~M:MASICBrowser.frmBrowser.txtStats2_KeyPress(System.Object,System.Windows.Forms.KeyPressEventArgs)")]
 [assembly: SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "Legacy Name", Scope = "member", Target = "~M:MASICBrowser.InputBox.textBoxText_TextChanged(System.Object,System.EventArgs)")]
 [assembly: SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "Legacy Name", Scope = "member", Target = "~M:MASICBrowser.InputBox.textBoxText_Validating(System.Object,System.ComponentModel.CancelEventArgs)")]
-[assembly: SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "<Pending>", Scope = "member", Target = "~M:MASICBrowser.frmBrowser.FindSimilarParentIon(ProgressFormNET.frmProgress)")]
-[assembly: SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "<Pending>", Scope = "member", Target = "~M:MASICBrowser.frmBrowser.TestValueToString")]
