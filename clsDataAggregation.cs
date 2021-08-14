@@ -292,7 +292,7 @@ namespace MASIC
                 var leftIndex = indexMidpoint;
                 do
                 {
-                    leftIndex = leftIndex - 1;
+                    leftIndex--;
                     if (leftIndex < matchIndexStart)
                     {
                         leftDone = true;
@@ -308,7 +308,7 @@ namespace MASIC
 
                 do
                 {
-                    rightIndex = rightIndex + 1;
+                    rightIndex++;
                     if (rightIndex > matchIndexEnd)
                     {
                         rightDone = true;

@@ -252,7 +252,7 @@ namespace MASIC
                 var binToSort = -1;
                 for (var index = binCount - 1; index >= 0; index += -1)
                 {
-                    pointTotal = pointTotal + histogramBinCounts[index];
+                    pointTotal += histogramBinCounts[index];
                     if (pointTotal >= MaximumDataCountToKeep)
                     {
                         binToSort = index;
@@ -329,7 +329,7 @@ namespace MASIC
                             }
                             else
                             {
-                                dataCountImplicitlyIncluded = dataCountImplicitlyIncluded + 1;
+                                dataCountImplicitlyIncluded++;
                             }
 
                             if (index % 10000 == 0)
