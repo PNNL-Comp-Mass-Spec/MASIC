@@ -206,7 +206,7 @@ namespace MASICTest
                     };
 
                     // 1 for the first MS/MS scan after the survey scan, 2 for the second one, etc.
-                    newFragScan.FragScanInfo.FragScanNumber = (scanList.MasterScanOrderCount - 1) - intLastSurveyScanIndexInMasterSeqOrder;
+                    newFragScan.FragScanInfo.FragScanNumber = scanList.MasterScanOrderCount - 1 - lastSurveyScanIndexInMasterSeqOrder;
                     newFragScan.FragScanInfo.MSLevel = 2;
 
                     newFragScan.TotalIonIntensity = newFragScan.BasePeakIonIntensity * (float)(0.25 + oRand.NextDouble() * 2);

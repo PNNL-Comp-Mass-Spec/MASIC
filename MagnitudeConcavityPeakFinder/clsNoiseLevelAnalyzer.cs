@@ -193,7 +193,7 @@ namespace MagnitudeConcavityPeakFinder
                     summedIntensity = 0;
                     for (var intIndex = 0; intIndex <= indexEnd; intIndex++)
                     {
-                        summedIntensity += Math.Pow((sortedData[intIndex] - baselineNoiseStats.NoiseLevel), 2);
+                        summedIntensity += Math.Pow(sortedData[intIndex] - baselineNoiseStats.NoiseLevel, 2);
                     }
                     baselineNoiseStats.NoiseStDev = Math.Sqrt(summedIntensity / (countSummed - 1));
 
@@ -251,7 +251,7 @@ namespace MagnitudeConcavityPeakFinder
                     summedIntensity = 0;
                     for (var intIndex = 0; intIndex <= indexEnd; intIndex++)
                     {
-                        summedIntensity += Math.Pow((sortedData[intIndex] - baselineNoiseStats.NoiseLevel), 2);
+                        summedIntensity += Math.Pow(sortedData[intIndex] - baselineNoiseStats.NoiseLevel, 2);
                     }
 
                     countSummed = indexEnd + 1;

@@ -72,7 +72,7 @@ namespace MASIC
             if (DataCount >= mDataValues.Length)
             {
                 var oldMDataValues = mDataValues;
-                mDataValues = new double[((int)Math.Floor(mDataValues.Length * 1.5))];
+                mDataValues = new double[(int)Math.Floor(mDataValues.Length * 1.5)];
                 Array.Copy(oldMDataValues, mDataValues, Math.Min((int)Math.Floor(mDataValues.Length * 1.5), oldMDataValues.Length));
 
                 var oldMDataIndices = mDataIndices;
@@ -288,8 +288,8 @@ namespace MASIC
                     {
                         if (histogramBinCounts[binToSort] > 0)
                         {
-                            binToSortAbundances = new double[(histogramBinCounts[binToSort])];
-                            binToSortDataIndices = new int[(histogramBinCounts[binToSort])];
+                            binToSortAbundances = new double[histogramBinCounts[binToSort]];
+                            binToSortDataIndices = new int[histogramBinCounts[binToSort]];
                         }
                         else
                         {
@@ -316,7 +316,7 @@ namespace MASIC
                                 {
                                     // Need to reserve more space (this is unexpected)
                                     var oldBinToSortAbundances = binToSortAbundances;
-                                    binToSortAbundances = new double[(binToSortAbundances.Length * 2)];
+                                    binToSortAbundances = new double[binToSortAbundances.Length * 2];
                                     Array.Copy(oldBinToSortAbundances, binToSortAbundances, Math.Min(binToSortAbundances.Length * 2, oldBinToSortAbundances.Length));
                                     var oldBinToSortDataIndices = binToSortDataIndices;
                                     binToSortDataIndices = new int[binToSortAbundances.Length];
