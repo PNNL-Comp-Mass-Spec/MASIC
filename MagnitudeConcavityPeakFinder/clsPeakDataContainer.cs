@@ -99,9 +99,9 @@ namespace MagnitudeConcavityPeakFinder
             return dataCount;
         }
 
-        public void SetSmoothedData(double[] newSmoothdData)
+        public void SetSmoothedData(double[] newSmoothedData)
         {
-            SmoothedYData = newSmoothdData;
+            SmoothedYData = newSmoothedData;
         }
     }
 }

@@ -149,7 +149,7 @@ namespace MASICTest
             var scanList = new clsScanList();
             var oRand = new Random();
 
-            var intLastSurveyScanIndexInMasterSeqOrder = -1;
+            var lastSurveyScanIndexInMasterSeqOrder = -1;
 
             // Populate scanList with example scan data
 
@@ -190,7 +190,7 @@ namespace MASICTest
                     var intLastSurveyScanIndex = scanList.SurveyScans.Count - 1;
 
                     scanList.AddMasterScanEntry(clsScanList.ScanTypeConstants.SurveyScan, intLastSurveyScanIndex);
-                    intLastSurveyScanIndexInMasterSeqOrder = scanList.MasterScanOrderCount - 1;
+                    lastSurveyScanIndexInMasterSeqOrder = scanList.MasterScanOrderCount - 1;
                 }
                 else
                 {
