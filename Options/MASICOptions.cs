@@ -454,9 +454,10 @@ namespace MASIC.Options
 
                 if (!reader.SectionPresent(XML_SECTION_SIC_OPTIONS))
                 {
-                    var errorMessage = "The node '<section name=" + "\"" + XML_SECTION_SIC_OPTIONS +
-                                       "\"" + "> was not found in the parameter file: " +
-                                       parameterFilePath;
+                    var errorMessage = string.Format(
+                        "The node '<section name=\"{0}\"> was not found in the parameter file: {1}",
+                        XML_SECTION_SIC_OPTIONS, parameterFilePath);
+
                     ReportError(errorMessage);
                     return false;
                 }
@@ -610,9 +611,10 @@ namespace MASIC.Options
                 // Binning Options
                 if (!reader.SectionPresent(XML_SECTION_BINNING_OPTIONS))
                 {
-                    var errorMessage = "The node '<section name=" + "\"" +
-                                       XML_SECTION_BINNING_OPTIONS + "\"" +
-                                       "> was not found in the parameter file: " + parameterFilePath;
+                    var errorMessage = string.Format(
+                        "The node '<section name=\"{0}\"> was not found in the parameter file: {1}",
+                        XML_SECTION_BINNING_OPTIONS, parameterFilePath);
+
                     ReportError(errorMessage);
 
                     SetBaseClassErrorCode(PRISM.FileProcessor.ProcessFilesBase.ProcessFilesErrorCodes.InvalidParameterFile);
