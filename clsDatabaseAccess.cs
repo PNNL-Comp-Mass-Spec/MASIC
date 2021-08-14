@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using MASIC.Options;
+using PRISMDatabaseUtils;
 
 namespace MASIC
 {
@@ -86,7 +87,9 @@ namespace MASIC
 
             try
             {
-                var dbTools = PRISMDatabaseUtils.DbToolsFactory.GetDBTools(masicOptions.DatabaseConnectionString);
+                var connectionStringToUse = DbToolsFactory.AddApplicationNameToConnectionString(masicOptions.DatabaseConnectionString, "MASIC");
+
+                var dbTools = DbToolsFactory.GetDBTools(connectionStringToUse);
 
                 var queryingSingleDataset = false;
 
