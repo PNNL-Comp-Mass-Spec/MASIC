@@ -1031,7 +1031,9 @@ namespace MASIC.Options
                 {
                     var query = (from item in matchSpecList select item).Distinct();
                     foreach (var item in query)
+                    {
                         StatusLogKeyNameFilterList.Add(item);
+                    }
                 }
             }
             catch (Exception)

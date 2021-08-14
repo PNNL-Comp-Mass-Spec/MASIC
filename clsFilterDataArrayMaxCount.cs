@@ -373,7 +373,9 @@ namespace MASIC
                         for (var index = 0; index < binToSortDataCount; index++)
                         {
                             while (binToSortDataIndices[index] > mDataIndices[originalDataArrayIndex])
+                            {
                                 originalDataArrayIndex++;
+                            }
 
                             if (Math.Abs(binToSortAbundances[index] - SkipDataPointFlag) < float.Epsilon)
                             {

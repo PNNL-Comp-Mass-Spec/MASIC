@@ -36,14 +36,18 @@ namespace MASIC.DataOutput
                     clsBinarySearch.eMissingDataModeConstants.ReturnClosestPoint);
 
                 while (surveyScanIndexMatch >= 0 && scanList.MasterScanOrder[surveyScanIndexMatch].ScanType == clsScanList.ScanTypeConstants.FragScan)
+                {
                     surveyScanIndexMatch--;
+                }
 
                 if (surveyScanIndexMatch < 0)
                 {
                     // Did not find the previous survey scan; find the next survey scan
                     surveyScanIndexMatch++;
                     while (surveyScanIndexMatch < scanList.MasterScanOrderCount && scanList.MasterScanOrder[surveyScanIndexMatch].ScanType == clsScanList.ScanTypeConstants.FragScan)
+                    {
                         surveyScanIndexMatch++;
+                    }
 
                     if (surveyScanIndexMatch >= scanList.MasterScanOrderCount)
                     {
@@ -91,7 +95,9 @@ namespace MASIC.DataOutput
                 scanListArray = new int[surveyScanCount];
 
                 for (var index = 0; index < surveyScanCount; index++)
+                {
                     scanListArray[index] = surveyScans[index].ScanNumber;
+                }
             }
             else
             {

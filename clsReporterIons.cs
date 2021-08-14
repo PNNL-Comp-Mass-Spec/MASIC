@@ -316,7 +316,9 @@ namespace MASIC
             }
 
             foreach (var reporterIon in reporterIons)
+            {
                 reporterIon.MZToleranceDa = mzToleranceDa;
+            }
 
             return reporterIons;
         }

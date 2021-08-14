@@ -111,7 +111,10 @@ namespace MASIC.DataOutput
                     writer.WriteLine("Category" + TAB_DELIMITER + "Name" + TAB_DELIMITER + "Value");
 
                     foreach (var setting in rawFileReader.FileInfo.TuneMethods[index].Settings)
+                    {
                         writer.WriteLine(setting.Category + TAB_DELIMITER + setting.Name + TAB_DELIMITER + setting.Value);
+                    }
+
                     writer.WriteLine();
                 }
             }

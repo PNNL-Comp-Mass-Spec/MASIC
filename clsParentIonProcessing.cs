@@ -799,7 +799,9 @@ namespace MASIC
                     sicOptions.SimilarIonMZToleranceHalfWidth,
                     out var matchIndexStart,
                     out var matchIndexEnd))
+            {
                 return;
+            }
 
             for (var matchIndex = matchIndexStart; matchIndex <= matchIndexEnd; matchIndex++)
             {

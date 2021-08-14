@@ -384,7 +384,9 @@ namespace MASIC.DataInput
                         // Compute the total scan intensity
                         newFragScan.TotalIonIntensity = 0;
                         for (var ionIndex = 0; ionIndex < newFragScan.IonCount; ionIndex++)
+                        {
                             newFragScan.TotalIonIntensity += msSpectrum.IonsIntensity[ionIndex];
+                        }
 
                         // Determine the minimum positive intensity in this scan
                         newFragScan.MinimumPositiveIntensity = mPeakFinder.FindMinimumPositiveValue(msSpectrum.IonsIntensity, 0);
@@ -573,13 +575,17 @@ namespace MASIC.DataInput
             {
                 // Decrement lastSurveyScanIndex if the corresponding SurveyScan's scan number is larger than fragScanNumber
                 while (lastSurveyScanIndex > 0 && surveyScans[lastSurveyScanIndex].ScanNumber > fragScanNumber)
+                {
                     // This code will generally not be reached, provided the calling function passed the correct lastSurveyScanIndex value to this function
                     lastSurveyScanIndex--;
+                }
 
                 // Increment lastSurveyScanIndex if the next SurveyScan's scan number is smaller than fragScanNumber
                 while (lastSurveyScanIndex < surveyScans.Count - 1 && surveyScans[lastSurveyScanIndex + 1].ScanNumber < fragScanNumber)
+                {
                     // This code will generally not be reached, provided the calling function passed the correct lastSurveyScanIndex value to this function
                     lastSurveyScanIndex++;
+                }
 
                 if (lastSurveyScanIndex >= surveyScans.Count - 1)
                 {

@@ -675,7 +675,9 @@ namespace MASIC
                            Math.Abs(mzBinList[mzIndex + 1].MZTolerance - mzSearchChunk.MZTolerance) < double.Epsilon &&
                            mzBinList[mzIndex + 1].MZToleranceIsPPM == mzSearchChunk.MZToleranceIsPPM &&
                            mzBinList[mzIndex + 1].MZ - mzBinList[mzSearchChunk.MZIndexStart].MZ <= mzToleranceDa / 2)
+                    {
                         mzIndex++;
+                    }
 
                     mzSearchChunk.MZIndexEnd = mzIndex;
 
@@ -788,7 +790,9 @@ namespace MASIC
 
                 fullSICDataCount[mzIndexWork] = 0;
                 for (var surveyScanIndex = 0; surveyScanIndex < scanList.SurveyScans.Count; surveyScanIndex++)
+                {
                     fullSICScanIndices[mzIndexWork, surveyScanIndex] = -1;
+                }
             }
 
             // ---------------------------------------------------------
@@ -913,7 +917,9 @@ namespace MASIC
 
                 // Copy the data for this m/z into fullSICIntensities1D()
                 for (var dataIndex = 0; dataIndex < fullSICDataCount[mzIndexWork]; dataIndex++)
+                {
                     fullSICIntensities1D[dataIndex] = fullSICIntensities[mzIndexWork, dataIndex];
+                }
 
                 // Compute the noise level; the noise level may change with increasing index number if the background is increasing for a given m/z
 

@@ -516,7 +516,9 @@ namespace MASICBrowser
                 sicStats.SICSmoothedYData.Clear();
 
                 foreach (var dataPoint in parentIon.SICData)
+                {
                     sicStats.SICSmoothedYData.Add(dataPoint.Intensity);
+                }
 
                 sicStats.SICSmoothedYDataIndexStart = smoothedYDataSubset.DataStartIndex;
 
@@ -1256,7 +1258,9 @@ namespace MASICBrowser
 
                     smoothedYData = new double[sicStats.SICSmoothedYData.Count];
                     for (var index = 0; index < sicStats.SICSmoothedYData.Count; index++)
+                    {
                         smoothedYData[index] = sicStats.SICSmoothedYData[index];
+                    }
                 }
 
                 // Populate Series 3 with the similar fragmentation scan values
@@ -1405,7 +1409,9 @@ namespace MASICBrowser
                 else
                 {
                     while (mSpectrum.GetSeriesCount() >= 4)
+                    {
                         mSpectrum.RemoveSeries(4);
+                    }
                 }
 
                 var actualSeriesCount = mSpectrum.GetSeriesCount();

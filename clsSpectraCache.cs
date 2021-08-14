@@ -231,11 +231,15 @@ namespace MASIC
 
                     // Write the m/z values
                     for (var index = 0; index < spectrumToCache.IonCount; index++)
+                    {
                         mPageFileWriter.Write(spectrumToCache.IonsMZ[index]);
+                    }
 
                     // Write the intensity values
                     for (var index = 0; index < spectrumToCache.IonCount; index++)
+                    {
                         mPageFileWriter.Write(spectrumToCache.IonsIntensity[index]);
+                    }
 
                     // Write four blank bytes (not really necessary, but adds a little padding between spectra)
                     mPageFileWriter.Write(0);
@@ -645,7 +649,9 @@ namespace MASIC
 
                 // Add 64 bytes of white space
                 for (var index = 0; index <= 63; index++)
+                {
                     mPageFileWriter.Write(byte.MinValue);
+                }
 
                 mPageFileWriter.Flush();
 

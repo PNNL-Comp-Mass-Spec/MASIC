@@ -643,7 +643,9 @@ namespace MASIC
 
             var DiffInRanksWork = 0.0;
             for (var j = 0; j < n; j++)
+            {
                 DiffInRanksWork += SquareNum(data1[j] - data2[j]);
+            }
 
             DiffInRanks = (float)(DiffInRanksWork);
 
@@ -697,12 +699,16 @@ namespace MASIC
                 {
                     var jt = j + 1;
                     while (jt < n && Math.Abs(w[jt] - w[j]) < float.Epsilon)
+                    {
                         jt++;
+                    }
 
                     var rank = 0.5F * (j + jt - 1) + 1;
 
                     for (var ji = j; ji < jt; ji++)
+                    {
                         w[ji] = rank;
+                    }
 
                     float t = jt - j;
                     s += t * t * t - t;          // t^3 - t

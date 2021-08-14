@@ -188,14 +188,18 @@ namespace MASIC
                             clsBinarySearch.eMissingDataModeConstants.ReturnClosestPoint);
 
                         while (fragScanIndexMatch < scanList.MasterScanOrderCount && scanList.MasterScanOrder[fragScanIndexMatch].ScanType == clsScanList.ScanTypeConstants.SurveyScan)
+                        {
                             fragScanIndexMatch++;
+                        }
 
                         if (fragScanIndexMatch == scanList.MasterScanOrderCount)
                         {
                             // Did not find the next frag scan; find the previous frag scan
                             fragScanIndexMatch--;
                             while (fragScanIndexMatch > 0 && scanList.MasterScanOrder[fragScanIndexMatch].ScanType == clsScanList.ScanTypeConstants.SurveyScan)
+                            {
                                 fragScanIndexMatch--;
+                            }
 
                             if (fragScanIndexMatch < 0)
                                 fragScanIndexMatch = 0;
@@ -564,7 +568,9 @@ namespace MASIC
             }
 
             foreach (var mzSearchSpec in mzSearchSpecs)
+            {
                 AddMzSearchTarget(mzSearchSpec);
+            }
 
             ValidateCustomSICList();
 

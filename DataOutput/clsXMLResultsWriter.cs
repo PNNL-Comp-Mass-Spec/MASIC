@@ -377,7 +377,9 @@ namespace MASIC.DataOutput
                                 if (smoothedYDataSubset.Data != null && smoothedYDataSubset.DataCount > 0)
                                 {
                                     for (var index = 0; index < smoothedYDataSubset.DataCount; index++)
+                                    {
                                         peakYDataSmoothed.Append(Math.Round(smoothedYDataSubset.Data[index]).ToString(CultureInfo.InvariantCulture) + ",");
+                                    }
 
                                     // Trim the trailing comma
                                     peakYDataSmoothed.Length--;

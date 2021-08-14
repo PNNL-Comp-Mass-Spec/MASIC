@@ -1065,6 +1065,7 @@ namespace MASIC
 
                         var outputFileTestPath = Path.Combine(outputDirectoryPath, "TestOutputFile" + DateTime.UtcNow.Ticks + ".tmp");
 
+                        // ReSharper disable once RemoveRedundantBraces
                         using (var writer = new StreamWriter(outputFileTestPath, false))
                         {
                             writer.WriteLine("Test");
@@ -1467,7 +1468,9 @@ namespace MASIC
 
                 float overallPctCompleted = 0;
                 for (var index = 0; index < currentStep; index++)
+                {
                     overallPctCompleted += weightingFactors[index] * 100;
+                }
 
                 overallPctCompleted += weightingFactors[currentStep] * SubtaskProgressPercentComplete;
 

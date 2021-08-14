@@ -32,7 +32,9 @@ namespace MASICPeakFinder
             Data = new double[DataCount + 1];
 
             for (var intIndex = startIndex; intIndex <= endIndex; intIndex++)
+            {
                 Data[intIndex - startIndex] = Math.Min(yData[intIndex], double.MaxValue);
+            }
         }
     }
 }

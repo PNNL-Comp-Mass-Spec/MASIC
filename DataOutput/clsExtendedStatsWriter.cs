@@ -112,10 +112,14 @@ namespace MASIC.DataOutput
             var headerNamesByID = new Dictionary<int, string>();
 
             foreach (var item in mExtendedHeaderNameMap)
+            {
                 headerNamesByID.Add(item.Value, item.Key);
+            }
 
             foreach (var headerItem in from item in headerNamesByID orderby item.Key select item.Value)
+            {
                 headerNames.Add(headerItem.TrimEnd(cTrimChars));
+            }
 
             return headerNames;
         }
@@ -125,7 +129,9 @@ namespace MASIC.DataOutput
             var newTable = new Dictionary<int, string>();
 
             foreach (var item in sourceTable)
+            {
                 newTable.Add(item.Key, item.Value);
+            }
 
             return newTable;
         }
@@ -164,7 +170,9 @@ namespace MASIC.DataOutput
 
             // Initialize nonConstantHeaderIDs
             for (var i = 0; i < mExtendedHeaderNameMap.Count; i++)
+            {
                 nonConstantHeaderIDs.Add(i);
+            }
 
             if (!mOptions.ConsolidateConstantExtendedHeaderValues)
             {
@@ -269,7 +277,9 @@ namespace MASIC.DataOutput
             constantHeaderIDs.Capacity = consolidatedValuesByID.Count;
 
             foreach (var item in consolidatedValuesByID)
+            {
                 constantHeaderIDs.Add(item.Key);
+            }
 
             var keysToRemove = new List<string>();
 
@@ -305,7 +315,9 @@ namespace MASIC.DataOutput
 
             // Populate nonConstantHeaderIDs with the ID values in mExtendedHeaderNameMap
             foreach (var item in mExtendedHeaderNameMap)
+            {
                 nonConstantHeaderIDs.Add(item.Value);
+            }
 
             return string.Join(Environment.NewLine, consolidatedValueList);
         }
@@ -383,6 +395,8 @@ namespace MASIC.DataOutput
                                                    ?? string.Empty;
 
                 // Write the constant extended stats values to a text file
+
+                // ReSharper disable once RemoveRedundantBraces
                 using (var constantHeaderWriter = new StreamWriter(extendedConstantHeaderOutputFilePath, false))
                 {
                     constantHeaderWriter.WriteLine(constantExtendedHeaderValues);

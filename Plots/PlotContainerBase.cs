@@ -138,7 +138,9 @@ namespace MASIC.Plots
 
             string logFileName;
             if (string.IsNullOrWhiteSpace(dataSource))
+            {
                 logFileName = "MASIC_Plotter_Debug.txt";
+            }
             else
             {
                 logFileName = dataSource + ".txt";

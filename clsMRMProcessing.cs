@@ -292,7 +292,9 @@ namespace MASIC
                     // Populate srmKeyToIndexMap
                     var srmKeyToIndexMap = new Dictionary<string, int>();
                     for (var srmIndex = 0; srmIndex < srmList.Count; srmIndex++)
+                    {
                         srmKeyToIndexMap.Add(ConstructSRMMapKey(srmList[srmIndex]), srmIndex);
+                    }
 
                     if (mOptions.WriteMRMDataList)
                     {
@@ -319,7 +321,9 @@ namespace MASIC
                         };
 
                         foreach (var srmEntry in srmList)
+                        {
                             headerNames.Add(ConstructSRMMapKey(srmEntry));
+                        }
 
                         crosstabWriter.WriteLine(string.Join(TAB_DELIMITER.ToString(), headerNames));
                     }

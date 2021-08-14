@@ -158,7 +158,9 @@ namespace MASIC
 
             var maxIntensity = 0.0;
             for (var index = 0; index < matrixSize; index++)
+            {
                 maxIntensity = Math.Max(maxIntensity, reporterIonIntensities[index]);
+            }
 
             if (debugShowIntensities)
             {
@@ -840,7 +842,9 @@ namespace MASIC
             for (var i = 0; i <= maxIndex; i++)
             {
                 for (var j = 0; j <= maxIndex; j++)
+                {
                     mCoeffs[i, j] /= 100.0;
+                }
             }
 
             if (debugShowMatrixTable)
@@ -870,7 +874,9 @@ namespace MASIC
 
                         Console.Write("     ");
                         for (var k = 0; k <= maxIndex; k++)
+                        {
                             Console.Write(" ------ ");
+                        }
 
                         Console.WriteLine();
                     }

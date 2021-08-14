@@ -845,7 +845,9 @@ namespace MASIC
             mPointerIndices = new int[arrayLength];
 
             for (var index = 0; index < arrayLength; index++)
+            {
                 mPointerIndices[index] = index;
+            }
 
             mPointerArrayIsValid = arrayLength > 0;
         }

@@ -91,8 +91,10 @@ namespace MagnitudeConcavityPeakFinder
                 dataCount = xDataCount;
 
             if (dataCount > yDataCount)
+            {
                 throw new Exception(
                     "xData array contains more data points than the yData array; unable to store in PeakDataContainer");
+            }
 
             return dataCount;
         }

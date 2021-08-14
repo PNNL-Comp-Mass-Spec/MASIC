@@ -57,7 +57,9 @@ namespace MASICPeakFinder
 
             clonedContainer.Peaks.Capacity = Peaks.Count;
             foreach (var sourcePeak in Peaks)
+            {
                 clonedContainer.Peaks.Add(sourcePeak.Clone());
+            }
 
             return clonedContainer;
         }

@@ -298,9 +298,12 @@ namespace MASIC
                         leftDone = true;
                     }
                     else if (Math.Abs(searchValue - dataValues[leftIndex]) > toleranceHalfWidth)
+                    {
                         leftDone = true;
+                    }
                 }
                 while (!leftDone);
+
                 var rightIndex = indexMidpoint;
 
                 do
@@ -311,7 +314,9 @@ namespace MASIC
                         rightDone = true;
                     }
                     else if (Math.Abs(searchValue - dataValues[rightIndex]) > toleranceHalfWidth)
+                    {
                         rightDone = true;
+                    }
                 }
                 while (!rightDone);
 

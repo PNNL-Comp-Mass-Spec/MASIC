@@ -224,6 +224,7 @@ namespace MASIC.Plots
 
             encoder.Frames.Add(BitmapFrame.Create(target));
 
+            // ReSharper disable once RemoveRedundantBraces
             using (var outputStream = new FileStream(imageFile.FullName, FileMode.Create, FileAccess.Write))
             {
                 encoder.Save(outputStream);

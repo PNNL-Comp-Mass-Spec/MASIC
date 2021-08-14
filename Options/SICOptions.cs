@@ -241,7 +241,10 @@
                     toleranceValue = 100;
             }
             else if (toleranceValue < 0 || toleranceValue > 10000)
+            {
                 toleranceValue = 0.6;
+            }
+
             SICTolerance = toleranceValue;
         }
 
