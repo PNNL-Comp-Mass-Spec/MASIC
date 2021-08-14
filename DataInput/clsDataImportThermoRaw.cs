@@ -18,7 +18,7 @@ namespace MASIC.DataInput
 
         private int mBpiUpdateCount;
 
-        private readonly Dictionary<string, int> mSIMScanMapping = new Dictionary<string, int>();
+        private readonly Dictionary<string, int> mSIMScanMapping = new();
 
         /// <summary>
         /// Constructor
