@@ -368,6 +368,8 @@ namespace MASICTest
             }
 
             Console.WriteLine("{0,-12} -> {1,-12}", valueToConvert, result);
+
+            Assert.AreEqual(expectedResult, result);
         }
     }
 }
