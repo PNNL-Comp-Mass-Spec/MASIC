@@ -95,4 +95,5 @@ using System.Diagnostics.CodeAnalysis;
 [assembly: SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "Legacy name", Scope = "type", Target = "~T:MASIC.DataOutput.clsThermoMetadataWriter")]
 [assembly: SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "Legacy name", Scope = "type", Target = "~T:MASIC.DataOutput.clsXMLResultsWriter")]
 [assembly: SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "Legacy name", Scope = "type", Target = "~T:MASIC.DatasetStats.clsDatasetStatsSummarizer")]
+[assembly: SuppressMessage("Usage", "RCS1146:Use conditional access.", Justification = "Leave for readability", Scope = "member", Target = "~M:MASIC.Plots.AxisInfo.GetOptions(System.Collections.Generic.List{System.String})~System.String")]
 [assembly: SuppressMessage("Usage", "RCS1246:Use element access.", Justification = "Prefer to use .First() instead of [0]", Scope = "module")]

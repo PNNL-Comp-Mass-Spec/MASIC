@@ -105,6 +105,7 @@ namespace MASIC.Plots
             if (!double.IsNaN(MajorStep))
                 options.Add("MajorStep=" + MajorStep);
 
+            // ReSharper disable once MergeIntoPattern
             if (additionalOptions != null && additionalOptions.Count > 0)
                 options.AddRange(additionalOptions);
 
