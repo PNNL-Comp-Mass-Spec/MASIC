@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 namespace MASIC
 {
-    public class clsUtilities
+    public static class clsUtilities
     {
-        // Const CHARGE_CARRIER_MASS_AVG As Double = 1.00739
+        // CHARGE_CARRIER_MASS_AVG As Double = 1.00739
 
         /// <summary>
         /// Monoisotopic charge carrier mass
