@@ -1165,72 +1165,74 @@ namespace MASIC
 
         private void ProcessFileUsingMASIC()
         {
-            if (!mWorking && ConfirmPaths())
+            if (mWorking || !ConfirmPaths())
             {
-                try
+                return;
+            }
+
+            try
+            {
+                txtLogMessages.ResetText();
+
+                // Configure settings
+                var success = UpdateMasicSettings(mMasic);
+                if (!success)
+                    return;
+
+                // Validate settings
+                success = ValidateSettings(mMasic);
+                if (!success)
+                    return;
+
+                mProgressForm = new frmProgress();
+
+                mProgressForm.InitializeProgressForm("Creating SIC's for the parent ions", 0, 100, false, true);
+                mProgressForm.InitializeSubtask("", 0, 100, false);
+                mProgressForm.ResetKeyPressAbortProcess();
+                mProgressForm.Show();
+                Application.DoEvents();
+
+                Cursor.Current = Cursors.WaitCursor;
+                mWorking = true;
+                cmdStartProcessing.Enabled = false;
+                Application.DoEvents();
+
+                var startTime = DateTime.UtcNow;
+
+                var outputDirectoryPath = txtOutputDirectoryPath.Text;
+                success = mMasic.ProcessFile(txtInputFilePath.Text, outputDirectoryPath);
+                Cursor.Current = Cursors.Default;
+                if (mMasic.Options.AbortProcessing)
                 {
-                    txtLogMessages.ResetText();
-
-                    // Configure settings
-                    var success = UpdateMasicSettings(mMasic);
-                    if (!success)
-                        return;
-
-                    // Validate settings
-                    success = ValidateSettings(mMasic);
-                    if (!success)
-                        return;
-
-                    mProgressForm = new frmProgress();
-
-                    mProgressForm.InitializeProgressForm("Creating SIC's for the parent ions", 0, 100, false, true);
-                    mProgressForm.InitializeSubtask("", 0, 100, false);
-                    mProgressForm.ResetKeyPressAbortProcess();
-                    mProgressForm.Show();
-                    Application.DoEvents();
-
-                    Cursor.Current = Cursors.WaitCursor;
-                    mWorking = true;
-                    cmdStartProcessing.Enabled = false;
-                    Application.DoEvents();
-
-                    var startTime = DateTime.UtcNow;
-
-                    var outputDirectoryPath = txtOutputDirectoryPath.Text;
-                    success = mMasic.ProcessFile(txtInputFilePath.Text, outputDirectoryPath);
-                    Cursor.Current = Cursors.Default;
-                    if (mMasic.Options.AbortProcessing)
-                    {
-                        MessageBox.Show("Canceled processing", "Canceled", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    }
-
-                    if (success)
-                    {
-                        // Grab the status message, but insert a carriage return directly after "in folder:"
-                        MessageBox.Show(mMasic.StatusMessage.Replace("in folder:", "in folder:" + Environment.NewLine) + Environment.NewLine + "Elapsed time: " + StringUtilities.DblToString(DateTime.UtcNow.Subtract(startTime).TotalSeconds, 2) + " sec", "Done", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    }
-                    else
-                    {
-                        MessageBox.Show("Error analyzing input file with MASIC: " + Environment.NewLine +
-                                        mMasic.GetErrorMessage() + Environment.NewLine +
-                                        mMasic.StatusMessage, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                    }
+                    MessageBox.Show("Canceled processing", "Canceled", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
-                catch (Exception ex)
+
+                if (success)
                 {
-                    MessageBox.Show("Error in frmMain->ProcessFileUsingMASIC: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                    // Grab the status message, but insert a carriage return directly after "in folder:"
+                    MessageBox.Show(mMasic.StatusMessage.Replace("in folder:", "in folder:" + Environment.NewLine) + Environment.NewLine + "Elapsed time: " + StringUtilities.DblToString(DateTime.UtcNow.Subtract(startTime).TotalSeconds, 2) + " sec", "Done", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
-                finally
+                else
                 {
-                    if (mProgressForm != null)
-                    {
-                        mProgressForm.HideForm();
-                        mProgressForm = null;
-                    }
-
-                    mWorking = false;
-                    cmdStartProcessing.Enabled = true;
+                    MessageBox.Show("Error analyzing input file with MASIC: " + Environment.NewLine +
+                                    mMasic.GetErrorMessage() + Environment.NewLine +
+                                    mMasic.StatusMessage, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error in frmMain->ProcessFileUsingMASIC: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+            }
+            finally
+            {
+                if (mProgressForm != null)
+                {
+                    mProgressForm.HideForm();
+                    mProgressForm = null;
+                }
+
+                mWorking = false;
+                cmdStartProcessing.Enabled = true;
             }
         }
 

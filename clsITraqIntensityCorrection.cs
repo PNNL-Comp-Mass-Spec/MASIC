@@ -171,43 +171,45 @@ namespace MASIC
             // Now update reporterIonIntensities
             for (var index = 0; index < matrixSize; index++)
             {
-                if (reporterIonIntensities[index] > 0)
+                if (!(reporterIonIntensities[index] > 0))
                 {
-                    double newIntensity;
-                    if (correctedIntensities[index] < 0)
+                    continue;
+                }
+
+                double newIntensity;
+                if (correctedIntensities[index] < 0)
+                {
+                    newIntensity = 0;
+                }
+                else
+                {
+                    newIntensity = correctedIntensities[index];
+                }
+
+                if (debugShowIntensities)
+                {
+                    // Compute percent change vs. the maximum reporter ion intensity
+                    var percentChange = (newIntensity - reporterIonIntensities[index]) / maxIntensity * 100;
+                    var percentChangeRounded = (int)Math.Round(percentChange, 0);
+
+                    string visualPercentChange;
+                    if (percentChangeRounded > 0)
                     {
-                        newIntensity = 0;
+                        visualPercentChange = new string('+', percentChangeRounded);
+                    }
+                    else if (percentChangeRounded < 0)
+                    {
+                        visualPercentChange = new string('-', -percentChangeRounded);
                     }
                     else
                     {
-                        newIntensity = correctedIntensities[index];
+                        visualPercentChange = string.Empty;
                     }
 
-                    if (debugShowIntensities)
-                    {
-                        // Compute percent change vs. the maximum reporter ion intensity
-                        var percentChange = (newIntensity - reporterIonIntensities[index]) / maxIntensity * 100;
-                        var percentChangeRounded = (int)Math.Round(percentChange, 0);
-
-                        string visualPercentChange;
-                        if (percentChangeRounded > 0)
-                        {
-                            visualPercentChange = new string('+', percentChangeRounded);
-                        }
-                        else if (percentChangeRounded < 0)
-                        {
-                            visualPercentChange = new string('-', -percentChangeRounded);
-                        }
-                        else
-                        {
-                            visualPercentChange = string.Empty;
-                        }
-
-                        Console.WriteLine("{0,-8} {1,-10:0.0} {2,-12:0.0}{3,7:0.0}%   {4}", index, reporterIonIntensities[index], newIntensity, percentChange, visualPercentChange);
-                    }
-
-                    reporterIonIntensities[index] = newIntensity;
+                    Console.WriteLine("{0,-8} {1,-10:0.0} {2,-12:0.0}{3,7:0.0}%   {4}", index, reporterIonIntensities[index], newIntensity, percentChange, visualPercentChange);
                 }
+
+                reporterIonIntensities[index] = newIntensity;
             }
 
             return true;
