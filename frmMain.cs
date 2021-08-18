@@ -153,8 +153,7 @@ namespace MASIC
                 }
             }
 
-            if (comment == null)
-                comment = string.Empty;
+            comment ??= string.Empty;
 
             if (!existingRowFound)
             {
@@ -662,7 +661,7 @@ namespace MASIC
             {
                 try
                 {
-                    fileSelector.InitialDirectory = Directory.GetParent(filePath).ToString();
+                    fileSelector.InitialDirectory = Directory.GetParent(filePath)?.ToString();
                 }
                 catch
                 {
@@ -809,7 +808,7 @@ namespace MASIC
             {
                 try
                 {
-                    fileSelector.InitialDirectory = Directory.GetParent(filePath).ToString();
+                    fileSelector.InitialDirectory = Directory.GetParent(filePath)?.ToString();
                 }
                 catch
                 {
@@ -1492,11 +1491,12 @@ namespace MASIC
                 Filter = "Text files (*.txt)|*.txt|All files (*.*)|*.*",
                 FilterIndex = 1
             };
+
             if (txtDatasetLookupFilePath.TextLength > 0)
             {
                 try
                 {
-                    fileSelector.InitialDirectory = Directory.GetParent(txtDatasetLookupFilePath.Text).ToString();
+                    fileSelector.InitialDirectory = Directory.GetParent(txtDatasetLookupFilePath.Text)?.ToString();
                 }
                 catch
                 {
@@ -1553,7 +1553,7 @@ namespace MASIC
             {
                 try
                 {
-                    fileSelector.InitialDirectory = Directory.GetParent(txtCustomSICFileName.Text).ToString();
+                    fileSelector.InitialDirectory = Directory.GetParent(txtCustomSICFileName.Text ?? ".")?.ToString();
                 }
                 catch
                 {
@@ -1619,7 +1619,7 @@ namespace MASIC
             {
                 try
                 {
-                    fileSelector.InitialDirectory = Directory.GetParent(txtInputFilePath.Text).ToString();
+                    fileSelector.InitialDirectory = Directory.GetParent(txtInputFilePath.Text ?? ".")?.ToString();
                 }
                 catch
                 {
