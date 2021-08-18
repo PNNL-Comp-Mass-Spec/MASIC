@@ -41,7 +41,7 @@ namespace MASIC
         // ReSharper disable CommentTypo
 
         // Ignore Spelling: Acet, Acq, Acetylated, amine, Checkbox, Combobox, CrLf, csv, Da, dpi, fracking frmMain
-        // Ignore Spelling: Golay, immonium, iTraq, Lys, mzml, Orbitrap Savitzky, Textbox, Xcalibur
+        // Ignore Spelling: Golay, immonium, iTraq, Lys, mzml, Orbitrap Savitzky, Textbox
 
         // ReSharper restore CommentTypo
 
@@ -1588,7 +1588,7 @@ namespace MASIC
                 DereferenceLinks = true,
                 Multiselect = false,
                 ValidateNames = true,
-                Filter = "Xcalibur Raw files (*.raw)|*.raw|" +
+                Filter = "Thermo Raw files (*.raw)|*.raw|" +
                          "mzXML files (*.mzXML)|*.mzXML|" +
                          "mzML files (*.mzML)|*.mzML|" +
                          "mzData files (*.mzData)|*.mzData|" +

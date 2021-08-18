@@ -752,7 +752,7 @@ namespace MASIC
                         RegisterDataImportEvents(dataImporter);
                         dataImporterBase = dataImporter;
 
-                        success = dataImporter.ExtractScanInfoFromXcaliburDataFile(
+                        success = dataImporter.ExtractScanInfoFromThermoDataFile(
                             inputFilePath,
                             scanList, spectraCache, dataOutputHandler,
                             keepRawMSSpectra,

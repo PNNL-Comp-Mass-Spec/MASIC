@@ -37,13 +37,13 @@ namespace MASIC.DataInput
         }
 
         private double ComputeInterference(
-            XRawFileIO xcaliburAccessor,
+            XRawFileIO rawFileReader,
             ThermoRawFileReader.clsScanInfo scanInfo,
             int precursorScanNumber)
         {
             if (precursorScanNumber != mCachedPrecursorScan)
             {
-                xcaliburAccessor.GetScanData(precursorScanNumber, out var centroidedIonsMz, out var centroidedIonsIntensity, 0, true);
+                rawFileReader.GetScanData(precursorScanNumber, out var centroidedIonsMz, out var centroidedIonsIntensity, 0, true);
 
                 UpdateCachedPrecursorScan(precursorScanNumber, centroidedIonsMz, centroidedIonsIntensity);
             }
@@ -132,7 +132,7 @@ namespace MASIC.DataInput
         /// <param name="keepMSMSSpectra"></param>
         /// <returns>True if Success, False if failure</returns>
         /// <remarks>Assumes filePath exists</remarks>
-        public bool ExtractScanInfoFromXcaliburDataFile(
+        public bool ExtractScanInfoFromThermoDataFile(
             string filePath,
             clsScanList scanList,
             clsSpectraCache spectraCache,
@@ -157,10 +157,10 @@ namespace MASIC.DataInput
                 LoadMSTuneInfo = mOptions.WriteMSTuneFile
             };
 
-            var xcaliburAccessor = new XRawFileIO(readerOptions) {
+            var rawFileReader = new XRawFileIO(readerOptions) {
                 ScanInfoCacheMaxSize = 0    // Don't cache scanInfo objects
             };
-            RegisterEvents(xcaliburAccessor);
+            RegisterEvents(rawFileReader);
 
             mBpiUpdateCount = 0;
 
@@ -179,31 +179,31 @@ namespace MASIC.DataInput
                 var inputFileFullPath = rawFileInfo.FullName;
 
                 // Open a handle to the data file
-                if (!xcaliburAccessor.OpenRawFile(inputFileFullPath))
+                if (!rawFileReader.OpenRawFile(inputFileFullPath))
                 {
-                    ReportError("Error opening input data file: " + inputFileFullPath + " (xcaliburAccessor.OpenRawFile returned False)");
+                    ReportError("Error opening input data file: " + inputFileFullPath + " (rawFileReader.OpenRawFile returned False)");
                     SetLocalErrorCode(clsMASIC.MasicErrorCodes.InputFileAccessError);
                     return false;
                 }
 
                 var datasetID = mOptions.SICOptions.DatasetID;
 
-                success = UpdateDatasetFileStats(rawFileInfo, datasetID, xcaliburAccessor);
+                success = UpdateDatasetFileStats(rawFileInfo, datasetID, rawFileReader);
 
                 var metadataWriter = new clsThermoMetadataWriter();
                 RegisterEvents(metadataWriter);
 
                 if (mOptions.WriteMSMethodFile)
                 {
-                    metadataWriter.SaveMSMethodFile(xcaliburAccessor, dataOutputHandler);
+                    metadataWriter.SaveMSMethodFile(rawFileReader, dataOutputHandler);
                 }
 
                 if (mOptions.WriteMSTuneFile)
                 {
-                    metadataWriter.SaveMSTuneFile(xcaliburAccessor, dataOutputHandler);
+                    metadataWriter.SaveMSTuneFile(rawFileReader, dataOutputHandler);
                 }
 
-                var scanCount = xcaliburAccessor.GetNumScans();
+                var scanCount = rawFileReader.GetNumScans();
 
                 if (scanCount <= 0)
                 {
@@ -213,13 +213,13 @@ namespace MASIC.DataInput
                     return false;
                 }
 
-                var scanStart = xcaliburAccessor.ScanStart;
-                var scanEnd = xcaliburAccessor.ScanEnd;
+                var scanStart = rawFileReader.ScanStart;
+                var scanEnd = rawFileReader.ScanEnd;
 
                 InitOptions(scanList, keepRawSpectra, keepMSMSSpectra);
 
-                UpdateProgress(string.Format("Reading Xcalibur data ({0:N0} scans){1}", scanCount, Environment.NewLine + Path.GetFileName(filePath)));
-                ReportMessage(string.Format("Reading Xcalibur data; Total scan count: {0:N0}", scanCount));
+                UpdateProgress(string.Format("Reading Thermo data ({0:N0} scans){1}", scanCount, Environment.NewLine + Path.GetFileName(filePath)));
+                ReportMessage(string.Format("Reading Thermo data; Total scan count: {0:N0}", scanCount));
 
                 var scanCountToRead = scanEnd - scanStart + 1;
                 var scansEst = mOptions.SICOptions.ScanRangeCount;
@@ -238,16 +238,16 @@ namespace MASIC.DataInput
                         continue;
                     }
 
-                    success = xcaliburAccessor.GetScanInfo(scanNumber, out ThermoRawFileReader.clsScanInfo thermoScanInfo);
+                    success = rawFileReader.GetScanInfo(scanNumber, out ThermoRawFileReader.clsScanInfo thermoScanInfo);
                     if (!success)
                     {
                         // GetScanInfo returned false
-                        ReportWarning("xcaliburAccessor.GetScanInfo returned false for scan " + scanNumber + "; aborting read");
+                        ReportWarning("rawFileReader.GetScanInfo returned false for scan " + scanNumber + "; aborting read");
                         break;
                     }
 
                     var percentComplete = scanList.MasterScanOrderCount / (double)(scanCountToRead) * 100;
-                    var extractSuccess = ExtractScanInfoCheckRange(xcaliburAccessor, thermoScanInfo, scanList, spectraCache, dataOutputHandler, percentComplete);
+                    var extractSuccess = ExtractScanInfoCheckRange(rawFileReader, thermoScanInfo, scanList, spectraCache, dataOutputHandler, percentComplete);
 
                     if (!extractSuccess)
                     {
@@ -266,17 +266,17 @@ namespace MASIC.DataInput
             catch (Exception ex)
             {
                 Console.WriteLine(ex.StackTrace);
-                ReportError("Error in ExtractScanInfoFromXcaliburDataFile", ex, clsMASIC.MasicErrorCodes.InputFileDataReadError);
+                ReportError("Error in ExtractScanInfoFromThermoDataFile", ex, clsMASIC.MasicErrorCodes.InputFileDataReadError);
             }
 
             // Close the handle to the data file
-            xcaliburAccessor.CloseRawFile();
+            rawFileReader.CloseRawFile();
 
             return success;
         }
 
         private bool ExtractScanInfoCheckRange(
-            XRawFileIO xcaliburAccessor,
+            XRawFileIO rawFileReader,
             ThermoRawFileReader.clsScanInfo thermoScanInfo,
             clsScanList scanList,
             clsSpectraCache spectraCache,
@@ -287,7 +287,7 @@ namespace MASIC.DataInput
 
             if (mScanTracking.CheckScanInRange(thermoScanInfo.ScanNumber, thermoScanInfo.RetentionTime, mOptions.SICOptions))
             {
-                success = ExtractScanInfoWork(xcaliburAccessor, scanList, spectraCache, dataOutputHandler,
+                success = ExtractScanInfoWork(rawFileReader, scanList, spectraCache, dataOutputHandler,
                                               mOptions.SICOptions, thermoScanInfo);
             }
             else
@@ -320,7 +320,7 @@ namespace MASIC.DataInput
         }
 
         private bool ExtractScanInfoWork(
-            XRawFileIO xcaliburAccessor,
+            XRawFileIO rawFileReader,
             clsScanList scanList,
             clsSpectraCache spectraCache,
             clsDataOutput dataOutputHandler,
@@ -337,17 +337,17 @@ namespace MASIC.DataInput
             if (thermoScanInfo.MSLevel <= 1)
             {
                 // Survey Scan
-                return ExtractXcaliburSurveyScan(xcaliburAccessor, scanList, spectraCache, dataOutputHandler,
+                return ExtractThermoSurveyScan(rawFileReader, scanList, spectraCache, dataOutputHandler,
                                                     sicOptions, thermoScanInfo);
             }
 
             // Fragmentation Scan
-            return ExtractXcaliburFragmentationScan(xcaliburAccessor, scanList, spectraCache, dataOutputHandler,
+            return ExtractThermoFragmentationScan(rawFileReader, scanList, spectraCache, dataOutputHandler,
                 sicOptions, mOptions.BinningOptions, thermoScanInfo);
         }
 
-        private bool ExtractXcaliburSurveyScan(
-            XRawFileIO xcaliburAccessor,
+        private bool ExtractThermoSurveyScan(
+            XRawFileIO rawFileReader,
             clsScanList scanList,
             clsSpectraCache spectraCache,
             clsDataOutput dataOutputHandler,
@@ -447,7 +447,7 @@ namespace MASIC.DataInput
 
             // Note: Even if mKeepRawSpectra = False, we still need to load the raw data so that we can compute the noise level for the spectrum
             var success = LoadSpectraForThermoRawFile(
-                xcaliburAccessor,
+                rawFileReader,
                 spectraCache,
                 scanInfo,
                 sicOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions,
@@ -464,8 +464,8 @@ namespace MASIC.DataInput
             return true;
         }
 
-        private bool ExtractXcaliburFragmentationScan(
-            XRawFileIO xcaliburAccessor,
+        private bool ExtractThermoFragmentationScan(
+            XRawFileIO rawFileReader,
             clsScanList scanList,
             clsSpectraCache spectraCache,
             clsDataOutput dataOutputHandler,
@@ -558,7 +558,7 @@ namespace MASIC.DataInput
             var msDataResolution = binningOptions.BinSize / sicOptions.CompressToleranceDivisorForDa;
 
             var success = LoadSpectraForThermoRawFile(
-                xcaliburAccessor,
+                rawFileReader,
                 spectraCache,
                 scanInfo,
                 sicOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions,
@@ -589,8 +589,8 @@ namespace MASIC.DataInput
             {
                 var precursorScanNumber = scanList.SurveyScans[mLastNonZoomSurveyScanIndex].ScanNumber;
 
-                // Compute the interference of the parent ion in the MS1 spectrum for this frag scan
-                scanInfo.FragScanInfo.InterferenceScore = ComputeInterference(xcaliburAccessor, thermoScanInfo, precursorScanNumber);
+                // Compute the interference of the parent ion in the MS1 spectrum for this fragmentation scan
+                scanInfo.FragScanInfo.InterferenceScore = ComputeInterference(rawFileReader, thermoScanInfo, precursorScanNumber);
             }
 
             return true;
@@ -613,7 +613,7 @@ namespace MASIC.DataInput
         }
 
         private bool LoadSpectraForThermoRawFile(
-            XRawFileIO xcaliburAccessor,
+            XRawFileIO rawFileReader,
             clsSpectraCache spectraCache,
             clsScanInfo scanInfo,
             clsBaselineNoiseOptions noiseThresholdOptions,
@@ -628,11 +628,11 @@ namespace MASIC.DataInput
             {
                 // Load the ions for this scan
 
-                lastKnownLocation = "xcaliburAccessor.GetScanData for scan " + scanInfo.ScanNumber;
+                lastKnownLocation = "rawFileReader.GetScanData for scan " + scanInfo.ScanNumber;
 
                 // Retrieve the m/z and intensity values for the given scan
                 // We retrieve the profile-mode data, since that's required for determining spectrum noise
-                scanInfo.IonCountRaw = xcaliburAccessor.GetScanData(scanInfo.ScanNumber, out var mzList, out var intensityList);
+                scanInfo.IonCountRaw = rawFileReader.GetScanData(scanInfo.ScanNumber, out var mzList, out var intensityList);
 
                 if (scanInfo.IonCountRaw > 0)
                 {
@@ -737,7 +737,7 @@ namespace MASIC.DataInput
         protected bool UpdateDatasetFileStats(
             FileInfo rawFileInfo,
             int datasetID,
-            XRawFileIO xcaliburAccessor)
+            XRawFileIO rawFileReader)
         {
             // Read the file info from the file system
             var success = UpdateDatasetFileStats(rawFileInfo, datasetID);
@@ -745,10 +745,10 @@ namespace MASIC.DataInput
             if (!success)
                 return false;
 
-            // Read the file info using the Xcalibur Accessor
+            // Read the file info using the ThermoRawFileReader
             try
             {
-                mDatasetFileInfo.AcqTimeStart = xcaliburAccessor.FileInfo.CreationDate;
+                mDatasetFileInfo.AcqTimeStart = rawFileReader.FileInfo.CreationDate;
             }
             catch (Exception)
             {
@@ -759,11 +759,11 @@ namespace MASIC.DataInput
             try
             {
                 // Look up the end scan time then compute .AcqTimeEnd
-                var scanEnd = xcaliburAccessor.ScanEnd;
-                xcaliburAccessor.GetScanInfo(scanEnd, out ThermoRawFileReader.clsScanInfo scanInfo);
+                var scanEnd = rawFileReader.ScanEnd;
+                rawFileReader.GetScanInfo(scanEnd, out ThermoRawFileReader.clsScanInfo scanInfo);
 
                 mDatasetFileInfo.AcqTimeEnd = mDatasetFileInfo.AcqTimeStart.AddMinutes(scanInfo.RetentionTime);
-                mDatasetFileInfo.ScanCount = xcaliburAccessor.GetNumScans();
+                mDatasetFileInfo.ScanCount = rawFileReader.GetNumScans();
             }
             catch (Exception)
             {
