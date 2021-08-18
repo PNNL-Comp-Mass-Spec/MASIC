@@ -1173,6 +1173,7 @@ namespace MASIC
             try
             {
                 txtLogMessages.ResetText();
+                mMasic.Options.AbortProcessing = false;
 
                 // Configure settings
                 var success = UpdateMasicSettings(mMasic);
