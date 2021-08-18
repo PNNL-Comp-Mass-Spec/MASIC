@@ -325,52 +325,31 @@ namespace MASIC
 
         public static string GetReporterIonModeDescription(ReporterIonMassModeConstants eReporterIonMode)
         {
-            switch (eReporterIonMode)
+            return eReporterIonMode switch
             {
-                case ReporterIonMassModeConstants.CustomOrNone:
-                    return "Custom/None";
-                case ReporterIonMassModeConstants.ITraqFourMZ:
-                    return "4-plex iTraq";
-                case ReporterIonMassModeConstants.ITraqETDThreeMZ:
-                    return "3-plex ETD iTraq";
-                case ReporterIonMassModeConstants.TMTTwoMZ:
-                    return "2-plex TMT";
-                case ReporterIonMassModeConstants.TMTSixMZ:
-                    return "6-plex TMT";
-                case ReporterIonMassModeConstants.TMTTenMZ:
-                    return "10-plex TMT";
-                case ReporterIonMassModeConstants.TMTElevenMZ:
-                    return "11-plex TMT";
-                case ReporterIonMassModeConstants.TMTSixteenMZ:
-                    // ReSharper disable once StringLiteralTypo
-                    return "16-plex TMT (aka TMTpro)";
-                case ReporterIonMassModeConstants.ITraqEightMZHighRes:
-                    return "8-plex iTraq (High Res MS/MS)";
-                case ReporterIonMassModeConstants.ITraqEightMZLowRes:
-                    return "8-plex iTraq (Low Res MS/MS)";
-                case ReporterIonMassModeConstants.PCGalnaz:
-                    return "PCGalnaz (300.13 m/z and 503.21 m/z)";
-                case ReporterIonMassModeConstants.HemeCFragment:
-                    return "Heme C (616.18 m/z and 616.19 m/z)";
-                case ReporterIonMassModeConstants.LycAcetFragment:
-                    return "Lys Acet (126.091 m/z and 127.095 m/z)";
-                case ReporterIonMassModeConstants.OGlcNAc:
-                    return "O-GlcNAc (204.087, 300.13, and 503.21 m/z)";
-                case ReporterIonMassModeConstants.NativeOGlcNAc:
-                    return "Native O-GlcNAc (126.055, 138.055, 144.065, 168.066, 186.076, 204.087, and 366.14 m/z)";
-                case ReporterIonMassModeConstants.FrackingAmine20160217:
-                    return "Fracking Amine 20160217 (157.089, 170.097, and 234.059 m/z)";
-                case ReporterIonMassModeConstants.FSFACustomCarbonyl:
-                    return "FSFA Custom Carbonyl (171.104, 236.074, 157.088 m/z)";
-                case ReporterIonMassModeConstants.FSFACustomCarboxylic:
-                    return "FSFA Custom Carboxylic (171.104, 234.058, 336.174 m/z)";
-                case ReporterIonMassModeConstants.FSFACustomHydroxyl:
-                    return "FSFA Custom Hydroxyl (151.063 and 166.087 m/z)";
-                case ReporterIonMassModeConstants.Acetylation:
-                    return "Acetylated K (126.091 and 143.118 m/z)";
-                default:
-                    return "Unknown mode";
-            }
+                ReporterIonMassModeConstants.CustomOrNone => "Custom/None",
+                ReporterIonMassModeConstants.ITraqFourMZ => "4-plex iTraq",
+                ReporterIonMassModeConstants.ITraqETDThreeMZ => "3-plex ETD iTraq",
+                ReporterIonMassModeConstants.TMTTwoMZ => "2-plex TMT",
+                ReporterIonMassModeConstants.TMTSixMZ => "6-plex TMT",
+                ReporterIonMassModeConstants.TMTTenMZ => "10-plex TMT",
+                ReporterIonMassModeConstants.TMTElevenMZ => "11-plex TMT",
+                // ReSharper disable once StringLiteralTypo
+                ReporterIonMassModeConstants.TMTSixteenMZ => "16-plex TMT (aka TMTpro)",
+                ReporterIonMassModeConstants.ITraqEightMZHighRes => "8-plex iTraq (High Res MS/MS)",
+                ReporterIonMassModeConstants.ITraqEightMZLowRes => "8-plex iTraq (Low Res MS/MS)",
+                ReporterIonMassModeConstants.PCGalnaz => "PCGalnaz (300.13 m/z and 503.21 m/z)",
+                ReporterIonMassModeConstants.HemeCFragment => "Heme C (616.18 m/z and 616.19 m/z)",
+                ReporterIonMassModeConstants.LycAcetFragment => "Lys Acet (126.091 m/z and 127.095 m/z)",
+                ReporterIonMassModeConstants.OGlcNAc => "O-GlcNAc (204.087, 300.13, and 503.21 m/z)",
+                ReporterIonMassModeConstants.NativeOGlcNAc => "Native O-GlcNAc (126.055, 138.055, 144.065, 168.066, 186.076, 204.087, and 366.14 m/z)",
+                ReporterIonMassModeConstants.FrackingAmine20160217 => "Fracking Amine 20160217 (157.089, 170.097, and 234.059 m/z)",
+                ReporterIonMassModeConstants.FSFACustomCarbonyl => "FSFA Custom Carbonyl (171.104, 236.074, 157.088 m/z)",
+                ReporterIonMassModeConstants.FSFACustomCarboxylic => "FSFA Custom Carboxylic (171.104, 234.058, 336.174 m/z)",
+                ReporterIonMassModeConstants.FSFACustomHydroxyl => "FSFA Custom Hydroxyl (151.063 and 166.087 m/z)",
+                ReporterIonMassModeConstants.Acetylation => "Acetylated K (126.091 and 143.118 m/z)",
+                _ => "Unknown mode",
+            };
         }
 
         private void InitializeReporterIonInfo()

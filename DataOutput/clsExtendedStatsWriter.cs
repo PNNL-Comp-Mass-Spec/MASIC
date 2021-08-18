@@ -57,24 +57,15 @@ namespace MASIC.DataOutput
                         else
                         {
                             // ReSharper disable StringLiteralTypo
-                            switch (value)
+                            value = value switch
                             {
-                                case "ff":
-                                    value = "Off";
-                                    break;
-                                case "n":
-                                    value = "On";
-                                    break;
-                                case "eady":
-                                    value = "Ready";
-                                    break;
-                                case "cquiring":
-                                    value = "Acquiring";
-                                    break;
-                                case "oad":
-                                    value = "Load";
-                                    break;
-                            }
+                                "ff" => "Off",
+                                "n" => "On",
+                                "eady" => "Ready",
+                                "cquiring" => "Acquiring",
+                                "oad" => "Load",
+                                _ => value
+                            };
                             // ReSharper restore StringLiteralTypo
                         }
 

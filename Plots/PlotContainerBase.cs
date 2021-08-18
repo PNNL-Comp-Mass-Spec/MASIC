@@ -114,21 +114,13 @@ namespace MASIC.Plots
 
         protected PlotTypes GetPlotTypeForCategory(PlotCategories plotCategory)
         {
-            switch (plotCategory)
+            return plotCategory switch
             {
-                case PlotCategories.Undefined:
-                case PlotCategories.SelectedIonChromatogramPeakStats:
-                    return PlotTypes.XY;
-
-                case PlotCategories.ReporterIonObservationRate:
-                    return PlotTypes.BarChart;
-
-                case PlotCategories.ReporterIonIntensityStats:
-                    return PlotTypes.BoxPlot;
-
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(plotCategory), plotCategory, null);
-            }
+                PlotCategories.Undefined or PlotCategories.SelectedIonChromatogramPeakStats => PlotTypes.XY,
+                PlotCategories.ReporterIonObservationRate => PlotTypes.BarChart,
+                PlotCategories.ReporterIonIntensityStats => PlotTypes.BoxPlot,
+                _ => throw new ArgumentOutOfRangeException(nameof(plotCategory), plotCategory, null),
+            };
         }
 
         protected void OpenDebugFile(string dataSource)

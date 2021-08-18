@@ -44,23 +44,14 @@ namespace MASIC
         {
             get
             {
-                switch (mDataType)
+                return mDataType switch
                 {
-                    case eDataTypeToUse.IntegerType:
-                        return mDataInt.Length;
-
-                    case eDataTypeToUse.FloatType:
-                        return mDataSingle.Length;
-
-                    case eDataTypeToUse.DoubleType:
-                        return mDataDouble.Length;
-
-                    case eDataTypeToUse.NoDataPresent:
-                        return 0;
-
-                    default:
-                        throw new Exception("Unknown data type encountered: " + mDataType);
-                }
+                    eDataTypeToUse.IntegerType => mDataInt.Length,
+                    eDataTypeToUse.FloatType => mDataSingle.Length,
+                    eDataTypeToUse.DoubleType => mDataDouble.Length,
+                    eDataTypeToUse.NoDataPresent => 0,
+                    _ => throw new Exception("Unknown data type encountered: " + mDataType)
+                };
             }
         }
 
@@ -500,18 +491,12 @@ namespace MASIC
 
             if (mDataType != eDataTypeToUse.IntegerType)
             {
-                switch (mDataType)
+                matchFound = mDataType switch
                 {
-                    case eDataTypeToUse.FloatType:
-                        matchFound = FindValueRange((float)searchValue, toleranceHalfWidth, out matchIndexStart, out matchIndexEnd);
-                        break;
-                    case eDataTypeToUse.DoubleType:
-                        matchFound = FindValueRange((double)searchValue, toleranceHalfWidth, out matchIndexStart, out matchIndexEnd);
-                        break;
-                    default:
-                        matchFound = false;
-                        break;
-                }
+                    eDataTypeToUse.FloatType => FindValueRange((float)searchValue, toleranceHalfWidth, out matchIndexStart, out matchIndexEnd),
+                    eDataTypeToUse.DoubleType => FindValueRange((double)searchValue, toleranceHalfWidth, out matchIndexStart, out matchIndexEnd),
+                    _ => false
+                };
             }
             else
             {
@@ -567,18 +552,13 @@ namespace MASIC
 
             if (mDataType != eDataTypeToUse.DoubleType)
             {
-                switch (mDataType)
+                matchFound = mDataType switch
                 {
-                    case eDataTypeToUse.IntegerType:
-                        matchFound = FindValueRange((int)Math.Round(searchValue), (int)Math.Round(toleranceHalfWidth), out matchIndexStart, out matchIndexEnd);
-                        break;
-                    case eDataTypeToUse.FloatType:
-                        matchFound = FindValueRange((float)searchValue, (float)toleranceHalfWidth, out matchIndexStart, out matchIndexEnd);
-                        break;
-                    default:
-                        matchFound = false;
-                        break;
-                }
+                    eDataTypeToUse.IntegerType => FindValueRange((int)Math.Round(searchValue), (int)Math.Round(toleranceHalfWidth),
+                        out matchIndexStart, out matchIndexEnd),
+                    eDataTypeToUse.FloatType => FindValueRange((float)searchValue, (float)toleranceHalfWidth, out matchIndexStart, out matchIndexEnd),
+                    _ => false
+                };
             }
             else
             {
@@ -634,18 +614,13 @@ namespace MASIC
 
             if (mDataType != eDataTypeToUse.FloatType)
             {
-                switch (mDataType)
+                matchFound = mDataType switch
                 {
-                    case eDataTypeToUse.IntegerType:
-                        matchFound = FindValueRange((int)Math.Round(searchValue), (int)Math.Round(toleranceHalfWidth), out matchIndexStart, out matchIndexEnd);
-                        break;
-                    case eDataTypeToUse.DoubleType:
-                        matchFound = FindValueRange((double)searchValue, toleranceHalfWidth, out matchIndexStart, out matchIndexEnd);
-                        break;
-                    default:
-                        matchFound = false;
-                        break;
-                }
+                    eDataTypeToUse.IntegerType => FindValueRange((int)Math.Round(searchValue), (int)Math.Round(toleranceHalfWidth),
+                        out matchIndexStart, out matchIndexEnd),
+                    eDataTypeToUse.DoubleType => FindValueRange((double)searchValue, toleranceHalfWidth, out matchIndexStart, out matchIndexEnd),
+                    _ => false
+                };
             }
             else
             {

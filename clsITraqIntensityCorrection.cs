@@ -215,25 +215,18 @@ namespace MASIC
             return true;
         }
 
-        private int GetMatrixLength(clsReporterIons.ReporterIonMassModeConstants eReporterIonMode)
+        private int GetMatrixLength(clsReporterIons.ReporterIonMassModeConstants reporterIonMode)
         {
-            switch (eReporterIonMode)
+            return reporterIonMode switch
             {
-                case clsReporterIons.ReporterIonMassModeConstants.ITraqFourMZ:
-                    return FOUR_PLEX_MATRIX_LENGTH;
-                case clsReporterIons.ReporterIonMassModeConstants.ITraqEightMZHighRes:
-                    return EIGHT_PLEX_HIGH_RES_MATRIX_LENGTH;
-                case clsReporterIons.ReporterIonMassModeConstants.ITraqEightMZLowRes:
-                    return EIGHT_PLEX_LOW_RES_MATRIX_LENGTH;
-                case clsReporterIons.ReporterIonMassModeConstants.TMTTenMZ:
-                    return TEN_PLEX_TMT_MATRIX_LENGTH;
-                case clsReporterIons.ReporterIonMassModeConstants.TMTElevenMZ:
-                    return ELEVEN_PLEX_TMT_MATRIX_LENGTH;
-                case clsReporterIons.ReporterIonMassModeConstants.TMTSixteenMZ:
-                    return SIXTEEN_PLEX_TMT_MATRIX_LENGTH;
-                default:
-                    throw new ArgumentOutOfRangeException("Invalid value for eReporterIonMode in GetMatrixLength: " + eReporterIonMode);
-            }
+                clsReporterIons.ReporterIonMassModeConstants.ITraqFourMZ => FOUR_PLEX_MATRIX_LENGTH,
+                clsReporterIons.ReporterIonMassModeConstants.ITraqEightMZHighRes => EIGHT_PLEX_HIGH_RES_MATRIX_LENGTH,
+                clsReporterIons.ReporterIonMassModeConstants.ITraqEightMZLowRes => EIGHT_PLEX_LOW_RES_MATRIX_LENGTH,
+                clsReporterIons.ReporterIonMassModeConstants.TMTTenMZ => TEN_PLEX_TMT_MATRIX_LENGTH,
+                clsReporterIons.ReporterIonMassModeConstants.TMTElevenMZ => ELEVEN_PLEX_TMT_MATRIX_LENGTH,
+                clsReporterIons.ReporterIonMassModeConstants.TMTSixteenMZ => SIXTEEN_PLEX_TMT_MATRIX_LENGTH,
+                _ => throw new ArgumentOutOfRangeException("Invalid value for eReporterIonMode in GetMatrixLength: " + reporterIonMode)
+            };
         }
 
         /// <summary>
