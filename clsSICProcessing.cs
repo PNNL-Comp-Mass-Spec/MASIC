@@ -641,8 +641,7 @@ namespace MASIC
 
                 var parentIonIndices = (from item in mzBinList select item.ParentIonIndex).ToList();
 
-                var mzIndex = 0;
-                while (mzIndex < mzBinList.Count)
+                for (var mzIndex = 0; mzIndex < mzBinList.Count; mzIndex++)
                 {
                     // ---------------------------------------------------------
                     // Find the next group of m/z values to use, starting with mzIndex
@@ -738,8 +737,6 @@ namespace MASIC
                         scanList.ProcessingIncomplete = true;
                         break;
                     }
-
-                    mzIndex++;
                 }
 
                 return true;
