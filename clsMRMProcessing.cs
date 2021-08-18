@@ -718,7 +718,7 @@ namespace MASIC
                         {
                             if (DateTime.UtcNow.Subtract(mOptions.LastParentIonProcessingLogTime).TotalSeconds >= 10 || parentIonsProcessed % 500 == 0)
                             {
-                                ReportMessage("Parent Ions Processed: " + parentIonsProcessed.ToString());
+                                ReportMessage("Parent Ions Processed: " + parentIonsProcessed);
                                 Console.Write(".");
                                 mOptions.LastParentIonProcessingLogTime = DateTime.UtcNow;
                             }

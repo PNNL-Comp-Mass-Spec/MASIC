@@ -233,7 +233,7 @@ namespace MASIC.DataInput
                         break;
                     default:
                         ReportError("Unknown BaselineNoiseMode encountered in DiscardDataBelowNoiseThreshold: " +
-                                    noiseThresholdOptions.BaselineNoiseMode.ToString());
+                                    noiseThresholdOptions.BaselineNoiseMode);
                         break;
                 }
 
@@ -275,7 +275,7 @@ namespace MASIC.DataInput
                     writeDebugData = false;
                     if (writeDebugData)
                     {
-                        writer = new StreamWriter(new FileStream(Path.Combine(mOptions.OutputDirectoryPath, "DataDump_" + msSpectrum.ScanNumber.ToString() + "_BeforeFilter.txt"), FileMode.Create, FileAccess.Write, FileShare.Read));
+                        writer = new StreamWriter(new FileStream(Path.Combine(mOptions.OutputDirectoryPath, "DataDump_" + msSpectrum.ScanNumber + "_BeforeFilter.txt"), FileMode.Create, FileAccess.Write, FileShare.Read));
                         writer.WriteLine("{0}\t{1}", "m/z", "Intensity");
                     }
 
@@ -335,7 +335,7 @@ namespace MASIC.DataInput
                 // ReSharper disable once ConditionIsAlwaysTrueOrFalse
                 if (writeDebugData)
                 {
-                    using var postFilterWriter = new StreamWriter(new FileStream(Path.Combine(mOptions.OutputDirectoryPath, "DataDump_" + msSpectrum.ScanNumber.ToString() + "_PostFilter.txt"), FileMode.Create, FileAccess.Write, FileShare.Read));
+                    using var postFilterWriter = new StreamWriter(new FileStream(Path.Combine(mOptions.OutputDirectoryPath, "DataDump_" + msSpectrum.ScanNumber + "_PostFilter.txt"), FileMode.Create, FileAccess.Write, FileShare.Read));
 
                     postFilterWriter.WriteLine("{0}\t{1}", "m/z", "Intensity");
 

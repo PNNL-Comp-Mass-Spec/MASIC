@@ -242,7 +242,7 @@ namespace MASIC.DataInput
                     if (!success)
                     {
                         // GetScanInfo returned false
-                        ReportWarning("xcaliburAccessor.GetScanInfo returned false for scan " + scanNumber.ToString() + "; aborting read");
+                        ReportWarning("xcaliburAccessor.GetScanInfo returned false for scan " + scanNumber + "; aborting read");
                         break;
                     }
 
@@ -311,7 +311,7 @@ namespace MASIC.DataInput
                 thermoScanInfo.ScanNumber >= mOptions.SICOptions.ScanRangeStart &&
                 thermoScanInfo.ScanNumber <= mOptions.SICOptions.ScanRangeEnd)
             {
-                ReportMessage("Reading scan: " + thermoScanInfo.ScanNumber.ToString());
+                ReportMessage("Reading scan: " + thermoScanInfo.ScanNumber);
                 Console.Write(".");
                 mLastLogTime = DateTime.UtcNow;
             }

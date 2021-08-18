@@ -59,7 +59,7 @@ namespace MASIC
                         return 0;
 
                     default:
-                        throw new Exception("Unknown data type encountered: " + mDataType.ToString());
+                        throw new Exception("Unknown data type encountered: " + mDataType);
                 }
             }
         }

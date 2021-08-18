@@ -177,7 +177,7 @@ namespace MASIC.DataOutput
                 if (bufferLength < 1)
                     bufferLength = 1;
 
-                writer.WriteLine("NumberOfSamples: " + bufferLength.ToString() + " ");
+                writer.WriteLine("NumberOfSamples: " + bufferLength + " ");
                 writer.WriteLine("SampleRate: 1 ");
                 writer.WriteLine("LowMassFreq: 0 ");
                 writer.WriteLine("FreqShift: 0 ");
@@ -197,7 +197,7 @@ namespace MASIC.DataOutput
                     }
                     else
                     {
-                        writer.WriteLine("CurrentXmax: " + scanList[scanCount - 1].ScanNumber.ToString() + " ");
+                        writer.WriteLine("CurrentXmax: " + scanList[scanCount - 1].ScanNumber + " ");
                     }
                 }
                 else

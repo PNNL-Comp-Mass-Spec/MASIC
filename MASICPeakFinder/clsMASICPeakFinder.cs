@@ -1974,7 +1974,7 @@ namespace MASICPeakFinder
                 default:
                     // Unknown mode
                     LogErrors("clsMASICPeakFinder->ComputeTrimmedNoiseLevel",
-                              "Unknown Noise Threshold Mode encountered: " + baselineNoiseOptions.BaselineNoiseMode.ToString(),
+                              "Unknown Noise Threshold Mode encountered: " + baselineNoiseOptions.BaselineNoiseMode,
                               null, false);
                     return false;
             }

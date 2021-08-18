@@ -534,7 +534,7 @@ namespace MASIC.DataOutput
                     outputFilePath += "_BPI.txt";
                     break;
                 case OutputFileTypeConstants.FragBPIFile:
-                    outputFilePath += "_Frag" + fragTypeNumber.ToString() + "_BPI.txt";
+                    outputFilePath += "_Frag" + fragTypeNumber + "_BPI.txt";
                     break;
                 case OutputFileTypeConstants.TICFile:
                     outputFilePath += "_TIC.txt";

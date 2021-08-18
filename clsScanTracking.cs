@@ -330,7 +330,7 @@ namespace MASIC
                         Console.WriteLine(
                             "Note: Scan " + scanInfo.ScanNumber + " has " + msSpectrum.IonCount + " ions; " +
                             "will only retain " + MAX_ALLOWABLE_ION_COUNT + " (trimmed " +
-                            mSpectraFoundExceedingMaxIonCount.ToString() + " spectra)");
+                            mSpectraFoundExceedingMaxIonCount + " spectra)");
 
                         mMaxIonCountReported = msSpectrum.IonCount;
                     }

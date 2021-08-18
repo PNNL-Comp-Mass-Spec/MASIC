@@ -150,7 +150,7 @@ namespace MASIC
 
             if (reporterIonIntensities.Length != matrixSize)
             {
-                throw new InvalidOperationException("Length of ReporterIonIntensities array must be " + matrixSize.ToString() +
+                throw new InvalidOperationException("Length of ReporterIonIntensities array must be " + matrixSize +
                                                     " when using the " + eReporterIonMode + " mode");
             }
 
@@ -232,7 +232,7 @@ namespace MASIC
                 case clsReporterIons.ReporterIonMassModeConstants.TMTSixteenMZ:
                     return SIXTEEN_PLEX_TMT_MATRIX_LENGTH;
                 default:
-                    throw new ArgumentOutOfRangeException("Invalid value for eReporterIonMode in GetMatrixLength: " + eReporterIonMode.ToString());
+                    throw new ArgumentOutOfRangeException("Invalid value for eReporterIonMode in GetMatrixLength: " + eReporterIonMode);
             }
         }
 
@@ -853,7 +853,7 @@ namespace MASIC
             {
                 // Print out the matrix
                 Console.WriteLine();
-                Console.WriteLine("Reporter Ion Correction Matrix; mode = " + ReporterIonMode.ToString());
+                Console.WriteLine("Reporter Ion Correction Matrix; mode = " + ReporterIonMode);
                 for (var i = 0; i <= maxIndex; i++)
                 {
                     if (i == 0)
@@ -864,11 +864,11 @@ namespace MASIC
                         {
                             if (j < 10)
                             {
-                                Console.Write("   " + j.ToString() + "    ");
+                                Console.Write("   " + j + "    ");
                             }
                             else
                             {
-                                Console.Write("   " + j.ToString() + "   ");
+                                Console.Write("   " + j + "   ");
                             }
                         }
 
@@ -889,7 +889,7 @@ namespace MASIC
                     else
                         indexSpacer = " ";
 
-                    Console.Write("  " + i.ToString() + indexSpacer);
+                    Console.Write("  " + i + indexSpacer);
                     for (var j = 0; j <= maxIndex; j++)
                     {
                         if (Math.Abs(mCoeffs[i, j]) < float.Epsilon)

@@ -740,7 +740,7 @@ namespace MASIC
                     {
                         if (DateTime.UtcNow.Subtract(lastLogTime).TotalSeconds >= 10 || parentIonIndex % 500 == 0)
                         {
-                            ReportMessage("Parent Ion Index: " + parentIonIndex.ToString());
+                            ReportMessage("Parent Ion Index: " + parentIonIndex);
                             Console.Write(".");
                             lastLogTime = DateTime.UtcNow;
                         }

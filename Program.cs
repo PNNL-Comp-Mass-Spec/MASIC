@@ -181,7 +181,7 @@ namespace MASIC
             if (percentComplete > 100)
                 percentComplete = 100;
 
-            Console.Write("Processing: " + percentComplete.ToString() + "% ");
+            Console.Write("Processing: " + percentComplete + "% ");
             if (addCarriageReturn)
             {
                 Console.WriteLine();

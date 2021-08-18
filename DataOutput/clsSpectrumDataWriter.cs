@@ -64,7 +64,7 @@ namespace MASIC.DataOutput
 
                     default:
                         // Unknown format
-                        ReportError("Unknown raw data file format: " + mOptions.RawDataExportOptions.FileFormat.ToString());
+                        ReportError("Unknown raw data file format: " + mOptions.RawDataExportOptions.FileFormat);
                         return false;
                 }
 

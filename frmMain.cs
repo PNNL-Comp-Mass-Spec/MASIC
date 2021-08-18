@@ -1091,7 +1091,7 @@ namespace MASIC
                 }
                 else
                 {
-                    message = rowsAlreadyPresent.ToString() + " rows of thresholds were";
+                    message = rowsAlreadyPresent + " rows of thresholds were";
                 }
 
                 MessageBox.Show(message + " already present in the table; duplicate rows are not allowed.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
@@ -1106,7 +1106,7 @@ namespace MASIC
                 }
                 else
                 {
-                    message = rowsSkipped.ToString() + " rows were skipped because they";
+                    message = rowsSkipped + " rows were skipped because they";
                 }
 
                 MessageBox.Show(message + " didn't contain two columns of numeric data.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);

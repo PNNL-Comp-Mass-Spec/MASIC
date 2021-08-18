@@ -98,8 +98,8 @@ namespace MASIC.DataInput
                 mScanTracking.ReserveListCapacity(scanCount);
                 spectraCache.SpectrumCount = Math.Max(spectraCache.SpectrumCount, scanCount);
 
-                UpdateProgress("Reading CDF/MGF data (" + msScanCount.ToString() + " scans)" + Environment.NewLine + Path.GetFileName(filePath));
-                ReportMessage("Reading CDF/MGF data; Total MS scan count: " + msScanCount.ToString());
+                UpdateProgress("Reading CDF/MGF data (" + msScanCount + " scans)" + Environment.NewLine + Path.GetFileName(filePath));
+                ReportMessage("Reading CDF/MGF data; Total MS scan count: " + msScanCount);
 
                 // Read all of the Survey scans from the CDF file
                 // CDF files created by the Agilent XCT list the first scan number as 0; use scanNumberCorrection to correct for this
@@ -228,7 +228,7 @@ namespace MASIC.DataInput
 
                     if (msScanIndex % 100 == 0)
                     {
-                        ReportMessage("Reading MS scan index: " + msScanIndex.ToString());
+                        ReportMessage("Reading MS scan index: " + msScanIndex);
                         Console.Write(".");
                     }
                 }

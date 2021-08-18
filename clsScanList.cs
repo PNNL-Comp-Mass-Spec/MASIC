@@ -22,7 +22,7 @@ namespace MASIC
 
             public override string ToString()
             {
-                return ScanIndexPointer + ": " + ScanType.ToString();
+                return ScanIndexPointer + ": " + ScanType;
             }
         }
 
