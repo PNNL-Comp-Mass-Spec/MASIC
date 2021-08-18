@@ -217,8 +217,6 @@ namespace MASIC
             out int matchIndexStart,
             out int matchIndexEnd)
         {
-            bool matchFound;
-
             matchIndexStart = 0;
             matchIndexEnd = dataValues.Count - 1;
 
