@@ -761,7 +761,7 @@ namespace MASIC
                     mCoeffs[6, 7] = 0;
                     mCoeffs[6, 8] = udtIsoPct130C.Minus1;
                     mCoeffs[6, 9] = 0;
-                    mCoeffs[6, 10] = udtIsoPct130C.Minus2;
+                    mCoeffs[6, 10] = udtIsoPct131C.Minus2;
 
                     mCoeffs[7, 3] = udtIsoPct128N.Plus2;
                     mCoeffs[7, 4] = 0;
@@ -771,7 +771,7 @@ namespace MASIC
                     mCoeffs[7, 8] = 0;
                     mCoeffs[7, 9] = udtIsoPct131N.Minus1;
                     mCoeffs[7, 10] = 0;
-                    mCoeffs[7, 11] = udtIsoPct131N.Minus2;
+                    mCoeffs[7, 11] = udtIsoPct132N.Minus2;
 
                     mCoeffs[8, 4] = udtIsoPct128C.Plus2;
                     mCoeffs[8, 5] = 0;
@@ -781,7 +781,7 @@ namespace MASIC
                     mCoeffs[8, 9] = 0;
                     mCoeffs[8, 10] = udtIsoPct131C.Minus1;
                     mCoeffs[8, 11] = 0;
-                    mCoeffs[8, 12] = udtIsoPct131C.Minus2;
+                    mCoeffs[8, 12] = udtIsoPct132C.Minus2;
 
                     mCoeffs[9, 5] = udtIsoPct129N.Plus2;
                     mCoeffs[9, 6] = 0;
@@ -789,9 +789,9 @@ namespace MASIC
                     mCoeffs[9, 8] = 0;
                     mCoeffs[9, 9] = udtIsoPct131N.Zero;
                     mCoeffs[9, 10] = 0;
-                    mCoeffs[9, 11] = udtIsoPct131N.Minus1;
+                    mCoeffs[9, 11] = udtIsoPct132N.Minus1;
                     mCoeffs[9, 12] = 0;
-                    mCoeffs[9, 13] = udtIsoPct131N.Minus2;
+                    mCoeffs[9, 13] = udtIsoPct133N.Minus2;
 
                     mCoeffs[10, 6] = udtIsoPct129C.Plus2;
                     mCoeffs[10, 7] = 0;
@@ -799,47 +799,47 @@ namespace MASIC
                     mCoeffs[10, 9] = 0;
                     mCoeffs[10, 10] = udtIsoPct131C.Zero;
                     mCoeffs[10, 11] = 0;
-                    mCoeffs[10, 12] = udtIsoPct131C.Minus1;
+                    mCoeffs[10, 12] = udtIsoPct132C.Minus1;
                     mCoeffs[10, 13] = 0;
-                    mCoeffs[10, 14] = udtIsoPct131C.Minus2;
+                    mCoeffs[10, 14] = udtIsoPct133C.Minus2;
 
-                    mCoeffs[11, 7] = udtIsoPct129C.Plus2;
+                    mCoeffs[11, 7] = udtIsoPct130N.Plus2;
                     mCoeffs[11, 8] = 0;
-                    mCoeffs[11, 9] = udtIsoPct130C.Plus1;
+                    mCoeffs[11, 9] = udtIsoPct131N.Plus1;
                     mCoeffs[11, 10] = 0;
-                    mCoeffs[11, 11] = udtIsoPct131C.Zero;
+                    mCoeffs[11, 11] = udtIsoPct132N.Zero;
                     mCoeffs[11, 12] = 0;
-                    mCoeffs[11, 13] = udtIsoPct131C.Minus1;
+                    mCoeffs[11, 13] = udtIsoPct133N.Minus1;
                     mCoeffs[11, 14] = 0;
-                    mCoeffs[11, 15] = udtIsoPct131C.Minus2;
+                    mCoeffs[11, 15] = udtIsoPct134N.Minus2;
 
-                    mCoeffs[12, 8] = udtIsoPct129C.Plus2;
+                    mCoeffs[12, 8] = udtIsoPct130C.Plus2;
                     mCoeffs[12, 9] = 0;
-                    mCoeffs[12, 10] = udtIsoPct130C.Plus1;
+                    mCoeffs[12, 10] = udtIsoPct131C.Plus1;
                     mCoeffs[12, 11] = 0;
-                    mCoeffs[12, 12] = udtIsoPct131C.Zero;
+                    mCoeffs[12, 12] = udtIsoPct132C.Zero;
                     mCoeffs[12, 13] = 0;
-                    mCoeffs[12, 14] = udtIsoPct131C.Minus1;
+                    mCoeffs[12, 14] = udtIsoPct133C.Minus1;
 
-                    mCoeffs[13, 9] = udtIsoPct129C.Plus2;
+                    mCoeffs[13, 9] = udtIsoPct131N.Plus2;
                     mCoeffs[13, 10] = 0;
-                    mCoeffs[13, 11] = udtIsoPct130C.Plus1;
+                    mCoeffs[13, 11] = udtIsoPct132N.Plus1;
                     mCoeffs[13, 12] = 0;
-                    mCoeffs[13, 13] = udtIsoPct131C.Zero;
+                    mCoeffs[13, 13] = udtIsoPct133N.Zero;
                     mCoeffs[13, 14] = 0;
-                    mCoeffs[13, 15] = udtIsoPct131C.Minus1;
+                    mCoeffs[13, 15] = udtIsoPct134N.Minus1;
 
-                    mCoeffs[14, 10] = udtIsoPct129C.Plus2;
+                    mCoeffs[14, 10] = udtIsoPct131C.Plus2;
                     mCoeffs[14, 11] = 0;
-                    mCoeffs[14, 12] = udtIsoPct130C.Plus1;
+                    mCoeffs[14, 12] = udtIsoPct132C.Plus1;
                     mCoeffs[14, 13] = 0;
-                    mCoeffs[14, 14] = udtIsoPct131C.Zero;
+                    mCoeffs[14, 14] = udtIsoPct133C.Zero;
 
-                    mCoeffs[15, 11] = udtIsoPct129C.Plus2;
+                    mCoeffs[15, 11] = udtIsoPct132N.Plus2;
                     mCoeffs[15, 12] = 0;
-                    mCoeffs[15, 13] = udtIsoPct130C.Plus1;
+                    mCoeffs[15, 13] = udtIsoPct133N.Plus1;
                     mCoeffs[15, 14] = 0;
-                    mCoeffs[15, 15] = udtIsoPct131C.Zero;
+                    mCoeffs[15, 15] = udtIsoPct134N.Zero;
                     break;
 
                 default:
