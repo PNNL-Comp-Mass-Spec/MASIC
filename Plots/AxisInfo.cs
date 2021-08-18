@@ -6,6 +6,8 @@ namespace MASIC.Plots
 {
     public class AxisInfo
     {
+        // Ignore Spelling: Autoscale
+
         public const string DEFAULT_AXIS_LABEL_FORMAT = "#,##0";
 
         public const string EXPONENTIAL_FORMAT = "0.00E+00";

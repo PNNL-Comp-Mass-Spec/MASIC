@@ -6,6 +6,8 @@ namespace MASIC
 {
     public class clsDataAggregation : EventNotifier
     {
+        // Ignore Spelling: uncaching
+
         /// <summary>
         /// When returnMax is false, determine the sum of the data within the search mass tolerance
         /// When returnMaxis true, determine the maximum of the data within the search mass tolerance

@@ -7,6 +7,8 @@ namespace MASIC
 {
     public class clsParentIonProcessing : clsMasicEventNotifier
     {
+        // Ignore Spelling: Da, Daltons
+
         private readonly clsReporterIons mReporterIons;
 
         /// <summary>

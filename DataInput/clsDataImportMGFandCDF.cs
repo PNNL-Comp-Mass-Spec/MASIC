@@ -8,6 +8,8 @@ namespace MASIC.DataInput
     // ReSharper disable once IdentifierTypo
     public class clsDataImportMGFandCDF : clsDataImport
     {
+        // Ignore Spelling: Chemstation
+
         // ReSharper disable once IdentifierTypo
         public clsDataImportMGFandCDF(
             MASICOptions masicOptions,
@@ -94,7 +96,9 @@ namespace MASIC.DataInput
                 {
                     scanCount = msScanCount * 3;
                 }
-                scanList.ReserveListCapacity(scanCount, Math.Min(msScanCount, scanCount / 3)); // Assume there are 2 frag scans for every survey scan
+
+                // Assume there are 2 fragmentation scans for every survey scan
+                scanList.ReserveListCapacity(scanCount, Math.Min(msScanCount, scanCount / 3));
                 mScanTracking.ReserveListCapacity(scanCount);
                 spectraCache.SpectrumCount = Math.Max(spectraCache.SpectrumCount, scanCount);
 
@@ -479,7 +483,7 @@ namespace MASIC.DataInput
                     }
                     else
                     {
-                        // Frag Scan
+                        // Fragmentation Scan
                         currentScan = scanList.FragScans[scanList.MasterScanOrder[scanIndex].ScanIndexPointer];
                     }
 

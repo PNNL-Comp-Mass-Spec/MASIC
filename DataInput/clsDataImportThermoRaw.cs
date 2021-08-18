@@ -490,7 +490,7 @@ namespace MASIC.DataInput
                 MRMScanType = thermoScanInfo.MRMScanType
             };
 
-            // Typically .EventNumber is 1 for the parent-ion scan; 2 for 1st frag scan, 3 for 2nd frag scan, etc.
+            // Typically .EventNumber is 1 for the parent-ion scan; 2 for 1st fragmentation scan, 3 for 2nd fragmentation scan, etc.
             // This resets for each new parent-ion scan
             scanInfo.FragScanInfo.FragScanNumber = thermoScanInfo.EventNumber - 1;
 
@@ -899,7 +899,7 @@ namespace MASIC.DataInput
             {
                 // Although the data returned by mXRawFile.GetMassListFromScanNum is generally sorted by m/z,
                 // we have observed a few cases in certain scans of certain datasets that points with
-                // similar m/z values are swapped and ths slightly out of order
+                // similar m/z values are swapped and thus slightly out of order
                 // The following if statement checks for this
                 if (mzList[index] < mzList[index - 1])
                 {

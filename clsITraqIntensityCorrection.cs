@@ -2,18 +2,31 @@
 
 namespace MASIC
 {
-    // This class corrects the intensities of iTraq or TMT data, based on the expected overlapping isotopic distributions
-    // It supports 4-plex and 8-plex iTraq
-    // It also supports TMT10, TMT11, and TMT16 (aka TMTpro)
-    //
-    // The isotopic distribution weights are provided by the iTraq or TMT manufacturer
-    //
-    // There are two options for the iTRAQ 4-plex weights:
-    // CorrectionFactorsiTRAQ4Plex.ABSciex
-    // CorrectionFactorsiTRAQ4Plex.BroadInstitute
-
+    // ReSharper disable CommentTypo
+    /// <summary>
+    /// <para>
+    /// This class corrects the intensities of iTraq or TMT data, based on the expected overlapping isotopic distributions
+    /// It supports 4-plex and 8-plex iTraq
+    /// It also supports TMT10, TMT11, and TMT16 (aka TMTpro)
+    /// </para>
+    /// <para>
+    /// The isotopic distribution weights are provided by the iTraq or TMT manufacturer
+    /// </para>
+    /// </summary>
+    /// <remarks>
+    /// There are two options for the iTRAQ 4-plex weights:
+    /// CorrectionFactorsiTRAQ4Plex.ABSciex
+    /// CorrectionFactorsiTRAQ4Plex.BroadInstitute
+    /// </remarks>
+    // ReSharper restore CommentTypo
     public class clsITraqIntensityCorrection
     {
+        // ReSharper disable CommentTypo
+
+        // Ignore Spelling: Biosystems, Da, Mertins, Philipp, plex, Proteomics, Sickmann, Vaudel
+
+        // ReSharper restore CommentTypo
+
         private const int FOUR_PLEX_MATRIX_LENGTH = 4;
         private const int EIGHT_PLEX_HIGH_RES_MATRIX_LENGTH = 8;
         private const int EIGHT_PLEX_LOW_RES_MATRIX_LENGTH = 9;

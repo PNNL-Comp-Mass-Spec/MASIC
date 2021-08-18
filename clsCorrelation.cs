@@ -19,6 +19,8 @@ namespace MASIC
     /// </summary>
     public class clsCorrelation : EventNotifier
     {
+        // Ignore Spelling: Spearman, Spearman's, zd
+
         /// <summary>
         /// Coefficients used by GammaLn
         /// </summary>

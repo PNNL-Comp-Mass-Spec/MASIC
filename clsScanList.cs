@@ -154,7 +154,7 @@ namespace MASIC
                 {
                     // This code shouldn't normally be reached
                     AddMasterScanEntry(eScanType, scanIndex, 0, 0);
-                    ReportMessage($"Error in AddMasterScanEntry for ScanType {eScanType}, Frag ScanIndex {scanIndex}: index is out of range");
+                    ReportMessage($"Error in AddMasterScanEntry for ScanType {eScanType}, Fragmentation ScanIndex {scanIndex}: index is out of range");
                 }
             }
             else

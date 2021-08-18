@@ -5,6 +5,13 @@ namespace MASIC
 {
     public class clsReporterIons
     {
+        // ReSharper disable CommentTypo
+
+        // Ignore Spelling: acet, acetylated, Alfaro, Amine, Carboxylic, Chengdong, Da, Du, Fracking
+        // Ignore Spelling: immonium, Lys, Merkley, Nakayasu, plex, Xu
+
+        // ReSharper restore CommentTypo
+
         public const double REPORTER_ION_TOLERANCE_DA_DEFAULT = 0.5;
         public const double REPORTER_ION_TOLERANCE_DA_MINIMUM = 0.001;
 
