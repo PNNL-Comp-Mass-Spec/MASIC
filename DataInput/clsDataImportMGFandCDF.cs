@@ -253,7 +253,7 @@ namespace MASIC.DataInput
                 scanNumberCorrection = 0;
 
                 // Now read the MS/MS data from the MGF file
-                do
+                while (true)
                 {
                     var fragScanFound = mgfReader.ReadNextSpectrum(out var spectrumInfo);
                     if (!fragScanFound)
@@ -356,7 +356,7 @@ namespace MASIC.DataInput
                     var newFragScan = new clsScanInfo
                     {
                         ScanNumber = spectrumInfo.ScanNumber,
-                        ScanTime = (float) scanTime,
+                        ScanTime = (float)scanTime,
                         ScanHeaderText = string.Empty,
                         ScanTypeName = "MSn",
                     };
@@ -436,7 +436,6 @@ namespace MASIC.DataInput
                         Console.Write(".");
                     }
                 }
-                while (true);
 
                 // Record the current memory usage (before we close the .MGF file)
                 OnUpdateMemoryUsage();
