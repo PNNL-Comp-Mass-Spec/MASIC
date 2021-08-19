@@ -51,7 +51,7 @@ namespace MASIC
             try
             {
                 // Use XrawFileIO to read the .Raw files
-                var readerOptions = new ThermoReaderOptions()
+                var readerOptions = new ThermoReaderOptions
                 {
                     LoadMSMethodInfo = false,
                     LoadMSTuneInfo = false
@@ -337,7 +337,7 @@ namespace MASIC
             var closestMZ = new double[reporterIons.Count];
 
             // Initialize the output variables
-            var dataColumns = new List<string>()
+            var dataColumns = new List<string>
             {
                 sicOptions.DatasetID.ToString(),
                 currentScan.ScanNumber.ToString(),

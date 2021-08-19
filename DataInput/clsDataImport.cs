@@ -501,7 +501,7 @@ namespace MASIC.DataInput
         /// </summary>
         public static IList<string> GetDefaultExtensionsToParse()
         {
-            return new List<string>()
+            return new List<string>
             {
                 THERMO_RAW_FILE_EXTENSION,
                 MZ_XML_FILE_EXTENSION1,
@@ -548,7 +548,7 @@ namespace MASIC.DataInput
         {
             const char TAB_DELIMITER = '\t';
 
-            var scanStatsEntry = new ScanStatsEntry()
+            var scanStatsEntry = new ScanStatsEntry
             {
                 ScanNumber = currentScan.ScanNumber
             };
@@ -589,7 +589,7 @@ namespace MASIC.DataInput
 
             mScanTracking.ScanStats.Add(scanStatsEntry);
 
-            var dataColumns = new List<string>()
+            var dataColumns = new List<string>
             {
                 datasetID.ToString(),                       // Dataset ID
                 scanStatsEntry.ScanNumber.ToString(),       // Scan number
@@ -638,7 +638,7 @@ namespace MASIC.DataInput
             var ionCount = centroidedIonsMz.Count;
             for (var index = 0; index < ionCount; index++)
             {
-                var newPeak = new InterDetect.Peak()
+                var newPeak = new InterDetect.Peak
                 {
                     Mz = centroidedIonsMz[index],
                     Abundance = centroidedIonsIntensity[index]

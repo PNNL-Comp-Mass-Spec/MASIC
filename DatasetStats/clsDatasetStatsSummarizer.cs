@@ -401,7 +401,7 @@ namespace MASIC.DatasetStats
                     ComputeScanStatsSummary(scanStats, out summaryStats);
                 }
 
-                var xmlSettings = new XmlWriterSettings()
+                var xmlSettings = new XmlWriterSettings
                 {
                     CheckCharacters = true,
                     Indent = true,
@@ -568,7 +568,7 @@ namespace MASIC.DatasetStats
                 using var scanStatsWriter = new StreamWriter(new FileStream(scanStatsFilePath, FileMode.Create, FileAccess.Write, FileShare.Read));
 
                 // Write the headers
-                var headerNames = new List<string>()
+                var headerNames = new List<string>
                 {
                     "Dataset",
                     "ScanNumber",
@@ -760,7 +760,7 @@ namespace MASIC.DatasetStats
                 if (writeHeaders)
                 {
                     // Write the header line
-                    var headerNames = new List<string>()
+                    var headerNames = new List<string>
                     {
                         "Dataset",
                         "ScanCount",
@@ -779,7 +779,7 @@ namespace MASIC.DatasetStats
                     writer.WriteLine(string.Join("\t", headerNames));
                 }
 
-                var dataValues = new List<string>()
+                var dataValues = new List<string>
                 {
                     datasetName,
                     (summaryStats.MSStats.ScanCount + summaryStats.MSnStats.ScanCount).ToString(),

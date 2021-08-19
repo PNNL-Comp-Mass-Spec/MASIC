@@ -800,7 +800,7 @@ namespace MASIC.DataOutput
             switch (outputFileType)
             {
                 case OutputFileTypeConstants.ScanStatsFlatFile:
-                    headerNames = new List<string>()
+                    headerNames = new List<string>
                     {
                         "Dataset",
                         "ScanNumber",
@@ -872,7 +872,7 @@ namespace MASIC.DataOutput
                     break;
 
                 case OutputFileTypeConstants.MRMSettingsFile:
-                    headerNames = new List<string>()
+                    headerNames = new List<string>
                     {
                         "Parent_Index",
                         "Parent_MZ",
@@ -883,7 +883,7 @@ namespace MASIC.DataOutput
                     };
                     break;
                 case OutputFileTypeConstants.MRMDatafile:
-                    headerNames = new List<string>()
+                    headerNames = new List<string>
                     {
                         "Scan",
                         "MRM_Parent_MZ",
@@ -892,7 +892,7 @@ namespace MASIC.DataOutput
                     };
                     break;
                 default:
-                    headerNames = new List<string>()
+                    headerNames = new List<string>
                     {
                         "Unknown header column names"
                     };

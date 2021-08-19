@@ -111,7 +111,7 @@ namespace MASIC
                                 {
                                     // Entry is not yet present; add it
 
-                                    var newSRMItem = new SRMListType()
+                                    var newSRMItem = new SRMListType
                                     {
                                         ParentIonMZ = mrmInfoForHash.ParentIonMZ,
                                         CentralMass = mrmInfoForHash.MRMMassList[mrmMassIndex].CentralMass

@@ -355,7 +355,7 @@ namespace MASIC.DataInput
             SICOptions sicOptions,
             ThermoRawFileReader.clsScanInfo thermoScanInfo)
         {
-            var scanInfo = new clsScanInfo()
+            var scanInfo = new clsScanInfo
             {
                 ScanNumber = thermoScanInfo.ScanNumber,
                 ScanTime = (float)thermoScanInfo.RetentionTime,
@@ -794,7 +794,7 @@ namespace MASIC.DataInput
                 entryValue = string.Empty;
             }
 
-            var statusEntries = new List<KeyValuePair<string, string>>()
+            var statusEntries = new List<KeyValuePair<string, string>>
             {
                 new KeyValuePair<string, string>(entryName, entryValue)
             };

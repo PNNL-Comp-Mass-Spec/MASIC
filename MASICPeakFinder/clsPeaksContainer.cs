@@ -71,7 +71,7 @@ namespace MASICPeakFinder
         /// <param name="skipSourceData"></param>
         public clsPeaksContainer Clone(bool skipSourceData = false)
         {
-            var clonedContainer = new clsPeaksContainer()
+            var clonedContainer = new clsPeaksContainer
             {
                 OriginalPeakLocationIndex = OriginalPeakLocationIndex,
                 SourceDataCount = SourceDataCount,

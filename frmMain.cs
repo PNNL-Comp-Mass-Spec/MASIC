@@ -643,7 +643,7 @@ namespace MASIC
         {
             // Prompts the user to select a file to load the options from
 
-            using var fileSelector = new OpenFileDialog()
+            using var fileSelector = new OpenFileDialog
             {
                 AddExtension = true,
                 CheckFileExists = true,
@@ -791,7 +791,7 @@ namespace MASIC
         {
             // Prompts the user to select a file to load the options from
 
-            using var fileSelector = new SaveFileDialog()
+            using var fileSelector = new SaveFileDialog
             {
                 AddExtension = true,
                 CheckFileExists = false,
@@ -1479,7 +1479,7 @@ namespace MASIC
 
         private void SelectDatasetLookupFile()
         {
-            using var fileSelector = new OpenFileDialog()
+            using var fileSelector = new OpenFileDialog
             {
                 AddExtension = true,
                 CheckFileExists = true,
@@ -1522,7 +1522,7 @@ namespace MASIC
 
         private void SelectCustomSICFile()
         {
-            using var fileSelector = new OpenFileDialog()
+            using var fileSelector = new OpenFileDialog
             {
                 AddExtension = true,
                 CheckFileExists = true,
@@ -1579,7 +1579,7 @@ namespace MASIC
 
         private void SelectInputFile()
         {
-            using var fileSelector = new OpenFileDialog()
+            using var fileSelector = new OpenFileDialog
             {
                 AddExtension = true,
                 CheckFileExists = true,
@@ -1747,7 +1747,7 @@ namespace MASIC
         {
             // Define the PM Thresholds table style
             // Setting the MappingName of the table style to CUSTOM_SIC_VALUES_DATA_TABLE will cause this style to be used with that table
-            var tsCustomSICValues = new DataGridTableStyle()
+            var tsCustomSICValues = new DataGridTableStyle
             {
                 MappingName = CUSTOM_SIC_VALUES_DATA_TABLE,
                 AllowSorting = true,

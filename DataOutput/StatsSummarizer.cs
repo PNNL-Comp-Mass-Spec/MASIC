@@ -819,7 +819,7 @@ namespace MASIC.DataOutput
                     var ionCountRaw = DbUtils.GetColumnValue(dataValues, columnMap, ScanStatsColumns.IonCountRaw, 0);
                     var scanTypeName = DbUtils.GetColumnValue(dataValues, columnMap, ScanStatsColumns.ScanTypeName);
 
-                    var scanInfo = new clsScanInfo()
+                    var scanInfo = new clsScanInfo
                     {
                         ScanNumber = scanNumber,
                         ScanTime = (float)scanTime,

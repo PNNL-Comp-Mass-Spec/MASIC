@@ -213,7 +213,7 @@ namespace MASIC.Plots
 
         private static CategoryAxis MakeCategoryAxis(AxisPosition position, AxisInfo axisInfo, int baseFontSize)
         {
-            var categoryAxis = new CategoryAxis()
+            var categoryAxis = new CategoryAxis
             {
                 Angle = 30
             };

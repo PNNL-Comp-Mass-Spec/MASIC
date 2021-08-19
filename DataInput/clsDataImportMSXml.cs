@@ -968,7 +968,7 @@ namespace MASIC.DataInput
             bool isMzXML,
             clsSpectrumInfoMzXML mzXmlSourceSpectrum)
         {
-            var scanInfo = new clsScanInfo()
+            var scanInfo = new clsScanInfo
             {
                 ScanNumber = spectrumInfo.ScanNumber,
                 ScanTime = spectrumInfo.RetentionTimeMin,
@@ -1186,7 +1186,7 @@ namespace MASIC.DataInput
                         }
                     }
 
-                    var mrmMassRange = new MRMMassRangeType()
+                    var mrmMassRange = new MRMMassRangeType
                     {
                         StartMass = spectrumInfo.mzRangeStart,
                         EndMass = spectrumInfo.mzRangeEnd
@@ -1282,7 +1282,7 @@ namespace MASIC.DataInput
             IReadOnlyList<double> intensityList,
             bool thermoRawFile)
         {
-            var mzXmlSourceSpectrum = new clsSpectrumInfoMzXML()
+            var mzXmlSourceSpectrum = new clsSpectrumInfoMzXML
             {
                 SpectrumID = mzMLSpectrum.ScanNumber,
                 ScanNumber = mzMLSpectrum.ScanNumber,

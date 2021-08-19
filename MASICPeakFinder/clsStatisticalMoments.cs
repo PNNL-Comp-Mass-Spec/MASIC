@@ -44,7 +44,7 @@
         /// </summary>
         public clsStatisticalMoments Clone()
         {
-            return new clsStatisticalMoments()
+            return new clsStatisticalMoments
             {
                 Area = Area,
                 CenterOfMassScan = CenterOfMassScan,

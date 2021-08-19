@@ -261,7 +261,7 @@ namespace MASIC.DataOutput
         public void WriteDecon2LSIsosFileHeaders(StreamWriter writer)
         {
             // ReSharper disable once StringLiteralTypo
-            var headerNames = new List<string>()
+            var headerNames = new List<string>
             {
                 "scan_num",
                 "charge",
@@ -311,7 +311,7 @@ namespace MASIC.DataOutput
             float monoisotopicAbu,
             float monoPlus2Abu)
         {
-            var dataValues = new List<string>()
+            var dataValues = new List<string>
             {
                 scanNumber.ToString(),
                 charge.ToString(),
@@ -338,7 +338,7 @@ namespace MASIC.DataOutput
         {
             // Old Headers:      "scan_num,time,type,num_isotopic_signatures,num_peaks,tic,bpi_mz,bpi,time_domain_signal,peak_intensity_threshold,peptide_intensity_threshold")
 
-            var headerNames = new List<string>()
+            var headerNames = new List<string>
             {
                 "scan_num",
                 "scan_time",
@@ -403,7 +403,7 @@ namespace MASIC.DataOutput
             int numPeaks,
             int numIsotopicSignatures)
         {
-            var dataLine = new List<string>()
+            var dataLine = new List<string>
             {
                 scanNumber.ToString(),
                 currentScan.ScanTime.ToString("0.0000"),

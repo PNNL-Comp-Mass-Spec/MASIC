@@ -1390,7 +1390,7 @@ namespace MASICPeakFinder
             {
                 // Initialize to default values
 
-                var statMomentsData = new clsStatisticalMoments()
+                var statMomentsData = new clsStatisticalMoments
                 {
                     Area = 0,
                     StDev = 0,
@@ -2286,7 +2286,7 @@ namespace MASICPeakFinder
             {
                 var peakDetector = new clsPeakDetection();
 
-                var peakData = new clsPeaksContainer() { SourceDataCount = sicData.Count };
+                var peakData = new clsPeaksContainer { SourceDataCount = sicData.Count };
 
                 if (peakData.SourceDataCount <= 1)
                 {
@@ -3229,7 +3229,7 @@ namespace MASICPeakFinder
                 minimumPotentialPeakArea = 1;
             }
 
-            potentialAreaStats = new clsSICPotentialAreaStats()
+            potentialAreaStats = new clsSICPotentialAreaStats
             {
                 MinimumPotentialPeakArea = minimumPotentialPeakArea,
                 PeakCountBasisForMinimumPotentialArea = peakCountBasisForMinimumPotentialArea
@@ -3567,7 +3567,7 @@ namespace MASICPeakFinder
             double minimumBaselineNoiseLevel,
             NoiseThresholdModes noiseThresholdMode)
         {
-            return new clsBaselineNoiseStats()
+            return new clsBaselineNoiseStats
             {
                 NoiseLevel = minimumBaselineNoiseLevel,
                 NoiseStDev = 0,

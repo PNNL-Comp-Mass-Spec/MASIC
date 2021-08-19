@@ -50,7 +50,7 @@ namespace MASIC
             {
                 var segmentedScan = ThermoFisher.CommonCore.Data.Business.SegmentedScan.FromMassesAndIntensities(masses, intensities);
 
-                var scanStats = new ThermoFisher.CommonCore.Data.Business.ScanStatistics()
+                var scanStats = new ThermoFisher.CommonCore.Data.Business.ScanStatistics
                 {
                     PacketType = 2 + (2 << 16),
                     ScanNumber = scanInfo.ScanNumber,
@@ -62,7 +62,7 @@ namespace MASIC
                     TIC = scanInfo.TotalIonIntensity
                 };
 
-                var scan = new ThermoFisher.CommonCore.Data.Business.Scan()
+                var scan = new ThermoFisher.CommonCore.Data.Business.Scan
                 {
                     MassResolution = massResolution,
                     ScanType = scanInfo.ScanTypeName,

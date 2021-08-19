@@ -1730,7 +1730,7 @@ namespace MASICBrowser
 
                                             indexInXMLFile = xmlReader.GetAttribute("Index");
 
-                                            var newParentIon = new clsParentIonStats()
+                                            var newParentIon = new clsParentIonStats
                                             {
                                                 Index = int.Parse(indexInXMLFile),
                                                 MZ = 0.0,

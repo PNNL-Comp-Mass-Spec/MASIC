@@ -647,7 +647,7 @@ namespace MASIC
                 // Populate searchRange
                 // Set UsePointerIndexArray to false to prevent .FillWithData trying to sort mzList
                 // (the data was already sorted above)
-                var searchRange = new clsSearchRange()
+                var searchRange = new clsSearchRange
                 {
                     UsePointerIndexArray = false
                 };

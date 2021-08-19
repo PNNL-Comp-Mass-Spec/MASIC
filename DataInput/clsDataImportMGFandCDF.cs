@@ -268,7 +268,7 @@ namespace MASIC.DataInput
 
                 scanList.AddMasterScanEntry(clsScanList.ScanTypeConstants.SurveyScan, lastSurveyScanIndex);
 
-                var surveyScansRecorded = new SortedSet<int>()
+                var surveyScansRecorded = new SortedSet<int>
                 {
                     lastSurveyScanIndex
                 };

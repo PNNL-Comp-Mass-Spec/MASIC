@@ -89,7 +89,7 @@ namespace MASICBrowser
         {
             // Returns True if no problems; otherwise, returns false
 
-            var validParameters = new List<string>() { "I" };
+            var validParameters = new List<string> { "I" };
 
             try
             {

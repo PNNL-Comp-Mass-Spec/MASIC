@@ -38,7 +38,7 @@
         /// </summary>
         public clsBaselineNoiseStats Clone()
         {
-            return new clsBaselineNoiseStats()
+            return new clsBaselineNoiseStats
             {
                 NoiseLevel = NoiseLevel,
                 NoiseStDev = NoiseStDev,

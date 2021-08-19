@@ -93,7 +93,7 @@ namespace MASIC
 
                 if (includeParentIon)
                 {
-                    var newMzBin = new clsMzBinInfo()
+                    var newMzBin = new clsMzBinInfo
                     {
                         MZ = scanList.ParentIons[parentIonIndex].MZ,
                         ParentIonIndex = parentIonIndex
@@ -260,7 +260,7 @@ namespace MASIC
             var baselineNoiseStats = mMASICPeakFinder.LookupNoiseStatsUsingSegments(scanIndexObservedInFullSIC, baselineNoiseStatSegments);
 
             // Initialize the peak
-            var sicPeak = new clsSICStatsPeak()
+            var sicPeak = new clsSICStatsPeak
             {
                 BaselineNoiseStats = baselineNoiseStats
             };
@@ -655,7 +655,7 @@ namespace MASIC
                     // of the m/z value that starts this group
                     // Only group m/z values with the same udtMZBinList().MZTolerance and udtMZBinList().MZToleranceIsPPM values
 
-                    var mzSearchChunk = new clsMzSearchInfo()
+                    var mzSearchChunk = new clsMzSearchInfo
                     {
                         MZIndexStart = mzIndex,
                         MZTolerance = mzBinList[mzIndex].MZTolerance,
@@ -945,7 +945,7 @@ namespace MASIC
                 var scanIndexObservedInFullSIC = mzSearchChunk[mzIndexWork].ScanIndexMax;
 
                 // Initialize sicDetails
-                var sicDetails = new clsSICDetails()
+                var sicDetails = new clsSICDetails
                 {
                     SICScanType = clsScanList.ScanTypeConstants.SurveyScan
                 };

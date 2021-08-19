@@ -92,7 +92,7 @@
         /// </summary>
         public clsSICStatsPeak Clone()
         {
-            return new clsSICStatsPeak()
+            return new clsSICStatsPeak
             {
                 IndexBaseLeft = IndexBaseLeft,
                 IndexBaseRight = IndexBaseRight,
