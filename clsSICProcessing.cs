@@ -84,27 +84,29 @@ namespace MASIC
                     }
                 }
 
-                if (includeParentIon)
+                if (!includeParentIon)
                 {
-                    var newMzBin = new clsMzBinInfo
-                    {
-                        MZ = scanList.ParentIons[parentIonIndex].MZ,
-                        ParentIonIndex = parentIonIndex
-                    };
-
-                    if (scanList.ParentIons[parentIonIndex].CustomSICPeak)
-                    {
-                        newMzBin.MZTolerance = scanList.ParentIons[parentIonIndex].CustomSICPeakMZToleranceDa;
-                        newMzBin.MZToleranceIsPPM = false;
-                    }
-                    else
-                    {
-                        newMzBin.MZTolerance = sicOptions.SICTolerance;
-                        newMzBin.MZToleranceIsPPM = sicOptions.SICToleranceIsPPM;
-                    }
-
-                    mzBinList.Add(newMzBin);
+                    continue;
                 }
+
+                var newMzBin = new clsMzBinInfo
+                {
+                    MZ = scanList.ParentIons[parentIonIndex].MZ,
+                    ParentIonIndex = parentIonIndex
+                };
+
+                if (scanList.ParentIons[parentIonIndex].CustomSICPeak)
+                {
+                    newMzBin.MZTolerance = scanList.ParentIons[parentIonIndex].CustomSICPeakMZToleranceDa;
+                    newMzBin.MZToleranceIsPPM = false;
+                }
+                else
+                {
+                    newMzBin.MZTolerance = sicOptions.SICTolerance;
+                    newMzBin.MZToleranceIsPPM = sicOptions.SICToleranceIsPPM;
+                }
+
+                mzBinList.Add(newMzBin);
             }
 
             // Sort mzBinList by m/z
