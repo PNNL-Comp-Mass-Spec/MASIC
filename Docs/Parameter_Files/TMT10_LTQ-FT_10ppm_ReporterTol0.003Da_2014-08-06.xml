@@ -6,13 +6,7 @@
   </section>
   <section name="MasicImportOptions">
     <item key="CDFTimeInSeconds" value="True" />
-    <item key="UseFinniganXRawAccessorFunctions" value="True" />
     <item key="ParentIonDecoyMassDa" value="0" />
-    <item key="InputFilePath" value="" />
-    <item key="LastDirectory" value="" />
-    <item key="PreferredInputFileExtension" value=".RAW" />
-    <item key="WindowWidth" value="710" />
-    <item key="WindowHeight" value="560" />
   </section>
   <section name="MasicExportOptions">
     <item key="IncludeHeaders" value="True" />
@@ -102,15 +96,15 @@
   </section>
   <section name="MemoryOptions">
     <item key="DiskCachingAlwaysDisabled" value="False" />
-    <item key="CacheFolderPath" value="" />
-    <item key="CacheSpectraToRetainInMemory" value="500" />
+    <item key="CacheDirectoryPath" value="" />
+    <item key="CacheSpectraToRetainInMemory" value="5000" />
   </section>
   <section name="PlotOptions">
     <item key="CreatePlots" value="True" />
     <item key="PlotWithPython" value="True" />
     <item key="SaveHistogramData" value="False" />
-    <item key="SaveReporterIonObservationRateData" value="True" />
     <item key="SaveHtmlFile" value="True" />
+    <item key="SaveReporterIonObservationRateData" value="True" />
     <item key="PeakAreaHistogramBinCount" value="40" />
     <item key="PeakWidthHistogramBinCount" value="40" />
     <item key="ReporterIonObservationRateTopNPct" value="80" />
@@ -118,7 +112,9 @@
   </section>
   <section name="CustomSICValues">
     <item key="MZList" value="" />
+    <item key="MZToleranceDaList" value="" />
     <item key="ScanCenterList" value="" />
+    <item key="ScanToleranceList" value="" />
     <item key="ScanCommentList" value="" />
     <item key="ScanTolerance" value="1000" />
     <item key="ScanType" value="Absolute" />
