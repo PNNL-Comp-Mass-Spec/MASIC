@@ -123,8 +123,7 @@ namespace MASIC
             {
                 try
                 {
-                    var targetIndex = GetReporterIonIndexFromMode(value);
-                    cboReporterIonMassMode.SelectedIndex = targetIndex;
+                    cboReporterIonMassMode.SelectedIndex = GetReporterIonIndexFromMode(value);
                 }
                 catch (Exception)
                 {

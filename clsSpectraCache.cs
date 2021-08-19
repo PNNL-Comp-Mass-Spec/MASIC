@@ -345,9 +345,7 @@ namespace MASIC
                 }
 
                 var basePath = filePathMatch.Substring(0, charIndex);
-                var cacheFiles = Directory.GetFiles(mCacheOptions.DirectoryPath, Path.GetFileName(basePath) + "*");
-
-                foreach (var cacheFile in cacheFiles)
+                foreach (var cacheFile in Directory.GetFiles(mCacheOptions.DirectoryPath, Path.GetFileName(basePath) + "*"))
                 {
                     File.Delete(cacheFile);
                 }

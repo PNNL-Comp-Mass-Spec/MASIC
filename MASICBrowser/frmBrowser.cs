@@ -1848,8 +1848,7 @@ namespace MASICBrowser
                                         // Split apart the Intensity data list using the delimiters in delimiterList
                                         if (intensityDataList != null)
                                         {
-                                            var valueList = intensityDataList.Trim().Split(delimiterList);
-                                            foreach (var intensity in valueList)
+                                            foreach (var intensity in intensityDataList.Trim().Split(delimiterList))
                                             {
                                                 if (PRISM.DataUtils.StringToValueUtils.IsNumber(intensity))
                                                 {
@@ -1869,8 +1868,7 @@ namespace MASICBrowser
                                         // Split apart the Mass data list using the delimiters in delimiterList
                                         if (massDataList != null)
                                         {
-                                            var valueList = massDataList.Trim().Split(delimiterList);
-                                            foreach (var mz in valueList)
+                                            foreach (var mz in massDataList.Trim().Split(delimiterList))
                                             {
                                                 if (PRISM.DataUtils.StringToValueUtils.IsNumber(mz))
                                                 {

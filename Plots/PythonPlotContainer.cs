@@ -84,9 +84,7 @@ namespace MASIC.Plots
                 return true;
             }
 
-            var pathsToCheck = PythonPathsToCheck();
-
-            foreach (var directoryPath in pathsToCheck)
+            foreach (var directoryPath in PythonPathsToCheck())
             {
                 var exePath = FindPythonExe(directoryPath);
                 if (string.IsNullOrWhiteSpace(exePath))
