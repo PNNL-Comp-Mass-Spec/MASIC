@@ -1709,6 +1709,7 @@ namespace MASICBrowser
                         XMLTextReaderSkipWhitespace(xmlReader);
                         if (xmlReader.ReadState != ReadState.Interactive)
                             break;
+
                         if (xmlReader.Depth < 2)
                         {
                             if (xmlReader.NodeType == XmlNodeType.Element)
@@ -1779,15 +1780,16 @@ namespace MASICBrowser
                                     case "SICData":
                                         currentXMLDataFileSection = CurrentXMLDataFileSectionConstants.Start;
                                         break;
+
                                     case "ProcessingSummary":
-                                        xmlReader.Skip();
-                                        break;
                                     case "MemoryOptions":
                                         xmlReader.Skip();
                                         break;
+
                                     case "SICOptions":
                                         currentXMLDataFileSection = CurrentXMLDataFileSectionConstants.Options;
                                         break;
+
                                     case "ProcessingStats":
                                         xmlReader.Skip();
                                         break;
@@ -2066,30 +2068,38 @@ namespace MASICBrowser
                                                 case "MZ":
                                                     ionStats.MZ = Math.Round(double.Parse(XMLTextReaderGetInnerText(xmlReader)), 6);
                                                     break;
+
                                                 case "SurveyScanNumber":
                                                     ionStats.SurveyScanNumber = int.Parse(XMLTextReaderGetInnerText(xmlReader));
                                                     break;
+
                                                 case "FragScanNumber":
                                                     ionStats.FragScanObserved = int.Parse(XMLTextReaderGetInnerText(xmlReader));
                                                     break;
+
                                                 case "FragScanTime":
                                                     ionStats.FragScanTime = float.Parse(XMLTextReaderGetInnerText(xmlReader));
                                                     break;
+
                                                 case "OptimalPeakApexScanNumber":
                                                     ionStats.OptimalPeakApexScanNumber = int.Parse(XMLTextReaderGetInnerText(xmlReader));
                                                     break;
+
                                                 case "OptimalPeakApexScanTime":
                                                     ionStats.OptimalPeakApexTime = float.Parse(XMLTextReaderGetInnerText(xmlReader));
                                                     break;
+
                                                 case "CustomSICPeak":
                                                     ionStats.CustomSICPeak = bool.Parse(XMLTextReaderGetInnerText(xmlReader));
                                                     break;
+
                                                 case "CustomSICPeakComment":
                                                     ionStats.CustomSICPeakComment = XMLTextReaderGetInnerText(xmlReader);
                                                     break;
 
                                                 case "SICScanType":
                                                     var sicScanType = XMLTextReaderGetInnerText(xmlReader);
+
                                                     // ReSharper disable once StringLiteralTypo
                                                     if ((sicScanType.ToLower() ?? string.Empty) == "fragscan")
                                                     {
@@ -2101,27 +2111,35 @@ namespace MASICBrowser
                                                     }
 
                                                     break;
+
                                                 case "PeakScanStart":
                                                     peakScanStart = int.Parse(XMLTextReaderGetInnerText(xmlReader));
                                                     break;
+
                                                 case "PeakScanEnd":
                                                     peakScanEnd = int.Parse(XMLTextReaderGetInnerText(xmlReader));
                                                     break;
+
                                                 case "PeakScanMaxIntensity":
                                                     ionStats.SICStats.ScanNumberMaxIntensity = int.Parse(XMLTextReaderGetInnerText(xmlReader));
                                                     break;
+
                                                 case "PeakIntensity":
                                                     ionStats.SICStats.Peak.MaxIntensityValue = double.Parse(XMLTextReaderGetInnerText(xmlReader));
                                                     break;
+
                                                 case "PeakSignalToNoiseRatio":
                                                     ionStats.SICStats.Peak.SignalToNoiseRatio = double.Parse(XMLTextReaderGetInnerText(xmlReader));
                                                     break;
+
                                                 case "FWHMInScans":
                                                     ionStats.SICStats.Peak.FWHMScanWidth = int.Parse(XMLTextReaderGetInnerText(xmlReader));
                                                     break;
+
                                                 case "PeakArea":
                                                     ionStats.SICStats.Peak.Area = double.Parse(XMLTextReaderGetInnerText(xmlReader));
                                                     break;
+
                                                 case "ShoulderCount":
                                                     ionStats.SICStats.Peak.ShoulderCount = int.Parse(XMLTextReaderGetInnerText(xmlReader));
                                                     break;
@@ -2134,12 +2152,15 @@ namespace MASICBrowser
                                                     ionStats.SICStats.Peak.BaselineNoiseStats.NoiseLevel = double.Parse(XMLTextReaderGetInnerText(xmlReader));
                                                     baselineNoiseStatsFound = true;
                                                     break;
+
                                                 case "PeakBaselineNoiseStDev":
                                                     ionStats.SICStats.Peak.BaselineNoiseStats.NoiseStDev = double.Parse(XMLTextReaderGetInnerText(xmlReader));
                                                     break;
+
                                                 case "PeakBaselinePointsUsed":
                                                     ionStats.SICStats.Peak.BaselineNoiseStats.PointsUsed = int.Parse(XMLTextReaderGetInnerText(xmlReader));
                                                     break;
+
                                                 case "NoiseThresholdModeUsed":
                                                     ionStats.SICStats.Peak.BaselineNoiseStats.NoiseThresholdModeUsed = (clsMASICPeakFinder.NoiseThresholdModes)int.Parse(XMLTextReaderGetInnerText(xmlReader));
                                                     break;
@@ -2147,18 +2168,23 @@ namespace MASICBrowser
                                                 case "StatMomentsArea":
                                                     ionStats.SICStats.Peak.StatisticalMoments.Area = double.Parse(XMLTextReaderGetInnerText(xmlReader));
                                                     break;
+
                                                 case "CenterOfMassScan":
                                                     ionStats.SICStats.Peak.StatisticalMoments.CenterOfMassScan = int.Parse(XMLTextReaderGetInnerText(xmlReader));
                                                     break;
+
                                                 case "PeakStDev":
                                                     ionStats.SICStats.Peak.StatisticalMoments.StDev = double.Parse(XMLTextReaderGetInnerText(xmlReader));
                                                     break;
+
                                                 case "PeakSkew":
                                                     ionStats.SICStats.Peak.StatisticalMoments.Skew = double.Parse(XMLTextReaderGetInnerText(xmlReader));
                                                     break;
+
                                                 case "PeakKSStat":
                                                     ionStats.SICStats.Peak.StatisticalMoments.KSStat = double.Parse(XMLTextReaderGetInnerText(xmlReader));
                                                     break;
+
                                                 case "StatMomentsDataCountUsed":
                                                     ionStats.SICStats.Peak.StatisticalMoments.DataCountUsed = int.Parse(XMLTextReaderGetInnerText(xmlReader));
                                                     break;
@@ -2166,12 +2192,15 @@ namespace MASICBrowser
                                                 case "SICScanStart":
                                                     scanStart = int.Parse(XMLTextReaderGetInnerText(xmlReader));
                                                     break;
+
                                                 case "SICScanIntervals":
                                                     scanIntervals = XMLTextReaderGetInnerText(xmlReader);
                                                     break;
+
                                                 case "SICPeakIndexStart":
                                                     ionStats.SICStats.Peak.IndexBaseLeft = int.Parse(XMLTextReaderGetInnerText(xmlReader));
                                                     break;
+
                                                 case "SICPeakIndexEnd":
                                                     ionStats.SICStats.Peak.IndexBaseRight = int.Parse(XMLTextReaderGetInnerText(xmlReader));
                                                     break;
@@ -2201,15 +2230,19 @@ namespace MASICBrowser
                                                     }
 
                                                     break;
+
                                                 case "IntensityDataList":
                                                     intensityDataList = XMLTextReaderGetInnerText(xmlReader);
                                                     break;
+
                                                 case "MassDataList":
                                                     massDataList = XMLTextReaderGetInnerText(xmlReader);
                                                     break;
+
                                                 case "SmoothedYDataList":
                                                     smoothedYDataList = XMLTextReaderGetInnerText(xmlReader);
                                                     break;
+
                                                 default:
                                                     // Unknown child node name; ignore it
                                                     break;
