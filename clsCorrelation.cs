@@ -19,6 +19,8 @@ namespace MASIC
     /// </summary>
     public class clsCorrelation : EventNotifier
     {
+        // ReSharper disable once CommentTypo
+
         // Ignore Spelling: Spearman, Spearman's, zd
 
         /// <summary>

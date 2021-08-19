@@ -260,6 +260,7 @@ namespace MASIC
 
         private clsScanInfo GetFakeSurveyScan(int scanNumber, float scanTime)
         {
+            // ReSharper disable once UseObjectOrCollectionInitializer
             var surveyScan = new clsScanInfo()
             {
                 ScanNumber = scanNumber,

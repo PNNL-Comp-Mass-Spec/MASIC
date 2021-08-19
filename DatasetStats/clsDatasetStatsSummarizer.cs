@@ -18,6 +18,8 @@ using System.Text;
 using System.Xml;
 using PRISM;
 
+// ReSharper disable UnusedMember.Global
+
 namespace MASIC.DatasetStats
 {
     /// <summary>
@@ -35,13 +37,11 @@ namespace MASIC.DatasetStats
         /// </summary>
         public const string SCAN_TYPE_STATS_SEP_CHAR = "::###::";
 
-        // ReSharper disable once UnusedMember.Global
         /// <summary>
         /// Dataset info file suffix
         /// </summary>
         public const string DATASET_INFO_FILE_SUFFIX = "_DatasetInfo.xml";
 
-        // ReSharper disable once UnusedMember.Global
         public const string DEFAULT_DATASET_STATS_FILENAME = "MSFileInfo_DatasetStats.txt";
 
         /// <summary>
@@ -56,7 +56,6 @@ namespace MASIC.DatasetStats
         private bool mDatasetSummaryStatsUpToDate;
         private DatasetSummaryStats mDatasetSummaryStats;
 
-        // ReSharper disable once UnusedMember.Global
         /// <summary>
         /// Dataset stats summary filename
         /// </summary>
@@ -112,7 +111,6 @@ namespace MASIC.DatasetStats
             ClearCachedData();
         }
 
-        // ReSharper disable once UnusedMember.Global
         /// <summary>
         /// Add a New scan
         /// </summary>
@@ -254,7 +252,6 @@ namespace MASIC.DatasetStats
             summaryStatDetails.ScanCount++;
         }
 
-        // ReSharper disable once UnusedMember.Global
         /// <summary>
         /// Creates an XML file summarizing the data stored in this class (in mDatasetScanStats, Me.DatasetFileInfo, and Me.SampleInfo)
         /// </summary>
@@ -307,7 +304,6 @@ namespace MASIC.DatasetStats
             }
         }
 
-        // ReSharper disable once UnusedMember.Global
         /// <summary>
         /// Creates XML summarizing the data stored in this class (in mDatasetScanStats, Me.DatasetFileInfo, and Me.SampleInfo)
         /// Auto-determines the dataset name using Me.DatasetFileInfo.DatasetName
@@ -318,7 +314,6 @@ namespace MASIC.DatasetStats
             return CreateDatasetInfoXML(DatasetFileInfo.DatasetName, mDatasetScanStats, DatasetFileInfo, SampleInfo);
         }
 
-        // ReSharper disable once UnusedMember.Global
         /// <summary>
         /// Creates XML summarizing the data stored in this class (in mDatasetScanStats, Me.DatasetFileInfo, and Me.SampleInfo)
         /// </summary>
@@ -329,7 +324,6 @@ namespace MASIC.DatasetStats
             return CreateDatasetInfoXML(datasetName, mDatasetScanStats, DatasetFileInfo, SampleInfo);
         }
 
-        // ReSharper disable once UnusedMember.Global
         /// <summary>
         /// Creates XML summarizing the data in scanStats and datasetInfo
         /// Auto-determines the dataset name using datasetInfo.DatasetName
@@ -342,7 +336,6 @@ namespace MASIC.DatasetStats
             return CreateDatasetInfoXML(datasetInfo.DatasetName, scanStats, datasetInfo);
         }
 
-        // ReSharper disable once UnusedMember.Global
         /// <summary>
         /// Creates XML summarizing the data in scanStats, datasetInfo, and oSampleInfo
         /// Auto-determines the dataset name using datasetInfo.DatasetName
@@ -542,7 +535,6 @@ namespace MASIC.DatasetStats
             return string.Empty;
         }
 
-        // ReSharper disable once UnusedMember.Global
         /// <summary>
         /// Creates a tab-delimited text file with details on each scan tracked by this class (stored in mDatasetScanStats)
         /// </summary>
@@ -676,7 +668,6 @@ namespace MASIC.DatasetStats
             OnErrorEvent(ErrorMessage, ex);
         }
 
-        // ReSharper disable once UnusedMember.Global
         /// <summary>
         /// Updates the scan type information for the specified scan number
         /// </summary>
@@ -705,7 +696,6 @@ namespace MASIC.DatasetStats
             return matchFound;
         }
 
-        // ReSharper disable once UnusedMember.Global
         /// <summary>
         /// Updates a tab-delimited text file, adding a new line summarizing the data stored in this class (in mDatasetScanStats and Me.DatasetFileInfo)
         /// </summary>

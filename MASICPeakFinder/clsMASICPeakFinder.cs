@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 
+// ReSharper disable UnusedMember.Global
+
 namespace MASICPeakFinder
 {
     // -------------------------------------------------------------------------------
@@ -75,7 +77,6 @@ namespace MASICPeakFinder
         /// </summary>
         public enum TTestConfidenceLevelConstants
         {
-            // ReSharper disable UnusedMember.Global
             /// <summary>
             /// 80%
             /// </summary>
@@ -115,7 +116,6 @@ namespace MASICPeakFinder
             /// 99.9%
             /// </summary>
             Conf99_9Pct = 7
-            // ReSharper restore UnusedMember.Global
         }
 
         private string mStatusMessage;
@@ -128,7 +128,6 @@ namespace MASICPeakFinder
         /// </summary>
         private readonly double[] TTestConfidenceLevels = new[] { 1.886, 2.92, 4.303, 6.965, 9.925, 14.089, 22.327, 31.598 };
 
-        // ReSharper disable once UnusedMember.Global
         /// <summary>
         /// Program date
         /// </summary>
@@ -139,7 +138,6 @@ namespace MASICPeakFinder
         /// </summary>
         public string ProgramVersion => GetVersionForExecutingAssembly();
 
-        // ReSharper disable once UnusedMember.Global
         /// <summary>
         /// Status message
         /// </summary>
@@ -153,7 +151,6 @@ namespace MASICPeakFinder
             mStatusMessage = string.Empty;
         }
 
-        // ReSharper disable once UnusedMember.Global
         /// <summary>
         /// Compute an updated peak area by adjusting for the baseline
         /// </summary>
@@ -197,7 +194,6 @@ namespace MASICPeakFinder
             return 0;
         }
 
-        // ReSharper disable once UnusedMember.Global
         /// <summary>
         /// Adjust the intensity of a SIC peak based on baseline noise stats
         /// </summary>
@@ -856,7 +852,6 @@ namespace MASICPeakFinder
             return fwhmScans;
         }
 
-        // ReSharper disable once UnusedMember.Global
         /// <summary>
         /// Test ComputeKSStatistic
         /// </summary>

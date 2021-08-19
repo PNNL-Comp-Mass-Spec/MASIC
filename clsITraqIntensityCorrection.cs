@@ -32,6 +32,7 @@ namespace MASIC
         private const int ELEVEN_PLEX_TMT_MATRIX_LENGTH = 11;
         private const int SIXTEEN_PLEX_TMT_MATRIX_LENGTH = 16;
 
+        // ReSharper disable IdentifierTypo
 
         /// <summary>
         /// 4-plex iTRAQ correction factor type
@@ -51,6 +52,10 @@ namespace MASIC
             /// </remarks>
             BroadInstitute = 1
         }
+
+        // ReSharper restore IdentifierTypo
+
+        // ReSharper restore CommentTypo
 
         private struct IsotopeContributionType
         {
