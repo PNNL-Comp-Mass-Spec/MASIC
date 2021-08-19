@@ -485,9 +485,10 @@ namespace MASIC
                 txtSICNoiseThresholdIntensity.Enabled = true;
                 txtSICNoiseFractionLowIntensityDataToAverage.Enabled = false;
             }
-            else if (cboSICNoiseThresholdMode.SelectedIndex == (int)MASICPeakFinder.clsMASICPeakFinder.NoiseThresholdModes.TrimmedMeanByAbundance ||
-                cboSICNoiseThresholdMode.SelectedIndex == (int)MASICPeakFinder.clsMASICPeakFinder.NoiseThresholdModes.TrimmedMeanByCount ||
-                cboSICNoiseThresholdMode.SelectedIndex == (int)MASICPeakFinder.clsMASICPeakFinder.NoiseThresholdModes.TrimmedMedianByAbundance)
+            else if (cboSICNoiseThresholdMode.SelectedIndex is
+                (int)MASICPeakFinder.clsMASICPeakFinder.NoiseThresholdModes.TrimmedMeanByAbundance or
+                (int)MASICPeakFinder.clsMASICPeakFinder.NoiseThresholdModes.TrimmedMeanByCount or
+                (int)MASICPeakFinder.clsMASICPeakFinder.NoiseThresholdModes.TrimmedMedianByAbundance)
             {
                 txtSICNoiseThresholdIntensity.Enabled = false;
                 txtSICNoiseFractionLowIntensityDataToAverage.Enabled = true;
@@ -508,9 +509,10 @@ namespace MASIC
                 txtMassSpectraNoiseFractionLowIntensityDataToAverage.Enabled = false;
                 txtMassSpectraNoiseMinimumSignalToNoiseRatio.Enabled = false;
             }
-            else if (cboMassSpectraNoiseThresholdMode.SelectedIndex == (int)MASICPeakFinder.clsMASICPeakFinder.NoiseThresholdModes.TrimmedMeanByAbundance ||
-                cboMassSpectraNoiseThresholdMode.SelectedIndex == (int)MASICPeakFinder.clsMASICPeakFinder.NoiseThresholdModes.TrimmedMeanByCount ||
-                cboMassSpectraNoiseThresholdMode.SelectedIndex == (int)MASICPeakFinder.clsMASICPeakFinder.NoiseThresholdModes.TrimmedMedianByAbundance)
+            else if (cboMassSpectraNoiseThresholdMode.SelectedIndex is
+                (int)MASICPeakFinder.clsMASICPeakFinder.NoiseThresholdModes.TrimmedMeanByAbundance or
+                (int)MASICPeakFinder.clsMASICPeakFinder.NoiseThresholdModes.TrimmedMeanByCount or
+                (int)MASICPeakFinder.clsMASICPeakFinder.NoiseThresholdModes.TrimmedMedianByAbundance)
             {
                 txtMassSpectraNoiseThresholdIntensity.Enabled = false;
                 txtMassSpectraNoiseFractionLowIntensityDataToAverage.Enabled = true;

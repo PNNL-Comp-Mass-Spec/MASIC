@@ -270,8 +270,7 @@ namespace MASIC.DataOutput
 
                 int highAbundanceThreshold;
 
-                if (Options.PlotOptions.ReporterIonObservationRateTopNPct > 100 ||
-                    Options.PlotOptions.ReporterIonObservationRateTopNPct < 1)
+                if (Options.PlotOptions.ReporterIonObservationRateTopNPct is > 100 or < 1)
                 {
                     highAbundanceThreshold = 100;
                 }

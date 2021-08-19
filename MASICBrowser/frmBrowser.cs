@@ -2722,7 +2722,7 @@ namespace MASICBrowser
             mParentIonPointerArray = new int[mParentIonStats.Count];
             var sortKeys = new double[mParentIonStats.Count];
 
-            if (cboSortOrder.SelectedIndex >= 0 && cboSortOrder.SelectedIndex < SORT_ORDER_MODE_COUNT)
+            if (cboSortOrder.SelectedIndex is >= 0 and < SORT_ORDER_MODE_COUNT)
             {
                 eSortMode = (SortOrderConstants)cboSortOrder.SelectedIndex;
             }

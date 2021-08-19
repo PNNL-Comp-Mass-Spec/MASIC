@@ -121,8 +121,7 @@ namespace MASIC
         {
             double massResolution;
 
-            if (toleranceUnit == ThermoFisher.CommonCore.Data.Business.ToleranceMode.Ppm ||
-                toleranceUnit == ThermoFisher.CommonCore.Data.Business.ToleranceMode.Mmu)
+            if (toleranceUnit is ThermoFisher.CommonCore.Data.Business.ToleranceMode.Ppm or ThermoFisher.CommonCore.Data.Business.ToleranceMode.Mmu)
             {
                 double massToleranceDa;
                 if (toleranceUnit == ThermoFisher.CommonCore.Data.Business.ToleranceMode.Ppm)

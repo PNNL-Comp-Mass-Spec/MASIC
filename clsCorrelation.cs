@@ -115,7 +115,7 @@ namespace MASIC
             get => mBinningOptions.IntensityPrecisionPercent;
             set
             {
-                if (value < 0 || value > 100)
+                if (value is < 0 or > 100)
                     value = 1;
                 mBinningOptions.IntensityPrecisionPercent = value;
             }
@@ -228,7 +228,7 @@ namespace MASIC
 
         private double BetaI(double a, double b, double x)
         {
-            if (x < 0.0 || x > 1.0)
+            if (x is < 0.0 or > 1.0)
             {
                 throw new Exception("Bad x in routine clsCorrelation->BetaI; should be between 0 and 1");
             }

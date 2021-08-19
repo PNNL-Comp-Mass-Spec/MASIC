@@ -740,8 +740,7 @@ namespace MASIC
         /// </summary>
         public override string GetErrorMessage()
         {
-            if (ErrorCode == ProcessFilesErrorCodes.LocalizedError ||
-                ErrorCode == ProcessFilesErrorCodes.NoError)
+            if (ErrorCode is ProcessFilesErrorCodes.LocalizedError or ProcessFilesErrorCodes.NoError)
             {
                 return LocalErrorCode switch
                 {
@@ -1146,7 +1145,7 @@ namespace MASIC
 
                         if (LocalErrorCode != MasicErrorCodes.NoError)
                         {
-                            if (LocalErrorCode == MasicErrorCodes.InvalidDatasetID || LocalErrorCode == MasicErrorCodes.InvalidDatasetLookupFilePath)
+                            if (LocalErrorCode is MasicErrorCodes.InvalidDatasetID or MasicErrorCodes.InvalidDatasetLookupFilePath)
                             {
                                 // Ignore this error
                                 SetLocalErrorCode(MasicErrorCodes.NoError);

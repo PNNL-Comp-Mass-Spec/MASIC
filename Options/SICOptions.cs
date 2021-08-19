@@ -144,7 +144,7 @@
             get => mMaxSICPeakWidthMinutesBackward;
             set
             {
-                if (value < 0 || value > 10000)
+                if (value is < 0 or > 10000)
                     value = 5;
                 mMaxSICPeakWidthMinutesBackward = value;
             }
@@ -161,7 +161,7 @@
             get => mMaxSICPeakWidthMinutesForward;
             set
             {
-                if (value < 0 || value > 10000)
+                if (value is < 0 or > 10000)
                     value = 5;
                 mMaxSICPeakWidthMinutesForward = value;
             }
@@ -206,7 +206,7 @@
             get => mSimilarIonToleranceHalfWidthMinutes;
             set
             {
-                if (value < 0 || value > 100000)
+                if (value is < 0 or > 100000)
                     value = 5;
                 mSimilarIonToleranceHalfWidthMinutes = value;
             }
@@ -223,7 +223,7 @@
             get => mSpectrumSimilarityMinimum;
             set
             {
-                if (value < 0 || value > 1)
+                if (value is < 0 or > 1)
                     value = 0.8F;
                 mSpectrumSimilarityMinimum = value;
             }
@@ -303,10 +303,10 @@
 
             if (SICToleranceIsPPM)
             {
-                if (toleranceValue < 0 || toleranceValue > 1000000)
+                if (toleranceValue is < 0 or > 1000000)
                     toleranceValue = 100;
             }
-            else if (toleranceValue < 0 || toleranceValue > 10000)
+            else if (toleranceValue is < 0 or > 10000)
             {
                 toleranceValue = 0.6;
             }

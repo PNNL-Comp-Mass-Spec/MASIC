@@ -149,9 +149,10 @@ namespace MASIC
                     // We skip contaminant ions, unless saveUncorrectedIntensities is True, in which case we include them
 
                     string mzValue;
-                    if (mOptions.ReporterIons.ReporterIonMassMode == clsReporterIons.ReporterIonMassModeConstants.TMTTenMZ ||
-                        mOptions.ReporterIons.ReporterIonMassMode == clsReporterIons.ReporterIonMassModeConstants.TMTElevenMZ ||
-                        mOptions.ReporterIons.ReporterIonMassMode == clsReporterIons.ReporterIonMassModeConstants.TMTSixteenMZ)
+                    if (mOptions.ReporterIons.ReporterIonMassMode is
+                        clsReporterIons.ReporterIonMassModeConstants.TMTTenMZ or
+                        clsReporterIons.ReporterIonMassModeConstants.TMTElevenMZ or
+                        clsReporterIons.ReporterIonMassModeConstants.TMTSixteenMZ)
                     {
                         mzValue = reporterIon.MZ.ToString("#0.000");
                     }
@@ -422,12 +423,13 @@ namespace MASIC
             Array.Copy(reporterIntensities, reporterIntensitiesCorrected, reporterIntensities.Length);
             if (mOptions.ReporterIons.ReporterIonApplyAbundanceCorrection)
             {
-                if (mOptions.ReporterIons.ReporterIonMassMode == clsReporterIons.ReporterIonMassModeConstants.ITraqFourMZ ||
-                    mOptions.ReporterIons.ReporterIonMassMode == clsReporterIons.ReporterIonMassModeConstants.ITraqEightMZHighRes ||
-                    mOptions.ReporterIons.ReporterIonMassMode == clsReporterIons.ReporterIonMassModeConstants.ITraqEightMZLowRes ||
-                    mOptions.ReporterIons.ReporterIonMassMode == clsReporterIons.ReporterIonMassModeConstants.TMTTenMZ ||
-                    mOptions.ReporterIons.ReporterIonMassMode == clsReporterIons.ReporterIonMassModeConstants.TMTElevenMZ ||
-                    mOptions.ReporterIons.ReporterIonMassMode == clsReporterIons.ReporterIonMassModeConstants.TMTSixteenMZ)
+                if (mOptions.ReporterIons.ReporterIonMassMode is
+                    clsReporterIons.ReporterIonMassModeConstants.ITraqFourMZ or
+                    clsReporterIons.ReporterIonMassModeConstants.ITraqEightMZHighRes or
+                    clsReporterIons.ReporterIonMassModeConstants.ITraqEightMZLowRes or
+                    clsReporterIons.ReporterIonMassModeConstants.TMTTenMZ or
+                    clsReporterIons.ReporterIonMassModeConstants.TMTElevenMZ or
+                    clsReporterIons.ReporterIonMassModeConstants.TMTSixteenMZ)
                 {
                     // Correct the reporter ion intensities using the Reporter Ion Intensity Corrector class
 
