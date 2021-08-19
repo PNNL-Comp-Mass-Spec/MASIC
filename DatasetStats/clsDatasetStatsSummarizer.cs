@@ -42,8 +42,6 @@ namespace MASIC.DatasetStats
         /// </summary>
         public const string DATASET_INFO_FILE_SUFFIX = "_DatasetInfo.xml";
 
-        public const string DEFAULT_DATASET_STATS_FILENAME = "MSFileInfo_DatasetStats.txt";
-
         /// <summary>
         /// Date/time format string
         /// </summary>
