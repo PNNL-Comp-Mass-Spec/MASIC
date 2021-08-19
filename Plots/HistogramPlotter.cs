@@ -208,11 +208,11 @@ namespace MASIC.Plots
             AddOxyPlotSeries(myPlot, points);
 
             // Update the axis format codes if the data values are small or the range of data is small
-            var xVals = (from item in points select item.X).ToList();
-            OxyPlotUtilities.UpdateAxisFormatCodeIfSmallValues(myPlot.Axes[0], xVals, true);
+            var xValues = (from item in points select item.X).ToList();
+            OxyPlotUtilities.UpdateAxisFormatCodeIfSmallValues(myPlot.Axes[0], xValues, true);
 
-            var yVals = (from item in points select item.Y).ToList();
-            OxyPlotUtilities.UpdateAxisFormatCodeIfSmallValues(myPlot.Axes[1], yVals, false);
+            var yValues = (from item in points select item.Y).ToList();
+            OxyPlotUtilities.UpdateAxisFormatCodeIfSmallValues(myPlot.Axes[1], yValues, false);
 
             var plotContainer = new PlotContainer(PlotCategory, myPlot, mWriteDebug)
             {

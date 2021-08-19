@@ -28,26 +28,26 @@
         /// <summary>
         /// Constructor that stores 0 for the index
         /// </summary>
-        /// <param name="intScanNumber"></param>
-        /// <param name="dblIntensity"></param>
-        /// <param name="dblMass"></param>
-        public clsSICDataPoint(int intScanNumber, double dblIntensity, double dblMass)
-            : this(intScanNumber, dblIntensity, dblMass, 0)
+        /// <param name="scanNumber"></param>
+        /// <param name="intensity"></param>
+        /// <param name="mass"></param>
+        public clsSICDataPoint(int scanNumber, double intensity, double mass)
+            : this(scanNumber, intensity, mass, 0)
         {
         }
 
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="intScanNumber"></param>
-        /// <param name="dblIntensity"></param>
-        /// <param name="dblMass"></param>
+        /// <param name="scanNumber"></param>
+        /// <param name="intensity"></param>
+        /// <param name="mass"></param>
         /// <param name="index"></param>
-        public clsSICDataPoint(int intScanNumber, double dblIntensity, double dblMass, int index)
+        public clsSICDataPoint(int scanNumber, double intensity, double mass, int index)
         {
-            ScanNumber = intScanNumber;
-            Intensity = dblIntensity;
-            Mass = dblMass;
+            ScanNumber = scanNumber;
+            Intensity = intensity;
+            Mass = mass;
             ScanIndex = index;
         }
 
