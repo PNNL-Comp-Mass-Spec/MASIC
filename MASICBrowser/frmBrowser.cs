@@ -191,7 +191,7 @@ namespace MASICBrowser
         /// <param name="progressForm"></param>
         private void AutoOpenMsMsResults(string masicFilePath, frmProgress progressForm)
         {
-            var dataDirectoryInfo = new DirectoryInfo(Path.GetDirectoryName(masicFilePath));
+            var dataDirectoryInfo = new DirectoryInfo(Path.GetDirectoryName(masicFilePath) ?? ".");
 
             var fileNameBase = Path.GetFileNameWithoutExtension(masicFilePath);
             if (fileNameBase.EndsWith("_sics", StringComparison.OrdinalIgnoreCase))
