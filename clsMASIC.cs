@@ -278,21 +278,10 @@ namespace MASIC
         /// </summary>
         public MasicErrorCodes LocalErrorCode { get; private set; }
 
-        public string MASICPeakFinderDllVersion
-        {
-            get
-            {
-                if (mMASICPeakFinder != null)
-                {
-                    return mMASICPeakFinder.ProgramVersion;
-                }
-
-                return string.Empty;
-            }
-        }
         /// <summary>
         /// Returns the version of the MASIC peak finder DLL
         /// </summary>
+        public string MASICPeakFinderDllVersion => mMASICPeakFinder != null ? mMASICPeakFinder.ProgramVersion : string.Empty;
 
         /// <summary>
         /// Processing options
