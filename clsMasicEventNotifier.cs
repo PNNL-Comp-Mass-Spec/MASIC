@@ -33,8 +33,8 @@ namespace MASIC
         /// <summary>
         /// Delegate for the base class error code event
         /// </summary>
-        /// <param name="eNewErrorCode"></param>
-        public delegate void UpdateBaseClassErrorCodeEventEventHandler(PRISM.FileProcessor.ProcessFilesBase.ProcessFilesErrorCodes eNewErrorCode);
+        /// <param name="newErrorCode"></param>
+        public delegate void UpdateBaseClassErrorCodeEventEventHandler(PRISM.FileProcessor.ProcessFilesBase.ProcessFilesErrorCodes newErrorCode);
 
         /// <summary>
         /// Update the code associated with an error
@@ -44,23 +44,23 @@ namespace MASIC
         /// <summary>
         /// Delete fro the update error code event
         /// </summary>
-        /// <param name="eNewErrorCode"></param>
+        /// <param name="newErrorCode"></param>
         /// <param name="leaveExistingErrorCodeUnchanged"></param>
-        public delegate void UpdateErrorCodeEventEventHandler(clsMASIC.MasicErrorCodes eNewErrorCode, bool leaveExistingErrorCodeUnchanged);
+        public delegate void UpdateErrorCodeEventEventHandler(clsMASIC.MasicErrorCodes newErrorCode, bool leaveExistingErrorCodeUnchanged);
 
         private void OnUpdateCacheStats(int cacheEventCount, int unCacheEventCount, int spectraPoolHitEventCount)
         {
             UpdateCacheStatsEvent?.Invoke(cacheEventCount, unCacheEventCount, spectraPoolHitEventCount);
         }
 
-        private void OnUpdateBaseClassErrorCode(PRISM.FileProcessor.ProcessFilesBase.ProcessFilesErrorCodes eNewErrorCode)
+        private void OnUpdateBaseClassErrorCode(PRISM.FileProcessor.ProcessFilesBase.ProcessFilesErrorCodes newErrorCode)
         {
-            UpdateBaseClassErrorCodeEvent?.Invoke(eNewErrorCode);
+            UpdateBaseClassErrorCodeEvent?.Invoke(newErrorCode);
         }
 
-        private void OnUpdateErrorCode(clsMASIC.MasicErrorCodes eNewErrorCode, bool leaveExistingErrorCodeUnchanged)
+        private void OnUpdateErrorCode(clsMASIC.MasicErrorCodes newErrorCode, bool leaveExistingErrorCodeUnchanged)
         {
-            UpdateErrorCodeEvent?.Invoke(eNewErrorCode, leaveExistingErrorCodeUnchanged);
+            UpdateErrorCodeEvent?.Invoke(newErrorCode, leaveExistingErrorCodeUnchanged);
         }
 
         /// <summary>
@@ -89,13 +89,13 @@ namespace MASIC
         /// Report an error message
         /// </summary>
         /// <param name="message"></param>
-        /// <param name="eNewErrorCode"></param>
+        /// <param name="newErrorCode"></param>
         protected void ReportError(string message,
-                                   clsMASIC.MasicErrorCodes eNewErrorCode = clsMASIC.MasicErrorCodes.NoError)
+                                   clsMASIC.MasicErrorCodes newErrorCode = clsMASIC.MasicErrorCodes.NoError)
         {
-            if (eNewErrorCode != clsMASIC.MasicErrorCodes.NoError)
+            if (newErrorCode != clsMASIC.MasicErrorCodes.NoError)
             {
-                OnUpdateErrorCode(eNewErrorCode, false);
+                OnUpdateErrorCode(newErrorCode, false);
             }
 
             OnErrorEvent(message);
@@ -106,14 +106,14 @@ namespace MASIC
         /// </summary>
         /// <param name="message"></param>
         /// <param name="ex"></param>
-        /// <param name="eNewErrorCode"></param>
+        /// <param name="newErrorCode"></param>
         protected void ReportError(string message,
                                    Exception ex,
-                                   clsMASIC.MasicErrorCodes eNewErrorCode = clsMASIC.MasicErrorCodes.NoError)
+                                   clsMASIC.MasicErrorCodes newErrorCode = clsMASIC.MasicErrorCodes.NoError)
         {
-            if (eNewErrorCode != clsMASIC.MasicErrorCodes.NoError)
+            if (newErrorCode != clsMASIC.MasicErrorCodes.NoError)
             {
-                OnUpdateErrorCode(eNewErrorCode, false);
+                OnUpdateErrorCode(newErrorCode, false);
             }
 
             OnErrorEvent(message, ex);
@@ -131,20 +131,20 @@ namespace MASIC
         /// <summary>
         /// Set the base class error code
         /// </summary>
-        /// <param name="eNewErrorCode"></param>
-        protected void SetBaseClassErrorCode(PRISM.FileProcessor.ProcessFilesBase.ProcessFilesErrorCodes eNewErrorCode)
+        /// <param name="newErrorCode"></param>
+        protected void SetBaseClassErrorCode(PRISM.FileProcessor.ProcessFilesBase.ProcessFilesErrorCodes newErrorCode)
         {
-            OnUpdateBaseClassErrorCode(eNewErrorCode);
+            OnUpdateBaseClassErrorCode(newErrorCode);
         }
 
         /// <summary>
         /// Set a local error code
         /// </summary>
-        /// <param name="eNewErrorCode"></param>
+        /// <param name="newErrorCode"></param>
         /// <param name="leaveExistingErrorCodeUnchanged"></param>
-        protected void SetLocalErrorCode(clsMASIC.MasicErrorCodes eNewErrorCode, bool leaveExistingErrorCodeUnchanged = false)
+        protected void SetLocalErrorCode(clsMASIC.MasicErrorCodes newErrorCode, bool leaveExistingErrorCodeUnchanged = false)
         {
-            OnUpdateErrorCode(eNewErrorCode, leaveExistingErrorCodeUnchanged);
+            OnUpdateErrorCode(newErrorCode, leaveExistingErrorCodeUnchanged);
         }
 
         /// <summary>
@@ -190,14 +190,14 @@ namespace MASIC
             OnUpdateCacheStats(cacheEventCount, unCacheEventCount, spectraPoolHitEventCount);
         }
 
-        private void UpdateBaseClassErrorCodeEventHandler(PRISM.FileProcessor.ProcessFilesBase.ProcessFilesErrorCodes eErrorCode)
+        private void UpdateBaseClassErrorCodeEventHandler(PRISM.FileProcessor.ProcessFilesBase.ProcessFilesErrorCodes errorCode)
         {
-            SetBaseClassErrorCode(eErrorCode);
+            SetBaseClassErrorCode(errorCode);
         }
 
-        private void UpdateErrorCodeEventHandler(clsMASIC.MasicErrorCodes eErrorCode, bool leaveExistingErrorCodeUnchanged)
+        private void UpdateErrorCodeEventHandler(clsMASIC.MasicErrorCodes errorCode, bool leaveExistingErrorCodeUnchanged)
         {
-            SetLocalErrorCode(eErrorCode, leaveExistingErrorCodeUnchanged);
+            SetLocalErrorCode(errorCode, leaveExistingErrorCodeUnchanged);
         }
     }
 }

@@ -393,7 +393,7 @@ namespace MASIC
                 var dataComparer = new clsCorrelation(binningOptions);
                 RegisterEvents(dataComparer);
 
-                const clsCorrelation.cmCorrelationMethodConstants eCorrelationMethod = clsCorrelation.cmCorrelationMethodConstants.Pearson;
+                const clsCorrelation.cmCorrelationMethodConstants correlationMethod = clsCorrelation.cmCorrelationMethodConstants.Pearson;
 
                 // Bin the data in the first spectrum
                 var success = CompareSpectraBinData(dataComparer, fragSpectrum1, binnedSpectrum1);
@@ -407,14 +407,14 @@ namespace MASIC
 
                 // Now compare the binned spectra
                 // Similarity will be 0 if either instance of BinnedIntensities has fewer than 5 data points
-                var similarity1 = dataComparer.Correlate(binnedSpectrum1.BinnedIntensities, binnedSpectrum2.BinnedIntensities, eCorrelationMethod);
+                var similarity1 = dataComparer.Correlate(binnedSpectrum1.BinnedIntensities, binnedSpectrum2.BinnedIntensities, correlationMethod);
 
                 if (!considerOffsetBinnedData)
                 {
                     return similarity1;
                 }
 
-                var similarity2 = dataComparer.Correlate(binnedSpectrum1.BinnedIntensitiesOffset, binnedSpectrum2.BinnedIntensitiesOffset, eCorrelationMethod);
+                var similarity2 = dataComparer.Correlate(binnedSpectrum1.BinnedIntensitiesOffset, binnedSpectrum2.BinnedIntensitiesOffset, correlationMethod);
                 return Math.Max(similarity1, similarity2);
             }
             catch (Exception ex)

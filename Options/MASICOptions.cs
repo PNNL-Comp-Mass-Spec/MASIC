@@ -525,7 +525,7 @@ namespace MASIC.Options
                     ReporterIons.ReporterIonStatsEnabled = reader.GetParam(
                         XML_SECTION_EXPORT_OPTIONS, "ReporterIonStatsEnabled", ReporterIons.ReporterIonStatsEnabled);
 
-                    var eReporterIonMassMode = (clsReporterIons.ReporterIonMassModeConstants)reader.GetParam(
+                    var reporterIonMassMode = (clsReporterIons.ReporterIonMassModeConstants)reader.GetParam(
                         XML_SECTION_EXPORT_OPTIONS, "ReporterIonMassMode", (int)ReporterIons.ReporterIonMassMode);
 
                     ReporterIons.ReporterIonToleranceDaDefault = reader.GetParam(
@@ -546,7 +546,7 @@ namespace MASIC.Options
                     ReporterIons.ReporterIonSaveUncorrectedIntensities = reader.GetParam(
                         XML_SECTION_EXPORT_OPTIONS, "ReporterIonSaveUncorrectedIntensities", ReporterIons.ReporterIonSaveUncorrectedIntensities);
 
-                    ReporterIons.SetReporterIonMassMode(eReporterIonMassMode,
+                    ReporterIons.SetReporterIonMassMode(reporterIonMassMode,
                                                         ReporterIons.ReporterIonToleranceDaDefault);
 
                     // Raw data export options

@@ -537,12 +537,12 @@ namespace MASIC.DataInput
         /// Append a line to the scan stats file
         /// </summary>
         /// <param name="writer"></param>
-        /// <param name="eScanType"></param>
+        /// <param name="scanType"></param>
         /// <param name="currentScan"></param>
         /// <param name="datasetID"></param>
         protected void SaveScanStatEntry(
             StreamWriter writer,
-            clsScanList.ScanTypeConstants eScanType,
+            clsScanList.ScanTypeConstants scanType,
             clsScanInfo currentScan,
             int datasetID)
         {
@@ -553,7 +553,7 @@ namespace MASIC.DataInput
                 ScanNumber = currentScan.ScanNumber
             };
 
-            if (eScanType == clsScanList.ScanTypeConstants.SurveyScan)
+            if (scanType == clsScanList.ScanTypeConstants.SurveyScan)
             {
                 scanStatsEntry.ScanType = 1;
                 scanStatsEntry.ScanTypeName = string.Copy(currentScan.ScanTypeName);

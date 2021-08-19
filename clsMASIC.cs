@@ -1608,9 +1608,9 @@ namespace MASIC
             }
         }
 
-        private void UpdateProcessingStep(ProcessingStepConstants eNewProcessingStep, bool forceStatusFileUpdate = false)
+        private void UpdateProcessingStep(ProcessingStepConstants newProcessingStep, bool forceStatusFileUpdate = false)
         {
-            ProcessStep = eNewProcessingStep;
+            ProcessStep = newProcessingStep;
             UpdateStatusFile(forceStatusFileUpdate);
         }
 
@@ -1711,14 +1711,14 @@ namespace MASIC
             mProcessingStats.SpectraPoolHitEventCount = spectraPoolHitEventCount;
         }
 
-        private void UpdateBaseClassErrorCodeEventHandler(ProcessFilesErrorCodes eErrorCode)
+        private void UpdateBaseClassErrorCodeEventHandler(ProcessFilesErrorCodes errorCode)
         {
-            SetBaseClassErrorCode(eErrorCode);
+            SetBaseClassErrorCode(errorCode);
         }
 
-        private void UpdateErrorCodeEventHandler(MasicErrorCodes eErrorCode, bool leaveExistingErrorCodeUnchanged)
+        private void UpdateErrorCodeEventHandler(MasicErrorCodes errorCode, bool leaveExistingErrorCodeUnchanged)
         {
-            SetLocalErrorCode(eErrorCode, leaveExistingErrorCodeUnchanged);
+            SetLocalErrorCode(errorCode, leaveExistingErrorCodeUnchanged);
         }
 
         /// <summary>

@@ -1132,15 +1132,15 @@ namespace MASIC.DataInput
 
             UpdateMSXmlScanType(scanInfo, spectrumInfo.MSLevel, "MSn", isMzXML, mzXmlSourceSpectrum);
 
-            var eMRMScanType = scanInfo.MRMScanType;
-            if (eMRMScanType != MRMScanTypeConstants.NotMRM)
+            var mrmScanType = scanInfo.MRMScanType;
+            if (mrmScanType != MRMScanTypeConstants.NotMRM)
             {
                 // This is an MRM scan
                 scanList.MRMDataPresent = true;
 
                 var mrmScan = new ThermoRawFileReader.clsScanInfo(spectrumInfo.SpectrumID)
                 {
-                    MRMScanType = eMRMScanType,
+                    MRMScanType = mrmScanType,
                     MRMInfo = new MRMInfo()
                 };
 
@@ -1233,7 +1233,7 @@ namespace MASIC.DataInput
 
             SaveScanStatEntry(dataOutputHandler.OutputFileHandles.ScanStats, clsScanList.ScanTypeConstants.FragScan, scanInfo, sicOptions.DatasetID);
 
-            if (eMRMScanType == MRMScanTypeConstants.NotMRM)
+            if (mrmScanType == MRMScanTypeConstants.NotMRM)
             {
                 // This is not an MRM scan
                 mParentIonProcessor.AddUpdateParentIons(scanList, mLastNonZoomSurveyScanIndex, spectrumInfo.ParentIonMZ,

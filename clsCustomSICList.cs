@@ -438,7 +438,7 @@ namespace MASIC
         /// <summary>
         /// Define custom SIC list values
         /// </summary>
-        /// <param name="eScanType"></param>
+        /// <param name="scanType"></param>
         /// <param name="mzToleranceDa"></param>
         /// <param name="scanOrAcqTimeToleranceValue"></param>
         /// <param name="mzList"></param>
@@ -450,7 +450,7 @@ namespace MASIC
         [Obsolete("Use SetCustomSICListValues that takes List(Of clsCustomMZSearchSpec)")]
         // ReSharper disable once UnusedMember.Global
         public bool SetCustomSICListValues(
-            CustomSICScanTypeConstants eScanType,
+            CustomSICScanTypeConstants scanType,
             double mzToleranceDa,
             float scanOrAcqTimeToleranceValue,
             double[] mzList,
@@ -485,7 +485,7 @@ namespace MASIC
 
             ResetMzSearchValues();
 
-            ScanToleranceType = eScanType;
+            ScanToleranceType = scanType;
 
             // This value is used if scanOrAcqTimeToleranceList is blank or for any entries in scanOrAcqTimeToleranceList() that are zero
             ScanOrAcqTimeTolerance = scanOrAcqTimeToleranceValue;
@@ -545,18 +545,18 @@ namespace MASIC
         /// <summary>
         /// Define custom SIC list values
         /// </summary>
-        /// <param name="eScanType"></param>
+        /// <param name="scanType"></param>
         /// <param name="scanOrAcqTimeToleranceValue"></param>
         /// <param name="mzSearchSpecs"></param>
         /// <returns>True if success, false if error</returns>
         public bool SetCustomSICListValues(
-            CustomSICScanTypeConstants eScanType,
+            CustomSICScanTypeConstants scanType,
             float scanOrAcqTimeToleranceValue,
             List<clsCustomMZSearchSpec> mzSearchSpecs)
         {
             ResetMzSearchValues();
 
-            ScanToleranceType = eScanType;
+            ScanToleranceType = scanType;
 
             // This value is used if scanOrAcqTimeToleranceList is blank or for any entries in scanOrAcqTimeToleranceList() that are zero
             ScanOrAcqTimeTolerance = scanOrAcqTimeToleranceValue;

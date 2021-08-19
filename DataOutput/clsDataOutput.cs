@@ -637,16 +637,16 @@ namespace MASIC.DataOutput
         /// </summary>
         /// <param name="inputFileName"></param>
         /// <param name="outputDirectoryPath"></param>
-        /// <param name="eFileType"></param>
+        /// <param name="fileType"></param>
         /// <param name="fragTypeNumber"></param>
         public static string ConstructOutputFilePath(
             string inputFileName,
             string outputDirectoryPath,
-            OutputFileTypeConstants eFileType,
+            OutputFileTypeConstants fileType,
             int fragTypeNumber = 1)
         {
             var outputFilePath = Path.Combine(outputDirectoryPath, Path.GetFileNameWithoutExtension(inputFileName));
-            switch (eFileType)
+            switch (fileType)
             {
                 case OutputFileTypeConstants.XMLFile:
                     outputFilePath += "_SICs.xml";
@@ -727,7 +727,7 @@ namespace MASIC.DataOutput
                     outputFilePath += "_SICdata.txt";
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(eFileType), "Unknown Output File Type found in clsDataOutput.ConstructOutputFilePath");
+                    throw new ArgumentOutOfRangeException(nameof(fileType), "Unknown Output File Type found in clsDataOutput.ConstructOutputFilePath");
             }
 
             return outputFilePath;
@@ -780,24 +780,24 @@ namespace MASIC.DataOutput
         /// Get the header line for the given file type, tab delimited
         /// </summary>
         /// <param name="scanList"></param>
-        /// <param name="eOutputFileType"></param>
-        public string GetHeadersForOutputFile(clsScanList scanList, OutputFileTypeConstants eOutputFileType)
+        /// <param name="outputFileType"></param>
+        public string GetHeadersForOutputFile(clsScanList scanList, OutputFileTypeConstants outputFileType)
         {
-            return GetHeadersForOutputFile(scanList, eOutputFileType, '\t');
+            return GetHeadersForOutputFile(scanList, outputFileType, '\t');
         }
 
         /// <summary>
         /// Get the header line for the given file type, using the specified delimiter
         /// </summary>
         /// <param name="scanList"></param>
-        /// <param name="eOutputFileType"></param>
+        /// <param name="outputFileType"></param>
         /// <param name="delimiter"></param>
         public string GetHeadersForOutputFile(
-            clsScanList scanList, OutputFileTypeConstants eOutputFileType, char delimiter)
+            clsScanList scanList, OutputFileTypeConstants outputFileType, char delimiter)
         {
             List<string> headerNames;
 
-            switch (eOutputFileType)
+            switch (outputFileType)
             {
                 case OutputFileTypeConstants.ScanStatsFlatFile:
                     headerNames = new List<string>()

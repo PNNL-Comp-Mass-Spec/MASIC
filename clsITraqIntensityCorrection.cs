@@ -92,21 +92,21 @@ namespace MASIC
         /// <summary>
         /// Constructor that assumes iTraqCorrectionFactorType = ABSciex
         /// </summary>
-        /// <param name="eReporterIonMode">iTRAQ or TMT mode</param>
-        public clsITraqIntensityCorrection(clsReporterIons.ReporterIonMassModeConstants eReporterIonMode)
-            : this(eReporterIonMode, CorrectionFactorsiTRAQ4Plex.ABSciex)
+        /// <param name="reporterIonMode">iTRAQ or TMT mode</param>
+        public clsITraqIntensityCorrection(clsReporterIons.ReporterIonMassModeConstants reporterIonMode)
+            : this(reporterIonMode, CorrectionFactorsiTRAQ4Plex.ABSciex)
         {
         }
 
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="eReporterIonMode">iTRAQ or TMT mode</param>
+        /// <param name="reporterIonMode">iTRAQ or TMT mode</param>
         /// <param name="iTraqCorrectionFactorType">Correction factor type for 4-plex iTRAQ</param>
-        /// <remarks>The iTraqCorrectionFactorType parameter is only used if eReporterIonMode is ITraqFourMZ</remarks>
-        public clsITraqIntensityCorrection(clsReporterIons.ReporterIonMassModeConstants eReporterIonMode, CorrectionFactorsiTRAQ4Plex iTraqCorrectionFactorType)
+        /// <remarks>The iTraqCorrectionFactorType parameter is only used if reporterIonMode is ITraqFourMZ</remarks>
+        public clsITraqIntensityCorrection(clsReporterIons.ReporterIonMassModeConstants reporterIonMode, CorrectionFactorsiTRAQ4Plex iTraqCorrectionFactorType)
         {
-            ReporterIonMode = eReporterIonMode;
+            ReporterIonMode = reporterIonMode;
             ITraq4PlexCorrectionFactorType = iTraqCorrectionFactorType;
 
             mMatrixUtility = new MatrixDecompositionUtility.LUDecomposition();
@@ -122,22 +122,22 @@ namespace MASIC
         /// <summary>
         /// Change the reporter ion mode
         /// </summary>
-        /// <param name="eReporterIonMode"></param>
-        public void UpdateReporterIonMode(clsReporterIons.ReporterIonMassModeConstants eReporterIonMode)
+        /// <param name="reporterIonMode"></param>
+        public void UpdateReporterIonMode(clsReporterIons.ReporterIonMassModeConstants reporterIonMode)
         {
-            UpdateReporterIonMode(eReporterIonMode, ITraq4PlexCorrectionFactorType);
+            UpdateReporterIonMode(reporterIonMode, ITraq4PlexCorrectionFactorType);
         }
 
         /// <summary>
         /// Change the reporter ion mode
         /// </summary>
-        /// <param name="eReporterIonMode"></param>
+        /// <param name="reporterIonMode"></param>
         /// <param name="iTraqCorrectionFactorType"></param>
-        public void UpdateReporterIonMode(clsReporterIons.ReporterIonMassModeConstants eReporterIonMode, CorrectionFactorsiTRAQ4Plex iTraqCorrectionFactorType)
+        public void UpdateReporterIonMode(clsReporterIons.ReporterIonMassModeConstants reporterIonMode, CorrectionFactorsiTRAQ4Plex iTraqCorrectionFactorType)
         {
-            if (ReporterIonMode != eReporterIonMode || ITraq4PlexCorrectionFactorType != iTraqCorrectionFactorType)
+            if (ReporterIonMode != reporterIonMode || ITraq4PlexCorrectionFactorType != iTraqCorrectionFactorType)
             {
-                ReporterIonMode = eReporterIonMode;
+                ReporterIonMode = reporterIonMode;
                 ITraq4PlexCorrectionFactorType = iTraqCorrectionFactorType;
                 InitializeCoefficients(true);
             }
@@ -179,12 +179,12 @@ namespace MASIC
         public bool ApplyCorrection(double[] reporterIonIntensities, bool debugShowIntensities = false)
         {
             var matrixSize = GetMatrixLength(ReporterIonMode);
-            var eReporterIonMode = clsReporterIons.GetReporterIonModeDescription(ReporterIonMode);
+            var reporterIonMode = clsReporterIons.GetReporterIonModeDescription(ReporterIonMode);
 
             if (reporterIonIntensities.Length != matrixSize)
             {
                 throw new InvalidOperationException("Length of ReporterIonIntensities array must be " + matrixSize +
-                                                    " when using the " + eReporterIonMode + " mode");
+                                                    " when using the " + reporterIonMode + " mode");
             }
 
             var correctedIntensities = mMatrixUtility.ProcessData(mCoeffs, matrixSize, reporterIonIntensities);
@@ -258,7 +258,7 @@ namespace MASIC
                 clsReporterIons.ReporterIonMassModeConstants.TMTTenMZ => TEN_PLEX_TMT_MATRIX_LENGTH,
                 clsReporterIons.ReporterIonMassModeConstants.TMTElevenMZ => ELEVEN_PLEX_TMT_MATRIX_LENGTH,
                 clsReporterIons.ReporterIonMassModeConstants.TMTSixteenMZ => SIXTEEN_PLEX_TMT_MATRIX_LENGTH,
-                _ => throw new ArgumentOutOfRangeException("Invalid value for eReporterIonMode in GetMatrixLength: " + reporterIonMode)
+                _ => throw new ArgumentOutOfRangeException("Invalid value for reporterIonMode in GetMatrixLength: " + reporterIonMode)
             };
         }
 

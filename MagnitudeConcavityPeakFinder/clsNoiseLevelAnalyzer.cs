@@ -347,14 +347,14 @@ namespace MagnitudeConcavityPeakFinder
 
         public BaselineNoiseStatsType GetBaselineNoiseStats(
             float sngMinimumBaselineNoiseLevel,
-            NoiseThresholdModes eNoiseThresholdMode)
+            NoiseThresholdModes noiseThresholdMode)
         {
             return new BaselineNoiseStatsType
             {
                 NoiseLevel = sngMinimumBaselineNoiseLevel,
                 NoiseStDev = 0,
                 PointsUsed = 0,
-                NoiseThresholdModeUsed = eNoiseThresholdMode
+                NoiseThresholdModeUsed = noiseThresholdMode
             };
         }
 

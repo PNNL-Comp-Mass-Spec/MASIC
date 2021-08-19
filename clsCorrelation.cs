@@ -406,13 +406,13 @@ namespace MASIC
         /// </summary>
         /// <param name="dataList1"></param>
         /// <param name="dataList2"></param>
-        /// <param name="eCorrelationMethod"></param>
+        /// <param name="correlationMethod"></param>
         /// <returns>Correlation value (0 to 1), or -1 if an error</returns>
         /// <remarks>If necessary, use the BinData function before calling this function to bin the data</remarks>
         public float Correlate(
             IReadOnlyList<float> dataList1,
             IReadOnlyList<float> dataList2,
-            cmCorrelationMethodConstants eCorrelationMethod)
+            cmCorrelationMethodConstants correlationMethod)
         {
             // ReSharper disable once NotAccessedVariable
             float probabilityOfSignificance;
@@ -452,7 +452,7 @@ namespace MASIC
                 if (nonZeroDataCount < MIN_NON_ZERO_ION_COUNT)
                     return 0;
 
-                switch (eCorrelationMethod)
+                switch (correlationMethod)
                 {
                     case cmCorrelationMethodConstants.Pearson:
                         CorrelatePearson(dataList1, dataList2, out var rValue, out probabilityOfSignificance, out _);

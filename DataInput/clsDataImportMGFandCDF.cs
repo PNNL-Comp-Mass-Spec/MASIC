@@ -493,10 +493,10 @@ namespace MASIC.DataInput
                 // Now that all of the data has been read, write out to the scan stats file, in order of scan number
                 for (var scanIndex = 0; scanIndex < scanList.MasterScanOrderCount; scanIndex++)
                 {
-                    var eScanType = scanList.MasterScanOrder[scanIndex].ScanType;
+                    var scanType = scanList.MasterScanOrder[scanIndex].ScanType;
                     clsScanInfo currentScan;
 
-                    if (eScanType == clsScanList.ScanTypeConstants.SurveyScan)
+                    if (scanType == clsScanList.ScanTypeConstants.SurveyScan)
                     {
                         // Survey scan
                         currentScan = scanList.SurveyScans[scanList.MasterScanOrder[scanIndex].ScanIndexPointer];
@@ -507,7 +507,7 @@ namespace MASIC.DataInput
                         currentScan = scanList.FragScans[scanList.MasterScanOrder[scanIndex].ScanIndexPointer];
                     }
 
-                    SaveScanStatEntry(dataOutputHandler.OutputFileHandles.ScanStats, eScanType, currentScan, sicOptions.DatasetID);
+                    SaveScanStatEntry(dataOutputHandler.OutputFileHandles.ScanStats, scanType, currentScan, sicOptions.DatasetID);
                 }
 
                 Console.WriteLine();

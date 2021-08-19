@@ -101,15 +101,15 @@ namespace MASIC.Plots
                 return;
             }
 
-            var eSymbolType = MarkerType.None;
+            var symbolType = MarkerType.None;
             if (points.Count == 1)
             {
-                eSymbolType = MarkerType.Circle;
+                symbolType = MarkerType.Circle;
             }
 
             series.Color = OxyColors.Black;
             series.StrokeThickness = 2;
-            series.MarkerType = eSymbolType;
+            series.MarkerType = symbolType;
 
             if (points.Count == 1)
             {

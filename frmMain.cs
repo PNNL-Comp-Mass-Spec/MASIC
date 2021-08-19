@@ -780,8 +780,8 @@ namespace MASIC
 
         private void IniFileSaveDefaultOptions()
         {
-            var eResponse = MessageBox.Show("Save the current options as defaults?", "Save Defaults", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1);
-            if (eResponse == DialogResult.Yes)
+            var response = MessageBox.Show("Save the current options as defaults?", "Save Defaults", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1);
+            if (response == DialogResult.Yes)
             {
                 IniFileSaveOptions(GetSettingsFilePath(), false);
             }
@@ -1667,9 +1667,9 @@ namespace MASIC
             txtDatasetInfoQuerySQL.Text = clsDatabaseAccess.DATABASE_DATASET_INFO_QUERY_DEFAULT;
         }
 
-        private void SetCustomSICToleranceType(clsCustomSICList.CustomSICScanTypeConstants eCustomSICScanToleranceType)
+        private void SetCustomSICToleranceType(clsCustomSICList.CustomSICScanTypeConstants customSICScanToleranceType)
         {
-            switch (eCustomSICScanToleranceType)
+            switch (customSICScanToleranceType)
             {
                 case clsCustomSICList.CustomSICScanTypeConstants.Absolute:
                     optCustomSICScanToleranceAbsolute.Checked = true;

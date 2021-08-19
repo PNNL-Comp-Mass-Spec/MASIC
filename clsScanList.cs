@@ -157,59 +157,59 @@ namespace MASIC
         /// <summary>
         /// Adds a new entry to .MasterScanOrder using an existing entry in SurveyScans() or FragScans()
         /// </summary>
-        /// <param name="eScanType"></param>
+        /// <param name="scanType"></param>
         /// <param name="scanIndex"></param>
-        public void AddMasterScanEntry(ScanTypeConstants eScanType, int scanIndex)
+        public void AddMasterScanEntry(ScanTypeConstants scanType, int scanIndex)
         {
-            if (eScanType == ScanTypeConstants.SurveyScan)
+            if (scanType == ScanTypeConstants.SurveyScan)
             {
                 if (SurveyScans.Count > 0 && scanIndex < SurveyScans.Count)
                 {
-                    AddMasterScanEntry(eScanType, scanIndex, SurveyScans[scanIndex].ScanNumber, SurveyScans[scanIndex].ScanTime);
+                    AddMasterScanEntry(scanType, scanIndex, SurveyScans[scanIndex].ScanNumber, SurveyScans[scanIndex].ScanTime);
                 }
                 else
                 {
                     // This code shouldn't normally be reached
-                    ReportMessage($"Error in AddMasterScanEntry for ScanType {eScanType}, Survey ScanIndex {scanIndex}: index is out of range");
-                    AddMasterScanEntry(eScanType, scanIndex, 0, 0);
+                    ReportMessage($"Error in AddMasterScanEntry for ScanType {scanType}, Survey ScanIndex {scanIndex}: index is out of range");
+                    AddMasterScanEntry(scanType, scanIndex, 0, 0);
                 }
             }
-            else if (eScanType == ScanTypeConstants.FragScan)
+            else if (scanType == ScanTypeConstants.FragScan)
             {
                 if (FragScans.Count > 0 && scanIndex < FragScans.Count)
                 {
-                    AddMasterScanEntry(eScanType, scanIndex, FragScans[scanIndex].ScanNumber, FragScans[scanIndex].ScanTime);
+                    AddMasterScanEntry(scanType, scanIndex, FragScans[scanIndex].ScanNumber, FragScans[scanIndex].ScanTime);
                 }
                 else
                 {
                     // This code shouldn't normally be reached
-                    AddMasterScanEntry(eScanType, scanIndex, 0, 0);
-                    ReportMessage($"Error in AddMasterScanEntry for ScanType {eScanType}, Fragmentation ScanIndex {scanIndex}: index is out of range");
+                    AddMasterScanEntry(scanType, scanIndex, 0, 0);
+                    ReportMessage($"Error in AddMasterScanEntry for ScanType {scanType}, Fragmentation ScanIndex {scanIndex}: index is out of range");
                 }
             }
             else
             {
                 // Unknown type; cannot add
-                ReportError("Programming error: unknown value for eScanType: " + eScanType);
+                ReportError("Programming error: unknown value for scanType: " + scanType);
             }
         }
 
         /// <summary>
         /// Adds a new entry to .MasterScanOrder, .MasterScanNumList and, .MasterScanTimeList
         /// </summary>
-        /// <param name="eScanType"></param>
+        /// <param name="scanType"></param>
         /// <param name="scanIndex"></param>
         /// <param name="scanNumber"></param>
         /// <param name="scanTime"></param>
         public void AddMasterScanEntry(
-            ScanTypeConstants eScanType,
+            ScanTypeConstants scanType,
             int scanIndex,
             int scanNumber,
             float scanTime)
         {
             var newScanEntry = new ScanOrderPointerType()
             {
-                ScanType = eScanType,
+                ScanType = scanType,
                 ScanIndexPointer = scanIndex
             };
 

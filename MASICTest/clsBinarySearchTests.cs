@@ -18,7 +18,7 @@ namespace MASICTest
         [TestCase(clsBinarySearch.eMissingDataModeConstants.ReturnClosestPoint)]
         [TestCase(clsBinarySearch.eMissingDataModeConstants.ReturnPreviousPoint)]
         [TestCase(clsBinarySearch.eMissingDataModeConstants.ReturnNextPoint)]
-        public void TestSearchFunctionsInt(clsBinarySearch.eMissingDataModeConstants eMissingDataMode)
+        public void TestSearchFunctionsInt(clsBinarySearch.eMissingDataModeConstants missingDataMode)
         {
             try
             {
@@ -40,7 +40,7 @@ namespace MASICTest
                 // C:\Users\username\AppData\Local\JetBrains\Installations\ReSharperPlatformVs15\BinarySearch_Test_Int.txt
 
                 var outputFolderPath = GetOutputFolderPath();
-                var outputFile = new FileInfo(Path.Combine(outputFolderPath, "BinarySearch_Test_Int_" + eMissingDataMode + ".txt"));
+                var outputFile = new FileInfo(Path.Combine(outputFolderPath, "BinarySearch_Test_Int_" + missingDataMode + ".txt"));
 
                 using (var writer = new StreamWriter(outputFile.FullName, false))
                 {
@@ -69,7 +69,7 @@ namespace MASICTest
                         var indexMatch = clsBinarySearch.BinarySearchFindNearest(
                             dataPoints,
                             dataPointToFind,
-                            eMissingDataMode);
+                            missingDataMode);
 
                         searchResults.Add(dataPointToFind, dataPoints[indexMatch]);
 
@@ -77,7 +77,7 @@ namespace MASICTest
                     }
 
                     // Verify some of the results
-                    switch (eMissingDataMode)
+                    switch (missingDataMode)
                     {
                         case clsBinarySearch.eMissingDataModeConstants.ReturnClosestPoint:
                             Assert.AreEqual(searchResults[10], 8);
@@ -119,7 +119,7 @@ namespace MASICTest
         [TestCase(clsBinarySearch.eMissingDataModeConstants.ReturnClosestPoint)]
         [TestCase(clsBinarySearch.eMissingDataModeConstants.ReturnPreviousPoint)]
         [TestCase(clsBinarySearch.eMissingDataModeConstants.ReturnNextPoint)]
-        public void TestSearchFunctionsDbl(clsBinarySearch.eMissingDataModeConstants eMissingDataMode)
+        public void TestSearchFunctionsDbl(clsBinarySearch.eMissingDataModeConstants missingDataMode)
         {
             try
             {
@@ -141,7 +141,7 @@ namespace MASICTest
                 // C:\Users\username\AppData\Local\JetBrains\Installations\ReSharperPlatformVs15\BinarySearch_Test_Int.txt
 
                 var outputFolderPath = GetOutputFolderPath();
-                var outputFile = new FileInfo(Path.Combine(outputFolderPath, "BinarySearch_Test_Double_" + eMissingDataMode + ".txt"));
+                var outputFile = new FileInfo(Path.Combine(outputFolderPath, "BinarySearch_Test_Double_" + missingDataMode + ".txt"));
 
                 using (var writer = new StreamWriter(outputFile.FullName, false))
                 {
@@ -168,14 +168,14 @@ namespace MASICTest
                     for (var index = searchValueStart; index <= searchValueEnd; index++)
                     {
                         var dataPointToFind = index + index / 10.0;
-                        var indexMatch = clsBinarySearch.BinarySearchFindNearest(dataPoints, dataPointToFind, eMissingDataMode);
+                        var indexMatch = clsBinarySearch.BinarySearchFindNearest(dataPoints, dataPointToFind, missingDataMode);
                         searchResults.Add(dataPointToFind, dataPoints[indexMatch]);
 
                         writer.WriteLine("{0}\t{1}\t{2}", dataPointToFind, dataPoints[indexMatch], indexMatch);
                     }
 
                     // Verify some of the results
-                    switch (eMissingDataMode)
+                    switch (missingDataMode)
                     {
                         case clsBinarySearch.eMissingDataModeConstants.ReturnClosestPoint:
                             Assert.AreEqual(searchResults[23.1], 20.69693846, 1E-06);

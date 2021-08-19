@@ -245,36 +245,36 @@ namespace MASIC
         }
 
         /// <summary>
-        /// Get the default reporter ions, using the default reporter ion m/z tolerance (customized based on eReporterIonMassMode)
+        /// Get the default reporter ions, using the default reporter ion m/z tolerance (customized based on reporterIonMassMode)
         /// </summary>
-        /// <param name="eReporterIonMassMode"></param>
-        public static List<clsReporterIonInfo> GetDefaultReporterIons(ReporterIonMassModeConstants eReporterIonMassMode)
+        /// <param name="reporterIonMassMode"></param>
+        public static List<clsReporterIonInfo> GetDefaultReporterIons(ReporterIonMassModeConstants reporterIonMassMode)
         {
-            return eReporterIonMassMode switch
+            return reporterIonMassMode switch
             {
                 ReporterIonMassModeConstants.TMTSixMZ =>
-                    GetDefaultReporterIons(eReporterIonMassMode, REPORTER_ION_TOLERANCE_DA_DEFAULT_TMT6),
+                    GetDefaultReporterIons(reporterIonMassMode, REPORTER_ION_TOLERANCE_DA_DEFAULT_TMT6),
                 ReporterIonMassModeConstants.TMTTenMZ or ReporterIonMassModeConstants.TMTElevenMZ or ReporterIonMassModeConstants.TMTSixteenMZ =>
-                    GetDefaultReporterIons(eReporterIonMassMode, REPORTER_ION_TOLERANCE_DA_DEFAULT_TMT10),
+                    GetDefaultReporterIons(reporterIonMassMode, REPORTER_ION_TOLERANCE_DA_DEFAULT_TMT10),
                 ReporterIonMassModeConstants.ITraqEightMZHighRes =>
-                    GetDefaultReporterIons(eReporterIonMassMode, REPORTER_ION_TOLERANCE_DA_DEFAULT_ITRAQ8_HIGH_RES),
+                    GetDefaultReporterIons(reporterIonMassMode, REPORTER_ION_TOLERANCE_DA_DEFAULT_ITRAQ8_HIGH_RES),
                 _ =>
-                    GetDefaultReporterIons(eReporterIonMassMode, REPORTER_ION_TOLERANCE_DA_DEFAULT)
+                    GetDefaultReporterIons(reporterIonMassMode, REPORTER_ION_TOLERANCE_DA_DEFAULT)
             };
         }
 
         /// <summary>
         /// Get the reporter ion m/z values for the given reporter ion mass mode
         /// </summary>
-        /// <param name="eReporterIonMassMode"></param>
+        /// <param name="reporterIonMassMode"></param>
         /// <param name="mzToleranceDa"></param>
         public static List<clsReporterIonInfo> GetDefaultReporterIons(
-            ReporterIonMassModeConstants eReporterIonMassMode,
+            ReporterIonMassModeConstants reporterIonMassMode,
             double mzToleranceDa)
         {
             var reporterIons = new List<clsReporterIonInfo>(16); // largest count is 16
 
-            switch (eReporterIonMassMode)
+            switch (reporterIonMassMode)
             {
                 case ReporterIonMassModeConstants.ITraqFourMZ:
                     // ITRAQ, aka iTRAQ4
@@ -483,10 +483,10 @@ namespace MASIC
         /// <summary>
         /// Get a description of the given reporter ion mode
         /// </summary>
-        /// <param name="eReporterIonMode"></param>
-        public static string GetReporterIonModeDescription(ReporterIonMassModeConstants eReporterIonMode)
+        /// <param name="reporterIonMode"></param>
+        public static string GetReporterIonModeDescription(ReporterIonMassModeConstants reporterIonMode)
         {
-            return eReporterIonMode switch
+            return reporterIonMode switch
             {
                 ReporterIonMassModeConstants.CustomOrNone => "Custom/None",
                 ReporterIonMassModeConstants.ITraqFourMZ => "4-plex iTraq",
@@ -509,7 +509,7 @@ namespace MASIC
                 ReporterIonMassModeConstants.FSFACustomCarboxylic => "FSFA Custom Carboxylic (171.104, 234.058, 336.174 m/z)",
                 ReporterIonMassModeConstants.FSFACustomHydroxyl => "FSFA Custom Hydroxyl (151.063 and 166.087 m/z)",
                 ReporterIonMassModeConstants.Acetylation => "Acetylated K (126.091 and 143.118 m/z)",
-                _ => throw new ArgumentOutOfRangeException(nameof(eReporterIonMode), eReporterIonMode, null)
+                _ => throw new ArgumentOutOfRangeException(nameof(reporterIonMode), reporterIonMode, null)
             };
         }
 
@@ -530,38 +530,38 @@ namespace MASIC
         /// <summary>
         /// Set the reporter ion mass mode
         /// </summary>
-        /// <param name="eReporterIonMassMode"></param>
-        public void SetReporterIonMassMode(ReporterIonMassModeConstants eReporterIonMassMode)
+        /// <param name="reporterIonMassMode"></param>
+        public void SetReporterIonMassMode(ReporterIonMassModeConstants reporterIonMassMode)
         {
-            if (eReporterIonMassMode == ReporterIonMassModeConstants.ITraqEightMZHighRes)
+            if (reporterIonMassMode == ReporterIonMassModeConstants.ITraqEightMZHighRes)
             {
-                SetReporterIonMassMode(eReporterIonMassMode, REPORTER_ION_TOLERANCE_DA_DEFAULT_ITRAQ8_HIGH_RES);
+                SetReporterIonMassMode(reporterIonMassMode, REPORTER_ION_TOLERANCE_DA_DEFAULT_ITRAQ8_HIGH_RES);
             }
             else
             {
-                SetReporterIonMassMode(eReporterIonMassMode, REPORTER_ION_TOLERANCE_DA_DEFAULT);
+                SetReporterIonMassMode(reporterIonMassMode, REPORTER_ION_TOLERANCE_DA_DEFAULT);
             }
         }
 
         /// <summary>
         /// Set the reporter ion mass mode
         /// </summary>
-        /// <param name="eReporterIonMassMode"></param>
+        /// <param name="reporterIonMassMode"></param>
         /// <param name="mzToleranceDa"></param>
         public void SetReporterIonMassMode(
-            ReporterIonMassModeConstants eReporterIonMassMode,
+            ReporterIonMassModeConstants reporterIonMassMode,
             double mzToleranceDa)
         {
-            // Note: If eReporterIonMassMode = ReporterIonMassModeConstants.CustomOrNone then nothing is changed
+            // Note: If reporterIonMassMode = ReporterIonMassModeConstants.CustomOrNone then nothing is changed
 
-            if (eReporterIonMassMode != ReporterIonMassModeConstants.CustomOrNone)
+            if (reporterIonMassMode != ReporterIonMassModeConstants.CustomOrNone)
             {
                 ReporterIonToleranceDaDefault = mzToleranceDa;
 
-                var reporterIonInfo = GetDefaultReporterIons(eReporterIonMassMode, mzToleranceDa);
+                var reporterIonInfo = GetDefaultReporterIons(reporterIonMassMode, mzToleranceDa);
 
                 SetReporterIons(reporterIonInfo, false);
-                mReporterIonMassMode = eReporterIonMassMode;
+                mReporterIonMassMode = reporterIonMassMode;
             }
         }
 

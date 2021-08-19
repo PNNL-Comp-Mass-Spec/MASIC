@@ -1687,7 +1687,7 @@ namespace MASICBrowser
             try
             {
                 // Initialize the stream reader and the XML Text Reader
-                CurrentXMLDataFileSectionConstants eCurrentXMLDataFileSection;
+                CurrentXMLDataFileSectionConstants currentXMLDataFileSection;
                 using (var reader = new StreamReader(filePath))
                 using (var xmlReader = new XmlTextReader(reader))
                 {
@@ -1698,7 +1698,7 @@ namespace MASICBrowser
                     // Initialize mParentIonStats
                     mParentIonStats.Clear();
 
-                    eCurrentXMLDataFileSection = CurrentXMLDataFileSectionConstants.UnknownFile;
+                    currentXMLDataFileSection = CurrentXMLDataFileSectionConstants.UnknownFile;
                     var validParentIon = false;
 
                     while (xmlReader.Read())
@@ -1713,7 +1713,7 @@ namespace MASICBrowser
                                 switch (xmlReader.Name)
                                 {
                                     case "ParentIon":
-                                        eCurrentXMLDataFileSection = CurrentXMLDataFileSectionConstants.ParentIons;
+                                        currentXMLDataFileSection = CurrentXMLDataFileSectionConstants.ParentIons;
                                         validParentIon = false;
 
                                         if (xmlReader.HasAttributes)
@@ -1774,7 +1774,7 @@ namespace MASICBrowser
                                         break;
 
                                     case "SICData":
-                                        eCurrentXMLDataFileSection = CurrentXMLDataFileSectionConstants.Start;
+                                        currentXMLDataFileSection = CurrentXMLDataFileSectionConstants.Start;
                                         break;
                                     case "ProcessingSummary":
                                         xmlReader.Skip();
@@ -1783,7 +1783,7 @@ namespace MASICBrowser
                                         xmlReader.Skip();
                                         break;
                                     case "SICOptions":
-                                        eCurrentXMLDataFileSection = CurrentXMLDataFileSectionConstants.Options;
+                                        currentXMLDataFileSection = CurrentXMLDataFileSectionConstants.Options;
                                         break;
                                     case "ProcessingStats":
                                         xmlReader.Skip();
@@ -2006,9 +2006,9 @@ namespace MASICBrowser
                             }
                         }
 
-                        if (eCurrentXMLDataFileSection != CurrentXMLDataFileSectionConstants.UnknownFile && xmlReader.NodeType == XmlNodeType.Element)
+                        if (currentXMLDataFileSection != CurrentXMLDataFileSectionConstants.UnknownFile && xmlReader.NodeType == XmlNodeType.Element)
                         {
-                            switch (eCurrentXMLDataFileSection)
+                            switch (currentXMLDataFileSection)
                             {
                                 case CurrentXMLDataFileSectionConstants.Options:
                                     try
@@ -2235,7 +2235,7 @@ namespace MASICBrowser
 
                 FindSimilarParentIon(similarIonMZToleranceHalfWidth * 2, progressForm);
 
-                if (eCurrentXMLDataFileSection == CurrentXMLDataFileSectionConstants.UnknownFile)
+                if (currentXMLDataFileSection == CurrentXMLDataFileSectionConstants.UnknownFile)
                 {
                     MessageBox.Show("Root element 'SICData' not found in the input file: " + Environment.NewLine + filePath, "Invalid File Format", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 }
@@ -2690,7 +2690,7 @@ namespace MASICBrowser
         /// </summary>
         private void SortData()
         {
-            SortOrderConstants eSortMode;
+            SortOrderConstants sortMode;
 
             var scanNumberSaved = 0;
 
@@ -2722,11 +2722,11 @@ namespace MASICBrowser
 
             if (cboSortOrder.SelectedIndex is >= 0 and < SORT_ORDER_MODE_COUNT)
             {
-                eSortMode = (SortOrderConstants)cboSortOrder.SelectedIndex;
+                sortMode = (SortOrderConstants)cboSortOrder.SelectedIndex;
             }
             else
             {
-                eSortMode = SortOrderConstants.SortByScanPeakCenter;
+                sortMode = SortOrderConstants.SortByScanPeakCenter;
             }
 
             if (chkFilterByIntensity.Checked && PRISM.DataUtils.StringToValueUtils.IsNumber(txtMinimumIntensity.Text))
@@ -2759,7 +2759,7 @@ namespace MASICBrowser
                 minimumSN = double.MinValue;
             }
 
-            switch (eSortMode)
+            switch (sortMode)
             {
                 case SortOrderConstants.SortByPeakIndex:
                     for (var index = 0; index < mParentIonStats.Count; index++)
