@@ -2391,16 +2391,7 @@ namespace MASICPeakFinder
 
                 do
                 {
-                    bool testingMinimumPeakWidth;
-
-                    if (peakData.PeakWidthPointsMinimum == MINIMUM_PEAK_WIDTH)
-                    {
-                        testingMinimumPeakWidth = true;
-                    }
-                    else
-                    {
-                        testingMinimumPeakWidth = false;
-                    }
+                    var testingMinimumPeakWidth = peakData.PeakWidthPointsMinimum == MINIMUM_PEAK_WIDTH;
 
                     try
                     {

@@ -71,14 +71,7 @@ namespace MASIC
                     {
                         if (surveyScan.SIMScan)
                         {
-                            if (surveyScan.SIMIndex == simIndex)
-                            {
-                                includeParentIon = true;
-                            }
-                            else
-                            {
-                                includeParentIon = false;
-                            }
+                            includeParentIon = surveyScan.SIMIndex == simIndex;
                         }
                         else
                         {
@@ -804,15 +797,8 @@ namespace MASIC
 
                 if (processSIMScans)
                 {
-                    if (scanList.SurveyScans[surveyScanIndex].SIMScan &&
-                        scanList.SurveyScans[surveyScanIndex].SIMIndex == simIndex)
-                    {
-                        useScan = true;
-                    }
-                    else
-                    {
-                        useScan = false;
-                    }
+                    useScan = scanList.SurveyScans[surveyScanIndex].SIMScan &&
+                              scanList.SurveyScans[surveyScanIndex].SIMIndex == simIndex;
                 }
                 else
                 {
@@ -1213,15 +1199,7 @@ namespace MASIC
                 if (scanIndexObserved < 0)
                     scanIndexObserved = 0;
 
-                bool processingMRMPeak;
-                if (currentParentIon.MRMDaughterMZ > 0)
-                {
-                    processingMRMPeak = true;
-                }
-                else
-                {
-                    processingMRMPeak = false;
-                }
+                var processingMRMPeak = currentParentIon.MRMDaughterMZ > 0;
 
                 var sicStats = currentParentIon.SICStats;
 

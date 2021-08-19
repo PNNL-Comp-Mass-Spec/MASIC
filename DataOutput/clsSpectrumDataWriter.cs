@@ -69,14 +69,7 @@ namespace MASIC.DataOutput
 
                 var spectrumExportCount = 0;
 
-                if (!mOptions.RawDataExportOptions.IncludeMSMS && mOptions.RawDataExportOptions.RenumberScans)
-                {
-                    mOptions.RawDataExportOptions.RenumberScans = true;
-                }
-                else
-                {
-                    mOptions.RawDataExportOptions.RenumberScans = false;
-                }
+                mOptions.RawDataExportOptions.RenumberScans = !mOptions.RawDataExportOptions.IncludeMSMS && mOptions.RawDataExportOptions.RenumberScans;
 
                 UpdateProgress(0, "Exporting raw data");
 
