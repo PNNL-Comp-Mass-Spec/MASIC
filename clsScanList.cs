@@ -9,17 +9,43 @@ namespace MASIC
     /// </summary>
     public class clsScanList : clsMasicEventNotifier
     {
+        /// <summary>
+        /// Scan types
+        /// </summary>
         public enum ScanTypeConstants
         {
+            /// <summary>
+            /// Survey scan
+            /// </summary>
             SurveyScan = 0,
+
+            /// <summary>
+            /// Fragmentation scan
+            /// </summary>
             FragScan = 1
         }
 
+        /// <summary>
+        /// Scan order pointer container
+        /// </summary>
         public struct ScanOrderPointerType
         {
+            /// <summary>
+            /// Scan type
+            /// </summary>
             public ScanTypeConstants ScanType;
-            public int ScanIndexPointer;                  // Pointer to entry into list clsScanList.SurveyScans or clsScanList.FragScans
 
+            /// <summary>
+            /// Scan index pointer
+            /// </summary>
+            /// <remarks>
+            /// Pointer to entry in .SurveyScans() or .FragScans()
+            /// </remarks>
+            public int ScanIndexPointer;
+
+            /// <summary>
+            /// Show the scan index value and scan type
+            /// </summary>
             public override string ToString()
             {
                 return ScanIndexPointer + ": " + ScanType;
@@ -63,7 +89,6 @@ namespace MASIC
         /// <summary>
         /// Number of items in MasterScanOrder
         /// </summary>
-        /// <returns></returns>
         public int MasterScanOrderCount => MasterScanOrder.Count;
 
         /// <summary>
@@ -74,13 +99,11 @@ namespace MASIC
         /// <summary>
         /// Will be true if SIM data is present
         /// </summary>
-        /// <returns></returns>
         public bool SIMDataPresent { get; set; }
 
         /// <summary>
         /// Will be true if MRM data is present
         /// </summary>
-        /// <returns></returns>
         public bool MRMDataPresent { get; set; }
 
         /// <summary>
@@ -98,6 +121,10 @@ namespace MASIC
             ParentIons = new List<clsParentIonInfo>(8);
         }
 
+        /// <summary>
+        /// Adds a fake (placeholder) survey scan with scan number 0 and scan time 0
+        /// </summary>
+        /// <returns>The index in SurveyScans() at which the new scan was added</returns>
         public int AddFakeSurveyScan()
         {
             const int scanNumber = 0;
@@ -107,7 +134,7 @@ namespace MASIC
         }
 
         /// <summary>
-        /// Adds a "fake" survey scan with the given scan number and scan time
+        /// Adds a fake (placeholder) survey scan with the given scan number and scan time
         /// </summary>
         /// <param name="scanNumber"></param>
         /// <param name="scanTime"></param>
@@ -127,10 +154,13 @@ namespace MASIC
             return surveyScanIndex;
         }
 
+        /// <summary>
+        /// Adds a new entry to .MasterScanOrder using an existing entry in SurveyScans() or FragScans()
+        /// </summary>
+        /// <param name="eScanType"></param>
+        /// <param name="scanIndex"></param>
         public void AddMasterScanEntry(ScanTypeConstants eScanType, int scanIndex)
         {
-            // Adds a new entry to .MasterScanOrder using an existing entry in SurveyScans() or FragScans()
-
             if (eScanType == ScanTypeConstants.SurveyScan)
             {
                 if (SurveyScans.Count > 0 && scanIndex < SurveyScans.Count)
@@ -164,6 +194,13 @@ namespace MASIC
             }
         }
 
+        /// <summary>
+        /// Adds a new entry to .MasterScanOrder, .MasterScanNumList and, .MasterScanTimeList
+        /// </summary>
+        /// <param name="eScanType"></param>
+        /// <param name="scanIndex"></param>
+        /// <param name="scanNumber"></param>
+        /// <param name="scanTime"></param>
         public void AddMasterScanEntry(
             ScanTypeConstants eScanType,
             int scanIndex,
@@ -249,6 +286,9 @@ namespace MASIC
             return surveyScan;
         }
 
+        /// <summary>
+        /// Clear all stored data
+        /// </summary>
         public void Initialize()
         {
             SurveyScans.Clear();

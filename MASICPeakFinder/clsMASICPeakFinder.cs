@@ -24,29 +24,96 @@ namespace MASICPeakFinder
         // Ignore Spelling: Butterworth, fwhm, Golay, pdf, prepend, Savitzky, unsmoothed
 
         public string PROGRAM_DATE = "November 25, 2020";
+        /// <summary>
+        /// Program date
+        /// </summary>
+        public string PROGRAM_DATE = "September 18, 2021";
 
-        public const int MINIMUM_PEAK_WIDTH = 3;                         // Width in points
+        /// <summary>
+        /// Minimum peak width, in points
+        /// </summary>
+        public const int MINIMUM_PEAK_WIDTH = 3;
 
+        /// <summary>
+        /// Noise threshold modes
+        /// </summary>
         public enum NoiseThresholdModes
         {
+            /// <summary>
+            /// Absolute intensity
+            /// </summary>
             AbsoluteThreshold = 0,
+
+            /// <summary>
+            /// Trimmed mean by abundance
+            /// </summary>
             TrimmedMeanByAbundance = 1,
+
+            /// <summary>
+            /// Trimmed mean by count
+            /// </summary>
             TrimmedMeanByCount = 2,
+
+            /// <summary>
+            /// Trimmed median by abundance
+            /// </summary>
             TrimmedMedianByAbundance = 3,
+
+            /// <summary>
+            /// Dual trimmed mean by abundance
+            /// </summary>
             DualTrimmedMeanByAbundance = 4,
+
+            /// <summary>
+            /// Mean of data near the peak
+            /// </summary>
             MeanOfDataInPeakVicinity = 5
         }
 
+        /// <summary>
+        /// T-test confidence levels
+        /// </summary>
         public enum TTestConfidenceLevelConstants
         {
             // ReSharper disable UnusedMember.Global
+            /// <summary>
+            /// 80%
+            /// </summary>
             Conf80Pct = 0,
+
+            /// <summary>
+            /// 90%
+            /// </summary>
             Conf90Pct = 1,
+
+            /// <summary>
+            /// 95%
+            /// </summary>
             Conf95Pct = 2,
+
+            /// <summary>
+            /// 98%
+            /// </summary>
             Conf98Pct = 3,
+
+            /// <summary>
+            /// 99%
+            /// </summary>
             Conf99Pct = 4,
+
+            /// <summary>
+            /// 99.5%
+            /// </summary>
             Conf99_5Pct = 5,
+
+            /// <summary>
+            /// 99.8%
+            /// </summary>
             Conf99_8Pct = 6,
+
+            /// <summary>
+            /// 99.9%
+            /// </summary>
             Conf99_9Pct = 7
             // ReSharper restore UnusedMember.Global
         }
@@ -62,11 +129,20 @@ namespace MASICPeakFinder
         private readonly double[] TTestConfidenceLevels = new[] { 1.886, 2.92, 4.303, 6.965, 9.925, 14.089, 22.327, 31.598 };
 
         // ReSharper disable once UnusedMember.Global
+        /// <summary>
+        /// Program date
+        /// </summary>
         public string ProgramDate => PROGRAM_DATE;
 
+        /// <summary>
+        /// Program version
+        /// </summary>
         public string ProgramVersion => GetVersionForExecutingAssembly();
 
         // ReSharper disable once UnusedMember.Global
+        /// <summary>
+        /// Status message
+        /// </summary>
         public string StatusMessage => mStatusMessage;
 
         /// <summary>
@@ -95,6 +171,14 @@ namespace MASICPeakFinder
             return BaselineAdjustArea(sicPeak.Area, sicPeak.BaselineNoiseStats.NoiseLevel, sicPeak.FWHMScanWidth, sicPeakWidthFullScans, allowNegativeValues);
         }
 
+        /// <summary>
+        /// Compute an updated peak area by adjusting for the baseline
+        /// </summary>
+        /// <param name="peakArea"></param>
+        /// <param name="baselineNoiseLevel"></param>
+        /// <param name="sicPeakFWHMScans"></param>
+        /// <param name="sicPeakWidthFullScans"></param>
+        /// <param name="allowNegativeValues"></param>
         public static double BaselineAdjustArea(
             double peakArea,
             double baselineNoiseLevel,
@@ -114,11 +198,22 @@ namespace MASICPeakFinder
         }
 
         // ReSharper disable once UnusedMember.Global
+        /// <summary>
+        /// Adjust the intensity of a SIC peak based on baseline noise stats
+        /// </summary>
+        /// <param name="sicPeak"></param>
+        /// <param name="allowNegativeValues"></param>
         public static double BaselineAdjustIntensity(clsSICStatsPeak sicPeak, bool allowNegativeValues)
         {
             return BaselineAdjustIntensity(sicPeak.MaxIntensityValue, sicPeak.BaselineNoiseStats.NoiseLevel, allowNegativeValues);
         }
 
+        /// <summary>
+        /// Adjust the intensity of a data point based on baseline noise stats
+        /// </summary>
+        /// <param name="rawIntensity"></param>
+        /// <param name="baselineNoiseLevel"></param>
+        /// <param name="allowNegativeValues"></param>
         public static double BaselineAdjustIntensity(
             double rawIntensity,
             double baselineNoiseLevel,
@@ -201,7 +296,7 @@ namespace MASICPeakFinder
             var success = false;
 
             // Examine the exclusion range.  If the exclusion range excludes all
-            // data to the left or right of the peak, then use a few data points anyway, even if this does include some of the peak
+            // data to the left or right of the peak, use a few data points anyway, even if this does include some of the peak
             if (exclusionIndexStart < indexStart + MINIMUM_PEAK_WIDTH)
             {
                 exclusionIndexStart = indexStart + MINIMUM_PEAK_WIDTH;
@@ -586,7 +681,7 @@ namespace MASICPeakFinder
             bool subtractBaselineNoise)
         {
             // Note: The calling function should have already populated sicPeak.MaxIntensityValue, plus .IndexMax, .IndexBaseLeft, and .IndexBaseRight
-            // If subtractBaselineNoise is True, then this function also uses sicPeak.BaselineNoiseStats....
+            // If subtractBaselineNoise is True, this function also uses sicPeak.BaselineNoiseStats....
             // Note: This function returns the FWHM value in units of scan number; it does not update the value stored in sicPeak
             // This function does, however, update sicPeak.IndexMax if it is not between sicPeak.IndexBaseLeft and sicPeak.IndexBaseRight
 
@@ -762,6 +857,9 @@ namespace MASICPeakFinder
         }
 
         // ReSharper disable once UnusedMember.Global
+        /// <summary>
+        /// Test ComputeKSStatistic
+        /// </summary>
         public void TestComputeKSStat()
         {
             var scanNumbers = new[] { 0, 4, 8, 12, 16, 20, 24, 28, 32, 36, 40 };
@@ -786,7 +884,7 @@ namespace MASICPeakFinder
             // c) Step through the remaining data and interpolate across gaps with intensities of 0 (linear interpolation)
             // d) Use this final data to compute the statistical moments and KS Statistic
 
-            // If less than 3 points remain with the above procedure, then use the 5 points centered around the peak maximum, non-baseline corrected data
+            // If less than 3 points remain with the above procedure, use the 5 points centered around the peak maximum, non-baseline corrected data
         }
 
         private double ComputeKSStatistic(
@@ -892,6 +990,14 @@ namespace MASICPeakFinder
             return ComputeTrimmedNoiseLevel(dataList, 0, dataCount - 1, baselineNoiseOptions, IGNORE_NON_POSITIVE_DATA, out baselineNoiseStats);
         }
 
+        /// <summary>
+        /// Compute the noise level based on the data near the peak
+        /// </summary>
+        /// <param name="dataCount"></param>
+        /// <param name="sicScanNumbers"></param>
+        /// <param name="sicIntensities"></param>
+        /// <param name="sicPeak"></param>
+        /// <param name="baselineNoiseOptions"></param>
         [Obsolete("Use the version that takes a List(Of clsSICDataPoint")]
         public bool ComputeNoiseLevelInPeakVicinity(
             int dataCount, int[] sicScanNumbers, double[] sicIntensities,
@@ -908,6 +1014,12 @@ namespace MASICPeakFinder
             return ComputeNoiseLevelInPeakVicinity(sicData, sicPeak, baselineNoiseOptions);
         }
 
+        /// <summary>
+        /// Compute the noise level based on the data near the peak
+        /// </summary>
+        /// <param name="sicData"></param>
+        /// <param name="sicPeak"></param>
+        /// <param name="baselineNoiseOptions"></param>
         public bool ComputeNoiseLevelInPeakVicinity(
             List<clsSICDataPoint> sicData,
             clsSICStatsPeak sicPeak,
@@ -957,7 +1069,7 @@ namespace MASICPeakFinder
                 indexEnd = sicData.Count - 1;
 
             // Compare indexStart to sicPeak.PreviousPeakFWHMPointRight
-            // If it is less than .PreviousPeakFWHMPointRight, then update accordingly
+            // If it is less than .PreviousPeakFWHMPointRight, update accordingly
             if (indexStart < sicPeak.PreviousPeakFWHMPointRight &&
                 sicPeak.PreviousPeakFWHMPointRight < sicPeak.IndexMax)
             {
@@ -966,7 +1078,7 @@ namespace MASICPeakFinder
                 if (indexStart < 0)
                     indexStart = 0;
 
-                // If not enough points, then alternately shift indexStart to the left 1 point and
+                // If not enough points, alternately shift indexStart to the left 1 point and
                 // indexBaseLeft to the right one point until we do have enough points
                 var shiftLeft = true;
                 while (indexBaseLeft - indexStart + 1 < NOISE_ESTIMATE_DATA_COUNT_MINIMUM)
@@ -991,7 +1103,7 @@ namespace MASICPeakFinder
             }
 
             // Compare indexEnd to sicPeak.NextPeakFWHMPointLeft
-            // If it is greater than .NextPeakFWHMPointLeft, then update accordingly
+            // If it is greater than .NextPeakFWHMPointLeft, update accordingly
             if (indexEnd >= sicPeak.NextPeakFWHMPointLeft &&
                 sicPeak.NextPeakFWHMPointLeft > sicPeak.IndexMax)
             {
@@ -1000,7 +1112,7 @@ namespace MASICPeakFinder
                 if (indexEnd >= sicData.Count)
                     indexEnd = sicData.Count - 1;
 
-                // If not enough points, then alternately shift indexEnd to the right 1 point and
+                // If not enough points, alternately shift indexEnd to the right 1 point and
                 // indexBaseRight to the left one point until we do have enough points
                 var shiftLeft = false;
                 while (indexEnd - indexBaseRight + 1 < NOISE_ESTIMATE_DATA_COUNT_MINIMUM)
@@ -1056,7 +1168,6 @@ namespace MASICPeakFinder
         /// <param name="sicIntensities">List of intensities</param>
         /// <param name="sicPeak"></param>
         /// <param name="fragScanNumber"></param>
-        /// <returns></returns>
         [Obsolete("Use the version that takes a List(Of clsSICDataPoint")]
         public bool ComputeParentIonIntensity(
             int dataCount,
@@ -1083,7 +1194,6 @@ namespace MASICPeakFinder
         /// <param name="sicData"></param>
         /// <param name="sicPeak"></param>
         /// <param name="fragScanNumber"></param>
-        /// <returns></returns>
         public bool ComputeParentIonIntensity(
             IList<clsSICDataPoint> sicData,
             clsSICStatsPeak sicPeak,
@@ -1107,7 +1217,7 @@ namespace MASICPeakFinder
                 {
                     // The fragmentation scan has the same scan number as the SIC scan just before it, or the SIC scan is greater than the fragmentation scan
                     // This shouldn't normally happen, but we'll account for the possibility anyway
-                    // If the data file only has MS spectra and no MS/MS spectra, and if the parent ion is a custom M/Z value, then this code will be reached
+                    // If the data file only has MS spectra and no MS/MS spectra, and if the parent ion is a custom M/Z value, this code will be reached
                     sicPeak.ParentIonIntensity = y1;
                 }
                 // We need to perform some interpolation to determine .ParentIonIntensity
@@ -1151,7 +1261,6 @@ namespace MASICPeakFinder
         /// </summary>
         /// <param name="sicData"></param>
         /// <param name="sicPeak"></param>
-        /// <returns></returns>
         /// <remarks>The calling function must populate sicPeak.IndexMax, sicPeak.IndexBaseLeft, and sicPeak.IndexBaseRight</remarks>
         private bool ComputeSICPeakArea(IList<clsSICDataPoint> sicData, clsSICStatsPeak sicPeak)
         {
@@ -1167,7 +1276,7 @@ namespace MASICPeakFinder
                 var intensities = new double[sicPeak.IndexBaseRight - sicPeak.IndexBaseLeft + 2 + 1];
 
                 // Define an intensity threshold of 5% of MaximumIntensity
-                // If the peak data is not flanked by points <= intensityThreshold, then we'll add them
+                // If the peak data is not flanked by points <= intensityThreshold, we'll add them
                 var intensityThreshold = sicData[sicPeak.IndexMax].Intensity * 0.05;
 
                 // Estimate the average scan interval between each data point
@@ -1327,7 +1436,7 @@ namespace MASICPeakFinder
 
                 // Contains values from sicData[x].ScanNumber
                 var scanNumbers = new int[Math.Max(dataCount, minimumDataCount) + 1 + 1];
-                // Contains values from sicData[x].Intensity subtracted by the baseline noise level; if the result is less than 0, then will contain 0
+                // Contains values from sicData[x].Intensity subtracted by the baseline noise level; if the result is less than 0, will contain 0
                 var intensities = new double[scanNumbers.Length];
                 var useRawDataAroundMaximum = false;
 
@@ -1599,7 +1708,7 @@ namespace MASICPeakFinder
                 // For the first moment (m1), need to sum: intensity times scan number.
                 // For each of the moments, need to subtract scanNumbers(0) from the scan numbers since
                 // statistical moments calculations are skewed if the first X value is not zero.
-                // When ScanDelta is > 1, then need to interpolate.
+                // When ScanDelta is > 1, we need to interpolate.
 
                 var moment1Sum = (scanNumbers[0] - scanNumbers[0]) * intensities[0];
                 for (var dataIndex = 1; dataIndex < dataCount; dataIndex++)
@@ -1655,7 +1764,7 @@ namespace MASICPeakFinder
 
                     // For the second moment (m2), need to sum: (ScanNumber - m1)^2 * Intensity
                     // For the third moment (m3), need to sum: (ScanNumber - m1)^3 * Intensity
-                    // When ScanDelta is > 1, then need to interpolate
+                    // When ScanDelta is > 1, we need to interpolate
                     var moment2Sum = Math.Pow(scanNumbers[0] - centerOfMassDecimal, 2) * intensities[0];
                     var moment3Sum = Math.Pow(scanNumbers[0] - centerOfMassDecimal, 3) * intensities[0];
                     for (var dataIndex = 1; dataIndex < dataCount; dataIndex++)
@@ -1737,6 +1846,11 @@ namespace MASICPeakFinder
             return true;
         }
 
+        /// <summary>
+        /// Compute the signal to noise ratio
+        /// </summary>
+        /// <param name="signal"></param>
+        /// <param name="noiseThresholdIntensity"></param>
         public static double ComputeSignalToNoise(double signal, double noiseThresholdIntensity)
         {
             if (noiseThresholdIntensity > 0)
@@ -1750,7 +1864,7 @@ namespace MASICPeakFinder
         /// <summary>
         /// Computes a trimmed mean or trimmed median using the low intensity data up to baselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage
         /// Additionally, computes a full median using all data in dataList
-        /// If ignoreNonPositiveData is True, then removes data from dataList() less than zero 0 and less than .MinimumBaselineNoiseLevel
+        /// If ignoreNonPositiveData is True, removes data from dataList() less than zero 0 and less than .MinimumBaselineNoiseLevel
         /// </summary>
         /// <param name="dataList"></param>
         /// <param name="indexStart"></param>
@@ -1998,7 +2112,6 @@ namespace MASICPeakFinder
         /// <param name="sicPeak"></param>
         /// <param name="sicData"></param>
         /// <param name="sigmaValueForBase"></param>
-        /// <returns></returns>
         private static int ComputeWidthAtBaseUsingFWHM(
             clsSICStatsPeak sicPeak,
             IList<clsSICDataPoint> sicData,
@@ -2021,7 +2134,6 @@ namespace MASICPeakFinder
         /// <param name="sicPeakFWHMScans"></param>
         /// <param name="sicPeakWidthFullScans"></param>
         /// <param name="sigmaValueForBase"></param>
-        /// <returns></returns>
         /// <remarks>Does not allow the width determined to be larger than sicPeakWidthFullScans</remarks>
         private static int ComputeWidthAtBaseUsingFWHM(
             int sicPeakFWHMScans,
@@ -2068,7 +2180,6 @@ namespace MASICPeakFinder
         /// <param name="peakWidthBaseScans"></param>
         /// <param name="sicPeak"></param>
         /// <param name="sicData"></param>
-        /// <returns></returns>
         private int ConvertScanWidthToPoints(
             int peakWidthBaseScans,
             clsSICStatsPeak sicPeak,
@@ -2083,7 +2194,6 @@ namespace MASICPeakFinder
         /// </summary>
         /// <param name="sicData"></param>
         /// <param name="absoluteMinimumValue"></param>
-        /// <returns></returns>
         public double FindMinimumPositiveValue(IList<clsSICDataPoint> sicData, double absoluteMinimumValue)
         {
             var minimumPositiveValue = (from item in sicData where item.Intensity > 0 select item.Intensity).DefaultIfEmpty(absoluteMinimumValue).Min();
@@ -2100,7 +2210,6 @@ namespace MASICPeakFinder
         /// </summary>
         /// <param name="dataList"></param>
         /// <param name="absoluteMinimumValue"></param>
-        /// <returns></returns>
         public double FindMinimumPositiveValue(IList<double> dataList, double absoluteMinimumValue)
         {
             var minimumPositiveValue = (from item in dataList where item > 0 select item).DefaultIfEmpty(absoluteMinimumValue).Min();
@@ -2118,7 +2227,6 @@ namespace MASICPeakFinder
         /// <param name="dataCount"></param>
         /// <param name="dataList"></param>
         /// <param name="absoluteMinimumValue"></param>
-        /// <returns></returns>
         /// <remarks>
         /// Does not use dataList.Length to determine the length of the list; uses dataCount
         /// However, if dataCount is > dataList.Length, dataList.Length-1 will be used for the maximum index to examine
@@ -2317,7 +2425,7 @@ namespace MASICPeakFinder
                     if (validPeakFound)
                     {
                         // For each peak, see if several zero intensity values are in a row in the raw data
-                        // If found, then narrow the peak to leave just one zero intensity value
+                        // If found, narrow the peak to leave just one zero intensity value
                         foreach (var currentPeak in peakData.Peaks)
                         {
                             while (currentPeak.LeftEdge < sicData.Count - 1 &&
@@ -2547,7 +2655,7 @@ namespace MASICPeakFinder
                         }
                     }
                     // No peaks or no peaks containing .OriginalPeakLocationIndex
-                    // If peakData.PeakWidthPointsMinimum is greater than 3 and testingMinimumPeakWidth = False, then decrement it by 50%
+                    // If peakData.PeakWidthPointsMinimum is greater than 3 and testingMinimumPeakWidth = False, decrement it by 50%
                     else if (peakData.PeakWidthPointsMinimum > MINIMUM_PEAK_WIDTH && !testingMinimumPeakWidth)
                     {
                         peakData.PeakWidthPointsMinimum = (int)Math.Floor(peakData.PeakWidthPointsMinimum / 2.0);
@@ -2605,7 +2713,7 @@ namespace MASICPeakFinder
             var errorMessage = string.Empty;
 
             // Smooth the Y data, and store in peaksContainer.SmoothedYData
-            // Note that if using a Butterworth filter, then we increase peaksContainer.PeakWidthPointsMinimum if too small, compared to 1/SamplingFrequency
+            // Note that if using a Butterworth filter, we increase peaksContainer.PeakWidthPointsMinimum if too small, compared to 1/SamplingFrequency
             var peakWidthPointsMinimum = peaksContainer.PeakWidthPointsMinimum;
             var dataIsSmoothed = FindPeaksWorkSmoothData(
                 peaksContainer, simDataPresent,
@@ -2709,7 +2817,7 @@ namespace MASICPeakFinder
 
                 // See if the peak boundaries (left and right edges) need to be narrowed or expanded
                 // Do this by stepping left or right while the intensity is decreasing.  If an increase is found, but the
-                // next point after the increasing point is less than the current point, then possibly keep stepping; the
+                // next point after the increasing point is less than the current point, possibly keep stepping; the
                 // test for whether to keep stepping is that the next point away from the increasing point must be less
                 // than the current point.  If this is the case, replace the increasing point with the average of the
                 // current point and the point two points away
@@ -2882,9 +2990,9 @@ namespace MASICPeakFinder
                 peakItem.PeakIsValid = true;
                 if (returnClosestPeak)
                 {
-                    // If peaksContainer.OriginalPeakLocationIndex is not between peakIndexStart and peakIndexEnd, then check
+                    // If peaksContainer.OriginalPeakLocationIndex is not between peakIndexStart and peakIndexEnd, check
                     // if the scan number for peaksContainer.OriginalPeakLocationIndex is within .MaxDistanceScansNoOverlap scans of
-                    // either of the peak edges; if not, then mark the peak as invalid since it does not contain the
+                    // either of the peak edges; if not, mark the peak as invalid since it does not contain the
                     // scan for the parent ion
                     if (peaksContainer.OriginalPeakLocationIndex < peakIndexStart)
                     {
@@ -3021,6 +3129,13 @@ namespace MASICPeakFinder
             return false;
         }
 
+        /// <summary>
+        /// Compute the potential peak area for a given list of intensity values
+        /// </summary>
+        /// <param name="dataCount"></param>
+        /// <param name="sicIntensities"></param>
+        /// <param name="potentialAreaStats"></param>
+        /// <param name="sicPeakFinderOptions"></param>
         public void FindPotentialPeakArea(
             int dataCount,
             IReadOnlyList<double> sicIntensities,
@@ -3073,7 +3188,7 @@ namespace MASICPeakFinder
 
                 foreach (var dataPoint in sicData)
                 {
-                    // If this data point is > .MinimumBaselineNoiseLevel, then add this intensity to potentialPeakArea
+                    // If this data point is > .MinimumBaselineNoiseLevel, add this intensity to potentialPeakArea
                     // and increment validPeakCount
                     var intensityToUse = Math.Max(minimumPositiveValue, dataPoint.Intensity);
                     if (intensityToUse >= sicPeakFinderOptions.SICBaselineNoiseOptions.MinimumBaselineNoiseLevel)
@@ -3085,7 +3200,7 @@ namespace MASICPeakFinder
                     if (intensityQueue.Count >= sicPeakFinderOptions.InitialPeakWidthScansMaximum)
                     {
                         // Decrement potentialPeakArea by the oldest item in the queue
-                        // If that item is >= .MinimumBaselineNoiseLevel, then decrement validPeakCount too
+                        // If that item is >= .MinimumBaselineNoiseLevel, decrement validPeakCount too
                         var oldestIntensity = intensityQueue.Dequeue();
 
                         if (oldestIntensity >= sicPeakFinderOptions.SICBaselineNoiseOptions.MinimumBaselineNoiseLevel && oldestIntensity > 0)
@@ -3181,7 +3296,6 @@ namespace MASICPeakFinder
         /// <param name="returnClosestPeak"></param>
         /// <param name="simDataPresent">Set to true if Select Ion Monitoring data is present and there are thus large gaps in the survey scan numbers</param>
         /// <param name="recomputeNoiseLevel"></param>
-        /// <returns></returns>
         /// <remarks>
         /// The calling function should populate sicPeak.IndexObserved with the index in SICData() where the
         /// parent ion m/z was actually observed; this will be used as the default peak location if a peak cannot be found
@@ -3206,7 +3320,7 @@ namespace MASICPeakFinder
                 FindPotentialPeakArea(sicData, out potentialAreaStatsForPeak, sicPeakFinderOptions);
 
                 // See if the potential peak area for this SIC is lower than the values for the Region
-                // If so, then update the region values with this peak's values
+                // If so, update the region values with this peak's values
                 if (potentialAreaStatsForPeak.MinimumPotentialPeakArea > 1 && potentialAreaStatsForPeak.PeakCountBasisForMinimumPotentialArea >= MINIMUM_PEAK_WIDTH)
                 {
                     if (potentialAreaStatsForPeak.PeakCountBasisForMinimumPotentialArea > potentialAreaStatsForRegion.PeakCountBasisForMinimumPotentialArea)
@@ -3325,8 +3439,8 @@ namespace MASICPeakFinder
                         //    }
                         //}
 
-                        // If smoothing was enabled, then see if the smoothed value is larger than sicPeak.MaxIntensityValue
-                        // If it is, then use the smoothed value for sicPeak.MaxIntensityValue
+                        // If smoothing was enabled, see if the smoothed value is larger than sicPeak.MaxIntensityValue
+                        // If it is, use the smoothed value for sicPeak.MaxIntensityValue
                         if (sicPeakFinderOptions.UseSavitzkyGolaySmooth || sicPeakFinderOptions.UseButterworthSmooth)
                         {
                             var dataIndex = sicPeak.IndexMax - smoothedYDataSubset.DataStartIndex;
@@ -3379,6 +3493,9 @@ namespace MASICPeakFinder
             }
         }
 
+        /// <summary>
+        /// Get the default noise threshold options
+        /// </summary>
         public static clsBaselineNoiseOptions GetDefaultNoiseThresholdOptions()
         {
             var baselineNoiseOptions = new clsBaselineNoiseOptions
@@ -3395,6 +3512,9 @@ namespace MASICPeakFinder
             return baselineNoiseOptions;
         }
 
+        /// <summary>
+        /// Get the default peak finder options
+        /// </summary>
         public static clsSICPeakFinderOptions GetDefaultSICPeakFinderOptions()
         {
             var sicPeakFinderOptions = new clsSICPeakFinderOptions
@@ -3447,6 +3567,11 @@ namespace MASICPeakFinder
             }
         }
 
+        /// <summary>
+        /// Initialize the baseline noise stats
+        /// </summary>
+        /// <param name="minimumBaselineNoiseLevel"></param>
+        /// <param name="noiseThresholdMode"></param>
         public static clsBaselineNoiseStats InitializeBaselineNoiseStats(
             double minimumBaselineNoiseLevel,
             NoiseThresholdModes noiseThresholdMode)
@@ -3462,6 +3587,12 @@ namespace MASICPeakFinder
             return baselineNoiseStats;
         }
 
+        /// <summary>
+        /// Initialize the baseline noise stats
+        /// </summary>
+        /// <param name="baselineNoiseStats"></param>
+        /// <param name="minimumBaselineNoiseLevel"></param>
+        /// <param name="noiseThresholdMode"></param>
         [Obsolete("Use the version that returns baselineNoiseStatsType")]
         public static void InitializeBaselineNoiseStats(
             out clsBaselineNoiseStats baselineNoiseStats,
@@ -3513,7 +3644,6 @@ namespace MASICPeakFinder
         /// <param name="Y1"></param>
         /// <param name="Y2"></param>
         /// <param name="xValToInterpolate"></param>
-        /// <returns></returns>
         private bool InterpolateY(
             out double interpolatedIntensity,
             int X1, int X2,
@@ -3550,6 +3680,11 @@ namespace MASICPeakFinder
             }
         }
 
+        /// <summary>
+        /// Lookup noise stats for a given data point, using segment-based noise stats
+        /// </summary>
+        /// <param name="scanIndexObserved"></param>
+        /// <param name="noiseStatsSegments"></param>
         public clsBaselineNoiseStats LookupNoiseStatsUsingSegments(
             int scanIndexObserved,
             List<clsBaselineNoiseStatsSegment> noiseStatsSegments)

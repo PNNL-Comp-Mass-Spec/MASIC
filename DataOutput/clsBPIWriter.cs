@@ -6,6 +6,9 @@ using MASIC.Options;
 
 namespace MASIC.DataOutput
 {
+    /// <summary>
+    /// BPI Writer
+    /// </summary>
     public class clsBPIWriter : clsMasicEventNotifier
     {
         // ReSharper disable CommentTypo
@@ -29,17 +32,22 @@ namespace MASIC.DataOutput
             return PRISM.StringUtilities.DblToString(value, 2);
         }
 
+        /// <summary>
+        /// Save BPIs as an ICR-2LS compatible .TIC file (using only the MS1 scans),
+        /// plus two Decon2LS compatible .CSV files (one for the MS1 scans and one for the MS2, MS3, etc. scans)
+        /// </summary>
+        /// <param name="scanList"></param>
+        /// <param name="spectraCache"></param>
+        /// <param name="inputFilePathFull"></param>
+        /// <param name="outputDirectoryPath"></param>
+        /// <remarks>SaveExtendedScanStatsFiles() creates a tab-delimited text file with the BPI and TIC information for each scan</remarks>
+        /// <returns>True if success, false if an error</returns>
         public bool SaveBPIs(
             clsScanList scanList,
             clsSpectraCache spectraCache,
             string inputFilePathFull,
             string outputDirectoryPath)
         {
-            // This function creates an ICR-2LS compatible .TIC file (using only the MS1 scans), plus
-            // two Decon2LS compatible .CSV files (one for the MS1 scans and one for the MS2, MS3, etc. scans)
-
-            // Note: Note that SaveExtendedScanStatsFiles() creates a tab-delimited text file with the BPI and TIC information for each scan
-
             var currentFilePath = "_MS_scans.csv";
 
             try
@@ -246,6 +254,10 @@ namespace MASIC.DataOutput
             }
         }
 
+        /// <summary>
+        /// Write the header line for a _isos.csv file
+        /// </summary>
+        /// <param name="writer"></param>
         public void WriteDecon2LSIsosFileHeaders(StreamWriter writer)
         {
             // ReSharper disable once StringLiteralTypo
@@ -268,6 +280,22 @@ namespace MASIC.DataOutput
             writer.WriteLine(string.Join(", ", headerNames));
         }
 
+        /// <summary>
+        /// Append a data line to the _isos.csv file
+        /// </summary>
+        /// <param name="writer"></param>
+        /// <param name="scanNumber"></param>
+        /// <param name="charge"></param>
+        /// <param name="intensity"></param>
+        /// <param name="ionMZ"></param>
+        /// <param name="isoFit"></param>
+        /// <param name="averageMass"></param>
+        /// <param name="monoisotopicMass"></param>
+        /// <param name="mostAbundantMass"></param>
+        /// <param name="peakFWHM"></param>
+        /// <param name="signalToNoise"></param>
+        /// <param name="monoisotopicAbu"></param>
+        /// <param name="monoPlus2Abu"></param>
         public void WriteDecon2LSIsosFileEntry(
             StreamWriter writer,
             int scanNumber,
@@ -302,6 +330,10 @@ namespace MASIC.DataOutput
             writer.WriteLine(string.Join(",", dataValues));
         }
 
+        /// <summary>
+        /// Write the header line to the _scans.csv file
+        /// </summary>
+        /// <param name="writer"></param>
         public void WriteDecon2LSScanFileHeaders(StreamWriter writer)
         {
             // Old Headers:      "scan_num,time,type,num_isotopic_signatures,num_peaks,tic,bpi_mz,bpi,time_domain_signal,peak_intensity_threshold,peptide_intensity_threshold")
@@ -354,6 +386,15 @@ namespace MASIC.DataOutput
             WriteDecon2LSScanFileEntry(writer, currentScan, scanNumber, msLevel, numPeaks, numIsotopicSignatures);
         }
 
+        /// <summary>
+        /// Append a data line to the _scans.csv file
+        /// </summary>
+        /// <param name="writer"></param>
+        /// <param name="currentScan"></param>
+        /// <param name="scanNumber"></param>
+        /// <param name="msLevel"></param>
+        /// <param name="numPeaks"></param>
+        /// <param name="numIsotopicSignatures"></param>
         public void WriteDecon2LSScanFileEntry(
             StreamWriter writer,
             clsScanInfo currentScan,

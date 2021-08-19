@@ -4,6 +4,10 @@ using PRISM;
 
 namespace MASIC
 {
+    /// <summary>
+    /// This class looks for ions in a given m/z range and combines their intensity values
+    /// (reporting either the summed value or the maximum value)
+    /// </summary>
     public class clsDataAggregation : EventNotifier
     {
         // Ignore Spelling: uncaching

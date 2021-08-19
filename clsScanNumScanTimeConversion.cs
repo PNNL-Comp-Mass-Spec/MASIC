@@ -4,16 +4,18 @@ using PRISM;
 
 namespace MASIC
 {
+    /// <summary>
+    /// Class for converting from scan number to acquisition time
+    /// </summary>
     public class clsScanNumScanTimeConversion : EventNotifier
     {
         /// <summary>
-        /// Find the index of the scan closest to scanOrAcqTime (searching both Survey and Frag Scans using the MasterScanList)
+        /// Find the index of the scan closest to scanOrAcqTime (searching both Survey and Fragmentation Scans using the MasterScanList)
         /// </summary>
         /// <param name="scanList"></param>
         /// <param name="scanOrAcqTime">can be absolute, relative, or AcquisitionTime</param>
         /// <param name="scanType">Specifies what type of value scanOrAcqTime is; 0=absolute, 1=relative, 2=acquisition time (aka elution time)</param>
         /// <returns>The index of the scan closest to scanOrAcqTime, or 0 if an error</returns>
-        /// <remarks></remarks>
         private int FindNearestScanNumIndex(
             clsScanList scanList,
             float scanOrAcqTime,
@@ -50,7 +52,6 @@ namespace MASIC
         /// <param name="scanList"></param>
         /// <param name="scanOrAcqTime">Scan or acquisition time</param>
         /// <param name="scanType">Type for scanOrAcqTime; should be Absolute, Relative, or AcquisitionTime</param>
-        /// <returns></returns>
         public int FindNearestSurveyScanIndex(
             clsScanList scanList,
             float scanOrAcqTime,
@@ -109,8 +110,6 @@ namespace MASIC
         /// <param name="scanOrAcqTime">Value to convert</param>
         /// <param name="scanType">Type of the value to convert; 0=Absolute, 1=Relative, 2=Acquisition Time (aka elution time)</param>
         /// <param name="convertingRangeOrTolerance">True when converting a range</param>
-        /// <returns></returns>
-        /// <remarks></remarks>
         public int ScanOrAcqTimeToAbsolute(
             clsScanList scanList,
             float scanOrAcqTime,
@@ -148,8 +147,8 @@ namespace MASIC
 
                     case clsCustomSICList.CustomSICScanTypeConstants.AcquisitionTime:
                         // scanOrAcqTime is an elution time value
-                        // If convertingRangeOrTolerance = False, then look for the scan that is nearest to scanOrAcqTime
-                        // If convertingRangeOrTolerance = True, then Convert scanOrAcqTime to a relative scan range and then
+                        // If convertingRangeOrTolerance = False, look for the scan that is nearest to scanOrAcqTime
+                        // If convertingRangeOrTolerance = True, convert scanOrAcqTime to a relative scan range and then
                         // call this function again with that relative time
 
                         if (convertingRangeOrTolerance)
@@ -198,7 +197,6 @@ namespace MASIC
         /// <param name="scanOrAcqTime"></param>
         /// <param name="scanType"></param>
         /// <param name="convertingRangeOrTolerance"></param>
-        /// <returns></returns>
         public float ScanOrAcqTimeToScanTime(
             clsScanList scanList,
             float scanOrAcqTime,

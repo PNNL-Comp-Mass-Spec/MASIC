@@ -1,5 +1,8 @@
 ﻿namespace MASIC.DatasetStats
 {
+    /// <summary>
+    /// Information about a given scan (spectrum)
+    /// </summary>
     public class ScanStatsEntry
     {
         // Ignore Spelling: centroiding
@@ -121,6 +124,9 @@
             MzMax = 0;
         }
 
+        /// <summary>
+        /// Show the scan number and scan filter
+        /// </summary>
         public override string ToString()
         {
             return string.Format("Scan {0}: {1}", ScanNumber, ScanFilterText);

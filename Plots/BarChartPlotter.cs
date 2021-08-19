@@ -10,8 +10,13 @@ using ColumnSeries = OxyPlot.Series.ColumnSeries;
 
 namespace MASIC.Plots
 {
+    /// <summary>
+    /// Bar chart plotter
+    /// </summary>
     public class BarChartPlotter : EventNotifier
     {
+        // Ignore Spelling: autoscale
+
         private readonly BarChartInfo mBarChart;
 
         private readonly bool mWriteDebug;
@@ -67,6 +72,11 @@ namespace MASIC.Plots
             Reset();
         }
 
+        /// <summary>
+        /// Add a single data point
+        /// </summary>
+        /// <param name="label"></param>
+        /// <param name="value"></param>
         public void AddData(string label, double value)
         {
             mBarChart.AddPoint(label, value);
@@ -309,7 +319,6 @@ namespace MASIC.Plots
         /// <param name="outputFilePath">Output: the full path to the .png file created by this method</param>
         /// <param name="yAxisMinimum"></param>
         /// <param name="yAxisMaximum"></param>
-        /// <returns></returns>
         public bool SavePlotFile(string datasetName, string outputDirectory, out string outputFilePath, int yAxisMinimum, int yAxisMaximum)
         {
             outputFilePath = string.Empty;

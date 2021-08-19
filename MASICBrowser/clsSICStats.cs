@@ -12,7 +12,6 @@ namespace MASICBrowser
         /// <summary>
         /// Scan number of the peak apex
         /// </summary>
-        /// <returns></returns>
         public int ScanNumberMaxIntensity { get; set; }
 
         public MASICPeakFinder.clsSICPotentialAreaStats SICPotentialAreaStatsForPeak { get; set; }

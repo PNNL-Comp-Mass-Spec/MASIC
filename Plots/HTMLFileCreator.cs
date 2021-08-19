@@ -34,7 +34,6 @@ namespace MASIC.Plots
         /// <summary>
         /// Create the index.html file in the directory the same directory as the first item in PlotFiles
         /// </summary>
-        /// <returns></returns>
         // ReSharper disable once UnusedMember.Global
         public bool CreateHTMLFile()
         {
@@ -45,7 +44,6 @@ namespace MASIC.Plots
         /// Create the index.html file in the specified directory
         /// </summary>
         /// <param name="outputDirectoryPath"></param>
-        /// <returns></returns>
         public bool CreateHTMLFile(string outputDirectoryPath)
         {
             try

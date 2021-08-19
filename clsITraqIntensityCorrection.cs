@@ -34,10 +34,24 @@ namespace MASIC
         private const int ELEVEN_PLEX_TMT_MATRIX_LENGTH = 11;
         private const int SIXTEEN_PLEX_TMT_MATRIX_LENGTH = 16;
 
+
+        /// <summary>
+        /// 4-plex iTRAQ correction factor type
+        /// </summary>
         public enum CorrectionFactorsiTRAQ4Plex
         {
+            /// <summary>
+            /// AB Sciex
+            /// </summary>
             ABSciex = 0,
-            BroadInstitute = 1          // Provided by Philipp Mertins at the Broad Institute (pmertins@broadinstitute.org)
+
+            /// <summary>
+            /// Broad Institute
+            /// </summary>
+            /// <remarks>
+            /// Provided by Philipp Mertins at the Broad Institute (pmertins@broadinstitute.org)
+            /// </remarks>
+            BroadInstitute = 1
         }
 
         private struct IsotopeContributionType
@@ -62,15 +76,20 @@ namespace MASIC
 
         private readonly MatrixDecompositionUtility.LUDecomposition mMatrixUtility;
 
+        /// <summary>
+        /// Reporter ion mode
+        /// </summary>
         public clsReporterIons.ReporterIonMassModeConstants ReporterIonMode { get; private set; }
 
+        /// <summary>
+        /// 4-plex iTRAQ correction factor type
+        /// </summary>
         public CorrectionFactorsiTRAQ4Plex ITraq4PlexCorrectionFactorType { get; private set; }
 
         /// <summary>
-        /// Constructor; assumes iTraqCorrectionFactorType = CorrectionFactorsiTRAQ4Plex.ABSciex
+        /// Constructor that assumes iTraqCorrectionFactorType = ABSciex
         /// </summary>
         /// <param name="eReporterIonMode">iTRAQ or TMT mode</param>
-        /// <remarks></remarks>
         public clsITraqIntensityCorrection(clsReporterIons.ReporterIonMassModeConstants eReporterIonMode)
             : this(eReporterIonMode, CorrectionFactorsiTRAQ4Plex.ABSciex)
         {
@@ -126,7 +145,6 @@ namespace MASIC
         /// </summary>
         /// <param name="reporterIonIntensities"></param>
         /// <param name="debugShowIntensities">When true, show the old and new reporter ion intensities at the console</param>
-        /// <returns></returns>
         public bool ApplyCorrection(float[] reporterIonIntensities, bool debugShowIntensities = false)
         {
             var dataCount = reporterIonIntensities.Length - 1;
@@ -155,7 +173,6 @@ namespace MASIC
         /// </summary>
         /// <param name="reporterIonIntensities"></param>
         /// <param name="debugShowIntensities">When true, show the old and new reporter ion intensities at the console</param>
-        /// <returns></returns>
         public bool ApplyCorrection(double[] reporterIonIntensities, bool debugShowIntensities = false)
         {
             var matrixSize = GetMatrixLength(ReporterIonMode);
@@ -923,7 +940,6 @@ namespace MASIC
         /// <param name="zero">Value between 0 and 100, but typically close to 98; if this is 0 or 100, it is auto-computed</param>
         /// <param name="plus1">Value between 0 and 100, but typically close to 0</param>
         /// <param name="plus2">Value between 0 and 100, but typically close to 0</param>
-        /// <returns></returns>
         /// <remarks>The values should sum to 100; however, if zero (aka the Monoisotopic Peak) is 0, its value will be auto-computed</remarks>
         private IsotopeContributionType DefineIsotopeContribution(
             float minus2,

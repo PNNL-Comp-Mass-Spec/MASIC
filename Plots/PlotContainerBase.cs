@@ -6,6 +6,9 @@ using PRISM.FileProcessor;
 
 namespace MASIC.Plots
 {
+    /// <summary>
+    /// Plot container base class
+    /// </summary>
     public abstract class PlotContainerBase : EventNotifier
     {
         // Ignore Spelling: yyyy-MM-dd hh:mm:ss
@@ -36,6 +39,9 @@ namespace MASIC.Plots
         /// </summary>
         public enum PlotCategories
         {
+            /// <summary>
+            /// Undefined
+            /// </summary>
             Undefined = 0,
 
             /// <summary>
@@ -57,16 +63,34 @@ namespace MASIC.Plots
             ReporterIonIntensityStats = 3
         }
 
+        /// <summary>
+        /// Log writer
+        /// </summary>
         protected StreamWriter mLogWriter;
 
+        /// <summary>
+        /// Bottom left annotation
+        /// </summary>
         public string AnnotationBottomLeft { get; set; }
 
+        /// <summary>
+        /// Bottom right annotation
+        /// </summary>
         public string AnnotationBottomRight { get; set; }
 
+        /// <summary>
+        /// Plot title
+        /// </summary>
         public string PlotTitle { get; set; }
 
+        /// <summary>
+        /// Plot category
+        /// </summary>
         public PlotCategories PlotCategory { get; protected set; }
 
+        /// <summary>
+        /// Series count
+        /// </summary>
         public abstract int SeriesCount { get; }
 
         /// <summary>
@@ -87,6 +111,10 @@ namespace MASIC.Plots
             }
         }
 
+        /// <summary>
+        /// Dispose of the log writer
+        /// </summary>
+        /// <param name="disposing"></param>
         protected virtual void Dispose(bool disposing)
         {
             mLogWriter?.Close();
@@ -114,6 +142,10 @@ namespace MASIC.Plots
             return string.Join(";", plotOptions);
         }
 
+        /// <summary>
+        /// Get the plot type based on the plot category
+        /// </summary>
+        /// <param name="plotCategory"></param>
         protected PlotTypes GetPlotTypeForCategory(PlotCategories plotCategory)
         {
             return plotCategory switch
@@ -125,6 +157,10 @@ namespace MASIC.Plots
             };
         }
 
+        /// <summary>
+        /// Open a debug log file
+        /// </summary>
+        /// <param name="dataSource"></param>
         protected void OpenDebugFile(string dataSource)
         {
             var appName = System.Reflection.Assembly.GetExecutingAssembly().GetName().Name;
@@ -152,8 +188,19 @@ namespace MASIC.Plots
                 mLogWriter.WriteLine();
         }
 
+        /// <summary>
+        /// Abstract method for saving the plot as a PNG file
+        /// </summary>
+        /// <param name="pngFile"></param>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
+        /// <param name="resolution"></param>
         public abstract bool SaveToPNG(FileInfo pngFile, int width, int height, int resolution);
 
+        /// <summary>
+        /// Append a line to the log file
+        /// </summary>
+        /// <param name="message"></param>
         public void WriteDebugLog(string message)
         {
             mLogWriter?.WriteLine(DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss") + ": " + message);

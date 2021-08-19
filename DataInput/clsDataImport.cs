@@ -8,6 +8,9 @@ using PRISM;
 
 namespace MASIC.DataInput
 {
+    /// <summary>
+    /// Base class for reading spectra from mass spec data files
+    /// </summary>
     public abstract class clsDataImport : clsMasicEventNotifier
     {
         // Ignore Spelling: centroided
@@ -18,51 +21,128 @@ namespace MASIC.DataInput
         /// <remarks>Needs to be all caps because of the switch statement in clsMASIC.LoadData</remarks>
         public const string THERMO_RAW_FILE_EXTENSION = ".RAW";
 
+        /// <summary>
+        /// .mzML file extension
+        /// </summary>
         public const string MZ_ML_FILE_EXTENSION = ".MZML";
 
+        /// <summary>
+        /// .mzXML file extension
+        /// </summary>
         public const string MZ_XML_FILE_EXTENSION1 = ".MZXML";
+
+        /// <summary>
+        /// Generic .mzXML file name
+        /// </summary>
         public const string MZ_XML_FILE_EXTENSION2 = "MZXML.XML";
 
+        /// <summary>
+        /// .mzData file extension
+        /// </summary>
         public const string MZ_DATA_FILE_EXTENSION1 = ".MZDATA";
+
+        /// <summary>
+        /// Generic .mzData file name
+        /// </summary>
         public const string MZ_DATA_FILE_EXTENSION2 = "MZDATA.XML";
 
-        public const string AGILENT_MSMS_FILE_EXTENSION = ".MGF";    // Agilent files must have been exported to a .MGF and .CDF file pair prior to using MASIC
+        /// <summary>
+        /// .mgf file extension
+        /// </summary>
+        /// <remarks>
+        /// Agilent files must have been exported to a .MGF and .CDF file pair prior to using MASIC
+        /// </remarks>
+        public const string AGILENT_MSMS_FILE_EXTENSION = ".MGF";
+
+        /// <summary>
+        /// .cdf file extension
+        /// </summary>
         public const string AGILENT_MS_FILE_EXTENSION = ".CDF";
 
+        /// <summary>
+        /// .txt file extension
+        /// </summary>
         public const string TEXT_FILE_EXTENSION = ".TXT";
 
         private const int ISOLATION_WIDTH_NOT_FOUND_WARNINGS_TO_SHOW = 5;
 
+        /// <summary>
+        /// Number of times a warning should be shown regarding a missing precursor
+        /// </summary>
         protected const int PRECURSOR_NOT_FOUND_WARNINGS_TO_SHOW = 5;
 
+        /// <summary>
+        /// MASIC options
+        /// </summary>
         protected readonly MASICOptions mOptions;
 
+        /// <summary>
+        /// Parent ion processor
+        /// </summary>
         protected readonly clsParentIonProcessing mParentIonProcessor;
 
+        /// <summary>
+        /// MASIC peak finder
+        /// </summary>
         protected readonly MASICPeakFinder.clsMASICPeakFinder mPeakFinder;
 
+        /// <summary>
+        /// Scan tracking
+        /// </summary>
         protected readonly clsScanTracking mScanTracking;
 
+        /// <summary>
+        /// Dataset file info
+        /// </summary>
         protected DatasetFileInfo mDatasetFileInfo;
 
+        /// <summary>
+        /// When true, store raw spectra in the spectrum cache
+        /// When false, compute the noise level of each spectrum but do not store in the cache
+        /// </summary>
         protected bool mKeepRawSpectra;
+
+        /// <summary>
+        /// When true, store MS/MS spectra in the spectrum cache
+        /// </summary>
         protected bool mKeepMSMSSpectra;
 
+        /// <summary>
+        /// Scan index of the most recent survey scan
+        /// </summary>
         protected int mLastSurveyScanIndexInMasterSeqOrder;
+
+        /// <summary>
+        /// Scan index of the most recent non-zoom survey scan
+        /// </summary>
         protected int mLastNonZoomSurveyScanIndex;
+
+        /// <summary>
+        /// Last time a log entry was written
+        /// </summary>
         protected DateTime mLastLogTime;
 
         private readonly InterDetect.InterferenceCalculator mInterferenceCalculator;
 
         private readonly List<InterDetect.Peak> mCachedPrecursorIons;
+
+        /// <summary>
+        /// Cached precursor scan
+        /// </summary>
         protected int mCachedPrecursorScan;
 
         private int mIsolationWidthNotFoundCount;
         private int mPrecursorNotFoundCount;
         private int mNextPrecursorNotFoundCountThreshold;
 
+        /// <summary>
+        /// Number of scans outside the specified scan number and/or scan time range
+        /// </summary>
         protected int mScansOutOfRange;
 
+        /// <summary>
+        /// Dataset file info
+        /// </summary>
         public DatasetFileInfo DatasetFileInfo => mDatasetFileInfo;
 
         /// <summary>
@@ -70,8 +150,14 @@ namespace MASIC.DataInput
         /// </summary>
         public event UpdateMemoryUsageEventEventHandler UpdateMemoryUsageEvent;
 
+        /// <summary>
+        /// Delegate for the memory usage event handler
+        /// </summary>
         public delegate void UpdateMemoryUsageEventEventHandler();
 
+        /// <summary>
+        /// Event raised when reporting the current memory usage
+        /// </summary>
         protected void OnUpdateMemoryUsage()
         {
             UpdateMemoryUsageEvent?.Invoke();
@@ -248,6 +334,13 @@ namespace MASIC.DataInput
             }
         }
 
+        /// <summary>
+        /// This method discards data from a spectrum to limit the number of data points
+        /// </summary>
+        /// <param name="msSpectrum"></param>
+        /// <param name="mzIgnoreRangeStart"></param>
+        /// <param name="mzIgnoreRangeEnd"></param>
+        /// <param name="maxIonCountToRetain"></param>
         public void DiscardDataToLimitIonCount(
             clsMSSpectrum msSpectrum,
             double mzIgnoreRangeStart,
@@ -352,6 +445,20 @@ namespace MASIC.DataInput
             }
         }
 
+        /// <summary>
+        /// <para>
+        /// This method is called after all spectra have been read
+        /// </para>
+        /// <para>
+        /// A warning is shown if no scans were stored
+        /// </para>
+        /// <para>
+        /// A Warning is shown if precursor ion was not found in any of the spectra
+        /// </para>
+        /// </summary>
+        /// <param name="scanList"></param>
+        /// <param name="dataFile"></param>
+        /// <returns>True if it at least one scan was stored, otherwise false</returns>
         protected bool FinalizeScanList(clsScanList scanList, FileSystemInfo dataFile)
         {
             if (scanList.MasterScanOrderCount <= 0)
@@ -390,6 +497,9 @@ namespace MASIC.DataInput
             return true;
         }
 
+        /// <summary>
+        /// Obtain the default list of file extensions to parse
+        /// </summary>
         public static IList<string> GetDefaultExtensionsToParse()
         {
             var extensionsToParse = new List<string>()
@@ -406,6 +516,12 @@ namespace MASIC.DataInput
             return extensionsToParse;
         }
 
+        /// <summary>
+        /// Initialize the base options
+        /// </summary>
+        /// <param name="scanList"></param>
+        /// <param name="keepRawSpectra"></param>
+        /// <param name="keepMSMSSpectra"></param>
         protected void InitBaseOptions(clsScanList scanList, bool keepRawSpectra, bool keepMSMSSpectra)
         {
             mLastNonZoomSurveyScanIndex = -1;
@@ -420,6 +536,13 @@ namespace MASIC.DataInput
             mLastLogTime = DateTime.UtcNow;
         }
 
+        /// <summary>
+        /// Append a line to the scan stats file
+        /// </summary>
+        /// <param name="writer"></param>
+        /// <param name="eScanType"></param>
+        /// <param name="currentScan"></param>
+        /// <param name="datasetID"></param>
         protected void SaveScanStatEntry(
             StreamWriter writer,
             clsScanList.ScanTypeConstants eScanType,
@@ -487,6 +610,12 @@ namespace MASIC.DataInput
             writer.WriteLine(string.Join(TAB_DELIMITER.ToString(), dataColumns));
         }
 
+        /// <summary>
+        /// Update the cached precursor scan
+        /// </summary>
+        /// <param name="precursorScanNumber"></param>
+        /// <param name="centroidedIonsMz"></param>
+        /// <param name="centroidedIonsIntensity"></param>
         protected void UpdateCachedPrecursorScan(
             int precursorScanNumber,
             double[] centroidedIonsMz,
@@ -495,6 +624,12 @@ namespace MASIC.DataInput
             UpdateCachedPrecursorScan(precursorScanNumber, centroidedIonsMz.ToList(), centroidedIonsIntensity.ToList());
         }
 
+        /// <summary>
+        /// Update the cached precursor scan
+        /// </summary>
+        /// <param name="precursorScanNumber"></param>
+        /// <param name="centroidedIonsMz"></param>
+        /// <param name="centroidedIonsIntensity"></param>
         protected void UpdateCachedPrecursorScan(
             int precursorScanNumber,
             List<double> centroidedIonsMz,
@@ -518,6 +653,12 @@ namespace MASIC.DataInput
             mCachedPrecursorScan = precursorScanNumber;
         }
 
+        /// <summary>
+        /// Update dataset file stats
+        /// </summary>
+        /// <param name="dataFileInfo"></param>
+        /// <param name="datasetID"></param>
+        /// <returns>True if success, false if an error</returns>
         protected bool UpdateDatasetFileStats(
             FileInfo dataFileInfo,
             int datasetID)
@@ -549,6 +690,11 @@ namespace MASIC.DataInput
             return true;
         }
 
+        /// <summary>
+        /// Show a warning that the MS2 isolation width could not be determined
+        /// </summary>
+        /// <param name="scanNumber"></param>
+        /// <param name="warningMessage"></param>
         protected void WarnIsolationWidthNotFound(int scanNumber, string warningMessage)
         {
             mIsolationWidthNotFoundCount++;

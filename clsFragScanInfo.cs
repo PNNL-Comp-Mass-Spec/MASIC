@@ -1,5 +1,8 @@
 ﻿namespace MASIC
 {
+    /// <summary>
+    /// Information about a single fragmentation scan (spectrum)
+    /// </summary>
     public class clsFragScanInfo
     {
         /// <summary>
@@ -10,7 +13,6 @@
         /// <summary>
         /// Parent ion m/z value
         /// </summary>
-        /// <returns></returns>
         public double ParentIonMz { get; }
 
         /// <summary>
@@ -47,6 +49,9 @@
             CollisionMode = string.Empty;
         }
 
+        /// <summary>
+        /// Show the parent ion index
+        /// </summary>
         public override string ToString()
         {
             return "Parent Ion " + ParentIonInfoIndex;

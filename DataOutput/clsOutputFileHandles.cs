@@ -3,6 +3,9 @@ using System.IO;
 
 namespace MASIC.DataOutput
 {
+    /// <summary>
+    /// Container for output file handles
+    /// </summary>
     public class clsOutputFileHandles : clsMasicEventNotifier
     {
         /// <summary>
@@ -20,10 +23,19 @@ namespace MASIC.DataOutput
 
         // ReSharper restore CommentTypo
 
+        /// <summary>
+        /// XML Results file
+        /// </summary>
         public System.Xml.XmlTextWriter XMLFileForSICs { get; set; }
 
+        /// <summary>
+        /// MS method file base path
+        /// </summary>
         public string MSMethodFilePathBase { get; set; }
 
+        /// <summary>
+        /// MS tune file base path
+        /// </summary>
         public string MSTuneFilePathBase { get; set; }
 
         /// <summary>
@@ -41,7 +53,6 @@ namespace MASIC.DataOutput
         /// <summary>
         /// Close all files
         /// </summary>
-        /// <returns></returns>
         public bool CloseAll()
         {
             try

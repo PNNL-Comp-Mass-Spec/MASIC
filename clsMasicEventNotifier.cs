@@ -3,6 +3,9 @@ using PRISM;
 
 namespace MASIC
 {
+    /// <summary>
+    /// MASIC event notifier
+    /// </summary>
     public abstract class clsMasicEventNotifier : EventNotifier
     {
         // Ignore Spelling: uncache
@@ -14,6 +17,12 @@ namespace MASIC
         /// </summary>
         public event UpdateCacheStatsEventEventHandler UpdateCacheStatsEvent;
 
+        /// <summary>
+        /// Delegate for the update cache stats event
+        /// </summary>
+        /// <param name="cacheEventCount"></param>
+        /// <param name="unCacheEventCount"></param>
+        /// <param name="spectraPoolHitEventCount"></param>
         public delegate void UpdateCacheStatsEventEventHandler(int cacheEventCount, int unCacheEventCount, int spectraPoolHitEventCount);
 
         /// <summary>
@@ -21,6 +30,10 @@ namespace MASIC
         /// </summary>
         public event UpdateBaseClassErrorCodeEventEventHandler UpdateBaseClassErrorCodeEvent;
 
+        /// <summary>
+        /// Delegate for the base class error code event
+        /// </summary>
+        /// <param name="eNewErrorCode"></param>
         public delegate void UpdateBaseClassErrorCodeEventEventHandler(PRISM.FileProcessor.ProcessFilesBase.ProcessFilesErrorCodes eNewErrorCode);
 
         /// <summary>
@@ -28,6 +41,11 @@ namespace MASIC
         /// </summary>
         public event UpdateErrorCodeEventEventHandler UpdateErrorCodeEvent;
 
+        /// <summary>
+        /// Delete fro the update error code event
+        /// </summary>
+        /// <param name="eNewErrorCode"></param>
+        /// <param name="leaveExistingErrorCodeUnchanged"></param>
         public delegate void UpdateErrorCodeEventEventHandler(clsMASIC.MasicErrorCodes eNewErrorCode, bool leaveExistingErrorCodeUnchanged);
 
         private void OnUpdateCacheStats(int cacheEventCount, int unCacheEventCount, int spectraPoolHitEventCount)
@@ -45,6 +63,10 @@ namespace MASIC
             UpdateErrorCodeEvent?.Invoke(eNewErrorCode, leaveExistingErrorCodeUnchanged);
         }
 
+        /// <summary>
+        /// Register events
+        /// </summary>
+        /// <param name="sourceClass"></param>
         protected void RegisterEvents(clsMasicEventNotifier sourceClass)
         {
             base.RegisterEvents(sourceClass);
@@ -54,11 +76,20 @@ namespace MASIC
             sourceClass.UpdateErrorCodeEvent += UpdateErrorCodeEventHandler;
         }
 
+        /// <summary>
+        /// Report a status message
+        /// </summary>
+        /// <param name="message"></param>
         protected void ReportMessage(string message)
         {
             OnStatusEvent(message);
         }
 
+        /// <summary>
+        /// Report an error message
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="eNewErrorCode"></param>
         protected void ReportError(string message,
                                    clsMASIC.MasicErrorCodes eNewErrorCode = clsMASIC.MasicErrorCodes.NoError)
         {
@@ -70,6 +101,12 @@ namespace MASIC
             OnErrorEvent(message);
         }
 
+        /// <summary>
+        /// Report an error message, including an exception
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="ex"></param>
+        /// <param name="eNewErrorCode"></param>
         protected void ReportError(string message,
                                    Exception ex,
                                    clsMASIC.MasicErrorCodes eNewErrorCode = clsMASIC.MasicErrorCodes.NoError)
@@ -82,21 +119,38 @@ namespace MASIC
             OnErrorEvent(message, ex);
         }
 
+        /// <summary>
+        /// Report a warning message
+        /// </summary>
+        /// <param name="message"></param>
         protected void ReportWarning(string message)
         {
             OnWarningEvent(message);
         }
 
+        /// <summary>
+        /// Set the base class error code
+        /// </summary>
+        /// <param name="eNewErrorCode"></param>
         protected void SetBaseClassErrorCode(PRISM.FileProcessor.ProcessFilesBase.ProcessFilesErrorCodes eNewErrorCode)
         {
             OnUpdateBaseClassErrorCode(eNewErrorCode);
         }
 
+        /// <summary>
+        /// Set a local error code
+        /// </summary>
+        /// <param name="eNewErrorCode"></param>
+        /// <param name="leaveExistingErrorCodeUnchanged"></param>
         protected void SetLocalErrorCode(clsMASIC.MasicErrorCodes eNewErrorCode, bool leaveExistingErrorCodeUnchanged = false)
         {
             OnUpdateErrorCode(eNewErrorCode, leaveExistingErrorCodeUnchanged);
         }
 
+        /// <summary>
+        /// Update cache stats
+        /// </summary>
+        /// <param name="spectraCache"></param>
         protected void UpdateCacheStats(clsSpectraCache spectraCache)
         {
             OnUpdateCacheStats(spectraCache.CacheEventCount, spectraCache.UnCacheEventCount, spectraCache.SpectraPoolHitEventCount);
@@ -111,11 +165,20 @@ namespace MASIC
             OnProgressUpdate(string.Empty, percentComplete);
         }
 
+        /// <summary>
+        /// Update progress
+        /// </summary>
+        /// <param name="progressMessage"></param>
         protected void UpdateProgress(string progressMessage)
         {
             OnProgressUpdate(progressMessage, mLastPercentComplete);
         }
 
+        /// <summary>
+        /// Update progress
+        /// </summary>
+        /// <param name="percentComplete"></param>
+        /// <param name="progressMessage"></param>
         protected void UpdateProgress(short percentComplete, string progressMessage)
         {
             mLastPercentComplete = percentComplete;

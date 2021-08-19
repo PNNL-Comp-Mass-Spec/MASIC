@@ -1,11 +1,23 @@
 ﻿namespace MASIC.Options
 {
+    /// <summary>
+    /// Histogram binning options
+    /// </summary>
     public class BinningOptions
     {
+        /// <summary>
+        /// X-value of the first bin
+        /// </summary>
         public float StartX { get; set; }
 
+        /// <summary>
+        /// X-value for the last bin
+        /// </summary>
         public float EndX { get; set; }
 
+        /// <summary>
+        /// Bin size
+        /// </summary>
         public float BinSize
         {
             get => mBinSize;
@@ -17,6 +29,9 @@
             }
         }
 
+        /// <summary>
+        /// Intensity precision, as a value between 0 and 100
+        /// </summary>
         public float IntensityPrecisionPercent
         {
             get => mIntensityPrecisionPercent;
@@ -28,14 +43,22 @@
             }
         }
 
+        /// <summary>
+        /// When true, normalize the values
+        /// </summary>
         public bool Normalize { get; set; }
 
         /// <summary>
         /// Sum all of the intensities for binned ions of the same bin together
         /// </summary>
-        /// <returns></returns>
         public bool SumAllIntensitiesForBin { get; set; }
 
+        /// <summary>
+        /// Maximum number of bins to allow
+        /// </summary>
+        /// <remarks>
+        /// Bin count is auto-determined as (EndX - StartX) / BinSize
+        /// </remarks>
         public int MaximumBinCount
         {
             get => mMaximumBinCount;

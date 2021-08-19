@@ -148,7 +148,6 @@ namespace MagnitudeConcavityPeakFinder
         /// Data point index in the x values that should be a part of the peak
         /// Used for determining the best peak</param>
         /// <param name="smoothedYData">Smoothed Y values</param>
-        /// <returns></returns>
         public List<clsPeakInfo> FindPeaks(
             SICPeakFinderOptionsType peakFinderOptions,
             List<KeyValuePair<int, double>> xyData,
@@ -329,7 +328,7 @@ namespace MagnitudeConcavityPeakFinder
             int index;
             for (index = 0; index < xyData.Count; index++)
             {
-                // If this data point is > .MinimumBaselineNoiseLevel, then add this intensity to potentialPeakArea
+                // If this data point is > .MinimumBaselineNoiseLevel, add this intensity to potentialPeakArea
                 //  and increment validPeakCount
                 var intensityToUse = Math.Max(minimumPositiveValue, xyData[index].Value);
                 if (intensityToUse >= udtSICPeakFinderOptions.SICBaselineNoiseOptions.MinimumBaselineNoiseLevel)
@@ -341,7 +340,7 @@ namespace MagnitudeConcavityPeakFinder
                 if (queIntensityList.Count >= udtSICPeakFinderOptions.InitialPeakWidthScansMaximum)
                 {
                     // Decrement potentialPeakArea by the oldest item in the queue
-                    // If that item is >= .MinimumBaselineNoiseLevel, then decrement validPeakCount too
+                    // If that item is >= .MinimumBaselineNoiseLevel, decrement validPeakCount too
                     var dblOldestIntensity = queIntensityList.Dequeue();
 
                     if (dblOldestIntensity >= udtSICPeakFinderOptions.SICBaselineNoiseOptions.MinimumBaselineNoiseLevel && dblOldestIntensity > 0)
@@ -756,7 +755,7 @@ namespace MagnitudeConcavityPeakFinder
             const float peakMaximum = 0;
 
             // Smooth the Y data, and store in peakData.SmoothedYData
-            // Note that if using a Butterworth filter, then we increase peakData.PeakWidthPointsMinimum if too small, compared to 1/SamplingFrequency
+            // Note that if using a Butterworth filter, we increase peakData.PeakWidthPointsMinimum if too small, compared to 1/SamplingFrequency
             var peakWidthPointsMinimum = peakData.PeakWidthPointsMinimum;
 
             var dataIsSmoothed = SmoothData(
@@ -837,7 +836,7 @@ namespace MagnitudeConcavityPeakFinder
 
                 // See if the peak boundaries (left and right edges) need to be narrowed or expanded
                 // Do this by stepping left or right while the intensity is decreasing.  If an increase is found, but the
-                // next point after the increasing point is less than the current point, then possibly keep stepping; the
+                // next point after the increasing point is less than the current point, possibly keep stepping; the
                 // test for whether to keep stepping is that the next point away from the increasing point must be less
                 // than the current point.  If this is the case, replace the increasing point with the average of the
                 // current point and the point two points away
@@ -909,10 +908,10 @@ namespace MagnitudeConcavityPeakFinder
                     continue;
                 }
 
-                // If peakData.OriginalPeakLocationIndex is not between peak.LeftEdge and peak.RightEdge, then check
-                //  if the scan number for peakData.OriginalPeakLocationIndex is within .MaxDistanceScansNoOverlap scans of
-                //  either of the peak edges; if not, then mark the peak as invalid since it does not contain the
-                //  scan for the parent ion
+                // If peakData.OriginalPeakLocationIndex is not between peak.LeftEdge and peak.RightEdge,
+                // check if the scan number for peakData.OriginalPeakLocationIndex is within .MaxDistanceScansNoOverlap scans
+                // of either of the peak edges; if not, mark the peak as invalid since it does not contain
+                // the scan for the parent ion
                 if (peakData.OriginalPeakLocationIndex < peak.LeftEdge)
                 {
                     if (

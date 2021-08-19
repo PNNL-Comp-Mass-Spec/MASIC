@@ -30,6 +30,9 @@ namespace MASIC
     // in compliance with the License.  You may obtain a copy of the License at
     // https://opensource.org/licenses/BSD-2-Clause
 
+    /// <summary>
+    /// Entry class for the GUI and console versions of MASIC
+    /// </summary>
     public static class Program
     {
         // Ignore Spelling: bool
@@ -413,6 +416,9 @@ namespace MASIC
         }
 
 #if GUI
+        /// <summary>
+        /// Show the GUI
+        /// </summary>
         public static void ShowGUI()
         {
             Application.EnableVisualStyles();

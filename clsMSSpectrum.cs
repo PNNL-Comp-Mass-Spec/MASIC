@@ -11,7 +11,6 @@ namespace MASIC
         /// <summary>
         /// Scan number
         /// </summary>
-        /// <returns></returns>
         /// <remarks>0 if not in use</remarks>
         public int ScanNumber { get; set; }
 
@@ -103,7 +102,6 @@ namespace MASIC
         /// <summary>
         /// Make a deep copy of this mass spectrum
         /// </summary>
-        /// <returns></returns>
         // ReSharper disable once UnusedMember.Global
         public clsMSSpectrum Clone()
         {
@@ -114,13 +112,17 @@ namespace MASIC
         /// Make a deep copy of the given mass spectrum
         /// </summary>
         /// <param name="sourceSpectrum"></param>
-        /// <returns></returns>
         public clsMSSpectrum Copy(clsMSSpectrum sourceSpectrum)
         {
             var newSpectrum = new clsMSSpectrum(sourceSpectrum.ScanNumber, sourceSpectrum.IonsMZ, sourceSpectrum.IonsIntensity, sourceSpectrum.IonsMZ.Count);
             return newSpectrum;
         }
 
+        /// <summary>
+        /// Replace data stored in IonsMZ, IonsIntensity, and Scan Number
+        /// </summary>
+        /// <param name="spectrum"></param>
+        /// <param name="scanNumberOverride"></param>
         public void ReplaceData(clsMSSpectrum spectrum, int scanNumberOverride)
         {
             ScanNumber = spectrum.ScanNumber;
@@ -142,6 +144,10 @@ namespace MASIC
             IonsIntensity.AddRange(spectrum.IonsIntensity);
         }
 
+        /// <summary>
+        /// Remove data from the end of IonsMZ and IonsIntensity
+        /// </summary>
+        /// <param name="ionCountNew"></param>
         public void ShrinkArrays(int ionCountNew)
         {
             if (ionCountNew > IonsMZ.Count)

@@ -15,15 +15,49 @@ namespace MASIC.Options
     {
         // Ignore Spelling: Sql, Da, plex, Butterworth, SavitzkyGolay, Zeroes, html
 
+        /// <summary>
+        /// MASIC parameter file section with database settings
+        /// </summary>
         public const string XML_SECTION_DATABASE_SETTINGS = "MasicDatabaseSettings";
+
+        /// <summary>
+        /// MASIC parameter file section with import options
+        /// </summary>
         public const string XML_SECTION_IMPORT_OPTIONS = "MasicImportOptions";
+
+        /// <summary>
+        /// MASIC parameter file section with export options
+        /// </summary>
         public const string XML_SECTION_EXPORT_OPTIONS = "MasicExportOptions";
+
+        /// <summary>
+        /// MASIC parameter file section with plot options
+        /// </summary>
         public const string XML_SECTION_PLOT_OPTIONS = "PlotOptions";
+
+        /// <summary>
+        /// MASIC parameter file section with SIC options
+        /// </summary>
         public const string XML_SECTION_SIC_OPTIONS = "SICOptions";
+
+        /// <summary>
+        /// MASIC parameter file section with binning options
+        /// </summary>
         public const string XML_SECTION_BINNING_OPTIONS = "BinningOptions";
+
+        /// <summary>
+        /// MASIC parameter file section with memory options
+        /// </summary>
         public const string XML_SECTION_MEMORY_OPTIONS = "MemoryOptions";
+
+        /// <summary>
+        /// MASIC parameter file section with custom SIC values
+        /// </summary>
         public const string XML_SECTION_CUSTOM_SIC_VALUES = "CustomSICValues";
 
+        /// <summary>
+        /// MASIC status file name
+        /// </summary>
         public const string DEFAULT_MASIC_STATUS_FILE_NAME = "MasicStatus.xml";
 
         /// <summary>
@@ -46,14 +80,40 @@ namespace MASIC.Options
         /// </summary>
         public PlotOptions PlotOptions { get; }
 
+        /// <summary>
+        /// If true, abort processing
+        /// </summary>
         public bool AbortProcessing { get; set; }
 
+        /// <summary>
+        /// DMS database connection string
+        /// </summary>
         public string DatabaseConnectionString { get; set; }
+
+        /// <summary>
+        /// SQL query for looking update dataset names and IDs
+        /// </summary>
         public string DatasetInfoQuerySql { get; set; }
+
+        /// <summary>
+        /// Dataset lookup file path
+        /// </summary>
         public string DatasetLookupFilePath { get; set; } = string.Empty;
 
+        /// <summary>
+        /// When true, include headers in export files
+        /// </summary>
         public bool IncludeHeadersInExportFile { get; set; }
+
+        /// <summary>
+        /// When true, include scan times in the _SICStats.txt file
+        /// </summary>
         public bool IncludeScanTimesInSICStatsFile { get; set; }
+
+        /// <summary>
+        /// When true, if an existing XML results file is found, CheckForExistingResults reports true
+        /// When false, CheckForExistingResults compares settings in an existing results file to settings for a new processing task, and reports true only if the settings match
+        /// </summary>
         public bool FastExistingXMLFileTest { get; set; }
 
         /// <summary>
@@ -67,12 +127,18 @@ namespace MASIC.Options
         public bool SkipSICAndRawDataProcessing { get; set; }
 
         /// <summary>
-        /// When True, then will not create any SICs; automatically set to false if mSkipSICAndRawDataProcessing = True
+        /// When True, will not create any SICs; automatically set to false if mSkipSICAndRawDataProcessing = True
         /// </summary>
         public bool ExportRawDataOnly { get; set; }
 
+        /// <summary>
+        /// Output directory path
+        /// </summary>
         public string OutputDirectoryPath { get; set; }
 
+        /// <summary>
+        /// Output directory path
+        /// </summary>
         [Obsolete("Use OutputDirectoryPath")]
         public string OutputFolderPath
         {
@@ -80,10 +146,24 @@ namespace MASIC.Options
             set => OutputDirectoryPath = value;
         }
 
+        /// <summary>
+        /// When true, create the SIC data file, _SICdata.txt
+        /// </summary>
         public bool WriteDetailedSICDataFile { get; set; }
+
+        /// <summary>
+        /// When true, create the MS method file, _MSMethod.txt
+        /// </summary>
         public bool WriteMSMethodFile { get; set; }
+
+        /// <summary>
+        /// When true, create the extended scan stats file, _MSTuneSettings.txt
+        /// </summary>
         public bool WriteMSTuneFile { get; set; }
 
+        /// <summary>
+        /// When true, create the _ScanStatsEx.txt file
+        /// </summary>
         public bool WriteExtendedStats { get; set; }
 
         /// <summary>
@@ -98,9 +178,19 @@ namespace MASIC.Options
         /// </summary>
         public bool WriteExtendedStatsStatusLog { get; set; }
 
+        /// <summary>
+        /// When true, create the consolidated extended scan stats file, _ScanStatsConstant.txt
+        /// </summary>
         public bool ConsolidateConstantExtendedHeaderValues { get; set; }
 
+        /// <summary>
+        /// When true, create the  MRM data file, _MRMData.txt
+        /// </summary>
         public bool WriteMRMDataList { get; set; }
+
+        /// <summary>
+        /// When true, create the MRM crosstab file, _MRMCrosstab.txt
+        /// </summary>
         public bool WriteMRMIntensityCrosstab { get; set; }
 
         /// <summary>
@@ -109,23 +199,60 @@ namespace MASIC.Options
         /// <remarks>It is useful to set this to true when processing a file that only has MRM data</remarks>
         public bool SuppressNoParentIonsError { get; set; }
 
+        /// <summary>
+        /// Raw data export options
+        /// </summary>
         public RawDataExportOptions RawDataExportOptions { get; }
 
+        /// <summary>
+        /// Reporter ions to find
+        /// </summary>
         public clsReporterIons ReporterIons { get; }
 
+        /// <summary>
+        /// When true, assume the scan time in .cdf files is the number of seconds since the acquisition started
+        /// When false, assume the scan time in .cdf files is the number of minutes since the acquisition started
+        /// </summary>
         public bool CDFTimeInSeconds { get; set; }
+
+        /// <summary>
+        /// Parent ion decoy mass, in Da
+        /// </summary>
         public double ParentIonDecoyMassDa { get; set; }
 
+        /// <summary>
+        /// When true, use base-64 data encoding when writing scan intervals to the XML results file
+        /// </summary>
         public bool UseBase64DataEncoding { get; set; }
 
+        /// <summary>
+        /// Spectrum caching options
+        /// </summary>
         public SpectrumCacheOptions CacheOptions { get; }
+
+        /// <summary>
+        /// MASIC status file name
+        /// </summary>
         public string MASICStatusFilename { get; set; } = DEFAULT_MASIC_STATUS_FILE_NAME;
 
+        /// <summary>
+        /// MASIC version
+        /// </summary>
         public string MASICVersion { get; }
+
+        /// <summary>
+        /// Peak finder version
+        /// </summary>
         public string PeakFinderVersion { get; }
 
+        /// <summary>
+        /// The last time that a message was logged reporting the number of parent ions processed
+        /// </summary>
         public DateTime LastParentIonProcessingLogTime { get; set; }
 
+        /// <summary>
+        /// Status message
+        /// </summary>
         public string StatusMessage { get; set; }
 
         /// <summary>
@@ -154,6 +281,10 @@ namespace MASIC.Options
             StatusLogKeyNameFilterList = new SortedSet<string>();
         }
 
+        /// <summary>
+        /// Convert custom SIC scan tolerance type from text to an enum
+        /// </summary>
+        /// <param name="scanType"></param>
         public clsCustomSICList.CustomSICScanTypeConstants GetScanToleranceTypeFromText(string scanType)
         {
             if (scanType == null)
@@ -179,15 +310,12 @@ namespace MASIC.Options
         /// When WriteExtendedStatsStatusLog is true, a file with extra info like voltage, current, temperature, pressure, etc. is created
         /// Use this property to filter the items written in the StatusLog file to only include the entries in this list
         /// </summary>
-        /// <returns></returns>
         public SortedSet<string> StatusLogKeyNameFilterList { get; }
 
         /// <summary>
         /// Returns the contents of StatusLogKeyNameFilterList
         /// </summary>
         /// <param name="commaSeparatedList">When true, returns a comma separated list; when false, returns a Newline separated list</param>
-        /// <returns></returns>
-        /// <remarks></remarks>
         public string GetStatusLogKeyNameFilterListAsText(bool commaSeparatedList)
         {
             var delimiter = commaSeparatedList ? ", " : Environment.NewLine;
@@ -195,6 +323,9 @@ namespace MASIC.Options
             return string.Join(delimiter, StatusLogKeyNameFilterList);
         }
 
+        /// <summary>
+        /// Reset options to their defaults
+        /// </summary>
         public void InitializeVariables()
         {
             AbortProcessing = false;
@@ -249,7 +380,6 @@ namespace MASIC.Options
         /// </summary>
         /// <param name="parameterFilePath"></param>
         /// <param name="inputFilePath"></param>
-        /// <returns></returns>
         public bool LoadParameterFileSettings(string parameterFilePath, string inputFilePath = "")
         {
             try
@@ -341,7 +471,7 @@ namespace MASIC.Options
                         XML_SECTION_EXPORT_OPTIONS, "SkipMSMSProcessing", SkipMSMSProcessing);
 
                     // Check for both "SkipSICProcessing" and "SkipSICAndRawDataProcessing" in the XML file
-                    // If either is true, then mExportRawDataOnly will be auto-set to false in function ProcessFiles
+                    // If either is true, mExportRawDataOnly will be auto-set to false in function ProcessFiles
                     SkipSICAndRawDataProcessing = reader.GetParam(
                         XML_SECTION_EXPORT_OPTIONS, "SkipSICProcessing", SkipSICAndRawDataProcessing);
 
@@ -374,6 +504,7 @@ namespace MASIC.Options
 
                     var filterList = reader.GetParam(
                         XML_SECTION_EXPORT_OPTIONS, "StatusLogKeyNameFilterList", string.Empty);
+
                     if (!string.IsNullOrEmpty(filterList))
                     {
                         SetStatusLogKeyNameFilterList(filterList, ',');
@@ -759,6 +890,10 @@ namespace MASIC.Options
             }
         }
 
+        /// <summary>
+        /// Save settings to a parameter file
+        /// </summary>
+        /// <param name="parameterFilePath"></param>
         public bool SaveParameterFileSettings(string parameterFilePath)
         {
             var writer = new XmlSettingsFileAccessor();
@@ -835,7 +970,7 @@ namespace MASIC.Options
                 // SIC Options
                 // Note: Skipping .DatasetID since this must be provided at the command line or through the Property Function interface
 
-                // "SICToleranceDa" is a legacy parameter.  If the SIC tolerance is in PPM, then "SICToleranceDa" is the Da tolerance at 1000 m/z
+                // "SICToleranceDa" is a legacy parameter.  If the SIC tolerance is in PPM, "SICToleranceDa" is the Da tolerance at 1000 m/z
                 writer.SetParam(XML_SECTION_SIC_OPTIONS, "SICToleranceDa", SICOptions.SICToleranceDa.ToString("0.0000"));
 
                 var sicTolerance = SICOptions.GetSICTolerance(out var sicToleranceIsPPM);
@@ -1022,7 +1157,7 @@ namespace MASIC.Options
         /// When WriteExtendedStatsStatusLog is true, a file with extra info like voltage, current, temperature, pressure, etc. is created
         /// Use this method to filter the items written in the StatusLog file to only include the entries in matchSpecList
         /// </summary>
-        /// <param name="matchSpecList"></param>
+        /// <param name="matchSpecList">List of header names to store; store all headers if this is an entry list</param>
         public void SetStatusLogKeyNameFilterList(List<string> matchSpecList)
         {
             try
@@ -1044,6 +1179,12 @@ namespace MASIC.Options
             }
         }
 
+        /// <summary>
+        /// When WriteExtendedStatsStatusLog is true, a file with extra info like voltage, current, temperature, pressure, etc. is created
+        /// Use this method to filter the items written in the StatusLog file to only include the entries in matchSpecList
+        /// </summary>
+        /// <param name="matchSpecList">Delimited list of header names to store; store all headers if this is an empty string</param>
+        /// <param name="delimiter"></param>
         public void SetStatusLogKeyNameFilterList(string matchSpecList, char delimiter)
         {
             try

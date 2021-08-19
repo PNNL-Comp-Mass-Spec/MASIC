@@ -4,42 +4,95 @@ using OxyPlot;
 
 namespace MASIC.Plots
 {
+    /// <summary>
+    /// Plot axis info
+    /// </summary>
     public class AxisInfo
     {
         // Ignore Spelling: Autoscale
 
+        /// <summary>
+        /// Default axis label format
+        /// </summary>
         public const string DEFAULT_AXIS_LABEL_FORMAT = "#,##0";
 
+        /// <summary>
+        /// Exponential label format
+        /// </summary>
         public const string EXPONENTIAL_FORMAT = "0.00E+00";
 
+        /// <summary>
+        /// When true, autoscale
+        /// </summary>
         public bool AutoScale { get; set; }
 
+        /// <summary>
+        /// When true, add a color axis
+        /// </summary>
         public bool AddColorAxis { get; set; }
 
 #pragma warning disable CS3003 // Type is not CLS-compliant
+
+        /// <summary>
+        /// Color palette
+        /// </summary>
         public OxyPalette ColorPalette { get; set; }
+
 #pragma warning restore CS3003 // Type is not CLS-compliant
 
+        /// <summary>
+        /// Minimum intensity for the color scale
+        /// </summary>
         public double ColorScaleMinIntensity { get; set; }
 
+        /// <summary>
+        /// Maximum intensity for the color scale
+        /// </summary>
         public double ColorScaleMaxIntensity { get; set; }
 
+        /// <summary>
+        /// Minimum value for the axis
+        /// </summary>
         public double Minimum { get; set; }
 
+        /// <summary>
+        /// Maximum value for the axis
+        /// </summary>
         public double Maximum { get; set; }
 
+        /// <summary>
+        /// Major step value
+        /// </summary>
         public double MajorStep { get; set; }
 
+        /// <summary>
+        /// Minor grid line thickness
+        /// </summary>
         public double MinorGridLineThickness { get; set; }
 
+        /// <summary>
+        /// String format for tick mark labels
+        /// </summary>
         public string StringFormat { get; set; }
 
+        /// <summary>
+        /// True if tick mark labels are percents
+        /// </summary>
         public bool TickLabelsArePercents { get; set; }
 
+        /// <summary>
+        /// True if tick mark labels should use exponential notation
+        /// </summary>
         public bool TickLabelsUseExponentialNotation { get; set; }
 
+        /// <summary>
+        /// Axis title
+        /// </summary>
         public string Title { get; set; }
 
+        /// <summary>
+        /// When true, use a logarithmic scale
+        /// </summary>
         public bool UseLogarithmicScale { get; set; }
 
         /// <summary>
@@ -71,7 +124,6 @@ namespace MASIC.Plots
         /// <summary>
         /// Get options as a semi colon separated list of key-value pairs
         /// </summary>
-        /// <returns></returns>
         public string GetOptions()
         {
             return GetOptions(new List<string>());
@@ -81,7 +133,6 @@ namespace MASIC.Plots
         /// Get options as a semi colon separated list of key-value pairs
         /// This is used when plotting data with Python
         /// </summary>
-        /// <returns></returns>
         public string GetOptions(List<string> additionalOptions)
         {
             var options = new List<string>();

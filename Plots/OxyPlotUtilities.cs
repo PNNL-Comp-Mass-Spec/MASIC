@@ -5,6 +5,9 @@ using OxyPlot.Axes;
 
 namespace MASIC.Plots
 {
+    /// <summary>
+    /// Helper class for plotting data using OxyPlot
+    /// </summary>
     public static class OxyPlotUtilities
     {
         private static string AddAxes(PlotModel myPlot, Axis xAxis, Axis yAxis, AxisInfo yAxisInfo)
@@ -40,6 +43,12 @@ namespace MASIC.Plots
         }
 
 #pragma warning disable CS3002 // Return type is not CLS-compliant
+        /// <summary>
+        /// Obtain a bar chart PlotModel
+        /// </summary>
+        /// <param name="title"></param>
+        /// <param name="xAxisLabels"></param>
+        /// <param name="yAxisInfo"></param>
         public static PlotModel GetBasicBarChartModel(
             string title,
             IEnumerable<string> xAxisLabels,
@@ -94,6 +103,12 @@ namespace MASIC.Plots
         }
 
 #pragma warning disable CS3002 // Return type is not CLS-compliant
+        /// <summary>
+        /// Obtain a box plot PlotModel
+        /// </summary>
+        /// <param name="title"></param>
+        /// <param name="xAxisLabels"></param>
+        /// <param name="yAxisInfo"></param>
         public static PlotModel GetBasicBoxPlotModel(
             string title,
             IEnumerable<string> xAxisLabels,
@@ -117,6 +132,12 @@ namespace MASIC.Plots
         }
 
 #pragma warning disable CS3002 // Return type is not CLS-compliant
+        /// <summary>
+        /// Obtain a basic PlotModel instance
+        /// </summary>
+        /// <param name="title"></param>
+        /// <param name="xAxisLabel"></param>
+        /// <param name="yAxisInfo"></param>
         public static PlotModel GetBasicPlotModel(
             string title,
             string xAxisLabel,
@@ -232,7 +253,6 @@ namespace MASIC.Plots
         /// <param name="currentAxis"></param>
         /// <param name="dataPoints"></param>
         /// <param name="integerData"></param>
-        /// <remarks></remarks>
 #pragma warning disable CS3001 // Argument type is not CLS-compliant
         public static void UpdateAxisFormatCodeIfSmallValues(Axis currentAxis, List<double> dataPoints, bool integerData)
 #pragma warning restore CS3001
@@ -249,6 +269,13 @@ namespace MASIC.Plots
         }
 
 #pragma warning disable CS3001 // Argument type is not CLS-compliant
+        /// <summary>
+        /// Update the axis format string if small values are present
+        /// </summary>
+        /// <param name="currentAxis"></param>
+        /// <param name="absoluteValueMin"></param>
+        /// <param name="absoluteValueMax"></param>
+        /// <param name="integerData"></param>
         public static void UpdateAxisFormatCodeIfSmallValues(Axis currentAxis, double absoluteValueMin, double absoluteValueMax, bool integerData)
 #pragma warning restore CS3001
         {
@@ -262,6 +289,10 @@ namespace MASIC.Plots
         }
 
 #pragma warning disable CS3001 // Argument type is not CLS-compliant
+        /// <summary>
+        /// Validate the major step size for tick marks
+        /// </summary>
+        /// <param name="currentAxis"></param>
         public static void ValidateMajorStep(Axis currentAxis)
 #pragma warning restore CS3001
         {

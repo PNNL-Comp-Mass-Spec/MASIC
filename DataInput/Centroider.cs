@@ -3,6 +3,9 @@ using System.Linq;
 
 namespace MASIC
 {
+    /// <summary>
+    /// Class for centroiding spectra
+    /// </summary>
     public class Centroider
     {
         /// <summary>
@@ -13,7 +16,6 @@ namespace MASIC
         /// <param name="intensities"></param>
         /// <param name="centroidedPrecursorIonsMz"></param>
         /// <param name="centroidedPrecursorIonsIntensity"></param>
-        /// <returns></returns>
         public bool CentroidData(clsScanInfo scanInfo,
             double[] masses,
             double[] intensities,
@@ -34,7 +36,6 @@ namespace MASIC
         /// <param name="massResolution"></param>
         /// <param name="centroidedPrecursorIonsMz"></param>
         /// <param name="centroidedPrecursorIonsIntensity"></param>
-        /// <returns></returns>
         public bool CentroidData(
             clsScanInfo scanInfo,
             double[] masses,
@@ -83,6 +84,12 @@ namespace MASIC
             }
         }
 
+        /// <summary>
+        /// Calculates the mass tolerance for the profile peak
+        /// </summary>
+        /// <remarks>
+        /// Uses the default tolerance factor, depending on isOrbitrapData
+        /// </remarks>
         public double EstimateResolution(
             double mass,
             double defaultMassTolerance,
@@ -94,11 +101,13 @@ namespace MASIC
             return EstimateResolution(mass, toleranceFactor, defaultMassTolerance, isOrbitrapData, toleranceUnit);
         }
 
-        /// <summary>Calculates the mass tolerance for the profile peak</summary>
-        /// <param name="mass">current mass tolerance value</param>
-        /// <param name="toleranceFactor">tolerance factor</param>
-        /// <param name="defaultMassTolerance">previous mass tolerance value</param>
-        /// <param name="isOrbitrapData">True if processing LTQ-FT Or Orbitrap data</param>
+        /// <summary>
+        /// Calculates the mass tolerance for the profile peak
+        /// </summary>
+        /// <param name="mass">Current mass tolerance value</param>
+        /// <param name="toleranceFactor">Tolerance factor</param>
+        /// <param name="defaultMassTolerance">Previous mass tolerance value</param>
+        /// <param name="isOrbitrapData">True if processing LTQ-FT or Orbitrap data</param>
         /// <param name="toleranceUnit">tolerance unit</param>
         /// <returns>The calculated mass resolution for the profile peak</returns>
         public double EstimateResolution(

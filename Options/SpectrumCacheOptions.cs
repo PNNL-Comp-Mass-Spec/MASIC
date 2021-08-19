@@ -2,15 +2,18 @@
 
 namespace MASIC.Options
 {
+    /// <summary>
+    /// Spectrum caching options
+    /// </summary>
     public class SpectrumCacheOptions
     {
         /// <summary>
-        /// If True, then spectra will never be cached to disk and the spectra pool will consequently be increased as needed
+        /// If True, spectra will never be cached to disk and the spectra pool will consequently be increased as needed
         /// </summary>
         public bool DiskCachingAlwaysDisabled { get; set; }
 
         /// <summary>
-        /// Path to the cache directory (can be relative or absolute, aka rooted); if empty, then the user's AppData directory is used
+        /// Path to the cache directory (can be relative or absolute, aka rooted); if empty, the user's AppData directory is used
         /// </summary>
         public string DirectoryPath { get; set; }
 
@@ -28,9 +31,15 @@ namespace MASIC.Options
             }
         }
 
+        /// <summary>
+        /// Required minimum free system memory size, in MB
+        /// </summary>
         [Obsolete("Legacy parameter; no longer used")]
         public float MinimumFreeMemoryMB { get; set; }
 
+        /// <summary>
+        /// Allowed maximum free system memory size, in MB
+        /// </summary>
         [Obsolete("Legacy parameter; no longer used")]
         public float MaximumMemoryUsageMB { get; set; }
 
@@ -51,7 +60,6 @@ namespace MASIC.Options
         /// <summary>
         /// Show the maximum number of spectra to cache, and the cache directory
         /// </summary>
-        /// <returns></returns>
         public override string ToString()
         {
             return "Cache up to " + SpectraToRetainInMemory + " in directory " + DirectoryPath;

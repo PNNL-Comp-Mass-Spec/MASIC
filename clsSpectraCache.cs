@@ -22,6 +22,9 @@ namespace MASIC
             InitializeVariables();
         }
 
+        /// <summary>
+        /// Close the page file and delete spectrum cache values
+        /// </summary>
         public void Dispose()
         {
             ClosePageFile();
@@ -473,7 +476,6 @@ namespace MASIC
         /// <summary>
         /// Get default cache options
         /// </summary>
-        /// <returns></returns>
         public static SpectrumCacheOptions GetDefaultCacheOptions()
         {
             var cacheOptions = new SpectrumCacheOptions
@@ -621,7 +623,6 @@ namespace MASIC
         /// Opens the page file reader and writer if not yet opened
         /// </summary>
         /// <param name="createIfUninitialized"></param>
-        /// <returns></returns>
         private bool ValidatePageFileIO(bool createIfUninitialized)
         {
             if (mPageFileReader != null)
@@ -823,7 +824,6 @@ namespace MASIC
             /// </summary>
             /// <param name="scanNumber"></param>
             /// <param name="item"></param>
-            /// <returns></returns>
             public bool GetItem(int scanNumber, out ScanMemoryCacheItem item)
             {
                 if (!mScanNumberToIndexMap.TryGetValue(scanNumber, out var index))
@@ -841,7 +841,6 @@ namespace MASIC
             /// </summary>
             /// <param name="newItem"></param>
             /// <param name="removedItem"></param>
-            /// <returns></returns>
             public bool AddNew(ScanMemoryCacheItem newItem, out ScanMemoryCacheItem removedItem)
             {
                 var itemRemoved = RemoveOldestItem(out removedItem);
@@ -927,7 +926,6 @@ namespace MASIC
             /// <summary>
             /// Report the number of cached spectra, along with the cache capacity
             /// </summary>
-            /// <returns></returns>
             public override string ToString()
             {
                 return string.Format(
@@ -983,7 +981,6 @@ namespace MASIC
             /// </summary>
             /// <param name="scanNumber"></param>
             /// <param name="item"></param>
-            /// <returns></returns>
             public bool GetItem(int scanNumber, out ScanMemoryCacheItem item)
             {
                 if (!mScanNumberToNodeMap.TryGetValue(scanNumber, out var node))
@@ -1006,7 +1003,6 @@ namespace MASIC
             /// </summary>
             /// <param name="newItem"></param>
             /// <param name="removedItem"></param>
-            /// <returns></returns>
             public bool AddNew(ScanMemoryCacheItem newItem, out ScanMemoryCacheItem removedItem)
             {
                 var itemRemoved = RemoveOldestItem(out removedItem);
@@ -1070,7 +1066,6 @@ namespace MASIC
             /// <summary>
             /// Report the number of cached spectra, along with the cache capacity
             /// </summary>
-            /// <returns></returns>
             public override string ToString()
             {
                 return string.Format(

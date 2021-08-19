@@ -36,7 +36,6 @@
         /// <summary>
         /// Clone an instance of this class
         /// </summary>
-        /// <returns></returns>
         public clsBaselineNoiseStats Clone()
         {
             var clonedStats = new clsBaselineNoiseStats()

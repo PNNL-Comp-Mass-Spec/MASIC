@@ -33,6 +33,9 @@ using PRISM.Logging;
 
 namespace MASIC
 {
+    /// <summary>
+    /// MASIC processing class
+    /// </summary>
     public class clsMASIC : PRISM.FileProcessor.ProcessFilesBase
     {
         // Ignore Spelling: Da, uncaching, OxyPlot, UnCache
@@ -75,17 +78,64 @@ namespace MASIC
         /// </summary>
         public enum ProcessingStepConstants
         {
+            /// <summary>
+            /// Starting a new analysis
+            /// </summary>
             NewTask = 0,
+
+            /// <summary>
+            /// Reading the input file
+            /// </summary>
             ReadDataFile = 1,
+
+            /// <summary>
+            /// Saving the base peak intensity chromatogram
+            /// </summary>
             SaveBPI = 2,
+
+            /// <summary>
+            /// Creating selected ion chromatograms and finding peaks
+            /// </summary>
             CreateSICsAndFindPeaks = 3,
+
+            /// <summary>
+            /// Finding similar parent ions
+            /// </summary>
             FindSimilarParentIons = 4,
+
+            /// <summary>
+            /// Saving extended scan stats files
+            /// </summary>
             SaveExtendedScanStatsFiles = 5,
+
+            /// <summary>
+            /// Saving the SIC stats files
+            /// </summary>
             SaveSICStatsFlatFile = 6,
+
+            /// <summary>
+            /// Closing open file handles
+            /// </summary>
             CloseOpenFileHandles = 7,
+
+            /// <summary>
+            /// Updating the XML file with optimal peak apex values
+            /// </summary>
             UpdateXMLFileWithNewOptimalPeakApexValues = 8,
+
+            /// <summary>
+            /// Creating plots
+            /// </summary>
             CreatePlots = 9,
+
+            /// <summary>
+            /// Processing canceled
+            /// </summary>
             Cancelled = 99,
+
+            /// <summary>
+            /// Processing complete
+            /// </summary>
             Complete = 100
         }
 
@@ -94,24 +144,105 @@ namespace MASIC
         /// </summary>
         public enum MasicErrorCodes
         {
+            /// <summary>
+            /// No error
+            /// </summary>
             NoError = 0,
+
+            /// <summary>
+            /// Invalid dataset lookup file path
+            /// </summary>
             InvalidDatasetLookupFilePath = 1,
-            UnknownFileExtension = 2,            // This error code matches the identical code in clsFilterMsMsSpectra
-            InputFileAccessError = 4,            // This error code matches the identical code in clsFilterMsMsSpectra
+
+            /// <summary>
+            /// Unknown file extension
+            /// </summary>
+            /// <remarks>
+            /// This error code matches the identical code in clsFilterMsMsSpectra
+            /// </remarks>
+            UnknownFileExtension = 2,
+
+            /// <summary>
+            /// Input file access error
+            /// </summary>
+            /// <remarks>
+            /// This error code matches the identical code in clsFilterMsMsSpectra
+            /// </remarks>
+            InputFileAccessError = 4,
+
+            /// <summary>
+            /// Invalid dataset ID
+            /// </summary>
             InvalidDatasetID = 8,
+
+            /// <summary>
+            /// Error creating selected ion chromatograms
+            /// </summary>
             CreateSICsError = 16,
+
+            /// <summary>
+            /// Error finding SIC peaks
+            /// </summary>
             FindSICPeaksError = 32,
+
+            /// <summary>
+            /// Invalid custom SIC values
+            /// </summary>
             InvalidCustomSICValues = 64,
+
+            /// <summary>
+            /// No parent ions were found in the input file
+            /// </summary>
             NoParentIonsFoundInInputFile = 128,
+
+            /// <summary>
+            /// No survey scans were found in the input file
+            /// </summary>
             NoSurveyScansFoundInInputFile = 256,
+
+            /// <summary>
+            /// Error finding similar parent ions
+            /// </summary>
             FindSimilarParentIonsError = 512,
+
+            /// <summary>
+            /// Error reading the input file
+            /// </summary>
             InputFileDataReadError = 1024,
+
+            /// <summary>
+            /// Error writing an output file
+            /// </summary>
             OutputFileWriteError = 2048,
+
+            /// <summary>
+            /// File I/O permission error
+            /// </summary>
             FileIOPermissionsError = 4096,
+
+            /// <summary>
+            /// Error creating the spectrum cache directory
+            /// </summary>
             ErrorCreatingSpectrumCacheDirectory = 8192,
+
+            /// <summary>
+            /// Error caching a spectrum
+            /// </summary>
             ErrorCachingSpectrum = 16384,
+
+            /// <summary>
+            /// Error uncaching a spectrum
+            /// </summary>
             ErrorUncachingSpectrum = 32768,
+
+            /// <summary>
+            /// Error deleting cached spectrum files
+            /// </summary>
             ErrorDeletingCachedSpectrumFiles = 65536,
+
+            /// <summary>
+            /// Unspecified error
+            /// </summary>
             UnspecifiedError = -1
         }
 
@@ -127,6 +258,9 @@ namespace MASIC
         /// </summary>
         public event ProgressSubtaskChangedEventHandler ProgressSubtaskChanged;
 
+        /// <summary>
+        /// Subtask changed event handler
+        /// </summary>
         public delegate void ProgressSubtaskChangedEventHandler();
 
         /// <summary>
@@ -134,6 +268,9 @@ namespace MASIC
         /// </summary>
         public event ProgressResetKeypressAbortEventHandler ProgressResetKeypressAbort;
 
+        /// <summary>
+        /// Abort processing event handler
+        /// </summary>
         public delegate void ProgressResetKeypressAbortEventHandler();
 
         /// <summary>
@@ -153,6 +290,9 @@ namespace MASIC
                 return string.Empty;
             }
         }
+        /// <summary>
+        /// Returns the version of the MASIC peak finder DLL
+        /// </summary>
 
         /// <summary>
         /// Processing options
@@ -172,7 +312,6 @@ namespace MASIC
         /// <summary>
         /// Subtask progress percent complete
         /// </summary>
-        /// <returns></returns>
         /// <remarks>Value between 0 and 100</remarks>
         public float SubtaskProgressPercentComplete { get; private set; }
 
@@ -602,7 +741,6 @@ namespace MASIC
         /// <summary>
         /// Get supported file extensions
         /// </summary>
-        /// <returns></returns>
         public override IList<string> GetDefaultExtensionsToParse()
         {
             return clsDataImport.GetDefaultExtensionsToParse();
@@ -611,7 +749,6 @@ namespace MASIC
         /// <summary>
         /// Get the error message, or an empty string if no error
         /// </summary>
-        /// <returns></returns>
         public override string GetErrorMessage()
         {
             if (ErrorCode == ProcessFilesErrorCodes.LocalizedError ||
@@ -649,7 +786,6 @@ namespace MASIC
         /// <summary>
         /// Get the amount of free memory, in MB
         /// </summary>
-        /// <returns></returns>
         private float GetFreeMemoryMB()
         {
             var freeMemoryMB = SystemInfo.GetFreeMemoryMB();
@@ -660,7 +796,6 @@ namespace MASIC
         /// <summary>
         /// Get the amount of memory used by this process
         /// </summary>
-        /// <returns></returns>
         private float GetProcessMemoryUsageMB()
         {
             // Obtain a handle to the current process
@@ -673,7 +808,6 @@ namespace MASIC
         /// <summary>
         /// Get total processing time, in seconds
         /// </summary>
-        /// <returns></returns>
         private float GetTotalProcessingTimeSec()
         {
             var currentProcess = Process.GetCurrentProcess();
@@ -917,7 +1051,6 @@ namespace MASIC
         /// <param name="outputDirectoryPath"></param>
         /// <param name="parameterFilePath"></param>
         /// <param name="resetErrorCode"></param>
-        /// <returns></returns>
         public override bool ProcessFile(
             string inputFilePath,
             string outputDirectoryPath,
@@ -1209,7 +1342,7 @@ namespace MASIC
                 // ---------------------------------------------------------
                 // See if an output XML file already exists
                 // If it does, open it and read the parameters used
-                // If they match the current analysis parameters, and if the input file specs match the input file, then
+                // If they match the current analysis parameters, and if the input file specs match the input file,
                 // do not reprocess
                 // ---------------------------------------------------------
 

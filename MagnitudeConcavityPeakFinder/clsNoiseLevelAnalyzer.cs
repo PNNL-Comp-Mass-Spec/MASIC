@@ -33,7 +33,7 @@ namespace MagnitudeConcavityPeakFinder
             public float MinimumSignalToNoiseRatio;
 
             /// <summary>
-            /// If the noise threshold computed is less than this value, then will use this value to compute S/N; additionally, this is used as the minimum intensity threshold when computing a trimmed noise level
+            /// If the noise threshold computed is less than this value, will use this value to compute S/N; additionally, this is used as the minimum intensity threshold when computing a trimmed noise level
             /// </summary>
             public float MinimumBaselineNoiseLevel;
 

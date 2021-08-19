@@ -2,6 +2,9 @@
 
 namespace MASIC
 {
+    /// <summary>
+    /// Container for a unique m/z item
+    /// </summary>
     public class clsUniqueMZListItem
     {
         /// <summary>
@@ -42,7 +45,6 @@ namespace MASIC
         /// <summary>
         /// Number of items in MatchIndices
         /// </summary>
-        /// <returns></returns>
         public int MatchCount => MatchIndices.Count;
 
         /// <summary>
@@ -58,6 +60,9 @@ namespace MASIC
             MatchIndices = new List<int>();
         }
 
+        /// <summary>
+        /// Show the average m/z value and match count
+        /// </summary>
         public override string ToString()
         {
             return "m/z avg: " + MZAvg + ", MatchCount: " + MatchIndices.Count;

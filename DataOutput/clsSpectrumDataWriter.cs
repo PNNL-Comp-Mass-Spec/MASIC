@@ -28,7 +28,6 @@ namespace MASIC.DataOutput
         /// <param name="spectraCache"></param>
         /// <param name="inputFileName"></param>
         /// <param name="outputDirectoryPath"></param>
-        /// <returns></returns>
         public bool ExportRawDataToDisk(
             clsScanList scanList,
             clsSpectraCache spectraCache,
@@ -208,7 +207,7 @@ namespace MASIC.DataOutput
                 // Update the minimum intensity if a higher minimum intensity is defined in .IntensityMinimum
                 minimumIntensityCurrentScan = Math.Max(minimumIntensityCurrentScan, mOptions.RawDataExportOptions.IntensityMinimum);
 
-                // If mOptions.RawDataExportOptions.MinimumSignalToNoiseRatio is > 0, then possibly update minimumIntensityCurrentScan
+                // If mOptions.RawDataExportOptions.MinimumSignalToNoiseRatio is > 0, possibly update minimumIntensityCurrentScan
                 if (mOptions.RawDataExportOptions.MinimumSignalToNoiseRatio > 0)
                 {
                     minimumIntensityCurrentScan = Math.Max(minimumIntensityCurrentScan, currentScan.BaselineNoiseStats.NoiseLevel * mOptions.RawDataExportOptions.MinimumSignalToNoiseRatio);
@@ -330,7 +329,7 @@ namespace MASIC.DataOutput
                 // Update the minimum intensity if a higher minimum intensity is defined in .IntensityMinimum
                 minimumIntensityCurrentScan = Math.Max(minimumIntensityCurrentScan, mOptions.RawDataExportOptions.IntensityMinimum);
 
-                // If mOptions.RawDataExportOptions.MinimumSignalToNoiseRatio is > 0, then possibly update minimumIntensityCurrentScan
+                // If mOptions.RawDataExportOptions.MinimumSignalToNoiseRatio is > 0, possibly update minimumIntensityCurrentScan
                 if (mOptions.RawDataExportOptions.MinimumSignalToNoiseRatio > 0)
                 {
                     minimumIntensityCurrentScan = Math.Max(minimumIntensityCurrentScan, currentScan.BaselineNoiseStats.NoiseLevel * mOptions.RawDataExportOptions.MinimumSignalToNoiseRatio);

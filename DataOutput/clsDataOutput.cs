@@ -7,48 +7,174 @@ using PRISM;
 
 namespace MASIC.DataOutput
 {
+    /// <summary>
+    /// Methods for writing data to the scan stats, SIC stats, and report ions .txt files
+    /// </summary>
     public class clsDataOutput : clsMasicEventNotifier
     {
+        // Ignore Spelling: crosstab
+
+        /// <summary>
+        /// Scan stats file suffix
+        /// </summary>
         public const string SCAN_STATS_FILE_SUFFIX = "_ScanStats.txt";
 
+        /// <summary>
+        /// SIC stats file suffix
+        /// </summary>
         public const string SIC_STATS_FILE_SUFFIX = "_SICstats.txt";
 
+        /// <summary>
+        /// Reporter ions file suffix
+        /// </summary>
         public const string REPORTER_IONS_FILE_SUFFIX = "_ReporterIons.txt";
 
+        /// <summary>
+        /// Output file types
+        /// </summary>
         public enum OutputFileTypeConstants
         {
+            /// <summary>
+            /// XML results file
+            /// </summary>
             XMLFile = 0,
+
+            /// <summary>
+            /// Scan stats file, _ScanStats.txt
+            /// </summary>
             ScanStatsFlatFile = 1,
+
+            /// <summary>
+            /// Extended scan stats file, _ScanStatsEx.txt
+            /// </summary>
             ScanStatsExtendedFlatFile = 2,
+
+            /// <summary>
+            /// Consolidated extended scan stats file, _ScanStatsConstant.txt
+            /// </summary>
             ScanStatsExtendedConstantFlatFile = 3,
+
+            /// <summary>
+            /// SIC stats file, _SICstats.txt
+            /// </summary>
             SICStatsFlatFile = 4,
+
+            /// <summary>
+            /// BPI plot that includes all scans, _BPI_MS.png
+            /// </summary>
             BPIFile = 5,
+
+            /// <summary>
+            /// BPI plot that only includes MSn scans, _BPI_MSn.png
+            /// </summary>
             FragBPIFile = 6,
+
+            /// <summary>
+            /// TIC plot, _TIC.png
+            /// </summary>
             TICFile = 7,
+
+            /// <summary>
+            /// ICR-2LS compatible _TIC_MSMS_Scan.tic file
+            /// </summary>
             ICRToolsFragTICChromatogramByScan = 8,
+
+            /// <summary>
+            /// ICR-2LS compatible _BPI_Scan.tic file
+            /// </summary>
             ICRToolsBPIChromatogramByScan = 9,
+
+            /// <summary>
+            /// ICR-2LS compatible _BPI_Time.tic file
+            /// </summary>
             ICRToolsBPIChromatogramByTime = 10,
+
+            /// <summary>
+            /// ICR-2LS compatible _TIC_Scan.tic file
+            /// </summary>
             ICRToolsTICChromatogramByScan = 11,
+
+            /// <summary>
+            /// ICR-2LS compatible .pek file
+            /// </summary>
             PEKFile = 12,
+
+            /// <summary>
+            /// Header glossary file
+            /// </summary>
             HeaderGlossary = 13,
+
+            /// <summary>
+            /// DeconTools compatible _scans.csv file
+            /// </summary>
             DeconToolsScansFile = 14,
+
+            /// <summary>
+            /// DeconTools compatible _isos.csv file
+            /// </summary>
             DeconToolsIsosFile = 15,
+
+            /// <summary>
+            /// DeconTools compatible _MS_scans.csv file
+            /// </summary>
             DeconToolsMSChromatogramFile = 16,
+
+            /// <summary>
+            /// DeconTools compatible _MSMS_scans.csv file
+            /// </summary>
             DeconToolsMSMSChromatogramFile = 17,
+
+            /// <summary>
+            /// MS Method file, _MSMethod.txt
+            /// </summary>
             MSMethodFile = 18,
+
+            /// <summary>
+            /// MS tune file, _MSTuneSettings.txt
+            /// </summary>
             MSTuneFile = 19,
+
+            /// <summary>
+            /// Reporter ions file, _ReporterIons.txt
+            /// </summary>
             ReporterIonsFile = 20,
+
+            /// <summary>
+            /// MRM settings file, _MRMSettings
+            /// </summary>
             MRMSettingsFile = 21,
+
+            /// <summary>
+            /// MRM data file, _MRMData.txt
+            /// </summary>
             MRMDatafile = 22,
+
+            /// <summary>
+            /// MRM crosstab file, _MRMCrosstab.txt
+            /// </summary>
             MRMCrosstabFile = 23,
+
+            /// <summary>
+            /// Dataset info file, _DatasetInfo.xml
+            /// </summary>
             DatasetInfoFile = 24,
+
+            /// <summary>
+            /// SIC data file, _SICdata.txt
+            /// </summary>
             SICDataFile = 25
         }
 
         private readonly MASICOptions mOptions;
 
+        /// <summary>
+        /// Output file handles
+        /// </summary>
         public clsOutputFileHandles OutputFileHandles { get; }
 
+        /// <summary>
+        /// Extended scan stats writer
+        /// </summary>
         public clsExtendedStatsWriter ExtendedStatsWriter { get; }
 
         /// <summary>
@@ -506,6 +632,13 @@ namespace MASIC.DataOutput
             return validExistingResultsFound;
         }
 
+        /// <summary>
+        /// Obtain the output file path for the given file type
+        /// </summary>
+        /// <param name="inputFileName"></param>
+        /// <param name="outputDirectoryPath"></param>
+        /// <param name="eFileType"></param>
+        /// <param name="fragTypeNumber"></param>
         public static string ConstructOutputFilePath(
             string inputFileName,
             string outputDirectoryPath,
@@ -600,6 +733,14 @@ namespace MASIC.DataOutput
             return outputFilePath;
         }
 
+        /// <summary>
+        /// Create the dataset info file
+        /// </summary>
+        /// <param name="inputFileName"></param>
+        /// <param name="outputDirectoryPath"></param>
+        /// <param name="scanTracking"></param>
+        /// <param name="datasetFileInfo"></param>
+        /// <returns>True if success, false if an error</returns>
         public bool CreateDatasetInfoFile(
             string inputFileName,
             string outputDirectoryPath,
@@ -635,11 +776,22 @@ namespace MASIC.DataOutput
             }
         }
 
+        /// <summary>
+        /// Get the header line for the given file type, tab delimited
+        /// </summary>
+        /// <param name="scanList"></param>
+        /// <param name="eOutputFileType"></param>
         public string GetHeadersForOutputFile(clsScanList scanList, OutputFileTypeConstants eOutputFileType)
         {
             return GetHeadersForOutputFile(scanList, eOutputFileType, '\t');
         }
 
+        /// <summary>
+        /// Get the header line for the given file type, using the specified delimiter
+        /// </summary>
+        /// <param name="scanList"></param>
+        /// <param name="eOutputFileType"></param>
+        /// <param name="delimiter"></param>
         public string GetHeadersForOutputFile(
             clsScanList scanList, OutputFileTypeConstants eOutputFileType, char delimiter)
         {
@@ -750,6 +902,12 @@ namespace MASIC.DataOutput
             return string.Join(delimiter.ToString(), headerNames);
         }
 
+        /// <summary>
+        /// Initialize the SIC details file, _SICdata.txt
+        /// </summary>
+        /// <param name="inputFilePathFull"></param>
+        /// <param name="outputDirectoryPath"></param>
+        /// <returns>True if success, false if an error</returns>
         public bool InitializeSICDetailsTextFile(
             string inputFilePathFull,
             string outputDirectoryPath)
@@ -785,6 +943,12 @@ namespace MASIC.DataOutput
             return true;
         }
 
+        /// <summary>
+        /// Open the output file handles
+        /// </summary>
+        /// <param name="inputFileName"></param>
+        /// <param name="outputDirectoryPath"></param>
+        /// <param name="writeHeaders"></param>
         public void OpenOutputFileHandles(
             string inputFileName,
             string outputDirectoryPath,
@@ -800,6 +964,13 @@ namespace MASIC.DataOutput
             OutputFileHandles.MSTuneFilePathBase = ConstructOutputFilePath(inputFileName, outputDirectoryPath, OutputFileTypeConstants.MSTuneFile);
         }
 
+        /// <summary>
+        /// Save the header glossary
+        /// </summary>
+        /// <param name="scanList"></param>
+        /// <param name="inputFileName"></param>
+        /// <param name="outputDirectoryPath"></param>
+        /// <returns>True if success, false if an error</returns>
         public bool SaveHeaderGlossary(
             clsScanList scanList,
             string inputFileName,
@@ -841,6 +1012,14 @@ namespace MASIC.DataOutput
             return true;
         }
 
+        /// <summary>
+        /// Save SIC data to the SIC data file
+        /// </summary>
+        /// <param name="sicOptions"></param>
+        /// <param name="scanList"></param>
+        /// <param name="parentIonIndex"></param>
+        /// <param name="sicDetails"></param>
+        /// <returns>True if success, false if an error</returns>
         public bool SaveSICDataToText(
             SICOptions sicOptions,
             clsScanList scanList,

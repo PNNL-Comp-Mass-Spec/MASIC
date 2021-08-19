@@ -6,6 +6,9 @@ using MASICPeakFinder;
 
 namespace MASIC
 {
+    /// <summary>
+    /// Class for tracking scan metadata
+    /// </summary>
     public class clsScanTracking : clsMasicEventNotifier
     {
         /// <summary>
@@ -181,7 +184,7 @@ namespace MASIC
 
             // Step through the data, consolidating data within msDataResolution
             // Note that we're copying in place rather than making a new, duplicate array
-            // If the m/z value is between mzIgnoreRangeStart and mzIgnoreRangeEnd, then we will not compress the data
+            // If the m/z value is between mzIgnoreRangeStart and mzIgnoreRangeEnd, we will not compress the data
 
             targetIndex = 0;
             index = 0;
@@ -267,6 +270,19 @@ namespace MASIC
             }
         }
 
+        /// <summary>
+        /// Process and store a spectrum
+        /// </summary>
+        /// <param name="scanInfo"></param>
+        /// <param name="dataImportUtilities"></param>
+        /// <param name="spectraCache"></param>
+        /// <param name="msSpectrum"></param>
+        /// <param name="noiseThresholdOptions"></param>
+        /// <param name="discardLowIntensityData"></param>
+        /// <param name="compressData"></param>
+        /// <param name="msDataResolution"></param>
+        /// <param name="keepRawSpectrum"></param>
+        /// <returns>True if success false if an error</returns>
         public bool ProcessAndStoreSpectrum(
             clsScanInfo scanInfo,
             DataInput.clsDataImport dataImportUtilities,
@@ -296,7 +312,7 @@ namespace MASIC
                 if (discardLowIntensityData && scanInfo.MRMScanType == ThermoRawFileReader.MRMScanTypeConstants.NotMRM)
                 {
                     // Discard data below the noise level or below the minimum S/N level
-                    // If we are searching for Reporter ions, then it is important to not discard any of the ions in the region of the reporter ion m/z values
+                    // If we are searching for Reporter ions, it is important to not discard any of the ions in the region of the reporter ion m/z values
                     lastKnownLocation = "Call DiscardDataBelowNoiseThreshold";
                     dataImportUtilities.DiscardDataBelowNoiseThreshold(msSpectrum,
                                                                        scanInfo.BaselineNoiseStats.NoiseLevel,
@@ -310,7 +326,7 @@ namespace MASIC
                 if (compressData)
                 {
                     lastKnownLocation = "Call CompressSpectraData";
-                    // Again, if we are searching for Reporter ions, then it is important to not discard any of the ions in the region of the reporter ion m/z values
+                    // Again, if we are searching for Reporter ions, it is important to not discard any of the ions in the region of the reporter ion m/z values
                     CompressSpectraData(msSpectrum, msDataResolution,
                                         mReporterIons.MZIntensityFilterIgnoreRangeStart,
                                         mReporterIons.MZIntensityFilterIgnoreRangeEnd);

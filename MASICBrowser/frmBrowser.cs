@@ -1563,7 +1563,7 @@ namespace MASICBrowser
         /// </para>
         /// <para>
         /// Construct a mapping between .FragScanObserved and Index in mParentIonStats
-        /// If multiple parent ions have the same value for .FragScanObserved, then the we will only track the mapping to the first one
+        /// If multiple parent ions have the same value for .FragScanObserved, we will only track the mapping to the first one
         /// </para>
         /// </summary>
         private void PopulateParentIonIndexColumnInMsMsResultsTable()
@@ -1809,7 +1809,7 @@ namespace MASICBrowser
                                         sicScans.Add(scanStart);
 
                                         // scanIntervals contains the intervals from each scan to the next
-                                        // If the interval is <=9, then it is stored as a number
+                                        // If the interval is <= 9, it is stored as a number
                                         // For intervals between 10 and 35, uses letters A to Z
                                         // For intervals between 36 and 61, uses letters A to Z
                                         if (scanIntervals != null)

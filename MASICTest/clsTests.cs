@@ -176,7 +176,7 @@ namespace MASICTest
                     // Determine the minimum positive intensity in this scan
                     newSurveyScan.MinimumPositiveIntensity = INTENSITY_MINIMUM;
 
-                    // If this is a mzXML file that was processed with ReadW, then these values will get updated by UpdateMSXMLScanType
+                    // If this is a mzXML file that was processed with ReadW, these values will get updated by UpdateMSXMLScanType
                     newSurveyScan.ZoomScan = false;
                     newSurveyScan.SIMScan = false;
                     newSurveyScan.MRMScanType = MRMScanTypeConstants.NotMRM;
@@ -214,7 +214,7 @@ namespace MASICTest
                     // Determine the minimum positive intensity in this scan
                     newFragScan.MinimumPositiveIntensity = INTENSITY_MINIMUM;
 
-                    // If this is a mzXML file that was processed with ReadW, then these values will get updated by UpdateMSXMLScanType
+                    // If this is a mzXML file that was processed with ReadW, these values will get updated by UpdateMSXMLScanType
                     newFragScan.ZoomScan = false;
                     newFragScan.SIMScan = false;
                     newFragScan.MRMScanType = MRMScanTypeConstants.NotMRM;

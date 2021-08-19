@@ -3,6 +3,9 @@ using System.Collections.Generic;
 
 namespace MASIC
 {
+    /// <summary>
+    /// Container for reporter ions to find
+    /// </summary>
     public class clsReporterIons
     {
         // ReSharper disable CommentTypo
@@ -12,32 +15,149 @@ namespace MASIC
 
         // ReSharper restore CommentTypo
 
+        /// <summary>
+        /// Default reporter ion tolerance, in Da
+        /// </summary>
         public const double REPORTER_ION_TOLERANCE_DA_DEFAULT = 0.5;
+
+        /// <summary>
+        /// Default minimum allowed reporter ion tolerance, in Da
+        /// </summary>
         public const double REPORTER_ION_TOLERANCE_DA_MINIMUM = 0.001;
 
+        /// <summary>
+        /// Default reporter ion tolerance for 8-plex iTRAQ
+        /// </summary>
         public const double REPORTER_ION_TOLERANCE_DA_DEFAULT_ITRAQ8_HIGH_RES = 0.015;
 
+        /// <summary>
+        /// Default reporter ion tolerance for 6-plex TMT reporter ions
+        /// </summary>
+        public const double REPORTER_ION_TOLERANCE_DA_DEFAULT_TMT6 = 0.015;
+
+        /// <summary>
+        /// Default reporter ion tolerance for 10-plex TMT reporter ions (also applies to 11-plex ans 16-plex TMT)
+        /// </summary>
+        public const double REPORTER_ION_TOLERANCE_DA_DEFAULT_TMT10 = 0.015;
+
+        /// <summary>
+        /// Reporter ion mass modes
+        /// </summary>
         public enum ReporterIonMassModeConstants
         {
+            /// <summary>
+            /// Custom / none
+            /// </summary>
             CustomOrNone = 0,
+
+            /// <summary>
+            /// 4-plex iTRAQ
+            /// </summary>
             ITraqFourMZ = 1,
+
+            /// <summary>
+            /// 3-plex iTRAQ
+            /// </summary>
             ITraqETDThreeMZ = 2,
+
+            /// <summary>
+            /// 2-plex TMT
+            /// </summary>
             TMTTwoMZ = 3,
+
+            /// <summary>
+            /// 6-plex TMT
+            /// </summary>
             TMTSixMZ = 4,
-            ITraqEightMZHighRes = 5,     // This version of 8-plex iTraq should be used when the reporter ion search tolerance is +/-0.03 Da or smaller
-            ITraqEightMZLowRes = 6,      // This version of 8-plex iTraq will account for immonium loss from phenylalanine
+
+            /// <summary>
+            /// 8-plex iTRAQ
+            /// </summary>
+            /// <remarks>
+            /// This version of 8-plex iTraq should be used when the reporter ion search tolerance is +/-0.03 Da or smaller
+            /// </remarks>
+            ITraqEightMZHighRes = 5,
+
+            /// <summary>
+            /// 8-plex iTRAQ
+            /// </summary>
+            /// <remarks>
+            /// This version of 8-plex iTraq will account for immonium loss from phenylalanine
+            /// </remarks>
+            ITraqEightMZLowRes = 6,
+
+            /// <summary>
+            /// PC Galnaz fragments
+            /// </summary>
             PCGalnaz = 7,
+
+            /// <summary>
+            /// Heme-C fragments
+            /// </summary>
             HemeCFragment = 8,
+
+            /// <summary>
+            /// Lys acet fragments
+            /// </summary>
             LycAcetFragment = 9,
-            TMTTenMZ = 10,               // Several of the reporter ion masses are just 49 ppm apart, thus you must use a very tight tolerance of +/-0.003 Da
+
+            /// <summary>
+            /// 10-plex TMT
+            /// </summary>
+            /// <remarks>
+            /// Several of the reporter ion masses are just 49 ppm apart, thus you must use a very tight tolerance of +/-0.003 Da
+            /// </remarks>
+            TMTTenMZ = 10,
+
+            /// <summary>
+            /// O-GlcNAc fragments
+            /// </summary>
             OGlcNAc = 11,
+
+            /// <summary>
+            /// Fracking amine fragments
+            /// </summary>
             FrackingAmine20160217 = 12,
+
+            /// <summary>
+            /// FSFA carbonyl fragments
+            /// </summary>
             FSFACustomCarbonyl = 13,
+
+            /// <summary>
+            /// FSFA carboxylic fragments
+            /// </summary>
             FSFACustomCarboxylic = 14,
+
+            /// <summary>
+            /// FSFA hydroxyl fragments
+            /// </summary>
             FSFACustomHydroxyl = 15,
+
+            /// <summary>
+            /// 11-plex TMT
+            /// </summary>
+            /// <remarks>
+            /// Several of the reporter ion masses are just 49 ppm apart, thus you must use a very tight tolerance of +/-0.003 Da
+            /// </remarks>
             TMTElevenMZ = 16,
+
+            /// <summary>
+            /// Acetylation fragments
+            /// </summary>
             Acetylation = 17,
+
+            /// <summary>
+            /// 16-plex TMT
+            /// </summary>
+            /// <remarks>
+            /// Several of the reporter ion masses are just 49 ppm apart, thus you must use a very tight tolerance of +/-0.003 Da
+            /// </remarks>
             TMTSixteenMZ = 18,
+
+            /// <summary>
+            /// Native O-GlcNAc fragments
+            /// </summary>
             NativeOGlcNAc = 19
         }
 
@@ -57,12 +177,24 @@ namespace MASIC
         /// </summary>
         public double MZIntensityFilterIgnoreRangeEnd { get; set; }
 
+        /// <summary>
+        /// List of reporter ions
+        /// </summary>
         public List<clsReporterIonInfo> ReporterIonList { get; }
 
+        /// <summary>
+        /// When true,  Look for Reporter Ions in the fragmentation spectra
+        /// </summary>
         public bool ReporterIonStatsEnabled { get; set; }
 
+        /// <summary>
+        /// When true, correct the reporter ion intensities using the Reporter Ion Intensity Corrector class
+        /// </summary>
         public bool ReporterIonApplyAbundanceCorrection { get; set; }
 
+        /// <summary>
+        /// Correction factor to use when the reporter ion mass mode is ITraqFourMZ
+        /// </summary>
         public clsITraqIntensityCorrection.CorrectionFactorsiTRAQ4Plex ReporterIonITraq4PlexCorrectionFactorType { get; set; }
 
         /// <summary>
@@ -70,6 +202,9 @@ namespace MASIC
         /// </summary>
         public bool ReporterIonSaveUncorrectedIntensities { get; set; }
 
+        /// <summary>
+        /// Reporter ion mass mode
+        /// </summary>
         public ReporterIonMassModeConstants ReporterIonMassMode
         {
             get => mReporterIonMassMode;
@@ -81,6 +216,9 @@ namespace MASIC
         /// </summary>
         public bool ReporterIonSaveObservedMasses { get; set; }
 
+        /// <summary>
+        /// Default reporter ion tolerance, in Da
+        /// </summary>
         public double ReporterIonToleranceDaDefault
         {
             get
@@ -106,6 +244,10 @@ namespace MASIC
             InitializeReporterIonInfo();
         }
 
+        /// <summary>
+        /// Get the default reporter ions, using the default reporter ion m/z tolerance (customized based on eReporterIonMassMode)
+        /// </summary>
+        /// <param name="eReporterIonMassMode"></param>
         public static List<clsReporterIonInfo> GetDefaultReporterIons(ReporterIonMassModeConstants eReporterIonMassMode)
         {
             if (eReporterIonMassMode == ReporterIonMassModeConstants.ITraqEightMZHighRes)
@@ -118,6 +260,11 @@ namespace MASIC
             }
         }
 
+        /// <summary>
+        /// Get the reporter ion m/z values for the given reporter ion mass mode
+        /// </summary>
+        /// <param name="eReporterIonMassMode"></param>
+        /// <param name="mzToleranceDa"></param>
         public static List<clsReporterIonInfo> GetDefaultReporterIons(
             ReporterIonMassModeConstants eReporterIonMassMode,
             double mzToleranceDa)
@@ -330,6 +477,10 @@ namespace MASIC
             return reporterIons;
         }
 
+        /// <summary>
+        /// Get a description of the given reporter ion mode
+        /// </summary>
+        /// <param name="eReporterIonMode"></param>
         public static string GetReporterIonModeDescription(ReporterIonMassModeConstants eReporterIonMode)
         {
             return eReporterIonMode switch
@@ -373,6 +524,10 @@ namespace MASIC
             ReporterIonSaveUncorrectedIntensities = false;
         }
 
+        /// <summary>
+        /// Set the reporter ion mass mode
+        /// </summary>
+        /// <param name="eReporterIonMassMode"></param>
         public void SetReporterIonMassMode(ReporterIonMassModeConstants eReporterIonMassMode)
         {
             if (eReporterIonMassMode == ReporterIonMassModeConstants.ITraqEightMZHighRes)
@@ -385,6 +540,11 @@ namespace MASIC
             }
         }
 
+        /// <summary>
+        /// Set the reporter ion mass mode
+        /// </summary>
+        /// <param name="eReporterIonMassMode"></param>
+        /// <param name="mzToleranceDa"></param>
         public void SetReporterIonMassMode(
             ReporterIonMassModeConstants eReporterIonMassMode,
             double mzToleranceDa)
@@ -402,6 +562,11 @@ namespace MASIC
             }
         }
 
+        /// <summary>
+        /// Define reporter ions to search for
+        /// </summary>
+        /// <param name="reporterIons"></param>
+        /// <param name="customReporterIons"></param>
         public void SetReporterIons(
             List<clsReporterIonInfo> reporterIons,
             bool customReporterIons)

@@ -14,6 +14,9 @@ namespace MASIC
     /// </summary>
     public class clsSearchRange
     {
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public clsSearchRange()
         {
             InitializeLocalVariables();
@@ -40,6 +43,9 @@ namespace MASIC
 
         private bool mPointerArrayIsValid;
 
+        /// <summary>
+        /// Number of data points tracked by this class (stored via FillWithData)
+        /// </summary>
         public int DataCount
         {
             get
@@ -59,7 +65,6 @@ namespace MASIC
         /// Get the original index of a data point, given its current index
         /// </summary>
         /// <param name="index"></param>
-        /// <returns></returns>
         // ReSharper disable once UnusedMember.Global
         public int get_OriginalIndex(int index)
         {

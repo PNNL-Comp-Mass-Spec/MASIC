@@ -4,6 +4,9 @@ using ThermoRawFileReader;
 
 namespace MASIC.DataOutput
 {
+    /// <summary>
+    /// Class for writing method settings and tune settings for Thermo files
+    /// </summary>
     public class clsThermoMetadataWriter : clsMasicEventNotifier
     {
         /// <summary>
@@ -11,7 +14,6 @@ namespace MASIC.DataOutput
         /// </summary>
         /// <param name="rawFileReader"></param>
         /// <param name="dataOutputHandler"></param>
-        /// <returns></returns>
         public bool SaveMSMethodFile(
             XRawFileIO rawFileReader,
             clsDataOutput dataOutputHandler)
@@ -71,7 +73,6 @@ namespace MASIC.DataOutput
         /// </summary>
         /// <param name="rawFileReader"></param>
         /// <param name="dataOutputHandler"></param>
-        /// <returns></returns>
         public bool SaveMSTuneFile(
             XRawFileIO rawFileReader,
             clsDataOutput dataOutputHandler)

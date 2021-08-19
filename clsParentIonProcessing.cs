@@ -5,6 +5,9 @@ using MASIC.Options;
 
 namespace MASIC
 {
+    /// <summary>
+    /// Class for tracking parent ions
+    /// </summary>
     public class clsParentIonProcessing : clsMasicEventNotifier
     {
         // Ignore Spelling: Da, Daltons
@@ -192,7 +195,7 @@ namespace MASIC
                 scanList.FragScans[fragScanIndex].FragScanInfo.ParentIonInfoIndex = scanList.ParentIons.Count;
 
                 // Look for .MZ in the survey scan, using a tolerance of parentIonTolerance
-                // If found, then update the mass to the matched ion
+                // If found, update the mass to the matched ion
                 // This is done to determine the parent ion mass more precisely
                 if (sicOptions.RefineReportedParentIonMZ)
                 {
@@ -259,6 +262,23 @@ namespace MASIC
             }
         }
 
+        /// <summary>
+        /// Compare the fragmentation spectra for the two parent ions
+        /// </summary>
+        /// <param name="scanList"></param>
+        /// <param name="spectraCache"></param>
+        /// <param name="parentIonIndex1"></param>
+        /// <param name="parentIonIndex2"></param>
+        /// <param name="binningOptions"></param>
+        /// <param name="noiseThresholdOptions"></param>
+        /// <param name="dataImportUtilities"></param>
+        /// <remarks>
+        /// Returns 0 if no similarity or no spectra to compare
+        /// Returns -1 if an error
+        /// </remarks>
+        /// <returns>
+        /// The highest similarity score (ranging from 0 to 1, where 1 is a perfect match)
+        /// </returns>
         private float CompareFragSpectraForParentIons(
             clsScanList scanList,
             clsSpectraCache spectraCache,
@@ -268,11 +288,6 @@ namespace MASIC
             MASICPeakFinder.clsBaselineNoiseOptions noiseThresholdOptions,
             DataInput.clsDataImport dataImportUtilities)
         {
-            // Compare the fragmentation spectra for the two parent ions
-            // Returns the highest similarity score (ranging from 0 to 1)
-            // Returns 0 if no similarity or no spectra to compare
-            // Returns -1 if an error
-
             float highestSimilarityScore;
 
             try
@@ -345,20 +360,31 @@ namespace MASIC
             return highestSimilarityScore;
         }
 
+        /// <summary>
+        /// Compares two spectra and returns a similarity score (ranging from 0 to 1)
+        /// </summary>
+        /// <param name="fragSpectrum1"></param>
+        /// <param name="fragSpectrum2"></param>
+        /// <param name="binningOptions"></param>
+        /// <param name="considerOffsetBinnedData"></param>
+        /// <remarks>
+        /// <para>
+        /// Both the standard binned data and the offset binned data are compared
+        /// </para>
+        /// <para>
+        /// If considerOffsetBinnedData = True, the larger of the two similarity scores is returned
+        /// </para>
+        /// <para>
+        /// Returns -1 if an error
+        /// </para>
+        /// </remarks>
+        /// The highest similarity score (ranging from 0 to 1, where 1 is a perfect match)
         private float CompareSpectra(
             clsMSSpectrum fragSpectrum1,
             clsMSSpectrum fragSpectrum2,
             BinningOptions binningOptions,
             bool considerOffsetBinnedData = true)
         {
-            // Compares the two spectra and returns a similarity score (ranging from 0 to 1)
-            // Perfect match is 1; no similarity is 0
-            // Note that both the standard binned data and the offset binned data are compared
-            // If considerOffsetBinnedData = True, then the larger of the two scores is returned
-            // similarity scores is returned
-            //
-            // If an error, returns -1
-
             var binnedSpectrum1 = new clsBinnedData();
             var binnedSpectrum2 = new clsBinnedData();
 
@@ -465,6 +491,16 @@ namespace MASIC
             return success;
         }
 
+        /// <summary>
+        /// Searches mzList for the closest match to searchMZ within tolerance bestMatchMZ
+        /// If a match is found, updates bestMatchMZ to the m/z of the match and returns True
+        /// </summary>
+        /// <param name="mzList"></param>
+        /// <param name="ionCount"></param>
+        /// <param name="searchMZ"></param>
+        /// <param name="toleranceMZ"></param>
+        /// <param name="bestMatchMZ"></param>
+        /// <returns>Closest m/z value</returns>
         private bool FindClosestMZ(
             IList<double> mzList,
             int ionCount,
@@ -472,9 +508,6 @@ namespace MASIC
             double toleranceMZ,
             out double bestMatchMZ)
         {
-            // Searches mzList for the closest match to searchMZ within tolerance bestMatchMZ
-            // If a match is found, then updates bestMatchMZ to the m/z of the match and returns True
-
             int closestMatchIndex;
             var bestMassDifferenceAbs = 0.0;
 
@@ -519,7 +552,6 @@ namespace MASIC
         /// <param name="masicOptions"></param>
         /// <param name="dataImportUtilities"></param>
         /// <param name="ionUpdateCount"></param>
-        /// <returns></returns>
         public bool FindSimilarParentIons(
             clsScanList scanList,
             clsSpectraCache spectraCache,
@@ -660,7 +692,7 @@ namespace MASIC
                         similarParentIonsData.IonInUseCount = 1;
 
                         // Look for other parent ions with m/z values in tolerance (must be within mass tolerance and scan tolerance)
-                        // If new values are added, then repeat the search using the updated udtUniqueMZList().MZAvg value
+                        // If new values are added, repeat the search using the updated udtUniqueMZList().MZAvg value
                         int ionInUseCountOriginal;
                         do
                         {
@@ -865,7 +897,6 @@ namespace MASIC
         /// </summary>
         /// <param name="sicOptions"></param>
         /// <param name="parentIonMZ"></param>
-        /// <returns></returns>
         public static double GetParentIonToleranceDa(SICOptions sicOptions, double parentIonMZ)
         {
             return GetParentIonToleranceDa(sicOptions, parentIonMZ, sicOptions.SICTolerance);
@@ -878,7 +909,6 @@ namespace MASIC
         /// <param name="sicOptions"></param>
         /// <param name="parentIonMZ"></param>
         /// <param name="parentIonTolerance"></param>
-        /// <returns></returns>
         public static double GetParentIonToleranceDa(SICOptions sicOptions, double parentIonMZ, double parentIonTolerance)
         {
             if (sicOptions.SICToleranceIsPPM)

@@ -6,13 +6,27 @@ using PRISMDatabaseUtils;
 
 namespace MASIC
 {
+    /// <summary>
+    /// Class for obtaining data from the DMS database
+    /// </summary>
     public class clsDatabaseAccess : clsMasicEventNotifier
     {
-        // frmMain uses these constants
-
         // ReSharper disable UnusedMember.Global
 
+        /// <summary>
+        /// DMS connection string
+        /// </summary>
+        /// <remarks>
+        /// The GUI uses this (see frmMain)
+        /// </remarks>
         public const string DATABASE_CONNECTION_STRING_DEFAULT = "Data Source=gigasax;Initial Catalog=DMS5;User=DMSReader;Password=dms4fun";
+
+        /// <summary>
+        /// Query for obtaining dataset names and IDs
+        /// </summary>
+        /// <remarks>
+        /// The GUI uses this (see frmMain)
+        /// </remarks>
         public const string DATABASE_DATASET_INFO_QUERY_DEFAULT = "Select Dataset, ID FROM V_Dataset_Export";
 
         // ReSharper restore UnusedMember.Global
@@ -36,7 +50,6 @@ namespace MASIC
         /// <param name="inputFilePath"></param>
         /// <param name="datasetLookupFilePath"></param>
         /// <param name="defaultDatasetID"></param>
-        /// <returns></returns>
         public int LookupDatasetID(
             string inputFilePath,
             string datasetLookupFilePath,
@@ -178,7 +191,6 @@ namespace MASIC
         /// <param name="datasetLookupFilePath"></param>
         /// <param name="datasetName"></param>
         /// <param name="newDatasetId"></param>
-        /// <returns></returns>
         private bool GetDatasetIDFromFile(string datasetLookupFilePath, string datasetName, out int newDatasetId)
         {
             var delimiterList = new[] { ' ', ',', '\t' };

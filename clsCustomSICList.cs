@@ -92,7 +92,7 @@ namespace MASIC
         public List<clsCustomMZSearchSpec> CustomMZSearchValues { get; }
 
         /// <summary>
-        /// When True, then will only search for the m/z values listed in the custom m/z list
+        /// When True, only search for the m/z values listed in the custom m/z list
         /// </summary>
         public bool LimitSearchToCustomMZList { get; set; }
 
@@ -303,7 +303,6 @@ namespace MASIC
         /// <param name="scanCenterList">Comma or tab separated list of scan centers</param>
         /// <param name="scanToleranceList">Comma or tab separated list of scan tolerances</param>
         /// <param name="scanCommentList">Comma or tab separated list of comments</param>
-        /// <returns></returns>
         public bool ParseCustomSICList(
             string mzList,
             string mzToleranceDaList,
@@ -589,7 +588,7 @@ namespace MASIC
             }
 
             // Check whether all of the values are between 0 and 1
-            // If they are, then auto-switch .ScanToleranceType to "Relative"
+            // If they are, auto-switch .ScanToleranceType to "Relative"
 
             var countBetweenZeroAndOne = 0;
             var countOverOne = 0;
@@ -630,7 +629,6 @@ namespace MASIC
         /// <summary>
         /// Show a count of the number of custom m/z values to find
         /// </summary>
-        /// <returns></returns>
         public override string ToString()
         {
             if (CustomMZSearchValues == null || CustomMZSearchValues.Count == 0)

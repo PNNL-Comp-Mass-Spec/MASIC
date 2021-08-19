@@ -146,7 +146,6 @@ namespace MASIC
         /// </summary>
         /// <param name="sourceInfo"></param>
         /// <param name="parentIonMZ"></param>
-        /// <returns></returns>
         public static clsMRMScanInfo DuplicateMRMInfo(
             MRMInfo sourceInfo,
             double parentIonMZ)
@@ -176,7 +175,6 @@ namespace MASIC
         /// Duplicate MRM info
         /// </summary>
         /// <param name="sourceInfo"></param>
-        /// <returns></returns>
         private clsMRMScanInfo DuplicateMRMInfo(clsMRMScanInfo sourceInfo)
         {
             var targetInfo = new clsMRMScanInfo
@@ -207,7 +205,6 @@ namespace MASIC
         /// <param name="spectraCache"></param>
         /// <param name="inputFileName"></param>
         /// <param name="outputDirectoryPath"></param>
-        /// <returns></returns>
         public bool ExportMRMDataToDisk(
             clsScanList scanList,
             clsSpectraCache spectraCache,
@@ -555,7 +552,6 @@ namespace MASIC
         /// <param name="xmlResultsWriter"></param>
         /// <param name="peakFinder"></param>
         /// <param name="parentIonsProcessed"></param>
-        /// <returns></returns>
         public bool ProcessMRMList(
             clsScanList scanList,
             clsSpectraCache spectraCache,

@@ -3,6 +3,9 @@ using System.Collections.Generic;
 
 namespace MASIC
 {
+    /// <summary>
+    /// Number utility methods
+    /// </summary>
     public static class clsUtilities
     {
         // CHARGE_CARRIER_MASS_AVG As Double = 1.00739
@@ -56,7 +59,6 @@ namespace MASIC
         /// <param name="currentCharge"></param>
         /// <param name="desiredCharge"></param>
         /// <param name="chargeCarrierMass"></param>
-        /// <returns></returns>
         public static double ConvoluteMass(
             double massMZ,
             short currentCharge,
@@ -118,7 +120,6 @@ namespace MASIC
         /// Convert from a double to float
         /// </summary>
         /// <param name="value"></param>
-        /// <returns></returns>
         /// <remarks>Assures that the value is between float.MinValue and float.MaxValue</remarks>
         public static float CFloatSafe(double value)
         {
@@ -135,7 +136,6 @@ namespace MASIC
         /// Return true if the number can be parsed as a double
         /// </summary>
         /// <param name="value"></param>
-        /// <returns></returns>
         public static bool IsNumber(string value)
         {
             try
@@ -155,7 +155,6 @@ namespace MASIC
         /// <param name="textToUpdate"></param>
         /// <param name="oldSuffix"></param>
         /// <param name="newSuffix"></param>
-        /// <returns></returns>
         public static string ReplaceSuffix(string textToUpdate, string oldSuffix, string newSuffix)
         {
             if (!textToUpdate.EndsWith(oldSuffix, StringComparison.OrdinalIgnoreCase))
@@ -172,7 +171,6 @@ namespace MASIC
         /// </summary>
         /// <param name="value1"></param>
         /// <param name="value2"></param>
-        /// <returns></returns>
         public static bool ValuesMatch(float value1, float value2)
         {
             return ValuesMatch(value1, value2, -1);
@@ -184,7 +182,6 @@ namespace MASIC
         /// <param name="value1"></param>
         /// <param name="value2"></param>
         /// <param name="digitsOfPrecision">Digits to round the numbers to before comparing</param>
-        /// <returns></returns>
         /// <remarks>If digitsOfPrecision is negative, the values must match within float.Epsilon</remarks>
         public static bool ValuesMatch(float value1, float value2, int digitsOfPrecision)
         {
@@ -208,7 +205,6 @@ namespace MASIC
         /// </summary>
         /// <param name="value1"></param>
         /// <param name="value2"></param>
-        /// <returns></returns>
         public static bool ValuesMatch(double value1, double value2)
         {
             return ValuesMatch(value1, value2, -1);
@@ -220,7 +216,6 @@ namespace MASIC
         /// <param name="value1"></param>
         /// <param name="value2"></param>
         /// <param name="digitsOfPrecision">Digits to round the numbers to before comparing</param>
-        /// <returns></returns>
         /// <remarks>If digitsOfPrecision is negative, the values must match within double.Epsilon</remarks>
         public static bool ValuesMatch(double value1, double value2, int digitsOfPrecision)
         {
@@ -244,7 +239,6 @@ namespace MASIC
         /// </summary>
         /// <param name="massToConvert"></param>
         /// <param name="currentMZ"></param>
-        /// <returns></returns>
         // ReSharper disable once UnusedMember.Global
         public static double MassToPPM(double massToConvert, double currentMZ)
         {
@@ -256,7 +250,6 @@ namespace MASIC
         /// </summary>
         /// <param name="ppmToConvert"></param>
         /// <param name="currentMZ"></param>
-        /// <returns></returns>
         public static double PPMToMass(double ppmToConvert, double currentMZ)
         {
             return ppmToConvert / 1000000.0 * currentMZ;

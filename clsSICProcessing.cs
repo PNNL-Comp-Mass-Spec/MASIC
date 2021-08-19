@@ -7,6 +7,9 @@ using MASICPeakFinder;
 
 namespace MASIC
 {
+    /// <summary>
+    /// This class creates selected ion chromatograms for parent ions
+    /// </summary>
     public class clsSICProcessing : clsMasicEventNotifier
     {
         private const string CREATING_SICS = "Creating SIC's for parent ions";
@@ -125,7 +128,6 @@ namespace MASIC
         /// <param name="dataOutputHandler"></param>
         /// <param name="sicProcessor"></param>
         /// <param name="xmlResultsWriter"></param>
-        /// <returns></returns>
         public bool CreateParentIonSICs(
             clsScanList scanList,
             clsSpectraCache spectraCache,
@@ -169,11 +171,11 @@ namespace MASIC
                 Console.Write(CREATING_SICS);
                 ReportMessage(CREATING_SICS);
 
-                // Create an array of m/z values in scanList.ParentIons, then sort by m/z
+                // Create an array of m/z values in scanList.ParentIons, sort by m/z
                 // Next, step through the data in order of m/z, creating SICs for each grouping of m/z's within half of the SIC tolerance
 
                 // First process the non SIM, non MRM scans
-                // If this file only has MRM scans, then CreateMZLookupList will return False
+                // If this file only has MRM scans, CreateMZLookupList will return False
                 var mzBinList = CreateMZLookupList(masicOptions, scanList, false, 0);
                 if (mzBinList.Count > 0)
                 {
@@ -1179,7 +1181,6 @@ namespace MASIC
         /// <param name="potentialAreaStatsForPeak"></param>
         /// <param name="sicPeak"></param>
         /// <param name="peakIsValid"></param>
-        /// <returns></returns>
         public bool StorePeakInParentIon(
             clsScanList scanList,
             int parentIonIndex,

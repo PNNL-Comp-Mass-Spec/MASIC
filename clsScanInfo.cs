@@ -3,6 +3,9 @@ using ThermoRawFileReader;
 
 namespace MASIC
 {
+    /// <summary>
+    /// Container for scan metadata
+    /// </summary>
     public class clsScanInfo
     {
         /// <summary>
@@ -59,6 +62,9 @@ namespace MASIC
         /// </summary>
         public bool SIMScan { get; set; }
 
+        /// <summary>
+        /// MRM scan type
+        /// </summary>
         public MRMScanTypeConstants MRMScanType { get; set; }
 
         /// <summary>
@@ -79,7 +85,6 @@ namespace MASIC
         /// <summary>
         /// True if the scan was collected in the FT cell of a Thermo instrument
         /// </summary>
-        /// <returns></returns>
         public bool IsFTMS { get; set; }
 
         /// <summary>
@@ -107,9 +112,11 @@ namespace MASIC
         /// Number of data points loaded via GetScanData
         /// (typically we load profile mode data)
         /// </summary>
-        /// <returns></returns>
         public int IonCountRaw { get; set; }
 
+        /// <summary>
+        /// Baseline noise stats
+        /// </summary>
         public MASICPeakFinder.clsBaselineNoiseStats BaselineNoiseStats { get; set; }
 
         /// <summary>
@@ -133,6 +140,9 @@ namespace MASIC
             ExtendedHeaderInfo = new Dictionary<int, string>();
         }
 
+        /// <summary>
+        /// Show the scan number and scan type
+        /// </summary>
         public override string ToString()
         {
             return "Scan " + ScanNumber + ", " + ScanTypeName;

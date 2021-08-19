@@ -2,12 +2,24 @@
 
 namespace MASIC.DatasetStats
 {
+    /// <summary>
+    /// Container for dataset summary stats
+    /// </summary>
     public class DatasetSummaryStats
     {
+        /// <summary>
+        /// Maximum elution time (retention time)
+        /// </summary>
         public double ElutionTimeMax { get; set; }
 
+        /// <summary>
+        /// MS1 stats container
+        /// </summary>
         public SummaryStatDetails MSStats { get; }
 
+        /// <summary>
+        /// MSn stats container
+        /// </summary>
         public SummaryStatDetails MSnStats { get; }
 
         /// <summary>
@@ -33,6 +45,9 @@ namespace MASIC.DatasetStats
             Clear();
         }
 
+        /// <summary>
+        /// Reset data to defaults
+        /// </summary>
         public void Clear()
         {
             ElutionTimeMax = 0;

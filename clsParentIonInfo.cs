@@ -2,6 +2,9 @@
 
 namespace MASIC
 {
+    /// <summary>
+    /// Container for a single parent ion
+    /// </summary>
     public class clsParentIonInfo
     {
         /// <summary>
@@ -21,7 +24,7 @@ namespace MASIC
         public int OptimalPeakApexScanNumber { get; set; }
 
         /// <summary>
-        /// If OptimalPeakApexScanNumber is inherited from another parent ion, then this is set to that parent ion's index; otherwise, this is -1
+        /// If OptimalPeakApexScanNumber is inherited from another parent ion, this is set to that parent ion's index; otherwise, this is -1
         /// </summary>
         public int PeakApexOverrideParentIonIndex { get; set; }
 
@@ -30,6 +33,9 @@ namespace MASIC
         /// </summary>
         public readonly List<int> FragScanIndices;
 
+        /// <summary>
+        /// SIC Stats for this parent ion
+        /// </summary>
         public clsSICStats SICStats { get; set; }
 
         /// <summary>
@@ -73,11 +79,18 @@ namespace MASIC
             SICStats = new clsSICStats();
         }
 
+        /// <summary>
+        /// Update the parent ion m/z value
+        /// </summary>
+        /// <param name="parentIonMz"></param>
         public void UpdateMz(double parentIonMz)
         {
             MZ = parentIonMz;
         }
 
+        /// <summary>
+        /// Show the parent ion m/z value
+        /// </summary>
         public override string ToString()
         {
             if (CustomSICPeak)

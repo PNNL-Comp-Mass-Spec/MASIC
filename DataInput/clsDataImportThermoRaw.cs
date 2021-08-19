@@ -10,6 +10,9 @@ using ThermoRawFileReader;
 
 namespace MASIC.DataInput
 {
+    /// <summary>
+    /// Class for reading spectra from a Thermo .raw file
+    /// </summary>
     public class clsDataImportThermoRaw : clsDataImport
     {
         private const string SCAN_EVENT_CHARGE_STATE = "Charge State";
@@ -428,7 +431,7 @@ namespace MASIC.DataInput
             if (sicOptions.SICToleranceIsPPM)
             {
                 // Define MSDataResolution based on the tolerance value that will be used at the lowest m/z in this spectrum, divided by sicOptions.CompressToleranceDivisorForPPM
-                // However, if the lowest m/z value is < 100, then use 100 m/z
+                // However, if the lowest m/z value is < 100, use 100 m/z
                 if (thermoScanInfo.LowMass < 100)
                 {
                     msDataResolution = clsParentIonProcessing.GetParentIonToleranceDa(sicOptions, 100) /
@@ -734,6 +737,13 @@ namespace MASIC.DataInput
             return true;
         }
 
+        /// <summary>
+        /// Update dataset file stats
+        /// </summary>
+        /// <param name="rawFileInfo"></param>
+        /// <param name="datasetID"></param>
+        /// <param name="rawFileReader"></param>
+        /// <returns>True if success, false if an error</returns>
         protected bool UpdateDatasetFileStats(
             FileInfo rawFileInfo,
             int datasetID,
@@ -802,6 +812,13 @@ namespace MASIC.DataInput
             StoreExtendedHeaderInfo(dataOutputHandler, scanInfo, statusEntries, new SortedSet<string>());
         }
 
+        /// <summary>
+        /// Store extended header info for a scan
+        /// </summary>
+        /// <param name="dataOutputHandler"></param>
+        /// <param name="scanInfo"></param>
+        /// <param name="statusEntries"></param>
+        /// <param name="keyNameFilterList">List of header names to store; store all headers if this is an entry list</param>
         private void StoreExtendedHeaderInfo(
             clsDataOutput dataOutputHandler,
             clsScanInfo scanInfo,

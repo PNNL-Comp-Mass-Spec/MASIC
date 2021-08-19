@@ -3,9 +3,16 @@ using ThermoRawFileReader;
 
 namespace MASIC
 {
+    /// <summary>
+    /// Container for MRM scan info
+    /// </summary>
     public class clsMRMScanInfo
     {
+        /// <summary>
+        /// Parent ion m/z
+        /// </summary>
         public double ParentIonMZ { get; set; }
+
         /// <summary>
         /// List of mass ranges monitored by the first quadrupole
         /// </summary>
@@ -21,6 +28,9 @@ namespace MASIC
         /// </summary>
         public int ScanCount { get; set; }
 
+        /// <summary>
+        /// Parent ion index
+        /// </summary>
         public int ParentIonInfoIndex { get; set; }
 
         /// <summary>

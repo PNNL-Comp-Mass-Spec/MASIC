@@ -1,5 +1,8 @@
 ﻿namespace MASIC.DatasetStats
 {
+    /// <summary>
+    /// Summary stat details
+    /// </summary>
     public class SummaryStatDetails
     {
         /// <summary>
@@ -35,6 +38,9 @@
             Clear();
         }
 
+        /// <summary>
+        /// Reset stored values to 0
+        /// </summary>
         public void Clear()
         {
             ScanCount = 0;
@@ -44,6 +50,9 @@
             BPIMedian = 0;
         }
 
+        /// <summary>
+        /// Show the scan count
+        /// </summary>
         public override string ToString()
         {
             return string.Format("ScanCount: {0}", ScanCount);

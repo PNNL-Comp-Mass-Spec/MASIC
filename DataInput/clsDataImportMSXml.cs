@@ -14,7 +14,7 @@ using ThermoRawFileReader;
 namespace MASIC.DataInput
 {
     /// <summary>
-    /// Import data from .mzXML, .mzData, or .mzML files
+    /// Class for reading spectra from .mzXML, .mzData, or .mzML files
     /// </summary>
     public class clsDataImportMSXml : clsDataImport
     {
@@ -960,7 +960,6 @@ namespace MASIC.DataInput
         /// <param name="sicOptions"></param>
         /// <param name="isMzXML"></param>
         /// <param name="mzXmlSourceSpectrum"></param>
-        /// <returns></returns>
         private bool ExtractSurveyScan(
             clsScanList scanList,
             clsSpectraCache spectraCache,
@@ -1016,7 +1015,7 @@ namespace MASIC.DataInput
             if (mOptions.SICOptions.SICToleranceIsPPM)
             {
                 // Define MSDataResolution based on the tolerance value that will be used at the lowest m/z in this spectrum, divided by sicOptions.CompressToleranceDivisorForPPM
-                // However, if the lowest m/z value is < 100, then use 100 m/z
+                // However, if the lowest m/z value is < 100, use 100 m/z
                 if (spectrumInfo.mzRangeStart < 100)
                 {
                     msDataResolution = clsParentIonProcessing.GetParentIonToleranceDa(sicOptions, 100) / sicOptions.CompressToleranceDivisorForPPM;
@@ -1264,7 +1263,6 @@ namespace MASIC.DataInput
         /// Get the first filter string defined in the CVParams of this mzML Spectrum
         /// </summary>
         /// <param name="mzMLSpectrum"></param>
-        /// <returns></returns>
         private string GetFilterString(SimpleMzMLReader.ParamData mzMLSpectrum)
         {
             if (mzMLSpectrum == null)
@@ -1603,6 +1601,13 @@ namespace MASIC.DataInput
             }
         }
 
+        /// <summary>
+        /// Update dataset file stats
+        /// </summary>
+        /// <param name="rawFileInfo"></param>
+        /// <param name="datasetID"></param>
+        /// <param name="xmlReader"></param>
+        /// <returns>True if success, false if an error</returns>
         [CLSCompliant(false)]
         protected bool UpdateDatasetFileStats(
             FileInfo rawFileInfo,

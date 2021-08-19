@@ -1,5 +1,8 @@
 ﻿namespace MASICPeakFinder
 {
+    /// <summary>
+    /// Options for computing the baseline noise value
+    /// </summary>
     public class clsBaselineNoiseOptions
     {
         /// <summary>
@@ -20,7 +23,7 @@
         public double MinimumSignalToNoiseRatio;
 
         /// <summary>
-        /// If the noise threshold computed is less than this value, then this value is used to compute S/N
+        /// If the noise threshold computed is less than this value, this value is used to compute S/N
         /// Additionally, this is used as the minimum intensity threshold when computing a trimmed noise level
         /// </summary>
         public double MinimumBaselineNoiseLevel;
@@ -44,7 +47,6 @@
         /// <summary>
         /// Return a new instance of clsBaselineNoiseOptions with copied options
         /// </summary>
-        /// <returns></returns>
         public clsBaselineNoiseOptions Clone()
         {
             return (clsBaselineNoiseOptions)MemberwiseClone();

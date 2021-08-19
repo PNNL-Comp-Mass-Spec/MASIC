@@ -10,6 +10,9 @@ using DbUtils = PRISMDatabaseUtils.DataTableUtils;
 
 namespace MASIC.DataOutput
 {
+    /// <summary>
+    /// Reporter ion stats summarizer
+    /// </summary>
     public class StatsSummarizer : EventNotifier
     {
         private const string UNDEFINED_UNITS = "Undefined Units";
@@ -1042,6 +1045,11 @@ namespace MASIC.DataOutput
             return interpolatedHistogram;
         }
 
+        /// <summary>
+        /// Summarize SIC stats
+        /// </summary>
+        /// <param name="sicStatsFilePath"></param>
+        /// <returns>True if success, false if an error</returns>
         public bool SummarizeSICStats(string sicStatsFilePath)
         {
             try

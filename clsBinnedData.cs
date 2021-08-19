@@ -2,15 +2,25 @@
 
 namespace MASIC
 {
+    /// <summary>
+    /// Container for binned intensity values
+    /// </summary>
+    /// <remarks>Used when comparing spectra</remarks>
     public class clsBinnedData
     {
+        /// <summary>
+        /// X value of the first bin
+        /// </summary>
         public float BinnedDataStartX { get; set; }
+
+        /// <summary>
+        /// Bin size
+        /// </summary>
         public float BinSize { get; set; }
 
         /// <summary>
         /// Number of bins in BinnedIntensities
         /// </summary>
-        /// <returns></returns>
         public int BinCount => BinnedIntensities.Count;
 
         /// <summary>
@@ -32,6 +42,9 @@ namespace MASIC
             BinnedIntensitiesOffset = new List<float>();
         }
 
+        /// <summary>
+        /// Show the bin count, bin size, and start x
+        /// </summary>
         public override string ToString()
         {
             return "BinCount: " + BinCount + ", BinSize: " + BinSize.ToString("0.0") + ", StartX: " + BinnedDataStartX.ToString("0.0");

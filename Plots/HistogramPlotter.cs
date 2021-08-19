@@ -9,8 +9,12 @@ using PRISM;
 
 namespace MASIC.Plots
 {
+    /// <summary>
+    /// Class for creating histogram plots
+    /// </summary>
     public class HistogramPlotter : EventNotifier
     {
+
         private readonly HistogramInfo mHistogram;
 
         private readonly bool mWriteDebug;
@@ -51,7 +55,7 @@ namespace MASIC.Plots
         public string YAxisLabel { get; set; } = "Bin Count";
 
         /// <summary>
-        /// When true, remove zeroes from the start and end of the data
+        /// When true, remove zeros from the start and end of the data
         /// </summary>
         public bool RemoveZeroesFromEnds { get; set; }
 
@@ -76,6 +80,11 @@ namespace MASIC.Plots
             Reset();
         }
 
+        /// <summary>
+        /// Add a data point
+        /// </summary>
+        /// <param name="bin"></param>
+        /// <param name="binCount"></param>
         public void AddData(double bin, int binCount)
         {
             mHistogram.AddPoint(bin, binCount);
@@ -366,7 +375,6 @@ namespace MASIC.Plots
         /// <param name="datasetName"></param>
         /// <param name="outputDirectory"></param>
         /// <param name="outputFilePath">Output: the full path to the .png file created by this method</param>
-        /// <returns></returns>
         public bool SavePlotFile(string datasetName, string outputDirectory, out string outputFilePath)
         {
             outputFilePath = string.Empty;

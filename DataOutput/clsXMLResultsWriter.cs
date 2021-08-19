@@ -32,7 +32,6 @@ namespace MASIC.DataOutput
         /// If all empty and/or all 0, returns an empty string
         /// </summary>
         /// <param name="toleranceList">Comma separated list of values</param>
-        /// <returns></returns>
         private string CheckForEmptyToleranceList(string toleranceList)
         {
             var toleranceValues = toleranceList.Split(',');
@@ -77,7 +76,6 @@ namespace MASIC.DataOutput
         /// <param name="sicDetails"></param>
         /// <param name="smoothedYDataSubset"></param>
         /// <param name="dataOutputHandler"></param>
-        /// <returns></returns>
         public bool SaveDataToXML(
             clsScanList scanList,
             int parentIonIndex,
@@ -240,7 +238,7 @@ namespace MASIC.DataOutput
                         // Save scan interval list as long list of numbers
                         // There are no tab delimiters, since we require that all
                         // of the SICDataScanInterval values be <= 61
-                        // If the interval is <=9, then the interval is stored as a number
+                        // If the interval is <= 9, the interval is stored as a number
                         // For intervals between 10 and 35, uses letters A to Z
                         // For intervals between 36 and 61, uses letters A to Z
 
@@ -443,7 +441,6 @@ namespace MASIC.DataOutput
         /// <param name="spectraCache"></param>
         /// <param name="processingStats"></param>
         /// <param name="processingTimeSec"></param>
-        /// <returns></returns>
         public bool XMLOutputFileFinalize(
             clsDataOutput dataOutputHandler,
             clsScanList scanList,
@@ -500,7 +497,6 @@ namespace MASIC.DataOutput
         /// <param name="spectraCache"></param>
         /// <param name="sicOptions"></param>
         /// <param name="binningOptions"></param>
-        /// <returns></returns>
         public bool XMLOutputFileInitialize(
             string inputFilePathFull,
             string outputDirectoryPath,
@@ -570,7 +566,7 @@ namespace MASIC.DataOutput
 
                 // SIC Options
 
-                // "SICToleranceDa" is a legacy parameter; If the SIC tolerance is in PPM, then "SICToleranceDa" is the Da tolerance at 1000 m/z
+                // "SICToleranceDa" is a legacy parameter; If the SIC tolerance is in PPM, "SICToleranceDa" is the Da tolerance at 1000 m/z
                 writer.WriteElementString("SICToleranceDa", clsParentIonProcessing.GetParentIonToleranceDa(sicOptions, 1000).ToString("0.0000"));
 
                 writer.WriteElementString("SICTolerance", sicOptions.SICTolerance.ToString("0.0000"));
@@ -710,7 +706,6 @@ namespace MASIC.DataOutput
         /// <param name="scanList"></param>
         /// <param name="inputFileName"></param>
         /// <param name="outputDirectoryPath"></param>
-        /// <returns></returns>
         public bool XmlOutputFileUpdateEntries(
             clsScanList scanList,
             string inputFileName,

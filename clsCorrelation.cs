@@ -34,6 +34,10 @@ namespace MASIC
         {
         }
 
+        /// <summary>
+        /// Constructor that includes binning options
+        /// </summary>
+        /// <param name="binningOptions"></param>
         public clsCorrelation(BinningOptions binningOptions)
         {
             mBinningOptions = binningOptions;
@@ -46,27 +50,50 @@ namespace MASIC
 
         private const int MIN_NON_ZERO_ION_COUNT = 5;
 
+        /// <summary>
+        /// Correlation method
+        /// </summary>
         public enum cmCorrelationMethodConstants
         {
+            /// <summary>
+            /// Pearson correlation
+            /// </summary>
             Pearson = 0,
+
+            /// <summary>
+            /// Spearman correlation
+            /// </summary>
             Spearman = 1,
+
+            /// <summary>
+            /// Kendall's tau
+            /// </summary>
             Kendall = 2
         }
 
         private BinningOptions mBinningOptions;
 
+        /// <summary>
+        /// X-value of the first bin
+        /// </summary>
         public float BinStartX
         {
             get => mBinningOptions.StartX;
             set => mBinningOptions.StartX = value;
         }
 
+        /// <summary>
+        /// X-value for the last bin
+        /// </summary>
         public float BinEndX
         {
             get => mBinningOptions.EndX;
             set => mBinningOptions.EndX = value;
         }
 
+        /// <summary>
+        /// Bin size
+        /// </summary>
         public float BinSize
         {
             get => mBinningOptions.BinSize;
@@ -78,6 +105,9 @@ namespace MASIC
             }
         }
 
+        /// <summary>
+        /// Intensity precision, as a value between 0 and 100
+        /// </summary>
         public float BinnedDataIntensityPrecisionPercent
         {
             get => mBinningOptions.IntensityPrecisionPercent;
@@ -89,20 +119,35 @@ namespace MASIC
             }
         }
 
+        /// <summary>
+        /// Noise threshold intensity
+        /// </summary>
         public float NoiseThresholdIntensity { get; set; }
 
+        /// <summary>
+        /// When true, normalize the values
+        /// </summary>
         public bool NormalizeBinnedData
         {
             get => mBinningOptions.Normalize;
             set => mBinningOptions.Normalize = value;
         }
 
+        /// <summary>
+        /// Sum all of the intensities for binned ions of the same bin together
+        /// </summary>
         public bool SumAllIntensitiesForBin
         {
             get => mBinningOptions.SumAllIntensitiesForBin;
             set => mBinningOptions.SumAllIntensitiesForBin = value;
         }
 
+        /// <summary>
+        /// Maximum number of bins to allow
+        /// </summary>
+        /// <remarks>
+        /// Bin count is auto-determined as (EndX - StartX) / BinSize
+        /// </remarks>
         public int MaximumBinCount
         {
             get => mBinningOptions.MaximumBinCount;
@@ -297,7 +342,7 @@ namespace MASIC
                             binnedYData[binNumber] += yData[index];
                         }
                         // Only change the bin's intensity if this ion's intensity is larger than the bin's intensity
-                        // If it is, then set the bin intensity to equal the ion's intensity
+                        // If it is, set the bin intensity to equal the ion's intensity
                         else if (yData[index] > binnedYData[binNumber])
                         {
                             binnedYData[binNumber] = yData[index];
@@ -745,7 +790,6 @@ namespace MASIC
         /// Computes the natural logarithm of the Gamma Function
         /// </summary>
         /// <param name="xx"></param>
-        /// <returns></returns>
         private double GammaLn(double xx)
         {
             var x = xx;
@@ -764,6 +808,9 @@ namespace MASIC
             return -tmp + Math.Log(2.5066282746310007 * ser / x);
         }
 
+        /// <summary>
+        /// Get the default binning options
+        /// </summary>
         public static BinningOptions GetDefaultBinningOptions()
         {
             var binningOptions = new BinningOptions
@@ -780,12 +827,20 @@ namespace MASIC
             return binningOptions;
         }
 
+        /// <summary>
+        /// Obtain an instance of the binning options
+        /// </summary>
+        /// <param name="binningOptions"></param>
         [Obsolete("Use GetDefaultBinningOptions, which returns an instance of clsBinningOptions")]
         public static void InitializeBinningOptions(out BinningOptions binningOptions)
         {
             binningOptions = GetDefaultBinningOptions();
         }
 
+        /// <summary>
+        /// Set the binning options
+        /// </summary>
+        /// <param name="binningOptions"></param>
         public void SetBinningOptions(BinningOptions binningOptions)
         {
             mBinningOptions = binningOptions;
@@ -804,8 +859,8 @@ namespace MASIC
         private int ValueToBinNumber(float thisValue, float startValue, float histogramBinSize)
         {
             // First subtract StartValue from ThisValue
-            // For example, if StartValue is 500 and ThisValue is 500.28, then WorkingValue = 0.28
-            // Or, if StartValue is 500 and ThisValue is 530.83, then WorkingValue = 30.83
+            // For example, if StartValue is 500 and ThisValue is 500.28, WorkingValue will be 0.28
+            // Or, if StartValue is 500 and ThisValue is 530.83, WorkingValue will be 30.83
             var workingValue = thisValue - startValue;
 
             // Now, dividing WorkingValue by BinSize and rounding to nearest integer

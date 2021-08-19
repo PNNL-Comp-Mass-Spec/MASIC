@@ -5,15 +5,36 @@ using PRISMDatabaseUtils;
 
 namespace MASIC.DataInput
 {
+    /// <summary>
+    /// Class for reading a custom SIC list file
+    /// </summary>
     public class clsCustomSICListReader : clsMasicEventNotifier
     {
-        public const string CUSTOM_SIC_COLUMN_MZ = "MZ";
-        public const string CUSTOM_SIC_COLUMN_MZ_TOLERANCE = "MZToleranceDa";
+        private const string CUSTOM_SIC_COLUMN_MZ = "MZ";
+
+        private const string CUSTOM_SIC_COLUMN_MZ_TOLERANCE = "MZToleranceDa";
+
+        /// <summary>
+        /// Scan center column name
+        /// </summary>
         public const string CUSTOM_SIC_COLUMN_SCAN_CENTER = "ScanCenter";
+
+        /// <summary>
+        /// Scan tolerance column name
+        /// </summary>
         public const string CUSTOM_SIC_COLUMN_SCAN_TOLERANCE = "ScanTolerance";
+
+        /// <summary>
+        /// Scan time column name
+        /// </summary>
         public const string CUSTOM_SIC_COLUMN_SCAN_TIME = "ScanTime";
+
+        /// <summary>
+        /// Time tolerance column name
+        /// </summary>
         public const string CUSTOM_SIC_COLUMN_TIME_TOLERANCE = "TimeTolerance";
-        public const string CUSTOM_SIC_COLUMN_COMMENT = "Comment";
+
+        private const string CUSTOM_SIC_COLUMN_COMMENT = "Comment";
 
         private enum CustomSICFileColumns
         {
@@ -33,7 +54,6 @@ namespace MASIC.DataInput
         /// </summary>
         /// <param name="delimiter"></param>
         /// <param name="includeAndBeforeLastItem"></param>
-        /// <returns></returns>
         public static string GetCustomMZFileColumnHeaders(
             string delimiter = ", ",
             bool includeAndBeforeLastItem = true)
@@ -72,7 +92,6 @@ namespace MASIC.DataInput
         /// Load a custom SIC list file
         /// </summary>
         /// <param name="customSICValuesFileName"></param>
-        /// <returns></returns>
         public bool LoadCustomSICListFromFile(string customSICValuesFileName)
         {
             var delimiterList = new[] { '\t' };
@@ -259,7 +278,6 @@ namespace MASIC.DataInput
         /// <param name="valueText"></param>
         /// <param name="columnName"></param>
         /// <param name="rowNumber"></param>
-        /// <returns></returns>
         /// <remarks>Raises an exception if unable to parse</remarks>
         private double ParseDouble(string valueText, string columnName, int rowNumber)
         {

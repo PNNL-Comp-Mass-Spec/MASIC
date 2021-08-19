@@ -1,5 +1,8 @@
 ﻿namespace MASICPeakFinder
 {
+    /// <summary>
+    /// Container for a SIC peak
+    /// </summary>
     public class clsSICStatsPeak
     {
         /// <summary>
@@ -25,7 +28,7 @@
 
         /// <summary>
         /// Intensity of the parent ion in the scan just prior to the scan in which the peptide was fragmented
-        /// If previous scan was not MS1, then interpolates between MS1 scans bracketing the MS2 scan
+        /// If previous scan was not MS1, interpolates between MS1 scans bracketing the MS2 scan
         /// </summary>
         public double ParentIonIntensity { get; set; }
 
@@ -60,18 +63,33 @@
         /// </summary>
         public int ShoulderCount { get; set; }
 
+        /// <summary>
+        /// Signal to noise ratio of the SIC peak
+        /// </summary>
         public double SignalToNoiseRatio { get; set; }
 
+        /// <summary>
+        /// Baseline noise stats
+        /// </summary>
         public clsBaselineNoiseStats BaselineNoiseStats { get; set; }
 
+        /// <summary>
+        /// Statistical moments
+        /// </summary>
         public clsStatisticalMoments StatisticalMoments { get; set; }
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public clsSICStatsPeak()
         {
             BaselineNoiseStats = new clsBaselineNoiseStats();
             StatisticalMoments = new clsStatisticalMoments();
         }
 
+        /// <summary>
+        /// Clone this SIC peak
+        /// </summary>
         public clsSICStatsPeak Clone()
         {
             var clonedPeak = new clsSICStatsPeak()

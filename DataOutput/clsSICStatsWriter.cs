@@ -8,10 +8,16 @@ using PRISM;
 
 namespace MASIC.DataOutput
 {
+    /// <summary>
+    /// SIC Stats Writer
+    /// </summary>
     public class clsSICStatsWriter : clsMasicEventNotifier
     {
         // Ignore Spelling: Frag
 
+        /// <summary>
+        /// SIC stats file path
+        /// </summary>
         public string SICStatsFilePath { get; private set; } = string.Empty;
 
         private clsParentIonInfo GetFakeParentIonForFragScan(clsScanList scanList, int fragScanIndex)
@@ -113,7 +119,6 @@ namespace MASIC.DataOutput
         /// <param name="outputDirectoryPath"></param>
         /// <param name="masicOptions"></param>
         /// <param name="dataOutputHandler"></param>
-        /// <returns></returns>
         public bool SaveSICStatsFlatFile(
             clsScanList scanList,
             string inputFileName,

@@ -71,7 +71,6 @@ namespace MASICBrowser
         /// Returns the full path to the executing .Exe or .Dll
         /// </summary>
         /// <returns>File path</returns>
-        /// <remarks></remarks>
         private static string GetAppPath()
         {
             return Assembly.GetExecutingAssembly().Location;
@@ -81,8 +80,6 @@ namespace MASICBrowser
         /// Returns the .NET assembly version followed by the program date
         /// </summary>
         /// <param name="programDate"></param>
-        /// <returns></returns>
-        /// <remarks></remarks>
         private static string GetAppVersion(string programDate)
         {
             return Assembly.GetExecutingAssembly().GetName().Version + " (" + programDate + ")";

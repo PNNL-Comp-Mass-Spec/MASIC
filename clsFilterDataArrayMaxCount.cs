@@ -9,7 +9,7 @@ namespace MASIC
     /// <remarks>
     /// To use, first call AddDataPoint() for each source data point, specifying the value to sort on and a data point index
     /// When done, call FilterData()
-    /// This routine will determine which data points to retain
+    /// This method will determine which data points to retain
     /// For the remaining points, their data values will be changed to SkipDataPointFlag (defaults to -1)
     /// </remarks>
     public class clsFilterDataArrayMaxCount
@@ -24,12 +24,25 @@ namespace MASIC
         private double[] mDataValues = new double[0];
         private int[] mDataIndices = new int[0];
 
+        /// <summary>
+        /// Progress changed event
+        /// </summary>
         public event ProgressChangedEventHandler ProgressChanged;
 
+        /// <summary>
+        /// Delegate for the progress changed event
+        /// </summary>
+        /// <param name="progressVal"></param>
         public delegate void ProgressChangedEventHandler(float progressVal);
 
+        /// <summary>
+        /// Number of data points tracked by this class
+        /// </summary>
         public int DataCount { get; private set; }
 
+        /// <summary>
+        /// Maximum number of data points to retain
+        /// </summary>
         public int MaximumDataCountToKeep { get; set; }
 
         /// <summary>
@@ -38,6 +51,12 @@ namespace MASIC
         /// <remarks>Value between 0 and 100</remarks>
         public float Progress { get; private set; }
 
+        /// <summary>
+        /// Flag to use to indicate data that should be skipped
+        /// </summary>
+        /// <remarks>
+        /// Defaults to -1
+        /// </remarks>
         public float SkipDataPointFlag { get; set; }
 
         public bool TotalIntensityPercentageFilterEnabled { get; set; }
@@ -111,7 +130,6 @@ namespace MASIC
         /// Get the abundance value associated with the given data point
         /// </summary>
         /// <param name="dataPointIndex"></param>
-        /// <returns></returns>
         public double GetAbundanceByIndex(int dataPointIndex)
         {
             if (dataPointIndex >= 0 && dataPointIndex < DataCount)
@@ -278,7 +296,7 @@ namespace MASIC
                     if (Math.Abs(binToSortAbundanceMaximum - binToSortAbundanceMinimum) < float.Epsilon)
                     {
                         // Is this code ever reached?
-                        // If yes, then the code below won't populate binToSortAbundances() and binToSortDataIndices() with any data
+                        // If yes, the code below won't populate binToSortAbundances() and binToSortDataIndices() with any data
                         useFullDataSort = true;
                     }
 

@@ -7,12 +7,22 @@ using PRISM;
 
 namespace MASIC.DataOutput
 {
+    /// <summary>
+    /// This class reads the SIC stats file (plus the reporter ions file if it exists),
+    /// generates stats and histograms, then creates plots
+    /// </summary>
     public class StatsPlotter : EventNotifier
     {
         private readonly StatsSummarizer mStatsSummarizer;
 
+        /// <summary>
+        /// Reporter ion observation rate data file name
+        /// </summary>
         public const string REPORTER_ION_OBSERVATION_RATE_DATA_FILE_SUFFIX = "RepIonObsRate.txt";
 
+        /// <summary>
+        /// Reporter ion intensity stats file name
+        /// </summary>
         public const string REPORTER_ION_INTENSITY_STATS_FILE_SUFFIX = "RepIonStats.txt";
 
         /// <summary>

@@ -1,6 +1,4 @@
-﻿// This class computes aggregate stats for a dataset
-//
-// -------------------------------------------------------------------------------
+﻿// -------------------------------------------------------------------------------
 // Written by Matthew Monroe for the Department of Energy (PNNL, Richland, WA)
 // Program started May 7, 2009
 // Ported from clsMASICScanStatsParser to clsDatasetStatsSummarizer in February 2010
@@ -22,13 +20,25 @@ using PRISM;
 
 namespace MASIC.DatasetStats
 {
+    /// <summary>
+    /// Dataset stats summarizer
+    /// </summary>
+    /// <remarks>
+    /// This class computes aggregate stats for a dataset
+    /// </remarks>
     public class clsDatasetStatsSummarizer : EventNotifier
     {
         // Ignore Spelling: AcqTime, yyyy-MM-dd, hh:mm:ss tt
 
+        /// <summary>
+        /// Scan type stats separation character
+        /// </summary>
         public const string SCAN_TYPE_STATS_SEP_CHAR = "::###::";
 
         // ReSharper disable once UnusedMember.Global
+        /// <summary>
+        /// Dataset info file suffix
+        /// </summary>
         public const string DATASET_INFO_FILE_SUFFIX = "_DatasetInfo.xml";
 
         // ReSharper disable once UnusedMember.Global
@@ -47,6 +57,9 @@ namespace MASIC.DatasetStats
         private DatasetSummaryStats mDatasetSummaryStats;
 
         // ReSharper disable once UnusedMember.Global
+        /// <summary>
+        /// Dataset stats summary filename
+        /// </summary>
         public string DatasetStatsSummaryFileName
         {
             get => mDatasetStatsSummaryFileName;
@@ -62,25 +75,21 @@ namespace MASIC.DatasetStats
         /// <summary>
         /// Dataset file info
         /// </summary>
-        /// <returns></returns>
         public DatasetFileInfo DatasetFileInfo { get; }
 
         /// <summary>
         /// Error message
         /// </summary>
-        /// <returns></returns>
         public string ErrorMessage { get; private set; }
 
         /// <summary>
         /// Dataset file modification time
         /// </summary>
-        /// <returns></returns>
         public string FileDate { get; }
 
         /// <summary>
         /// Sample info
         /// </summary>
-        /// <returns></returns>
         public SampleInfo SampleInfo { get; }
 
         /// <summary>
@@ -134,7 +143,6 @@ namespace MASIC.DatasetStats
         /// <param name="scanStats">ScanStats data to parse</param>
         /// <param name="summaryStats">Stats output (initialized if nothing)</param>
         /// <returns>>True if success, false if error</returns>
-        /// <remarks></remarks>
         public bool ComputeScanStatsSummary(List<ScanStatsEntry> scanStats, out DatasetSummaryStats summaryStats)
         {
             summaryStats = new DatasetSummaryStats();
@@ -253,7 +261,6 @@ namespace MASIC.DatasetStats
         /// <param name="datasetName">Dataset Name</param>
         /// <param name="datasetInfoFilePath">File path to write the XML to</param>
         /// <returns>True if success; False if failure</returns>
-        /// <remarks></remarks>
         public bool CreateDatasetInfoFile(string datasetName, string datasetInfoFilePath)
         {
             return CreateDatasetInfoFile(datasetName, datasetInfoFilePath, mDatasetScanStats, DatasetFileInfo, SampleInfo);
@@ -268,7 +275,6 @@ namespace MASIC.DatasetStats
         /// <param name="datasetInfo">Dataset Info</param>
         /// <param name="oSampleInfo">Sample Info</param>
         /// <returns>True if success; False if failure</returns>
-        /// <remarks></remarks>
         public bool CreateDatasetInfoFile(
             string datasetName,
             string datasetInfoFilePath,
@@ -307,7 +313,6 @@ namespace MASIC.DatasetStats
         /// Auto-determines the dataset name using Me.DatasetFileInfo.DatasetName
         /// </summary>
         /// <returns>XML (as string)</returns>
-        /// <remarks></remarks>
         public string CreateDatasetInfoXML()
         {
             return CreateDatasetInfoXML(DatasetFileInfo.DatasetName, mDatasetScanStats, DatasetFileInfo, SampleInfo);
@@ -319,7 +324,6 @@ namespace MASIC.DatasetStats
         /// </summary>
         /// <param name="datasetName">Dataset Name</param>
         /// <returns>XML (as string)</returns>
-        /// <remarks></remarks>
         public string CreateDatasetInfoXML(string datasetName)
         {
             return CreateDatasetInfoXML(datasetName, mDatasetScanStats, DatasetFileInfo, SampleInfo);
@@ -333,7 +337,6 @@ namespace MASIC.DatasetStats
         /// <param name="scanStats">Scan stats to parse</param>
         /// <param name="datasetInfo">Dataset Info</param>
         /// <returns>XML (as string)</returns>
-        /// <remarks></remarks>
         public string CreateDatasetInfoXML(List<ScanStatsEntry> scanStats, DatasetFileInfo datasetInfo)
         {
             return CreateDatasetInfoXML(datasetInfo.DatasetName, scanStats, datasetInfo);
@@ -348,7 +351,6 @@ namespace MASIC.DatasetStats
         /// <param name="datasetInfo">Dataset Info</param>
         /// <param name="oSampleInfo">Sample Info</param>
         /// <returns>XML (as string)</returns>
-        /// <remarks></remarks>
         public string CreateDatasetInfoXML(
             List<ScanStatsEntry> scanStats,
             DatasetFileInfo datasetInfo,
@@ -364,7 +366,6 @@ namespace MASIC.DatasetStats
         /// <param name="scanStats">Scan stats to parse</param>
         /// <param name="datasetInfo">Dataset Info</param>
         /// <returns>XML (as string)</returns>
-        /// <remarks></remarks>
         public string CreateDatasetInfoXML(
             string datasetName,
             List<ScanStatsEntry> scanStats,
@@ -381,7 +382,6 @@ namespace MASIC.DatasetStats
         /// <param name="datasetInfo">Dataset Info</param>
         /// <param name="sampleInfo">Sample Info</param>
         /// <returns>XML (as string)</returns>
-        /// <remarks></remarks>
         public string CreateDatasetInfoXML(
             string datasetName,
             List<ScanStatsEntry> scanStats,
@@ -548,7 +548,6 @@ namespace MASIC.DatasetStats
         /// </summary>
         /// <param name="scanStatsFilePath">File path to write the text file to</param>
         /// <returns>True if success; False if failure</returns>
-        /// <remarks></remarks>
         public bool CreateScanStatsFile(string scanStatsFilePath)
         {
             return CreateScanStatsFile(scanStatsFilePath, mDatasetScanStats);
@@ -560,7 +559,6 @@ namespace MASIC.DatasetStats
         /// <param name="scanStatsFilePath">File path to write the text file to</param>
         /// <param name="scanStats">Scan stats to parse</param>
         /// <returns>True if success; False if failure</returns>
-        /// <remarks></remarks>
         public bool CreateScanStatsFile(
             string scanStatsFilePath,
             List<ScanStatsEntry> scanStats)
@@ -658,6 +656,9 @@ namespace MASIC.DatasetStats
             return item;
         }
 
+        /// <summary>
+        /// Get dataset summary stats
+        /// </summary>
         public DatasetSummaryStats GetDatasetSummaryStats()
         {
             if (!mDatasetSummaryStatsUpToDate)
@@ -683,7 +684,6 @@ namespace MASIC.DatasetStats
         /// <param name="scanType"></param>
         /// <param name="scanTypeName"></param>
         /// <returns>True if the scan was found and updated; otherwise false</returns>
-        /// <remarks></remarks>
         public bool UpdateDatasetScanType(int scanNumber, int scanType, string scanTypeName)
         {
             var matchFound = false;
@@ -712,7 +712,6 @@ namespace MASIC.DatasetStats
         /// <param name="datasetName">Dataset Name</param>
         /// <param name="datasetInfoFilePath">File path to write the XML to</param>
         /// <returns>True if success; False if failure</returns>
-        /// <remarks></remarks>
         public bool UpdateDatasetStatsTextFile(string datasetName, string datasetInfoFilePath)
         {
             return UpdateDatasetStatsTextFile(datasetName, datasetInfoFilePath, mDatasetScanStats, DatasetFileInfo, SampleInfo);
@@ -727,7 +726,6 @@ namespace MASIC.DatasetStats
         /// <param name="datasetInfo">Dataset Info</param>
         /// <param name="oSampleInfo">Sample Info</param>
         /// <returns>True if success; False if failure</returns>
-        /// <remarks></remarks>
         public bool UpdateDatasetStatsTextFile(
             string datasetName,
             string datasetStatsFilePath,

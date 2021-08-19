@@ -1,6 +1,9 @@
 ﻿
 namespace MASIC.Options
 {
+    /// <summary>
+    /// Plotting options
+    /// </summary>
     public class PlotOptions
     {
         /// <summary>

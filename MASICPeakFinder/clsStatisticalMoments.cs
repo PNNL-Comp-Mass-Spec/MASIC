@@ -1,11 +1,14 @@
 ﻿namespace MASICPeakFinder
 {
+    /// <summary>
+    /// Statistical moments options
+    /// </summary>
     public class clsStatisticalMoments
     {
         /// <summary>
         /// Area; Zeroth central moment (m0)
         /// Using baseline-corrected intensities unless all of the data is below the baseline;
-        /// if that's the case, then using the 3 points surrounding the peak apex
+        /// if that's the case, use the 3 points surrounding the peak apex
         /// </summary>
         public double Area { get; set; }
 
@@ -34,6 +37,9 @@
         /// </summary>
         public int DataCountUsed { get; set; }
 
+        /// <summary>
+        /// Clone the settings tracked by this class
+        /// </summary>
         public clsStatisticalMoments Clone()
         {
             var clonedStats = new clsStatisticalMoments()

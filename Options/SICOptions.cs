@@ -1,10 +1,20 @@
 ﻿namespace MASIC.Options
 {
+    /// <summary>
+    /// Selected ion chromatogram processing options
+    /// </summary>
     public class SICOptions
     {
         // Ignore Spelling: Da
 
+        /// <summary>
+        /// Default divisor to use when compressing spectra and sicOptions.SICToleranceIsPPM is false
+        /// </summary>
         public const double DEFAULT_COMPRESS_TOLERANCE_DIVISOR_FOR_DA = 5;
+
+        /// <summary>
+        /// Default divisor to use when compressing spectra and sicOptions.SICToleranceIsPPM is true
+        /// </summary>
         public const double DEFAULT_COMPRESS_TOLERANCE_DIVISOR_FOR_PPM = 3;
 
         /// <summary>
@@ -14,15 +24,18 @@
         public int DatasetID { get; set; }
 
         /// <summary>
-        /// Defaults to 10 ppm
+        /// SIC tolerance; defaults to 10 ppm
         /// </summary>
         public double SICTolerance { get; set; }
 
         /// <summary>
-        /// When true, then SICTolerance is treated as a PPM value
+        /// When true, SICTolerance is treated as a PPM value
         /// </summary>
         public bool SICToleranceIsPPM { get; set; }
 
+        /// <summary>
+        /// SIC tolerance, in Daltons
+        /// </summary>
         public double SICToleranceDa
         {
             get
@@ -38,15 +51,25 @@
             set => SetSICTolerance(value, false);
         }
         /// <summary>
-        /// If True, then will look through the m/z values in the parent ion spectrum data to find the closest match
+        /// If True, will look through the m/z values in the parent ion spectrum data to find the closest match
         /// (within SICToleranceDa / sicOptions.CompressToleranceDivisorForDa); will update the reported m/z value to the one found
         /// </summary>
         public bool RefineReportedParentIonMZ { get; set; }
 
         /// <summary>
-        /// If both ScanRangeStart >=0 and ScanRangeEnd > 0 then will only process data between those scan numbers
+        /// Start scan to process
         /// </summary>
+        /// <remarks>
+        /// If both ScanRangeStart >=0 and ScanRangeEnd > 0, only process data between those scan numbers
+        /// </remarks>
         public int ScanRangeStart { get; set; }
+
+        /// <summary>
+        /// End scan to process
+        /// </summary>
+        /// <remarks>
+        /// If both ScanRangeStart >=0 and ScanRangeEnd > 0, only process data between those scan numbers
+        /// </remarks>
         public int ScanRangeEnd { get; set; }
 
         /// <summary>
@@ -66,20 +89,30 @@
         }
 
         /// <summary>
-        /// If both RTRangeStart >=0 and RTRangeEnd > RTRangeStart then will only process data between those that scan range (in minutes)
+        /// Elution time of the first scan to process
         /// </summary>
+        /// <remarks>
+        /// If both RTRangeStart >=0 and RTRangeEnd > RTRangeStart, only process data between those that scan range (in minutes)
+        /// </remarks>
         public float RTRangeStart { get; set; }
+
+        /// <summary>
+        /// Elution time of the last scan to process
+        /// </summary>
+        /// <remarks>
+        /// If both RTRangeStart >=0 and RTRangeEnd > RTRangeStart, only process data between those that scan range (in minutes)
+        /// </remarks>
         public float RTRangeEnd { get; set; }
 
         /// <summary>
-        /// If true, then combines data points that have similar m/z values (within tolerance) when loading
+        /// If true, combines data points that have similar m/z values (within tolerance) when loading
         /// Tolerance is sicOptions.SICToleranceDa / sicOptions.CompressToleranceDivisorForDa
         /// (or divided by sicOptions.CompressToleranceDivisorForPPM if sicOptions.SICToleranceIsPPM=True)
         /// </summary>
         public bool CompressMSSpectraData { get; set; }
 
         /// <summary>
-        /// If true, then combines data points that have similar m/z values (within tolerance) when loading
+        /// If true, combines data points that have similar m/z values (within tolerance) when loading
         /// Tolerance is binningOptions.BinSize / sicOptions.CompressToleranceDivisorForDa
         /// </summary>
         public bool CompressMSMSSpectraData { get; set; }
@@ -91,7 +124,7 @@
         public double CompressToleranceDivisorForDa { get; set; }
 
         /// <summary>
-        /// If sicOptions.SICToleranceIsPPM is True, then this divisor is used instead of CompressToleranceDivisorForDa
+        /// If sicOptions.SICToleranceIsPPM is True, this divisor is used instead of CompressToleranceDivisorForDa
         /// </summary>
         public double CompressToleranceDivisorForPPM { get; set; }
 
@@ -101,8 +134,11 @@
         // or 3) the distance exceeds MaxSICPeakWidthMinutesBackward or MaxSICPeakWidthMinutesForward
 
         /// <summary>
-        /// Defaults to 5
+        /// Maximum SIC peak width, in minutes, to the left of the peak center
         /// </summary>
+        /// <remarks>
+        /// Defaults to 5
+        /// </remarks>
         public float MaxSICPeakWidthMinutesBackward
         {
             get => mMaxSICPeakWidthMinutesBackward;
@@ -115,8 +151,11 @@
         }
 
         /// <summary>
-        /// Defaults to 5
+        /// Maximum SIC peak width, in minutes, to the right of the peak center
         /// </summary>
+        /// <remarks>
+        /// Defaults to 5
+        /// </remarks>
         public float MaxSICPeakWidthMinutesForward
         {
             get => mMaxSICPeakWidthMinutesForward;
@@ -128,10 +167,19 @@
             }
         }
 
+        /// <summary>
+        /// SIC peak finder options
+        /// </summary>
         public MASICPeakFinder.clsSICPeakFinderOptions SICPeakFinderOptions { get; set; }
 
+        /// <summary>
+        /// When true, replace zeros with the minimum positive value from MS data
+        /// </summary>
         public bool ReplaceSICZeroesWithMinimumPositiveValueFromMSData { get; set; }
 
+        /// <summary>
+        /// When true, save smoothed data
+        /// </summary>
         public bool SaveSmoothedData { get; set; }
 
         /// <summary>
@@ -165,8 +213,11 @@
         }
 
         /// <summary>
-        /// Defaults to 0.8
+        /// Spectrum similarity threshold
         /// </summary>
+        /// <remarks>
+        /// Defaults to 0.8
+        /// </remarks>
         public float SpectrumSimilarityMinimum
         {
             get => mSpectrumSimilarityMinimum;
@@ -181,17 +232,27 @@
         private float mMaxSICPeakWidthMinutesBackward;
         private float mMaxSICPeakWidthMinutesForward;
 
+        /// <summary>
+        /// Obtain the SIC tolerance
+        /// </summary>
         public double GetSICTolerance()
         {
             return GetSICTolerance(out _);
         }
 
+        /// <summary>
+        /// Obtain the SIC tolerance, along with a flag that indicates if the tolerance is PPM-based
+        /// </summary>
+        /// <param name="toleranceIsPPM"></param>
         public double GetSICTolerance(out bool toleranceIsPPM)
         {
             toleranceIsPPM = SICToleranceIsPPM;
             return SICTolerance;
         }
 
+        /// <summary>
+        /// Reset options to default
+        /// </summary>
         public void Reset()
         {
             SICTolerance = 10;
@@ -231,6 +292,11 @@
             SpectrumSimilarityMinimum = 0.8F;
         }
 
+        /// <summary>
+        /// Set the SIC tolerance
+        /// </summary>
+        /// <param name="toleranceValue"></param>
+        /// <param name="toleranceIsPPM"></param>
         public void SetSICTolerance(double toleranceValue, bool toleranceIsPPM)
         {
             SICToleranceIsPPM = toleranceIsPPM;
@@ -248,6 +314,9 @@
             SICTolerance = toleranceValue;
         }
 
+        /// <summary>
+        /// Validate SIC options
+        /// </summary>
         public void ValidateSICOptions()
         {
             if (CompressToleranceDivisorForDa < 1)
@@ -261,6 +330,9 @@
             }
         }
 
+        /// <summary>
+        /// Show the SIC tolerance
+        /// </summary>
         public override string ToString()
         {
             var toleranceUnits = SICToleranceIsPPM ? "ppm" : "Da";

@@ -57,7 +57,6 @@ namespace MASICPeakFinder
         /// <param name="yValues"></param>
         /// <param name="startIndex"></param>
         /// <param name="endIndex"></param>
-        /// <returns></returns>
         public double ComputeSlope(
             double[] xValues,
             double[] yValues,
@@ -109,8 +108,8 @@ namespace MASICPeakFinder
         /// <remarks>
         /// Note that the maximum value of intensityThreshold vs. MaxValue*peakDetectIntensityThresholdPercentageOfMaximum is used as the minimum
         /// For example, if intensityThreshold = 10 and peakDetectIntensityThresholdPercentageOfMaximum =  5 (indicating 5%),
-        /// then if the maximum of yValues() is 50, then the minimum intensity of identified peaks is 10, and not 2.5
-        /// However, if the maximum of yValues() is 500, then the minimum intensity of identified peaks is 50, and not 10
+        /// then if the maximum of yValues() is 50, the minimum intensity of identified peaks is 10, and not 2.5
+        /// However, if the maximum of yValues() is 500, the minimum intensity of identified peaks is 50, and not 10
         /// </remarks>
         public List<clsPeakInfo> DetectPeaks(
             double[] xValues,
@@ -290,7 +289,7 @@ namespace MASICPeakFinder
             )
         {
             // Determine the peak width by looking for the adjacent valleys
-            // If, while looking, we find peakWidthPointsMinimum / 2 points in a row with intensity values below intensityThreshold, then
+            // If, while looking, we find peakWidthPointsMinimum / 2 points in a row with intensity values below intensityThreshold,
             // set the edge peakHalfWidth - 1 points closer to the peak maximum
 
             if (index > 0)
@@ -408,7 +407,7 @@ namespace MASICPeakFinder
                 widthInPoints = 2;
             }
 
-            // If the peak width is odd, then center around index
+            // If the peak width is odd, center around index
             // Otherwise, offset to the right of index
             if (widthInPoints % 2 == 0)
             {
@@ -430,7 +429,6 @@ namespace MASICPeakFinder
         /// <param name="xValues">X values</param>
         /// <param name="yValues">Y values (intensities)</param>
         /// <param name="dataPointCount"></param>
-        /// <returns></returns>
         private double FindArea(IReadOnlyList<double> xValues, IReadOnlyList<double> yValues, int dataPointCount)
         {
             double area = 0;
@@ -524,7 +522,6 @@ namespace MASICPeakFinder
         /// <param name="yValues"></param>
         /// <param name="coefficients"></param>
         /// <param name="polynomialOrder"></param>
-        /// <returns></returns>
         /// <remarks>
         /// Code from article "Fit for Purpose" written by Steven Abbot
         /// and published in the February 2003 issue of Hardcore Visual Basic.
@@ -567,7 +564,6 @@ namespace MASICPeakFinder
         /// <param name="xValues"></param>
         /// <param name="yValues"></param>
         /// <param name="equationTerms"></param>
-        /// <returns></returns>
         private void LLSqFit(IReadOnlyList<double> xValues, IReadOnlyList<double> yValues, ref LeastSquaresFitEquationTermType[] equationTerms)
         {
             var beta = new double[xValues.Count];

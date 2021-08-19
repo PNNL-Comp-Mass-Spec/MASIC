@@ -6,11 +6,24 @@ using MASIC.Options;
 
 namespace MASIC.DataOutput
 {
+    /// <summary>
+    /// Extended scan stats writer
+    /// </summary>
     public class clsExtendedStatsWriter : clsMasicEventNotifier
     {
+        /// <summary>
+        /// Collision mode column name
+        /// </summary>
         public const string EXTENDED_STATS_HEADER_COLLISION_MODE = "Collision Mode";
+
+        /// <summary>
+        /// Scan filter text column name
+        /// </summary>
         public const string EXTENDED_STATS_HEADER_SCAN_FILTER_TEXT = "Scan Filter Text";
 
+        /// <summary>
+        /// Number of extended header names tracked by this class
+        /// </summary>
         public int ExtendedHeaderNameCount => mExtendedHeaderNameMap.Count;
 
         /// <summary>
@@ -81,6 +94,9 @@ namespace MASIC.DataOutput
             return dataValues;
         }
 
+        /// <summary>
+        /// Construct the list of extended stat headers
+        /// </summary>
         public List<string> ConstructExtendedStatsHeaders()
         {
             var cTrimChars = new[] { ':', ' ' };
@@ -348,6 +364,14 @@ namespace MASIC.DataOutput
             return currentScan;
         }
 
+        /// <summary>
+        /// Create the extended scan stats file
+        /// </summary>
+        /// <param name="scanList"></param>
+        /// <param name="inputFileName"></param>
+        /// <param name="outputDirectoryPath"></param>
+        /// <param name="includeHeaders"></param>
+        /// <returns>True if successful, false if an error</returns>
         public bool SaveExtendedScanStatsFiles(
             clsScanList scanList,
             string inputFileName,
@@ -425,6 +449,11 @@ namespace MASIC.DataOutput
             return true;
         }
 
+        /// <summary>
+        /// Get extended header info ID by extended header name
+        /// </summary>
+        /// <param name="keyName"></param>
+        /// <returns></returns>
         public int GetExtendedHeaderInfoIdByName(string keyName)
         {
             if (TryGetExtendedHeaderInfoValue(keyName, out var idValue))

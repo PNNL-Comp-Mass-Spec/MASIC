@@ -24,6 +24,9 @@ namespace MASIC.Plots
 
         private const double PIXELS_PER_DIP = 1.25;
 
+        /// <summary>
+        /// Default base font size, in points
+        /// </summary>
         public const int DEFAULT_BASE_FONT_SIZE = 16;
 
         private enum ImageFileFormat
@@ -38,8 +41,14 @@ namespace MASIC.Plots
         /// <remarks>Type OxyPlot.PlotModel</remarks>
         public PlotModel Plot { get; }
 
+        /// <summary>
+        /// Base font size, in points
+        /// </summary>
         public int FontSizeBase { get; set; }
 
+        /// <summary>
+        /// Number of series
+        /// </summary>
         public override int SeriesCount
         {
             get
@@ -61,7 +70,6 @@ namespace MASIC.Plots
         /// <param name="thePlot">The plot (type OxyPlot.PlotModel)</param>
         /// <param name="writeDebug"></param>
         /// <param name="dataSource"></param>
-        /// <remarks></remarks>
         public PlotContainer(
             PlotCategories plotCategory,
             PlotModel thePlot,
@@ -80,7 +88,6 @@ namespace MASIC.Plots
         /// <param name="width">PNG file width, in pixels</param>
         /// <param name="height">PNG file height, in pixels</param>
         /// <param name="resolution">Image resolution, in dots per inch</param>
-        /// <remarks></remarks>
         public override bool SaveToPNG(FileInfo pngFile, int width, int height, int resolution)
         {
             if (pngFile == null)
@@ -95,6 +102,14 @@ namespace MASIC.Plots
         }
 
         // ReSharper disable once UnusedMember.Global
+        /// <summary>
+        /// Save the plot as a .jpg file
+        /// </summary>
+        /// <param name="jpgFile"></param>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
+        /// <param name="resolution"></param>
+        /// <returns>True if success, false if an error</returns>
         public bool SaveToJPG(FileInfo jpgFile, int width, int height, int resolution)
         {
             if (jpgFile == null)
@@ -234,6 +249,11 @@ namespace MASIC.Plots
         }
 
         // ReSharper disable once UnusedMember.Global
+        /// <summary>
+        /// Add a color gradient
+        /// </summary>
+        /// <param name="gradientName"></param>
+        /// <param name="colorGradient"></param>
         public void AddGradient(string gradientName, OxyPalette colorGradient)
         {
             var colorGradients = new Dictionary<string, OxyPalette> {
@@ -242,6 +262,10 @@ namespace MASIC.Plots
             AddGradients(colorGradients);
         }
 
+        /// <summary>
+        /// Add color gradients
+        /// </summary>
+        /// <param name="colorGradients"></param>
         public void AddGradients(Dictionary<string, OxyPalette> colorGradients)
         {
             mColorGradients = colorGradients;

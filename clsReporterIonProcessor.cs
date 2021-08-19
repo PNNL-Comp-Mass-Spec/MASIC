@@ -8,10 +8,16 @@ using ThermoRawFileReader;
 
 namespace MASIC
 {
+    /// <summary>
+    /// Class for finding reporter ions
+    /// </summary>
     public class clsReporterIonProcessor : clsMasicEventNotifier
     {
         // Ignore Spelling: Uniquify
 
+        /// <summary>
+        /// Column prefix for reporter ion data in the output file
+        /// </summary>
         public const string REPORTER_ION_COLUMN_PREFIX = "Ion_";
 
         private readonly MASICOptions mOptions;
@@ -32,8 +38,6 @@ namespace MASIC
         /// <param name="spectraCache"></param>
         /// <param name="inputFilePathFull">Full path to the input file</param>
         /// <param name="outputDirectoryPath"></param>
-        /// <returns></returns>
-        /// <remarks></remarks>
         public bool FindReporterIons(
             clsScanList scanList,
             clsSpectraCache spectraCache,
@@ -142,7 +146,7 @@ namespace MASIC
                         continue;
 
                     // Construct the reporter ion intensity header
-                    // We skip contaminant ions, unless saveUncorrectedIntensities is True, then we include them
+                    // We skip contaminant ions, unless saveUncorrectedIntensities is True, in which case we include them
 
                     string mzValue;
                     if (mOptions.ReporterIons.ReporterIonMassMode == clsReporterIons.ReporterIonMassModeConstants.TMTTenMZ ||
@@ -291,7 +295,6 @@ namespace MASIC
         /// <param name="delimiter"></param>
         /// <param name="saveUncorrectedIntensities"></param>
         /// <param name="saveObservedMasses"></param>
-        /// <remarks></remarks>
         private void FindReporterIonsWork(
             XRawFileIO rawFileReader,
             clsDataAggregation dataAggregation,
@@ -471,7 +474,7 @@ namespace MASIC
 
                     if (reporterIntensities[reporterIonIndex] > 0)
                     {
-                        // Compute the percent change, then update pctChangeSum
+                        // Compute the percent change, update pctChangeSum
                         var pctChange =
                             (reporterIntensitiesCorrected[reporterIonIndex] - reporterIntensities[reporterIonIndex]) /
                             reporterIntensities[reporterIonIndex];
@@ -489,7 +492,7 @@ namespace MASIC
                 if (!reporterIons[reporterIonIndex].ContaminantIon || saveUncorrectedIntensities)
                 {
                     // Append the reporter ion intensity to reporterIntensityList
-                    // We skip contaminant ions, unless saveUncorrectedIntensities is True, then we include them
+                    // We skip contaminant ions, unless saveUncorrectedIntensities is True, in which case we include them
 
                     reporterIntensityList.Add(StringUtilities.DblToString(reporterIntensitiesCorrected[reporterIonIndex], 2));
 
@@ -577,8 +580,18 @@ namespace MASIC
             writer.WriteLine(string.Join(delimiter.ToString(), dataColumns));
         }
 
+        /// <summary>
+        /// Reporter ion info comparison class
+        /// </summary>
+        /// <remarks>Compares m/z values</remarks>
         protected class clsReportIonInfoComparer : IComparer<clsReporterIonInfo>
         {
+            /// <summary>
+            /// Compare the m/z values of two reporter ions
+            /// </summary>
+            /// <param name="x"></param>
+            /// <param name="y"></param>
+            /// <returns>-1, 0, or 1</returns>
             public int Compare(clsReporterIonInfo x, clsReporterIonInfo y)
             {
                 var reporterIonInfoA = x;

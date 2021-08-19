@@ -1,5 +1,8 @@
 ﻿namespace MASICPeakFinder
 {
+    /// <summary>
+    /// SIC peak finder options
+    /// </summary>
     public class clsSICPeakFinderOptions
     {
         // Ignore Spelling: Butterworth, Savitzky, Golay
@@ -7,7 +10,6 @@
         /// <summary>
         /// Intensity Threshold Fraction Max
         /// </summary>
-        /// <returns></returns>
         /// <remarks>Value between 0 and 1; default: 0.01</remarks>
         public double IntensityThresholdFractionMax
         {
@@ -23,16 +25,17 @@
         /// <summary>
         /// Intensity Threshold Absolute Minimum
         /// </summary>
-        /// <returns></returns>
         /// <remarks>Default: 0</remarks>
         public double IntensityThresholdAbsoluteMinimum { get; set; }
 
+        /// <summary>
+        /// Baseline noise options
+        /// </summary>
         public clsBaselineNoiseOptions SICBaselineNoiseOptions { get; set; }
 
         /// <summary>
         /// Maximum distance that the edge of an identified peak can be away from the scan number that the parent ion was observed in if the identified peak does not contain the parent ion
         /// </summary>
-        /// <returns></returns>
         /// <remarks>Default: 0</remarks>
         public int MaxDistanceScansNoOverlap
         {
@@ -48,7 +51,6 @@
         /// <summary>
         /// Maximum fraction of the peak maximum that an upward spike can be to be included in the peak
         /// </summary>
-        /// <returns></returns>
         /// <remarks>Default: 0.20</remarks>
         public double MaxAllowedUpwardSpikeFractionMax
         {
@@ -64,7 +66,6 @@
         /// <summary>
         /// Multiplied by scaled S/N for the given spectrum to determine the initial minimum peak width (in scans) to try.  Scaled "S/N" = Math.Log10(Math.Floor("S/N")) * 10
         /// </summary>
-        /// <returns></returns>
         /// <remarks>Default: 0.5</remarks>
         public double InitialPeakWidthScansScaler
         {
@@ -80,7 +81,6 @@
         /// <summary>
         /// Maximum initial peak width to allow
         /// </summary>
-        /// <returns></returns>
         /// <remarks>Default: 30</remarks>
         public int InitialPeakWidthScansMaximum
         {
@@ -93,30 +93,41 @@
             }
         }
 
+        /// <summary>
+        /// When true, use smoothed data when finding peaks
+        /// </summary>
         public bool FindPeaksOnSmoothedData { get; set; }
 
+        /// <summary>
+        /// When true, smooth the data, regardless of minimum peak width
+        /// When false, only smooth if the peak has 5 or more points and either UseSavitzkyGolaySmooth is true or UseButterworthSmooth is true
+        /// </summary>
         public bool SmoothDataRegardlessOfMinimumPeakWidth { get; set; }
 
         /// <summary>
         /// Use Butterworth smoothing
         /// </summary>
-        /// <returns></returns>
         /// <remarks>UseButterworthSmooth takes precedence over UseSavitzkyGolaySmooth</remarks>
         public bool UseButterworthSmooth { get; set; }
 
+        /// <summary>
+        /// Butterworth sampling frequency
+        /// </summary>
         public double ButterworthSamplingFrequency { get; set; }
+
+        /// <summary>
+        /// When true, double the Butterworth sampling frequency for SIM data
+        /// </summary>
         public bool ButterworthSamplingFrequencyDoubledForSIMData { get; set; }
 
         /// <summary>
         /// Use Savitzky Golay smoothing
         /// </summary>
-        /// <returns></returns>
         public bool UseSavitzkyGolaySmooth { get; set; }
 
         /// <summary>
         /// Even number, 0 or greater; 0 means a moving average filter, 2 means a 2nd order Savitzky Golay filter
         /// </summary>
-        /// <returns></returns>
         /// <remarks>Default: 0</remarks>
         public short SavitzkyGolayFilterOrder
         {
@@ -138,6 +149,9 @@
             }
         }
 
+        /// <summary>
+        /// Baseline noise threshold options
+        /// </summary>
         public clsBaselineNoiseOptions MassSpectraNoiseThresholdOptions { get; set; }
 
         private int mInitialPeakWidthScansMaximum = 30;

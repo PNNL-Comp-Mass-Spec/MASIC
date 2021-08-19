@@ -5,11 +5,21 @@ using MASIC.Options;
 
 namespace MASIC.DataInput
 {
+    /// <summary>
+    /// Class for reading spectra from .mgf and .cdf files
+    /// </summary>
     // ReSharper disable once IdentifierTypo
     public class clsDataImportMGFandCDF : clsDataImport
     {
         // Ignore Spelling: Chemstation
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="masicOptions"></param>
+        /// <param name="peakFinder"></param>
+        /// <param name="parentIonProcessor"></param>
+        /// <param name="scanTracking"></param>
         // ReSharper disable once IdentifierTypo
         public clsDataImportMGFandCDF(
             MASICOptions masicOptions,
@@ -20,6 +30,16 @@ namespace MASIC.DataInput
         {
         }
 
+        /// <summary>
+        /// Read spectra from .mgf and .cdf files
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <param name="scanList"></param>
+        /// <param name="spectraCache"></param>
+        /// <param name="dataOutputHandler"></param>
+        /// <param name="keepRawSpectra"></param>
+        /// <param name="keepMSMSSpectra"></param>
+        /// <returns>True if successful, false if an error</returns>
         // ReSharper disable once IdentifierTypo
         public bool ExtractScanInfoFromMGFandCDF(
             string filePath,
@@ -178,7 +198,7 @@ namespace MASIC.DataInput
                             if (sicOptions.SICToleranceIsPPM)
                             {
                                 // Define MSDataResolution based on the tolerance value that will be used at the lowest m/z in this spectrum, divided by COMPRESS_TOLERANCE_DIVISOR
-                                // However, if the lowest m/z value is < 100, then use 100 m/z
+                                // However, if the lowest m/z value is < 100, use 100 m/z
                                 if (mzMin < 100)
                                 {
                                     msDataResolution = clsParentIonProcessing.GetParentIonToleranceDa(sicOptions, 100) /
@@ -279,9 +299,9 @@ namespace MASIC.DataInput
                     if (scanNumberCorrection == 0)
                     {
                         // See if udtSpectrumHeaderInfo.ScanNumberStart is equivalent to one of the survey scan numbers, yielding conflicting scan numbers
-                        // If it is, then there is an indexing error in the .MGF file; this error was present in .MGF files generated with
+                        // If it is, there is an indexing error in the .MGF file; this error was present in .MGF files generated with
                         // an older version of Agilent Chemstation.  These files typically have lines like ###MSMS: #13-29 instead of ###MSMS: #13/29/
-                        // If this indexing error is found, then we'll set scanNumberCorrection = 1 and apply it to all subsequent MS/MS scans;
+                        // If this indexing error is found, we'll set scanNumberCorrection = 1 and apply it to all subsequent MS/MS scans;
                         // we'll also need to correct prior MS/MS scans
                         for (var surveyScanIndex = lastSurveyScanIndex; surveyScanIndex < scanList.SurveyScans.Count; surveyScanIndex++)
                         {

@@ -2,28 +2,73 @@
 
 namespace MASICPeakFinder
 {
+    /// <summary>
+    /// Container for peak information
+    /// </summary>
     public class clsPeaksContainer
     {
-        public int OriginalPeakLocationIndex { get; set;
-         }
+        /// <summary>
+        /// Original peak location index
+        /// </summary>
+        public int OriginalPeakLocationIndex { get; set; }
+
+        /// <summary>
+        /// Source data count
+        /// </summary>
         public int SourceDataCount { get; set; }
 
+        /// <summary>
+        /// X data
+        /// </summary>
         public double[] XData;
+
+        /// <summary>
+        /// Y data
+        /// </summary>
         public double[] YData;
+
+        /// <summary>
+        /// Smoothed Y data
+        /// </summary>
         public double[] SmoothedYData;
 
+        /// <summary>
+        /// List of peaks found in the data
+        /// </summary>
         public List<clsPeakInfo> Peaks { get; set; }
 
+        /// <summary>
+        /// Minimum peak width, in points
+        /// </summary>
         public int PeakWidthPointsMinimum { get; set; }
+
+        /// <summary>
+        /// Maximum allowed upward spike, as a fraction of the maximum intensity
+        /// </summary>
         public double MaxAllowedUpwardSpikeFractionMax { get; set; }
+
+        /// <summary>
+        /// Index of the best peak
+        /// </summary>
         public int BestPeakIndex { get; set; }
+
+        /// <summary>
+        /// Area of the best peak
+        /// </summary>
         public double BestPeakArea { get; set; }
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public clsPeaksContainer()
         {
             Peaks = new List<clsPeakInfo>();
         }
 
+        /// <summary>
+        /// Clone the peak
+        /// </summary>
+        /// <param name="skipSourceData"></param>
         public clsPeaksContainer Clone(bool skipSourceData = false)
         {
             var clonedContainer = new clsPeaksContainer()
