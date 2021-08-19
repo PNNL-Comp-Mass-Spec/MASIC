@@ -360,9 +360,7 @@ namespace MASIC
                 }
 
                 lastKnownLocation = "Call AddSpectrumToPool";
-                var success = spectraCache.AddSpectrumToPool(msSpectrum, scanInfo.ScanNumber);
-
-                return success;
+                return spectraCache.AddSpectrumToPool(msSpectrum, scanInfo.ScanNumber);
             }
             catch (Exception ex)
             {

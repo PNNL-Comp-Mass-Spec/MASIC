@@ -501,7 +501,7 @@ namespace MASIC.DataInput
         /// </summary>
         public static IList<string> GetDefaultExtensionsToParse()
         {
-            var extensionsToParse = new List<string>()
+            return new List<string>()
             {
                 THERMO_RAW_FILE_EXTENSION,
                 MZ_XML_FILE_EXTENSION1,
@@ -511,8 +511,6 @@ namespace MASIC.DataInput
                 AGILENT_MSMS_FILE_EXTENSION,
                 TEXT_FILE_EXTENSION
             };
-
-            return extensionsToParse;
         }
 
         /// <summary>

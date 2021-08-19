@@ -117,8 +117,7 @@ namespace MASIC
         {
             get
             {
-                var reporterIonMode = GetSelectedReporterIonMode();
-                return reporterIonMode;
+                return GetSelectedReporterIonMode();
             }
             set
             {

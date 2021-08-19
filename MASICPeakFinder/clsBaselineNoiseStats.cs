@@ -38,14 +38,13 @@
         /// </summary>
         public clsBaselineNoiseStats Clone()
         {
-            var clonedStats = new clsBaselineNoiseStats()
+            return new clsBaselineNoiseStats()
             {
                 NoiseLevel = NoiseLevel,
                 NoiseStDev = NoiseStDev,
                 PointsUsed = PointsUsed,
                 NoiseThresholdModeUsed = NoiseThresholdModeUsed
             };
-            return clonedStats;
         }
     }
 }

@@ -119,14 +119,12 @@ namespace MASIC
                     return false;
                 }
 
-                var success = FindMaxValueInMZRange(
+                return FindMaxValueInMZRange(
                     spectrum.IonsMZ,
                     spectrum.IonsIntensity,
                     spectrum.IonCount,
                     mzStart, mzEnd,
                     out bestMatchMZ, out matchIntensity);
-
-                return success;
             }
             catch (Exception ex)
             {

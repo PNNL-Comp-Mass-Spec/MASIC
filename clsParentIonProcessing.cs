@@ -449,9 +449,7 @@ namespace MASIC
             binnedSpectrum.BinSize = dataComparer.BinSize;
 
             // Note that the data in xData and yData should have already been filtered to discard data points below the noise threshold intensity
-            var success = dataComparer.BinData(xData, yData, binnedSpectrum.BinnedIntensities, binnedSpectrum.BinnedIntensitiesOffset);
-
-            return success;
+            return dataComparer.BinData(xData, yData, binnedSpectrum.BinnedIntensities, binnedSpectrum.BinnedIntensitiesOffset);
         }
 
         private bool FindClosestMZ(

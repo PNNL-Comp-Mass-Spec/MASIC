@@ -392,9 +392,7 @@ namespace MASIC.Plots
 
                 outputFilePath = pngFile.FullName;
 
-                var success = boxPlot.SaveToPNG(pngFile, 1024, 600, 96);
-
-                return success;
+                return boxPlot.SaveToPNG(pngFile, 1024, 600, 96);
             }
             catch (Exception ex)
             {

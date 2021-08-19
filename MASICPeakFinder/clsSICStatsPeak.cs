@@ -92,7 +92,7 @@
         /// </summary>
         public clsSICStatsPeak Clone()
         {
-            var clonedPeak = new clsSICStatsPeak()
+            return new clsSICStatsPeak()
             {
                 IndexBaseLeft = IndexBaseLeft,
                 IndexBaseRight = IndexBaseRight,
@@ -109,7 +109,6 @@
                 BaselineNoiseStats = BaselineNoiseStats.Clone(),
                 StatisticalMoments = StatisticalMoments.Clone()
             };
-            return clonedPeak;
         }
     }
 }

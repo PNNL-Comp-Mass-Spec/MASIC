@@ -228,13 +228,11 @@ namespace MASIC.Plots
                 return string.Empty;
             }
 
-            var hyperlink = string.Format(
+            return string.Format(
                 "<a href=\"{0}\"><img src=\"{0}\" width=\"{1}\" border=\"0\" alt=\"{2}\"></a>",
                 plotFile.PlotFile.Name,
                 widthPixels,
                 plotFile.FileDescription);
-
-            return hyperlink;
         }
 
         private string GetDatasetDetailReportLink(string datasetName)

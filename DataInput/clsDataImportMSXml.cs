@@ -204,11 +204,9 @@ namespace MASIC.DataInput
                 return 0;
             }
 
-            var precursorInterference = ComputePrecursorInterference(
+            return (double)ComputePrecursorInterference(
                 scanInfo.ScanNumber,
                 precursorScanNumber, parentIonMz, isolationWidth, chargeState);
-
-            return precursorInterference;
         }
 
         /// <summary>
@@ -1275,8 +1273,7 @@ namespace MASIC.DataInput
                 return string.Empty;
             }
 
-            var filterString = filterStrings.First().Value;
-            return filterString;
+            return filterStrings.First().Value;
         }
 
         private clsSpectrumInfoMzXML GetSpectrumInfoFromMzMLSpectrum(

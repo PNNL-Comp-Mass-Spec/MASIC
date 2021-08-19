@@ -591,8 +591,7 @@ namespace MASIC
                 SetSubtaskProcessingStepPct(0);
                 UpdateOverallProgress("Creating plots in " + outputDirectoryPath);
 
-                var plotsCreated = CreatePlots(new FileInfo(sicStatsFilePath), outputDirectoryPath);
-                return plotsCreated;
+                return CreatePlots(new FileInfo(sicStatsFilePath), outputDirectoryPath);
             }
             catch (Exception ex)
             {
@@ -776,9 +775,7 @@ namespace MASIC
         /// </summary>
         private float GetFreeMemoryMB()
         {
-            var freeMemoryMB = SystemInfo.GetFreeMemoryMB();
-
-            return freeMemoryMB;
+            return (float)SystemInfo.GetFreeMemoryMB();
         }
 
         /// <summary>
@@ -993,8 +990,7 @@ namespace MASIC
         // ReSharper disable once UnusedMember.Global
         public bool LoadParameterFileSettings(string parameterFilePath)
         {
-            var success = Options.LoadParameterFileSettings(parameterFilePath);
-            return success;
+            return Options.LoadParameterFileSettings(parameterFilePath);
         }
 
         private void LogErrors(
@@ -1414,12 +1410,10 @@ namespace MASIC
                 // Find the Selected Ion Chromatograms, reporter ions, etc. and write the results to disk
                 // ---------------------------------------------------------
 
-                var success = FindSICsAndWriteOutput(
+                return FindSICsAndWriteOutput(
                     inputFilePath, outputDirectoryPath,
                     scanList, spectraCache, dataOutputHandler, scanTracking,
                     datasetFileInfo, parentIonProcessor, dataImporterBase);
-
-                return success;
             }
             catch (Exception ex)
             {

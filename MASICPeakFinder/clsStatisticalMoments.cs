@@ -44,7 +44,7 @@
         /// </summary>
         public clsStatisticalMoments Clone()
         {
-            var clonedStats = new clsStatisticalMoments()
+            return new clsStatisticalMoments()
             {
                 Area = Area,
                 CenterOfMassScan = CenterOfMassScan,
@@ -53,8 +53,6 @@
                 KSStat = KSStat,
                 DataCountUsed = DataCountUsed
             };
-
-            return clonedStats;
         }
     }
 }

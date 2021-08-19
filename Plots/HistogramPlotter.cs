@@ -407,8 +407,7 @@ namespace MASIC.Plots
 
                 outputFilePath = pngFile.FullName;
 
-                var success = histogramPlot.SaveToPNG(pngFile, 1024, 600, 96);
-                return success;
+                return histogramPlot.SaveToPNG(pngFile, 1024, 600, 96);
             }
             catch (Exception ex)
             {

@@ -478,14 +478,12 @@ namespace MASIC
         /// </summary>
         public static SpectrumCacheOptions GetDefaultCacheOptions()
         {
-            var cacheOptions = new SpectrumCacheOptions
+            return new SpectrumCacheOptions
             {
                 DiskCachingAlwaysDisabled = false,
                 DirectoryPath = Path.GetTempPath(),
                 SpectraToRetainInMemory = 1000
             };
-
-            return cacheOptions;
         }
 
         /// <summary>

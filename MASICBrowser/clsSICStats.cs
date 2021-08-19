@@ -29,7 +29,7 @@ namespace MASICBrowser
 
         public clsSICStats Clone()
         {
-            var stats = new clsSICStats
+            return new clsSICStats
             {
                 Peak = Peak.Clone(),
                 SICPeakWidthFullScans = SICPeakWidthFullScans,
@@ -42,8 +42,6 @@ namespace MASICBrowser
                 SICSmoothedYData = SICSmoothedYData.ToList(),
                 SICSmoothedYDataIndexStart = SICSmoothedYDataIndexStart,
             };
-
-            return stats;
         }
 
         public override string ToString()

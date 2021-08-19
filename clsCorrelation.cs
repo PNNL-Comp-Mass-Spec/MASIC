@@ -815,7 +815,7 @@ namespace MASIC
         /// </summary>
         public static BinningOptions GetDefaultBinningOptions()
         {
-            var binningOptions = new BinningOptions
+            return new BinningOptions
             {
                 StartX = 50,
                 EndX = 2000,
@@ -825,8 +825,6 @@ namespace MASIC
                 SumAllIntensitiesForBin = true,                     // Sum all of the intensities for binned ions of the same bin together
                 MaximumBinCount = 100000
             };
-
-            return binningOptions;
         }
 
         /// <summary>

@@ -131,8 +131,7 @@ namespace MASIC.Plots
 
                 if (mColorGradients == null || mColorGradients.Count == 0)
                 {
-                    var success = SaveToFile(imageFile, fileFormat, width, height, resolution);
-                    return success;
+                    return SaveToFile(imageFile, fileFormat, width, height, resolution);
                 }
 
                 foreach (var colorGradient in mColorGradients)
@@ -172,8 +171,7 @@ namespace MASIC.Plots
 
                     if (!matchFound)
                     {
-                        var success = SaveToFile(imageFile, fileFormat, width, height, resolution);
-                        return success;
+                        return SaveToFile(imageFile, fileFormat, width, height, resolution);
                     }
                 }
 

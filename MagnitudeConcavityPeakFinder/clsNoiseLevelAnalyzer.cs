@@ -349,15 +349,13 @@ namespace MagnitudeConcavityPeakFinder
             float sngMinimumBaselineNoiseLevel,
             NoiseThresholdModes eNoiseThresholdMode)
         {
-            var baselineNoiseStats = new BaselineNoiseStatsType
+            return new BaselineNoiseStatsType
             {
                 NoiseLevel = sngMinimumBaselineNoiseLevel,
                 NoiseStDev = 0,
                 PointsUsed = 0,
                 NoiseThresholdModeUsed = eNoiseThresholdMode
             };
-
-            return baselineNoiseStats;
         }
 
         /// <summary>
@@ -398,7 +396,7 @@ namespace MagnitudeConcavityPeakFinder
 
         public static BaselineNoiseOptionsType GetDefaultNoiseThresholdOptions()
         {
-            var baselineNoiseOptions = new BaselineNoiseOptionsType
+            return new BaselineNoiseOptionsType
             {
                 BaselineNoiseMode = NoiseThresholdModes.TrimmedMedianByAbundance,
                 BaselineNoiseLevelAbsolute = 0,
@@ -408,8 +406,6 @@ namespace MagnitudeConcavityPeakFinder
                 DualTrimmedMeanStdDevLimits = 5,
                 DualTrimmedMeanMaximumSegments = 3
             };
-
-            return baselineNoiseOptions;
         }
     }
 }

@@ -877,11 +877,9 @@ namespace MASIC.Options
                 var scanCommentList = reader.GetParam(
                     XML_SECTION_CUSTOM_SIC_VALUES, "ScanCommentList", string.Empty);
 
-                var success = CustomSICList.ParseCustomSICList(mzList, mzToleranceDaList,
+                return CustomSICList.ParseCustomSICList(mzList, mzToleranceDaList,
                     scanCenterList, scanToleranceList,
                     scanCommentList);
-
-                return success;
             }
             catch (Exception ex)
             {

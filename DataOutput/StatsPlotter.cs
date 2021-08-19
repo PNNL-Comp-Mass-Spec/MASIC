@@ -397,8 +397,7 @@ namespace MASIC.DataOutput
             var htmlCreator = new HTMLFileCreator(datasetName, Options.PlotOptions, plotFiles);
             RegisterEvents(htmlCreator);
 
-            var success = htmlCreator.CreateHTMLFile(outputDirectory);
-            return success;
+            return htmlCreator.CreateHTMLFile(outputDirectory);
         }
 
         private bool SaveHistogramData(string datasetName, string outputDirectory)
@@ -461,15 +460,13 @@ namespace MASIC.DataOutput
             if (mStatsSummarizer.ReporterIonNames.Keys.Count == 0)
                 return true;
 
-            var success = WriteReporterIonIntensityStatsData(
+            return WriteReporterIonIntensityStatsData(
                 mStatsSummarizer.ReporterIonNames,
                 mStatsSummarizer.ReporterIonIntensityStats,
                 mStatsSummarizer.ReporterIonIntensityStatsHighAbundanceData,
                 datasetName,
                 outputDirectory,
                 REPORTER_ION_INTENSITY_STATS_FILE_SUFFIX);
-
-            return success;
         }
 
         private bool SaveReporterIonObservationRateData(string datasetName, string outputDirectory)
@@ -477,15 +474,13 @@ namespace MASIC.DataOutput
             if (mStatsSummarizer.ReporterIonNames.Keys.Count == 0)
                 return true;
 
-            var success = WriteReporterIonObservationRateData(
+            return WriteReporterIonObservationRateData(
                 mStatsSummarizer.ReporterIonNames,
                 mStatsSummarizer.ReporterIonObservationRate,
                 mStatsSummarizer.ReporterIonObservationRateHighAbundance,
                 datasetName,
                 outputDirectory,
                 REPORTER_ION_OBSERVATION_RATE_DATA_FILE_SUFFIX);
-
-            return success;
         }
 
         private bool WriteHistogramData(

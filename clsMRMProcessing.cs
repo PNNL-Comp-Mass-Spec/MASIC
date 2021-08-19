@@ -216,9 +216,7 @@ namespace MASIC
                 return false;
             }
 
-            var success = ExportMRMDataToDisk(scanList, spectraCache, mrmSettings, srmList, inputFileName, outputDirectoryPath);
-
-            return success;
+            return ExportMRMDataToDisk(scanList, spectraCache, mrmSettings, srmList, inputFileName, outputDirectoryPath);
         }
 
         /// <summary>

@@ -3492,7 +3492,7 @@ namespace MASICPeakFinder
         /// </summary>
         public static clsBaselineNoiseOptions GetDefaultNoiseThresholdOptions()
         {
-            var baselineNoiseOptions = new clsBaselineNoiseOptions
+            return new clsBaselineNoiseOptions
             {
                 BaselineNoiseMode = NoiseThresholdModes.TrimmedMedianByAbundance,
                 BaselineNoiseLevelAbsolute = 0,
@@ -3502,8 +3502,6 @@ namespace MASICPeakFinder
                 DualTrimmedMeanStdDevLimits = 5,
                 DualTrimmedMeanMaximumSegments = 3
             };
-
-            return baselineNoiseOptions;
         }
 
         /// <summary>
@@ -3552,8 +3550,7 @@ namespace MASICPeakFinder
         {
             try
             {
-                var versionInfo = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
-                return versionInfo;
+                return System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
             }
             catch (Exception)
             {
@@ -3570,15 +3567,13 @@ namespace MASICPeakFinder
             double minimumBaselineNoiseLevel,
             NoiseThresholdModes noiseThresholdMode)
         {
-            var baselineNoiseStats = new clsBaselineNoiseStats()
+            return new clsBaselineNoiseStats()
             {
                 NoiseLevel = minimumBaselineNoiseLevel,
                 NoiseStDev = 0,
                 PointsUsed = 0,
                 NoiseThresholdModeUsed = noiseThresholdMode
             };
-
-            return baselineNoiseStats;
         }
 
         /// <summary>

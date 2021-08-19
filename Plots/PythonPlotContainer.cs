@@ -211,9 +211,7 @@ namespace MASIC.Plots
             // Examine the exit code
             if (programRunner.ExitCode == 0)
             {
-                var success = RenameTempPngFile(exportFile, workDir);
-
-                return success;
+                return RenameTempPngFile(exportFile, workDir);
             }
 
             OnErrorEvent("Python ExitCode = " + programRunner.ExitCode);

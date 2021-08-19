@@ -114,8 +114,7 @@ namespace MASIC
         /// <param name="sourceSpectrum"></param>
         public clsMSSpectrum Copy(clsMSSpectrum sourceSpectrum)
         {
-            var newSpectrum = new clsMSSpectrum(sourceSpectrum.ScanNumber, sourceSpectrum.IonsMZ, sourceSpectrum.IonsIntensity, sourceSpectrum.IonsMZ.Count);
-            return newSpectrum;
+            return new clsMSSpectrum(sourceSpectrum.ScanNumber, sourceSpectrum.IonsMZ, sourceSpectrum.IonsIntensity, sourceSpectrum.IonsMZ.Count);
         }
 
         /// <summary>
