@@ -1,5 +1,22 @@
 MASIC Change Log
 
+Version 3.2.7901; August 19, 2021
+	- Remove unused COM reference to MSFileReaderLib
+	- Fix bug with 16-plex TMT isotopic abundance correction coefficients
+		- Inaccurate coefficients were defined for ions 12-16
+
+Version 3.2.7762; April 2, 2021
+	- Compute reporter ion observation rates and total intensity by reporter ion channel
+	- Generate peak area and peak width histograms
+		- Supports both OxyPlot and Python plotting with matplotlib
+	- Create box and whisker plots showing the distribution of reporter ion intensities, by channel
+	- Add option /CreateParamFile for creating an example parameter file
+	- Optionally create an index.html file for viewing plots in a table
+
+Version 3.2.7645; June 9, 2020
+	- Significant speed improvements by optimizing the in-memory spectra pool
+	- Use GetColumnValue when reading a custom SIC list file
+
 Version 3.2.7438; May 13, 2020
 	- Fix a bug with the in-memory spectra pool
 		- There were certain cases where a spectrum in use might have its data replaced by a new spectrum read from the disk cache
