@@ -402,8 +402,8 @@ namespace MASIC
             var msg = new StringBuilder();
 
             msg.Append("When Export All Spectra Data Points is enabled, a separate file is created containing the raw data points (scan number, m/z, and intensity), using the specified file format. ");
-            msg.Append("If Export MS/MS Spectra is enabled, then the fragmentation spectra are included, in addition to the survey scan spectra (MS1 scans). ");
-            msg.Append("If MS/MS spectra are not included, then one can optionally renumber the survey scan spectra so that they increase in steps of 1, regardless of the number of MS/MS scans between each survey scan. ");
+            msg.Append("If Export MS/MS Spectra is enabled, the fragmentation spectra are included, in addition to the survey scan spectra (MS1 scans). ");
+            msg.Append("If MS/MS spectra are not included, one can optionally renumber the survey scan spectra so that they increase in steps of 1, regardless of the number of MS/MS scans between each survey scan. ");
             msg.Append("The Minimum Intensity and Maximum Ion Count options allow you to limit the number of data points exported for each spectrum.");
 
             lblRawDataExportOverview.Text = msg.ToString();
