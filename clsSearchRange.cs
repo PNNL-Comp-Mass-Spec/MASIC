@@ -314,13 +314,13 @@ namespace MASIC
         private void ClearUnusedData()
         {
             if (mDataType != eDataTypeToUse.IntegerType)
-                mDataInt = new int[0];
+                mDataInt = Array.Empty<int>();
 
             if (mDataType != eDataTypeToUse.FloatType)
-                mDataSingle = new float[0];
+                mDataSingle = Array.Empty<float>();
 
             if (mDataType != eDataTypeToUse.DoubleType)
-                mDataDouble = new double[0];
+                mDataDouble = Array.Empty<double>();
 
             if (mDataType == eDataTypeToUse.NoDataPresent)
             {

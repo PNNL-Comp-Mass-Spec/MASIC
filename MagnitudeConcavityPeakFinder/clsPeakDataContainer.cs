@@ -39,9 +39,9 @@ namespace MagnitudeConcavityPeakFinder
         public PeakDataContainer()
         {
             DataCount = 0;
-            XData = new double[0];
-            YData = new double[0];
-            SmoothedYData = new double[0];
+            XData = Array.Empty<double>();
+            YData = Array.Empty<double>();
+            SmoothedYData = Array.Empty<double>();
         }
 
         public void SetData(List<KeyValuePair<int, double>> xyData)

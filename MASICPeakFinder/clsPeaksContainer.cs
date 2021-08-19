@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace MASICPeakFinder
 {
@@ -85,9 +86,9 @@ namespace MASICPeakFinder
             {
                 clonedContainer.SourceDataCount = 0;
 
-                clonedContainer.XData = new double[0];
-                clonedContainer.YData = new double[0];
-                clonedContainer.SmoothedYData = new double[0];
+                clonedContainer.XData = Array.Empty<double>();
+                clonedContainer.YData = Array.Empty<double>();
+                clonedContainer.SmoothedYData = Array.Empty<double>();
             }
             else
             {

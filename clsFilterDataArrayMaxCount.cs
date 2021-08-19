@@ -21,8 +21,8 @@ namespace MASIC
         // 4 steps in method FilterDataByMaxDataCountToLoad
         private const int SUBTASK_STEP_COUNT = 4;
 
-        private double[] mDataValues = new double[0];
-        private int[] mDataIndices = new int[0];
+        private double[] mDataValues = Array.Empty<double>();
+        private int[] mDataIndices = Array.Empty<int>();
 
         /// <summary>
         /// Progress changed event

@@ -169,7 +169,7 @@ namespace MASICBrowser
         /// <summary>
         /// Pointer array used for dereferencing cboParentIon.SelectedItem to mParentIonStats
         /// </summary>
-        private int[] mParentIonPointerArray = new int[0];
+        private int[] mParentIonPointerArray = Array.Empty<int>();
 
         private bool mAutoStepEnabled;
         private int mAutoStepIntervalMsec;
@@ -1250,7 +1250,7 @@ namespace MASICBrowser
                 if (sicStats.SICSmoothedYData == null || sicStats.SICSmoothedYData.Count == 0)
                 {
                     smoothedYDataIndexStart = 0;
-                    smoothedYData = new double[0];
+                    smoothedYData = Array.Empty<double>();
                 }
                 else
                 {
@@ -2700,7 +2700,7 @@ namespace MASICBrowser
 
             if (mParentIonStats.Count == 0)
             {
-                mParentIonPointerArray = new int[0];
+                mParentIonPointerArray = Array.Empty<int>();
                 return;
             }
 
