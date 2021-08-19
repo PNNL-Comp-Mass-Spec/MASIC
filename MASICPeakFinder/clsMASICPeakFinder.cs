@@ -25,11 +25,10 @@ namespace MASICPeakFinder
     {
         // Ignore Spelling: Butterworth, fwhm, Golay, pdf, prepend, Savitzky, unsmoothed
 
-        public string PROGRAM_DATE = "November 25, 2020";
         /// <summary>
         /// Program date
         /// </summary>
-        public string PROGRAM_DATE = "September 18, 2021";
+        public string PROGRAM_DATE = "August 18, 2021";
 
         /// <summary>
         /// Minimum peak width, in points
