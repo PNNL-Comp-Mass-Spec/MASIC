@@ -292,16 +292,14 @@ namespace MASIC.DataOutput
                             }
                         }
 
-                        if (masicVersion == null)
-                            masicVersion = string.Empty;
-                        if (masicPeakFinderDllVersion == null)
-                            masicPeakFinderDllVersion = string.Empty;
+                        masicVersion ??= string.Empty;
+                        masicPeakFinderDllVersion ??= string.Empty;
 
                         // Check if the MASIC version matches
-                        if ((masicVersion ?? "") != (masicOptions.MASICVersion ?? ""))
+                        if ((masicVersion ?? string.Empty) != (masicOptions.MASICVersion ?? string.Empty))
                             return false;
 
-                        if ((masicPeakFinderDllVersion ?? "") != (masicOptions.PeakFinderVersion ?? ""))
+                        if ((masicPeakFinderDllVersion ?? string.Empty) != (masicOptions.PeakFinderVersion ?? string.Empty))
                             return false;
 
                         // Check the dataset number
@@ -309,13 +307,13 @@ namespace MASIC.DataOutput
                             return false;
 
                         // Check the filename in sourceFilePathCheck
-                        if ((Path.GetFileName(sourceFilePathCheck) ?? "") != (Path.GetFileName(inputFilePathFull) ?? ""))
+                        if ((Path.GetFileName(sourceFilePathCheck) ?? string.Empty) != (Path.GetFileName(inputFilePathFull) ?? string.Empty))
                             return false;
 
                         // Check if the source file stats match
                         var inputFileInfo = new FileInfo(inputFilePathFull);
                         var sourceFileDateTime = inputFileInfo.LastWriteTime;
-                        if ((sourceFileDateTimeCheck ?? "") != (sourceFileDateTime.ToShortDateString() + " " + sourceFileDateTime.ToShortTimeString() ?? ""))
+                        if ((sourceFileDateTimeCheck ?? string.Empty) != (sourceFileDateTime.ToShortDateString() + " " + sourceFileDateTime.ToShortTimeString() ?? string.Empty))
                             return false;
                         if (sourceFileSizeBytes != inputFileInfo.Length)
                             return false;
@@ -594,10 +592,10 @@ namespace MASIC.DataOutput
                         {
                             // Check if the Custom MZ options match
                             validExistingResultsFound =
-                                (customSICListCompare.RawTextMZList ?? "") == (masicOptions.CustomSICList.RawTextMZList ?? "") &&
-                                (customSICListCompare.RawTextMZToleranceDaList ?? "") == (masicOptions.CustomSICList.RawTextMZToleranceDaList ?? "") &&
-                                (customSICListCompare.RawTextScanOrAcqTimeCenterList ?? "") == (masicOptions.CustomSICList.RawTextScanOrAcqTimeCenterList ?? "") &&
-                                (customSICListCompare.RawTextScanOrAcqTimeToleranceList ?? "") == (masicOptions.CustomSICList.RawTextScanOrAcqTimeToleranceList ?? "") &&
+                                (customSICListCompare.RawTextMZList ?? string.Empty) == (masicOptions.CustomSICList.RawTextMZList ?? string.Empty) &&
+                                (customSICListCompare.RawTextMZToleranceDaList ?? string.Empty) == (masicOptions.CustomSICList.RawTextMZToleranceDaList ?? string.Empty) &&
+                                (customSICListCompare.RawTextScanOrAcqTimeCenterList ?? string.Empty) == (masicOptions.CustomSICList.RawTextScanOrAcqTimeCenterList ?? string.Empty) &&
+                                (customSICListCompare.RawTextScanOrAcqTimeToleranceList ?? string.Empty) == (masicOptions.CustomSICList.RawTextScanOrAcqTimeToleranceList ?? string.Empty) &&
                                 clsUtilities.ValuesMatch(customSICListCompare.ScanOrAcqTimeTolerance, masicOptions.CustomSICList.ScanOrAcqTimeTolerance) &&
                                 customSICListCompare.ScanToleranceType == masicOptions.CustomSICList.ScanToleranceType;
                         }
