@@ -38,50 +38,56 @@ namespace MASIC
         {
             ionMatchCount = 0;
             closestMZ = 0;
-            double ionSumOrMax = 0;
 
             try
             {
                 var smallestDifference = double.MaxValue;
 
-                if (msSpectrum.IonsMZ != null && msSpectrum.IonCount > 0)
+                if (msSpectrum.IonsMZ == null || msSpectrum.IonCount == 0)
                 {
-                    if (SumIonsFindValueInRange(msSpectrum.IonsMZ, searchMZ, searchToleranceHalfWidth, out var indexFirst, out var indexLast))
+                    return 0;
+                }
+
+                if (!SumIonsFindValueInRange(msSpectrum.IonsMZ, searchMZ, searchToleranceHalfWidth, out var indexFirst, out var indexLast))
+                {
+                    return 0;
+                }
+
+                double ionSumOrMax = 0;
+
+                for (var ionIndex = indexFirst; ionIndex <= indexLast; ionIndex++)
+                {
+                    if (returnMax)
                     {
-                        for (var ionIndex = indexFirst; ionIndex <= indexLast; ionIndex++)
+                        // Return max
+                        if (msSpectrum.IonsIntensity[ionIndex] > ionSumOrMax)
                         {
-                            if (returnMax)
-                            {
-                                // Return max
-                                if (msSpectrum.IonsIntensity[ionIndex] > ionSumOrMax)
-                                {
-                                    ionSumOrMax = msSpectrum.IonsIntensity[ionIndex];
-                                }
-                            }
-                            else
-                            {
-                                // Return sum
-                                ionSumOrMax += msSpectrum.IonsIntensity[ionIndex];
-                            }
-
-                            var testDifference = Math.Abs(msSpectrum.IonsMZ[ionIndex] - searchMZ);
-                            if (testDifference < smallestDifference)
-                            {
-                                smallestDifference = testDifference;
-                                closestMZ = msSpectrum.IonsMZ[ionIndex];
-                            }
+                            ionSumOrMax = msSpectrum.IonsIntensity[ionIndex];
                         }
+                    }
+                    else
+                    {
+                        // Return sum
+                        ionSumOrMax += msSpectrum.IonsIntensity[ionIndex];
+                    }
 
-                        ionMatchCount = indexLast - indexFirst + 1;
+                    var testDifference = Math.Abs(msSpectrum.IonsMZ[ionIndex] - searchMZ);
+                    if (testDifference < smallestDifference)
+                    {
+                        smallestDifference = testDifference;
+                        closestMZ = msSpectrum.IonsMZ[ionIndex];
                     }
                 }
+
+                ionMatchCount = indexLast - indexFirst + 1;
+
+                return ionSumOrMax;
             }
             catch (Exception)
             {
                 ionMatchCount = 0;
+                return 0;
             }
-
-            return ionSumOrMax;
         }
 
         /// <summary>
