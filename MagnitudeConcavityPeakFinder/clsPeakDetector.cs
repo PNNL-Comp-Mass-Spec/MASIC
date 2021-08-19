@@ -215,7 +215,7 @@ namespace MagnitudeConcavityPeakFinder
 
             peakData.OriginalPeakLocationIndex = originalPeakLocationIndex;
 
-            var peakFoundContainingOriginalPeakLocation = FindPeaksWork(
+            FindPeaksWork(
                 peakDetector,
                 scanNumbers,
                 peakData,

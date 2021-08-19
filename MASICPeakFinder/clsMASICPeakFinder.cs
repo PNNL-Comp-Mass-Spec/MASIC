@@ -1439,6 +1439,7 @@ namespace MASICPeakFinder
                 double maximumBaselineAdjustedIntensity = 0;
                 var indexMaximumIntensity = 0;
 
+                // ReSharper disable once ConditionIsAlwaysTrueOrFalse
                 if (USE_SMOOTHED_DATA)
                 {
                     dataCount = 0;
@@ -1929,8 +1930,7 @@ namespace MASICPeakFinder
 
             // Look for the minimum positive value and replace all data in dataListSorted with that value
 
-            // ReSharper disable once UnusedVariable
-            var minimumPositiveValue = ReplaceSortedDataWithMinimumPositiveValue(dataSortedCount, dataListSorted);
+            ReplaceSortedDataWithMinimumPositiveValue(dataSortedCount, dataListSorted);
 
             switch (baselineNoiseOptions.BaselineNoiseMode)
             {
