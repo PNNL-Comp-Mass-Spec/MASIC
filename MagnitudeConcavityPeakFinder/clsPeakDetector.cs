@@ -743,9 +743,9 @@ namespace MagnitudeConcavityPeakFinder
         /// </summary>
         /// <param name="peakDetector"></param>
         /// <param name="scanNumbers"></param>
-        /// <param name="peakData"></param>
+        /// <param name="peakData">Updated by this method to include the detected peaks</param>
         /// <param name="peakFinderOptions"></param>
-        /// <returns>Detected peaks will be in the peakData object</returns>
+        /// <returns>True if a valid peak was found, otherwise false</returns>
         private bool FindPeaksWork(
             PeakFinder peakDetector,
             IList<int> scanNumbers,

@@ -150,6 +150,9 @@ namespace MASICBrowser
             ParentIons = 3
         }
 
+        /// <summary>
+        /// Path to the data file to load
+        /// </summary>
         public string FileToAutoLoad { get; set; }
 
         private Spectrum mSpectrum;

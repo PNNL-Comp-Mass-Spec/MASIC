@@ -245,11 +245,18 @@ namespace MASICBrowser
     }
 
     /// <summary>
-    /// Class used to store the result of an InputBox.Show message.
+    /// Class used to store the result of an InputBox.Show message
     /// </summary>
     public class InputBoxResult
     {
+        /// <summary>
+        /// True if the user clicked OK
+        /// </summary>
         public bool OK;
+
+        /// <summary>
+        /// Text entered by the user
+        /// </summary>
         public string Text;
     }
 
@@ -258,8 +265,19 @@ namespace MASICBrowser
     /// </summary>
     public class InputBoxValidatingArgs : EventArgs
     {
+        /// <summary>
+        /// Text to parse (should contain an integer)
+        /// </summary>
         public string Text;
+
+        /// <summary>
+        /// Error message to show the user if the number in Text could not be parsed
+        /// </summary>
         public string Message;
+
+        /// <summary>
+        /// This is set to true
+        /// </summary>
         public bool Cancel;
     }
 
