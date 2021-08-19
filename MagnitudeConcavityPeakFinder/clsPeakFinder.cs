@@ -5,12 +5,12 @@ namespace MagnitudeConcavityPeakFinder
 {
     /// <summary>
     /// <para>
-    /// Peak detection routines
+    /// Peak detection methods
     /// Written by Matthew Monroe in roughly 2001 at UNC (Chapel Hill, NC)
     /// Kevin Lan provided the concept of Magnitude Concavity fitting
     /// Ported from LabView code to VB 6 in June 2003 at PNNL (Richland, WA)
     /// Ported from VB 6 to VB.NET in October 2003
-    /// Switched from using the eols.dll least squares fitting routine to using a local function
+    /// Switched from using the eols.dll least squares fitting method to using a local function
     /// Ported to C# in February 2015
     /// </para>
     /// <para>

@@ -230,7 +230,7 @@ namespace MASIC
         {
             if (x is < 0.0 or > 1.0)
             {
-                throw new Exception("Bad x in routine clsCorrelation->BetaI; should be between 0 and 1");
+                throw new Exception("Bad x in method clsCorrelation->BetaI; should be between 0 and 1");
             }
 
             double bt;
@@ -497,7 +497,7 @@ namespace MASIC
             // TINY is used to "regularize" the unusual case of complete correlation
             const double TINY = 1.0E-20;
 
-            // Given two arrays x[1..n] and y[1..n], this routine computes their correlation coefficient
+            // Given two arrays x[1..n] and y[1..n], this method computes their correlation coefficient
             // r (returned as r), the significance level at which the null hypothesis of zero correlation is
             // disproved (prob whose small value indicates a significant correlation), and Fisher's z (returned
             // as z), whose value can be used in further statistical tests as described above.
@@ -656,11 +656,11 @@ namespace MASIC
         {
             // Note: data1 and data2 are re-ordered by this function; thus, they are passed ByVal
 
-            // Given two data arrays, data1[0..n-1] and data2[0..n-1], this routine returns their sum-squared
+            // Given two data arrays, data1[0..n-1] and data2[0..n-1], this method returns their sum-squared
             // difference of ranks as D, the number of standard deviations by which D deviates from its null hypothesis
             // expected value as zd, the two-sided significance level of this deviation as prob_d,
             // Spearman's rank correlation rs as rs, and the two-sided significance level of its deviation from
-            // zero as prob_rs. The external routine CRank is used.  A small value of either prob_d or prob_rs indicates
+            // zero as prob_rs. The external method CRank is used.  A small value of either prob_d or prob_rs indicates
             // a significant correlation (rs positive) or anti correlation (rs negative).
 
             DiffInRanks = 0;

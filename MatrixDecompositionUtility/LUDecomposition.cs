@@ -93,7 +93,7 @@ namespace MatrixDecompositionUtility
                     j++;
                 }
                 if (Math.Abs(big) < double.Epsilon) {
-                    Console.WriteLine("Singular matrix in routine ludcmp!!");
+                    Console.WriteLine("Singular matrix in method ludcmp!!");
                 }
                 vv[i] = 1.0 / big;
                 i++;
