@@ -359,8 +359,7 @@ namespace MASIC.DataInput
                 {
                     var filterDataArray = new clsFilterDataArrayMaxCount
                     {
-                        MaximumDataCountToKeep = maxIonCountToRetain,
-                        TotalIntensityPercentageFilterEnabled = false
+                        MaximumDataCountToKeep = maxIonCountToRetain
                     };
 
                     // ReSharper disable ConditionIsAlwaysTrueOrFalse

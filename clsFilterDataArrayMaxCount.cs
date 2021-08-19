@@ -59,9 +59,17 @@ namespace MASIC
         /// </remarks>
         public float SkipDataPointFlag { get; set; }
 
+        /// <summary>
+        /// When true, the total intensity percentage filter is enabled
+        /// </summary>
+        [Obsolete("Not implemented")]
         public bool TotalIntensityPercentageFilterEnabled { get; set; }
 
-        public float TotalIntensityPercentageFilter { get; set; }
+        /// <summary>
+        /// Value to use when TotalIntensityPercentageFilterEnabled is true
+        /// </summary>
+        [Obsolete("Not implemented")]
+        public float TotalIntensityPercentageFilter { get; set; } = 90;
 
         /// <summary>
         /// Constructor
@@ -113,8 +121,10 @@ namespace MASIC
         {
             MaximumDataCountToKeep = 400000;
 
+#pragma warning disable 618
             TotalIntensityPercentageFilterEnabled = false;
             TotalIntensityPercentageFilter = 90;
+#pragma warning restore 618
 
             if (initialCapacity < 4)
             {
