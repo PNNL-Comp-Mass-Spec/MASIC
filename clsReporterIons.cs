@@ -250,14 +250,17 @@ namespace MASIC
         /// <param name="eReporterIonMassMode"></param>
         public static List<clsReporterIonInfo> GetDefaultReporterIons(ReporterIonMassModeConstants eReporterIonMassMode)
         {
-            if (eReporterIonMassMode == ReporterIonMassModeConstants.ITraqEightMZHighRes)
+            return eReporterIonMassMode switch
             {
-                return GetDefaultReporterIons(eReporterIonMassMode, REPORTER_ION_TOLERANCE_DA_DEFAULT_ITRAQ8_HIGH_RES);
-            }
-            else
-            {
-                return GetDefaultReporterIons(eReporterIonMassMode, REPORTER_ION_TOLERANCE_DA_DEFAULT);
-            }
+                ReporterIonMassModeConstants.TMTSixMZ =>
+                    GetDefaultReporterIons(eReporterIonMassMode, REPORTER_ION_TOLERANCE_DA_DEFAULT_TMT6),
+                ReporterIonMassModeConstants.TMTTenMZ or ReporterIonMassModeConstants.TMTElevenMZ or ReporterIonMassModeConstants.TMTSixteenMZ =>
+                    GetDefaultReporterIons(eReporterIonMassMode, REPORTER_ION_TOLERANCE_DA_DEFAULT_TMT10),
+                ReporterIonMassModeConstants.ITraqEightMZHighRes =>
+                    GetDefaultReporterIons(eReporterIonMassMode, REPORTER_ION_TOLERANCE_DA_DEFAULT_ITRAQ8_HIGH_RES),
+                _ =>
+                    GetDefaultReporterIons(eReporterIonMassMode, REPORTER_ION_TOLERANCE_DA_DEFAULT)
+            };
         }
 
         /// <summary>
@@ -506,7 +509,7 @@ namespace MASIC
                 ReporterIonMassModeConstants.FSFACustomCarboxylic => "FSFA Custom Carboxylic (171.104, 234.058, 336.174 m/z)",
                 ReporterIonMassModeConstants.FSFACustomHydroxyl => "FSFA Custom Hydroxyl (151.063 and 166.087 m/z)",
                 ReporterIonMassModeConstants.Acetylation => "Acetylated K (126.091 and 143.118 m/z)",
-                _ => "Unknown mode",
+                _ => throw new ArgumentOutOfRangeException(nameof(eReporterIonMode), eReporterIonMode, null)
             };
         }
 
