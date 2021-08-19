@@ -23,6 +23,7 @@ Source: ..\bin\Release\MathNet.Numerics.dll                       ; DestDir: {ap
 Source: ..\bin\Release\MatrixDecompositionUtility.dll             ; DestDir: {app}
 Source: ..\bin\Release\Microsoft.Bcl.AsyncInterfaces.dll          ; DestDir: {app}
 Source: ..\bin\Release\MSDataFileReader.dll                       ; DestDir: {app}
+Source: ..\bin\Release\netcdf.dll                                 ; DestDir: {app}
 Source: ..\bin\Release\NetCDFReader.dll                           ; DestDir: {app}
 Source: ..\bin\Release\Npgsql.dll                                 ; DestDir: {app}
 Source: ..\bin\Release\OxyPlot.dll                                ; DestDir: {app}
@@ -39,6 +40,7 @@ Source: ..\bin\Release\System.Numerics.Vectors.dll                ; DestDir: {ap
 Source: ..\bin\Release\System.Runtime.CompilerServices.Unsafe.dll ; DestDir: {app}
 Source: ..\bin\Release\System.Text.Encodings.Web.dll              ; DestDir: {app}
 Source: ..\bin\Release\System.Text.Json.dll                       ; DestDir: {app}
+Source: ..\bin\Release\System.Threading.Channels.dll              ; DestDir: {app}
 Source: ..\bin\Release\System.Threading.Tasks.Extensions.dll      ; DestDir: {app}
 Source: ..\bin\Release\System.ValueTuple.dll                      ; DestDir: {app}
 Source: ..\bin\Release\System.Buffers.dll                         ; DestDir: {app}
@@ -79,6 +81,15 @@ Source: ..\Docs\QExactive_Example\QC_Shew_18_02_Excerpt_SICstats.txt     ; DestD
 
 Source: ..\docs\Orbitrap_Example\Example_Orbitrap_Data_SICs.xml          ; DestDir: {app}\Orbitrap_Example
 Source: ..\docs\Orbitrap_Example\Example_Orbitrap_Data_SICstats.txt      ; DestDir: {app}\Orbitrap_Example
+
+Source: ..\docs\Parameter_Files\ITRAQ_LTQ-FT_10ppm_ReporterTol0.015Da_2014-08-06.xml     ; DestDir: {app}\Parameter_Files
+Source: ..\docs\Parameter_Files\ITRAQ8_LTQ-FT_10ppm_ReporterTol0.015Da_2014-08-06.xml    ; DestDir: {app}\Parameter_Files
+Source: ..\docs\Parameter_Files\LTQ-FT_10ppm_2014-08-06.xml                              ; DestDir: {app}\Parameter_Files
+Source: ..\docs\Parameter_Files\TMT10_LTQ-FT_10ppm_ReporterTol0.003Da_2014-08-06.xml     ; DestDir: {app}\Parameter_Files
+Source: ..\docs\Parameter_Files\TMT11_LTQ-FT_10ppm_ReporterTol0.003Da_2017-03-17.xml     ; DestDir: {app}\Parameter_Files
+Source: ..\docs\Parameter_Files\TMT11_LTQ-FT_10ppm_ReporterTol0.003Da_SaveUncorrectedIntensities_2018-06-28.xml     ; DestDir: {app}\Parameter_Files
+Source: ..\docs\Parameter_Files\TMT16_10ppm_ReporterTol0.003Da_2019-10-07.xml            ; DestDir: {app}\Parameter_Files
+Source: ..\docs\Parameter_Files\TMT6_LTQ-FT_10ppm_ReporterTol0.015Da_2014-08-06.xml      ; DestDir: {app}\Parameter_Files
 
 Source: ..\Docs\CustomMZList_AcqTime.txt                                 ; DestDir: {app}
 Source: ..\Docs\CustomMZList.txt                                         ; DestDir: {app}
