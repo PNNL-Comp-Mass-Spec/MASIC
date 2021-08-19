@@ -5,6 +5,8 @@
     /// </summary>
     public class clsStatisticalMoments
     {
+        // Ignore Spelling: Kolmogorov, Smirnov
+
         /// <summary>
         /// Area; Zeroth central moment (m0)
         /// Using baseline-corrected intensities unless all of the data is below the baseline;

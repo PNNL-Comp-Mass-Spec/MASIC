@@ -10,8 +10,8 @@ namespace MASIC
     {
         // ReSharper disable CommentTypo
 
-        // Ignore Spelling: acet, acetylated, Alfaro, Amine, Carboxylic, Chengdong, Da, Du, Fracking
-        // Ignore Spelling: immonium, Lys, Merkley, Nakayasu, plex, Xu
+        // Ignore Spelling: acet, acetylated, Acetylation, Alfaro, Amine, Carboxylic, Chengdong, Da, Du, Fracking
+        // Ignore Spelling: Galnaz, immonium, Lys, Merkley, Nakayasu, plex, Xu
 
         // ReSharper restore CommentTypo
 

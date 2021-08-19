@@ -5,6 +5,8 @@
     /// </summary>
     public class clsReporterIonInfo
     {
+        // Ignore Spelling: Daltons, immonium
+
         /// <summary>
         /// Reporter ion m/z
         /// </summary>

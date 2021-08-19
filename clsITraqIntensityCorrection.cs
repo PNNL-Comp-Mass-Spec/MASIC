@@ -23,9 +23,7 @@ namespace MASIC
     {
         // ReSharper disable CommentTypo
 
-        // Ignore Spelling: Biosystems, Da, Mertins, Philipp, plex, Proteomics, Sickmann, Vaudel
-
-        // ReSharper restore CommentTypo
+        // Ignore Spelling: Biosystems, Da, Mertins, Philipp, plex, Proteomics, Sciex, Sickmann, Vaudel
 
         private const int FOUR_PLEX_MATRIX_LENGTH = 4;
         private const int EIGHT_PLEX_HIGH_RES_MATRIX_LENGTH = 8;

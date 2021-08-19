@@ -7,6 +7,7 @@ namespace MASIC
     /// </summary>
     public class clsProcessingStats
     {
+        // Ignore Spelling: uncache
 
         /// <summary>
         /// Peak memory usage, in MB

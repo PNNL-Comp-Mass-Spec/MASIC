@@ -14,6 +14,7 @@ namespace MASIC.Plots
     /// </summary>
     public class HistogramPlotter : EventNotifier
     {
+        // Ignore Spelling: autoscale
 
         private readonly HistogramInfo mHistogram;
 

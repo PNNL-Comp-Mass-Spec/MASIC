@@ -5,6 +5,7 @@
     /// </summary>
     public class clsSICStats
     {
+        // Ignore Spelling: frag
 
         /// <summary>
         /// SIC peak

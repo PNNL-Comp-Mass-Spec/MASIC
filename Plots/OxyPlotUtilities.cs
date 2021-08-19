@@ -10,6 +10,8 @@ namespace MASIC.Plots
     /// </summary>
     public static class OxyPlotUtilities
     {
+        // Ignore Spelling: Arial
+
         private static string AddAxes(PlotModel myPlot, Axis xAxis, Axis yAxis, AxisInfo yAxisInfo)
         {
             myPlot.Axes.Add(xAxis);

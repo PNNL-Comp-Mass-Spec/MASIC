@@ -6,6 +6,8 @@ namespace MASIC.Options
     /// </summary>
     public class PlotOptions
     {
+        // Ignore Spelling: \Username, usr
+
         /// <summary>
         /// When true, create plots using the SIC data
         /// If reporter ion abundances were extracted, also create reporter ion observation rate plots

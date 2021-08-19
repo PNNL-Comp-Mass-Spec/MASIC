@@ -5,7 +5,7 @@
     /// </summary>
     public class SICOptions
     {
-        // Ignore Spelling: Da
+        // Ignore Spelling: Da, Daltons
 
         /// <summary>
         /// Default divisor to use when compressing spectra and sicOptions.SICToleranceIsPPM is false

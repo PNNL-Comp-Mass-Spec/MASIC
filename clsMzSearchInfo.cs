@@ -7,6 +7,8 @@ namespace MASIC
     /// </summary>
     public class clsMzSearchInfo
     {
+        // Ignore Spelling: Da
+
         /// <summary>
         /// m/z value to find
         /// </summary>

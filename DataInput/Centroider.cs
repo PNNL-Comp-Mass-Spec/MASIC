@@ -8,6 +8,8 @@ namespace MASIC
     /// </summary>
     public class Centroider
     {
+        // Ignore Spelling: amu, centroiding, mmu, Orbitrap
+
         /// <summary>
         /// Centroid a profile mode spectrum using the ThermoFisher.CommonCore.Data centroiding logic
         /// </summary>

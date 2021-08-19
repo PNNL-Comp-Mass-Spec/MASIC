@@ -5,6 +5,7 @@
     /// </summary>
     public class clsMzBinInfo
     {
+        // Ignore Spelling: Da
 
         /// <summary>
         /// m/z value
