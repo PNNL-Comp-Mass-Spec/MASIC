@@ -59,7 +59,7 @@ namespace MASIC.Plots
             /// <summary>
             /// Box and whiskers plot of reporter ion intensities
             /// </summary>
-            /// /// <remarks>Type PlotTypes.BoxPlot</remarks>
+            /// <remarks>Type PlotTypes.BoxPlot</remarks>
             ReporterIonIntensityStats = 3
         }
 
