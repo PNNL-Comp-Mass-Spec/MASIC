@@ -91,10 +91,9 @@ namespace MASIC
         private bool GetDatasetIDFromDatabase(MASICOptions masicOptions, string datasetName, out int newDatasetID)
         {
             const string avoidErrorMessage =
-                "To avoid seeing this message in the future, clear the 'SQL Server Connection String' and " +
-                "'Dataset Info Query SQL' entries on the Advanced tab and save a new settings file. " +
-                "Alternatively, edit a MASIC parameter file to remove the text after the equals sign " +
-                "for parameters ConnectionString and DatasetInfoQuerySql.";
+                "To avoid seeing this message in the future, clear the 'SQL Server Connection String' field " +
+                "on the Advanced tab and save a new settings file. Alternatively, edit a MASIC parameter file " +
+                "to have <item key=\"ConnectionString\" value=\"\" /> ";
 
             newDatasetID = 0;
 
