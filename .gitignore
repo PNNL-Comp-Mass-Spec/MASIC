@@ -100,9 +100,9 @@ Backup*/
 UpgradeLog*.XML
 
 SVN_Path.txt
-Docs/*.xls
-Docs/*.csv
-Docs/*.txt
+ExampleData/*.xls
+ExampleData/*.csv
+ExampleData/*.txt
 FindInvalidSICFiles/*
 MASIC_SourceCode/*
 MASICBrowser/MASICBrowser_SourceCode/*
@@ -113,9 +113,9 @@ XRawVB6/*
 /MASICBrowser/packages
 
 */Old/*
-Docs/Example_Orbitrap_Data.mzXML
+ExampleData/Example_Orbitrap_Data.mzXML
 Lib/MASIC.exe
 Lib/MASICPeakFinder.dll
 Lib/MatrixDecompositionUtility.dll
 **/.vs/
-Docs/*/Compare_OxyPlot
+ExampleData/*/Compare_OxyPlot
