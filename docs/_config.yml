@@ -1,0 +1,4 @@
+# Jekyll configuration
+name: MASIC
+description: MASIC (MS/MS Automated Selected Ion Chromatogram generator) Generates selected ion chromatograms (SICs) for all of the parent ions chosen for fragmentation in an LC-MS/MS analysis.
+url: https://pnnl-comp-mass-spec.github.io/MASIC/
