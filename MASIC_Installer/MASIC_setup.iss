@@ -1,7 +1,7 @@
 ﻿; This is an Inno Setup configuration file
 ; https://jrsoftware.org/isinfo.php
 
-#define ApplicationVersion GetFileVersion('..\bin\MASIC.exe')
+#define ApplicationVersion GetFileVersion('..\bin\Release\MASIC.exe')
 
 [CustomMessages]
 AppName=MASIC
