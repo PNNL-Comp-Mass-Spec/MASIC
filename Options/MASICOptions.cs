@@ -137,16 +137,6 @@ namespace MASIC.Options
         public string OutputDirectoryPath { get; set; }
 
         /// <summary>
-        /// Output directory path
-        /// </summary>
-        [Obsolete("Use OutputDirectoryPath")]
-        public string OutputFolderPath
-        {
-            get => OutputDirectoryPath;
-            set => OutputDirectoryPath = value;
-        }
-
-        /// <summary>
         /// When true, create the SIC data file, _SICdata.txt
         /// </summary>
         public bool WriteDetailedSICDataFile { get; set; }
