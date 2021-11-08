@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 
-namespace MASIC
+namespace MASIC.DataInput
 {
     /// <summary>
     /// Class for centroiding spectra
