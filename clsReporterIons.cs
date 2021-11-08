@@ -248,6 +248,7 @@ namespace MASIC
         /// Get the default reporter ions, using the default reporter ion m/z tolerance (customized based on reporterIonMassMode)
         /// </summary>
         /// <param name="reporterIonMassMode"></param>
+        // ReSharper disable once UnusedMember.Global
         public static List<clsReporterIonInfo> GetDefaultReporterIons(ReporterIonMassModeConstants reporterIonMassMode)
         {
             return reporterIonMassMode switch
@@ -602,6 +603,7 @@ namespace MASIC
         /// </summary>
         /// <param name="reporterIonMZList"></param>
         /// <remarks>Will use REPORTER_ION_TOLERANCE_DA_DEFAULT for the search tolerance</remarks>
+        // ReSharper disable once UnusedMember.Global
         public void SetReporterIons(
             double[] reporterIonMZList)
         {

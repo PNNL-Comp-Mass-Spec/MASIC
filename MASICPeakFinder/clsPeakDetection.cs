@@ -3,6 +3,8 @@ using System.Collections.Generic;
 
 namespace MASICPeakFinder
 {
+    // ReSharper disable once CommentTypo
+
     /// <summary>
     /// <para>
     /// Peak detection methods
@@ -20,8 +22,7 @@ namespace MASICPeakFinder
     /// </summary>
     internal class clsPeakDetection
     {
-        // ReSharper disable once CommentTypo
-        // Ignore Spelling: cx, struct, lan, pFunc, const, Eols, EoLeast, fn, coef
+        // Ignore Spelling: cx, lan, struct
 
         private enum TermFunctionConstants
         {
@@ -57,6 +58,7 @@ namespace MASICPeakFinder
         /// <param name="yValues"></param>
         /// <param name="startIndex"></param>
         /// <param name="endIndex"></param>
+        // ReSharper disable once UnusedMember.Global
         public double ComputeSlope(
             double[] xValues,
             double[] yValues,
@@ -514,6 +516,8 @@ namespace MASICPeakFinder
             if (peak.PeakLocation > peak.RightEdge)
                 peak.RightEdge = peak.PeakLocation;
         }
+
+        // ReSharper disable CommentTypo
 
         /// <summary>
         /// Least squares fit

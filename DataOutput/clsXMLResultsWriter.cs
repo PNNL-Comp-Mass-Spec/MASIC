@@ -121,6 +121,8 @@ namespace MASIC.DataOutput
 
                 var sicScanIndices = sicDetails.SICScanIndices;
 
+                // ReSharper disable once CommentTypo
+
                 // Write the SIC's and computed peak stats and areas to the XML file for the given parent ion
                 for (var fragScanIndex = 0; fragScanIndex < scanList.ParentIons[parentIonIndex].FragScanIndices.Count; fragScanIndex++)
                 {

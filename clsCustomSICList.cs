@@ -52,6 +52,7 @@ namespace MASIC
             /// <summary>
             /// Undefined
             /// </summary>
+            // ReSharper disable once UnusedMember.Global
             Undefined = 3
         }
 
@@ -549,6 +550,7 @@ namespace MASIC
         /// <param name="scanOrAcqTimeToleranceValue"></param>
         /// <param name="mzSearchSpecs"></param>
         /// <returns>True if success, false if error</returns>
+        // ReSharper disable once UnusedMember.Global
         public bool SetCustomSICListValues(
             CustomSICScanTypeConstants scanType,
             float scanOrAcqTimeToleranceValue,

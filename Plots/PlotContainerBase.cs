@@ -115,6 +115,7 @@ namespace MASIC.Plots
         /// Dispose of the log writer
         /// </summary>
         /// <param name="disposing"></param>
+        // ReSharper disable once UnusedMember.Global
         protected virtual void Dispose(bool disposing)
         {
             mLogWriter?.Close();

@@ -93,6 +93,7 @@ namespace MASIC
         /// Constructor that assumes iTraqCorrectionFactorType = ABSciex
         /// </summary>
         /// <param name="reporterIonMode">iTRAQ or TMT mode</param>
+        // ReSharper disable once UnusedMember.Global
         public clsITraqIntensityCorrection(clsReporterIons.ReporterIonMassModeConstants reporterIonMode)
             : this(reporterIonMode, CorrectionFactorsiTRAQ4Plex.ABSciex)
         {
@@ -123,6 +124,7 @@ namespace MASIC
         /// Change the reporter ion mode
         /// </summary>
         /// <param name="reporterIonMode"></param>
+        // ReSharper disable once UnusedMember.Global
         public void UpdateReporterIonMode(clsReporterIons.ReporterIonMassModeConstants reporterIonMode)
         {
             UpdateReporterIonMode(reporterIonMode, ITraq4PlexCorrectionFactorType);
@@ -148,6 +150,7 @@ namespace MASIC
         /// </summary>
         /// <param name="reporterIonIntensities"></param>
         /// <param name="debugShowIntensities">When true, show the old and new reporter ion intensities at the console</param>
+        // ReSharper disable once UnusedMember.Global
         public bool ApplyCorrection(float[] reporterIonIntensities, bool debugShowIntensities = false)
         {
             var dataCount = reporterIonIntensities.Length - 1;
@@ -268,6 +271,8 @@ namespace MASIC
         /// <param name="debugShowMatrixTable">When true, show a table of the coefficients at the console</param>
         private void InitializeCoefficients(bool debugShowMatrixTable)
         {
+            // ReSharper disable TooWideLocalVariableScope
+
             // iTraq reporter ions
             IsotopeContributionType udtIsoPct113;
             IsotopeContributionType udtIsoPct114;
@@ -297,6 +302,8 @@ namespace MASIC
             IsotopeContributionType udtIsoPct133N;
             IsotopeContributionType udtIsoPct133C;
             IsotopeContributionType udtIsoPct134N;
+
+            // ReSharper restore TooWideLocalVariableScope
 
             var matrixSize = GetMatrixLength(ReporterIonMode);
             var maxIndex = matrixSize - 1;
@@ -683,6 +690,7 @@ namespace MASIC
                     // 16-plex TMT, isotope contribution table for High Res MS/MS
                     // Source percentages provided by Thermo
 
+                    // ReSharper disable once CommentTypo
                     // TMTpro lot UH290428
                     udtIsoPct126 = DefineIsotopeContribution(0, 0, 100, 7.73F, 0.22F);
                     udtIsoPct127N = DefineIsotopeContribution(0, 0, 100, 7.46F, 0.22F);

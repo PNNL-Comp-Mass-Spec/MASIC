@@ -46,6 +46,7 @@ namespace MASIC
         /// <summary>
         /// Number of data points tracked by this class (stored via FillWithData)
         /// </summary>
+        // ReSharper disable once UnusedMember.Global
         public int DataCount
         {
             get

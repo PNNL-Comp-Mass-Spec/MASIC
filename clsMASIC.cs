@@ -281,6 +281,7 @@ namespace MASIC
         /// <summary>
         /// Returns the version of the MASIC peak finder DLL
         /// </summary>
+        // ReSharper disable once UnusedMember.Global
         public string MASICPeakFinderDllVersion => mMASICPeakFinder != null ? mMASICPeakFinder.ProgramVersion : string.Empty;
 
         /// <summary>

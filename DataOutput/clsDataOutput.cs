@@ -54,6 +54,8 @@ namespace MASIC.DataOutput
             /// </summary>
             ScanStatsExtendedConstantFlatFile = 3,
 
+            // ReSharper disable once CommentTypo
+
             /// <summary>
             /// SIC stats file, _SICstats.txt
             /// </summary>

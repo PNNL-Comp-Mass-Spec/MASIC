@@ -130,6 +130,8 @@ namespace MASIC.DataOutput
             }
         }
 
+        // ReSharper disable once UnusedMember.Local
+
         [Obsolete("No longer used")]
         private void SaveICRToolsChromatogramByScan(
             MASICOptions masicOptions,
@@ -235,6 +237,7 @@ namespace MASIC.DataOutput
 
                     if (saveElutionTimeInsteadOfScan)
                     {
+                        // ReSharper disable once RedundantCast
                         writer.Write((float)scan.ScanTime);
                     }
                     else

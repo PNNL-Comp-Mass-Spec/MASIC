@@ -52,6 +52,8 @@ namespace MASIC
             }
         }
 
+        // ReSharper disable once CommentTypo
+
         // Note: We're keeping the Survey Scans separate from the Fragmentation Scans to make the creation of the
         // survey scan based SIC's easier (and faster)
         // The MasterScanOrder array allows us to step through the data scan-by-scan, using both SurveyScans and FragScans

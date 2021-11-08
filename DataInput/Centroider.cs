@@ -10,6 +10,8 @@ namespace MASIC
     {
         // Ignore Spelling: amu, centroiding, mmu, Orbitrap
 
+        // ReSharper disable once UnusedMember.Global
+
         /// <summary>
         /// Centroid a profile mode spectrum using the ThermoFisher.CommonCore.Data centroiding logic
         /// </summary>
@@ -98,6 +100,8 @@ namespace MASIC
             bool isOrbitrapData)
         {
             var toleranceFactor = GetDefaultToleranceFactor(isOrbitrapData);
+
+            // ReSharper disable once ConvertToConstant.Local
             var toleranceUnit = ThermoFisher.CommonCore.Data.Business.ToleranceMode.Amu;
 
             return EstimateResolution(mass, toleranceFactor, defaultMassTolerance, isOrbitrapData, toleranceUnit);

@@ -327,6 +327,7 @@ namespace MASIC.Plots
         // ReSharper disable once UnusedMember.Local
         private double PointSizeToEm(int fontSizePoints)
         {
+            // ReSharper disable once PossibleLossOfFraction
             return fontSizePoints / 12;
         }
 

@@ -11,6 +11,8 @@ namespace MASIC.Plots
     /// </summary>
     internal abstract class PythonPlotContainer : PlotContainerBase
     {
+        // Ignore Spelling: usr
+
         protected const string TMP_FILE_SUFFIX = "_TmpExportData";
 
         protected int mSeriesCount;

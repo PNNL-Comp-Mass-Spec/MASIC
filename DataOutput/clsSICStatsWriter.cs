@@ -90,6 +90,8 @@ namespace MASIC.DataOutput
             return newParentIon;
         }
 
+        // ReSharper disable once UnusedMember.Local
+
         [Obsolete("Unused")]
         private void PopulateScanListPointerArray(
             IList<clsScanInfo> surveyScans,
