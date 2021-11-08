@@ -58,41 +58,41 @@ Source: ..\MASICBrowser\bin\Release\OxyDataPlotter.dll                      ; De
 Source: ..\MASICBrowser\bin\Release\OxyPlot.WindowsForms.dll                ; DestDir: {app}
 Source: ..\MASICBrowser\bin\Release\Svg.dll                                 ; DestDir: {app}
 
-Source: ..\Readme.md                                                     ; DestDir: {app}
-Source: ..\RevisionHistory.txt                                           ; DestDir: {app}
+Source: ..\Readme.md                                                        ; DestDir: {app}
+Source: ..\RevisionHistory.txt                                              ; DestDir: {app}
 
-Source: ..\Python\MASIC_Plotter.py                                       ; DestDir: {app}
-Source: ..\Python\Python_Setup.txt                                       ; DestDir: {app}
+Source: ..\Python\MASIC_Plotter.py                                          ; DestDir: {app}
+Source: ..\Python\Python_Setup.txt                                          ; DestDir: {app}
 
-Source: Images\delete_16x.ico                                            ; DestDir: {app}
+Source: Images\delete_16x.ico                                               ; DestDir: {app}
 
-Source: ..\Docs\MASICParameters.xml                                      ; DestDir: {app}
-Source: ..\Docs\LTQ_Example\Default_2008-08-22.xml                       ; DestDir: {app}\LTQ_Example
-Source: ..\Docs\LTQ_Example\QC_Standards_Excerpt.mzXML                   ; DestDir: {app}\LTQ_Example
-Source: ..\Docs\LTQ_Example\QC_Standards_Excerpt_SICs.xml                ; DestDir: {app}\LTQ_Example
-Source: ..\Docs\LTQ_Example\QC_Standards_Excerpt_ScanStats.txt           ; DestDir: {app}\LTQ_Example
-Source: ..\Docs\LTQ_Example\QC_Standards_Excerpt_SICstats.txt            ; DestDir: {app}\LTQ_Example
+Source: ..\ExampleData\MASICParameters.xml                                      ; DestDir: {app}
+Source: ..\ExampleData\LTQ_Example\Default_2008-08-22.xml                       ; DestDir: {app}\LTQ_Example
+Source: ..\ExampleData\LTQ_Example\QC_Standards_Excerpt.mzXML                   ; DestDir: {app}\LTQ_Example
+Source: ..\ExampleData\LTQ_Example\QC_Standards_Excerpt_SICs.xml                ; DestDir: {app}\LTQ_Example
+Source: ..\ExampleData\LTQ_Example\QC_Standards_Excerpt_ScanStats.txt           ; DestDir: {app}\LTQ_Example
+Source: ..\ExampleData\LTQ_Example\QC_Standards_Excerpt_SICstats.txt            ; DestDir: {app}\LTQ_Example
 
-Source: ..\Docs\QExactive_Example\LTQ-FT_10ppm_2014-08-06.xml            ; DestDir: {app}\QExactive_Example
-Source: ..\Docs\QExactive_Example\QC_Shew_18_02_Excerpt.mzXML            ; DestDir: {app}\QExactive_Example
-Source: ..\Docs\QExactive_Example\QC_Shew_18_02_Excerpt_ScanStats.txt    ; DestDir: {app}\QExactive_Example
-Source: ..\Docs\QExactive_Example\QC_Shew_18_02_Excerpt_SICs.xml         ; DestDir: {app}\QExactive_Example
-Source: ..\Docs\QExactive_Example\QC_Shew_18_02_Excerpt_SICstats.txt     ; DestDir: {app}\QExactive_Example
+Source: ..\ExampleData\QExactive_Example\LTQ-FT_10ppm_2014-08-06.xml            ; DestDir: {app}\QExactive_Example
+Source: ..\ExampleData\QExactive_Example\QC_Shew_18_02_Excerpt.mzXML            ; DestDir: {app}\QExactive_Example
+Source: ..\ExampleData\QExactive_Example\QC_Shew_18_02_Excerpt_ScanStats.txt    ; DestDir: {app}\QExactive_Example
+Source: ..\ExampleData\QExactive_Example\QC_Shew_18_02_Excerpt_SICs.xml         ; DestDir: {app}\QExactive_Example
+Source: ..\ExampleData\QExactive_Example\QC_Shew_18_02_Excerpt_SICstats.txt     ; DestDir: {app}\QExactive_Example
 
-Source: ..\docs\Orbitrap_Example\Example_Orbitrap_Data_SICs.xml          ; DestDir: {app}\Orbitrap_Example
-Source: ..\docs\Orbitrap_Example\Example_Orbitrap_Data_SICstats.txt      ; DestDir: {app}\Orbitrap_Example
+Source: ..\ExampleData\Orbitrap_Example\Example_Orbitrap_Data_SICs.xml          ; DestDir: {app}\Orbitrap_Example
+Source: ..\ExampleData\Orbitrap_Example\Example_Orbitrap_Data_SICstats.txt      ; DestDir: {app}\Orbitrap_Example
 
-Source: ..\docs\Parameter_Files\ITRAQ_LTQ-FT_10ppm_ReporterTol0.015Da_2014-08-06.xml     ; DestDir: {app}\Parameter_Files
-Source: ..\docs\Parameter_Files\ITRAQ8_LTQ-FT_10ppm_ReporterTol0.015Da_2014-08-06.xml    ; DestDir: {app}\Parameter_Files
-Source: ..\docs\Parameter_Files\LTQ-FT_10ppm_2014-08-06.xml                              ; DestDir: {app}\Parameter_Files
-Source: ..\docs\Parameter_Files\TMT10_LTQ-FT_10ppm_ReporterTol0.003Da_2014-08-06.xml     ; DestDir: {app}\Parameter_Files
-Source: ..\docs\Parameter_Files\TMT11_LTQ-FT_10ppm_ReporterTol0.003Da_2017-03-17.xml     ; DestDir: {app}\Parameter_Files
-Source: ..\docs\Parameter_Files\TMT11_LTQ-FT_10ppm_ReporterTol0.003Da_SaveUncorrectedIntensities_2018-06-28.xml     ; DestDir: {app}\Parameter_Files
-Source: ..\docs\Parameter_Files\TMT16_10ppm_ReporterTol0.003Da_2019-10-07.xml            ; DestDir: {app}\Parameter_Files
-Source: ..\docs\Parameter_Files\TMT6_LTQ-FT_10ppm_ReporterTol0.015Da_2014-08-06.xml      ; DestDir: {app}\Parameter_Files
+Source: ..\ExampleData\Parameter_Files\ITRAQ_LTQ-FT_10ppm_ReporterTol0.015Da_2014-08-06.xml     ; DestDir: {app}\Parameter_Files
+Source: ..\ExampleData\Parameter_Files\ITRAQ8_LTQ-FT_10ppm_ReporterTol0.015Da_2014-08-06.xml    ; DestDir: {app}\Parameter_Files
+Source: ..\ExampleData\Parameter_Files\LTQ-FT_10ppm_2014-08-06.xml                              ; DestDir: {app}\Parameter_Files
+Source: ..\ExampleData\Parameter_Files\TMT10_LTQ-FT_10ppm_ReporterTol0.003Da_2014-08-06.xml     ; DestDir: {app}\Parameter_Files
+Source: ..\ExampleData\Parameter_Files\TMT11_LTQ-FT_10ppm_ReporterTol0.003Da_2017-03-17.xml     ; DestDir: {app}\Parameter_Files
+Source: ..\ExampleData\Parameter_Files\TMT11_LTQ-FT_10ppm_ReporterTol0.003Da_SaveUncorrectedIntensities_2018-06-28.xml     ; DestDir: {app}\Parameter_Files
+Source: ..\ExampleData\Parameter_Files\TMT16_10ppm_ReporterTol0.003Da_2019-10-07.xml            ; DestDir: {app}\Parameter_Files
+Source: ..\ExampleData\Parameter_Files\TMT6_LTQ-FT_10ppm_ReporterTol0.015Da_2014-08-06.xml      ; DestDir: {app}\Parameter_Files
 
-Source: ..\Docs\CustomMZList_AcqTime.txt                                 ; DestDir: {app}
-Source: ..\Docs\CustomMZList.txt                                         ; DestDir: {app}
+Source: ..\ExampleData\CustomMZList_AcqTime.txt                                 ; DestDir: {app}
+Source: ..\ExampleData\CustomMZList.txt                                         ; DestDir: {app}
 
 Source: ..\Lib\netcdf.dll                                                ; DestDir: {app}
 Source: ..\Lib\RawFileReaderLicense.doc                                  ; DestDir: {app}

@@ -264,17 +264,17 @@ The `PlotOptions` section in the MASIC parameter file has options for instructin
 The reporter ion based plots are only created if reporter ions were searched for.
 
 Example plots are visible on GitHub
-* [TMT Example](https://htmlpreview.github.io/?https://github.com/PNNL-Comp-Mass-Spec/MASIC/blob/master/Docs/TMT_Example/index.html)
-* [Incomplete TMT labeling example](https://htmlpreview.github.io/?https://github.com/PNNL-Comp-Mass-Spec/MASIC/blob/master/Docs/TMT_Example_Bad_Labeling/index.html)
-* [QExactive Example](https://htmlpreview.github.io/?https://github.com/PNNL-Comp-Mass-Spec/MASIC/blob/master/Docs/QExactive_Example/index.html)
-* [QExactive HFX Example](https://htmlpreview.github.io/?https://github.com/PNNL-Comp-Mass-Spec/MASIC/blob/master/Docs/QEHFX01_PreMix_QC/index.html)
-* [QExactive HF Example](https://htmlpreview.github.io/?https://github.com/PNNL-Comp-Mass-Spec/MASIC/blob/master/Docs/QExactHF03_PreMix_QC/index.html)
+* [TMT Example](https://htmlpreview.github.io/?https://github.com/PNNL-Comp-Mass-Spec/MASIC/blob/master/ExampleData/TMT_Example/index.html)
+* [Incomplete TMT labeling example](https://htmlpreview.github.io/?https://github.com/PNNL-Comp-Mass-Spec/MASIC/blob/master/ExampleData/TMT_Example_Bad_Labeling/index.html)
+* [QExactive Example](https://htmlpreview.github.io/?https://github.com/PNNL-Comp-Mass-Spec/MASIC/blob/master/ExampleData/QExactive_Example/index.html)
+* [QExactive HFX Example](https://htmlpreview.github.io/?https://github.com/PNNL-Comp-Mass-Spec/MASIC/blob/master/ExampleData/QEHFX01_PreMix_QC/index.html)
+* [QExactive HF Example](https://htmlpreview.github.io/?https://github.com/PNNL-Comp-Mass-Spec/MASIC/blob/master/ExampleData/QExactHF03_PreMix_QC/index.html)
 
 
 By default, plots are created using OxyPlot, which only works on Windows
 
 To create plots with Python instead of OxyPlot, set `PlotWithPython` to `True` in the parameter file
-* For example, see https://github.com/PNNL-Comp-Mass-Spec/MASIC/blob/master/Docs/Parameter_Files/TMT11_LTQ-FT_10ppm_ReporterTol0.003Da_2017-03-17.xml
+* For example, see [TMT11_LTQ-FT_10ppm_ReporterTol0.003Da_2017-03-17.xml](https://github.com/PNNL-Comp-Mass-Spec/MASIC/blob/master/ExampleData/Parameter_Files/TMT11_LTQ-FT_10ppm_ReporterTol0.003Da_2017-03-17.xml)
 
 On Windows, MASIC looks for `python.exe` in directories that start with "Python3" or "Python 3", searching below:
 * C:\Program Files
@@ -323,7 +323,7 @@ will be created with the name OutputDirectoryName.
 The parameter file switch `/P` is optional. If supplied, it should point to a valid 
 MASIC XML parameter file. If omitted, defaults are used.
 * Create a parameter file for MASIC using the MASIC GUI
-* Alternatively, download a file from [GitHub](https://github.com/PNNL-Comp-Mass-Spec/MASIC/tree/master/Docs/Parameter_Files)
+* Alternatively, download a file from [GitHub](https://github.com/PNNL-Comp-Mass-Spec/MASIC/tree/master/ExampleData/Parameter_Files)
 
 The `/D` switch can be used to specify the Dataset ID of the input file; if
 omitted, 0 will be used

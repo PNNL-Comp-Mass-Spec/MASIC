@@ -472,7 +472,7 @@ namespace MASIC
                     "The parameter file switch /P is optional. " +
                     "If supplied, it should point to a valid MASIC XML parameter file.  If omitted, defaults are used." +
                     "Create a parameter file for MASIC using the MASIC GUI. " +
-                    "Alternatively, download a file from GitHub: https://github.com/PNNL-Comp-Mass-Spec/MASIC/tree/master/Docs/Parameter_Files"));
+                    "Alternatively, download a file from GitHub: https://github.com/PNNL-Comp-Mass-Spec/MASIC/tree/master/ExampleData/Parameter_Files"));
 
                 Console.WriteLine();
 

@@ -956,7 +956,7 @@ namespace MASIC.DataOutput
 
                     // Duplicate parent ion index
                     // This is not typically seen, but it is possible if the same parent ion is fragmented using multiple fragmentation modes
-                    // For example, see Angiotensin_AllScans.raw at https://github.com/PNNL-Comp-Mass-Spec/MASIC/tree/master/Docs/Lumos_Example
+                    // For example, see Angiotensin_AllScans.raw at https://github.com/PNNL-Comp-Mass-Spec/MASIC/tree/master/ExampleData/Lumos_Example
 
                     if (duplicateParentIonIndices.Contains(parentIonIndex))
                         continue;

@@ -529,9 +529,10 @@ namespace MASICPeakFinder
         /// <remarks>
         /// Code from article "Fit for Purpose" written by Steven Abbot
         /// and published in the February 2003 issue of Hardcore Visual Basic.
-        /// Code excerpted from the VB6 program FitIt
-        /// URL: http://msdn.microsoft.com/library/default.asp?url=/library/en-us/dnhcvb03/html/hcvb03b1.asp
+        /// Code excerpted from the VB6 program FitIt, previously available at
+        /// http://msdn.microsoft.com/library/default.asp?url=/library/en-us/dnhcvb03/html/hcvb03b1.asp
         /// </remarks>
+        // ReSharper restore CommentTypo
         private void LeastSquaresFit(IReadOnlyList<double> xValues, IReadOnlyList<double> yValues, out double[] coefficients, int polynomialOrder)
         {
             var equationTerms = new LeastSquaresFitEquationTermType[polynomialOrder + 1];
