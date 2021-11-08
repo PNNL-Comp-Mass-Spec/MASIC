@@ -277,8 +277,7 @@ namespace MASIC.Options
         /// <param name="scanType"></param>
         public clsCustomSICList.CustomSICScanTypeConstants GetScanToleranceTypeFromText(string scanType)
         {
-            if (scanType == null)
-                scanType = string.Empty;
+            scanType ??= string.Empty;
 
             var scanTypeTrimmed = scanType.Trim();
 
