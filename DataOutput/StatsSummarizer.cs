@@ -251,7 +251,7 @@ namespace MASIC.DataOutput
                     if (parentIon.Value.FragScanIndices.Count == 0)
                     {
                         OnWarningEvent(string.Format(
-                            "Parent ion {0} does not have a frag scan defined", parentIon.Key));
+                            "Parent ion {0} does not have a fragmentation scan defined", parentIon.Key));
                         continue;
                     }
 

@@ -45,7 +45,7 @@ namespace MASIC
         /// </summary>
         public clsMASIC()
         {
-            mFileDate = "August 18, 2021";
+            mFileDate = "November 8, 2021";
 
             LocalErrorCode = MasicErrorCodes.NoError;
             StatusMessage = string.Empty;
