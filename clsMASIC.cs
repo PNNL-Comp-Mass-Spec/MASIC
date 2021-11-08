@@ -776,7 +776,7 @@ namespace MASIC
         /// </summary>
         private float GetFreeMemoryMB()
         {
-            return (float)SystemInfo.GetFreeMemoryMB();
+            return SystemInfo.GetFreeMemoryMB();
         }
 
         /// <summary>

@@ -117,7 +117,7 @@ namespace MASIC.DataInput
                 return 0;
             }
 
-            return (double)ComputePrecursorInterference(
+            return ComputePrecursorInterference(
                 scanInfo.ScanNumber,
                 precursorScanNumber, parentIonMz, isolationWidth, chargeState);
         }
