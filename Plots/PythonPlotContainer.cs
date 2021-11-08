@@ -79,7 +79,7 @@ namespace MASIC.Plots
             if (!string.IsNullOrWhiteSpace(PythonPath))
                 return true;
 
-            if (PRISM.SystemInfo.IsLinux)
+            if (SystemInfo.IsLinux)
             {
                 PythonPath = "/usr/bin/python3";
                 ConsoleMsgUtils.ShowDebug("Assuming Python 3 is at {0}", PythonPath);

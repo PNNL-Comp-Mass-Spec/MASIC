@@ -383,11 +383,16 @@ namespace MASIC.DataInput
                         ScanTime = (float)scanTime,
                         ScanHeaderText = string.Empty,
                         ScanTypeName = "MSn",
+                        FragScanInfo =
+                        {
+                            FragScanNumber = fragScanIteration,
+                            MSLevel = 2
+                        },
+                        MRMScanInfo =
+                        {
+                            MRMMassCount = 0
+                        }
                     };
-
-                    newFragScan.FragScanInfo.FragScanNumber = fragScanIteration;
-                    newFragScan.FragScanInfo.MSLevel = 2;
-                    newFragScan.MRMScanInfo.MRMMassCount = 0;
 
                     scanList.FragScans.Add(newFragScan);
 

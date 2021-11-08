@@ -239,7 +239,7 @@ namespace MASIC.DataInput
                         continue;
                     }
 
-                    success = rawFileReader.GetScanInfo(scanNumber, out ThermoRawFileReader.clsScanInfo thermoScanInfo);
+                    success = rawFileReader.GetScanInfo(scanNumber, out var thermoScanInfo);
                     if (!success)
                     {
                         // GetScanInfo returned false
@@ -370,11 +370,13 @@ namespace MASIC.DataInput
                 MRMScanType = thermoScanInfo.MRMScanType,
                 LowMass = thermoScanInfo.LowMass,
                 HighMass = thermoScanInfo.HighMass,
-                IsFTMS = thermoScanInfo.IsFTMS
+                IsFTMS = thermoScanInfo.IsFTMS,
+                FragScanInfo =
+                {
+                    // Survey scans typically lead to multiple parent ions; we do not record them here
+                    ParentIonInfoIndex = -1
+                }
             };
-
-            // Survey scans typically lead to multiple parent ions; we do not record them here
-            scanInfo.FragScanInfo.ParentIonInfoIndex = -1;
 
             if (scanInfo.MRMScanType != MRMScanTypeConstants.NotMRM)
             {
@@ -488,12 +490,14 @@ namespace MASIC.DataInput
                 MinimumPositiveIntensity = 0,
                 ZoomScan = thermoScanInfo.ZoomScan,
                 SIMScan = thermoScanInfo.SIMScan,
-                MRMScanType = thermoScanInfo.MRMScanType
+                MRMScanType = thermoScanInfo.MRMScanType,
+                FragScanInfo =
+                {
+                    // Typically .EventNumber is 1 for the parent-ion scan; 2 for 1st fragmentation scan, 3 for 2nd fragmentation scan, etc.
+                    // This resets for each new parent-ion scan
+                    FragScanNumber = thermoScanInfo.EventNumber - 1
+                }
             };
-
-            // Typically .EventNumber is 1 for the parent-ion scan; 2 for 1st fragmentation scan, 3 for 2nd fragmentation scan, etc.
-            // This resets for each new parent-ion scan
-            scanInfo.FragScanInfo.FragScanNumber = thermoScanInfo.EventNumber - 1;
 
             // The .EventNumber value is sometimes wrong; need to check for this
             // For example, if the dataset only has MS2 scans and no parent-ion scan, .EventNumber will be 2 for every MS2 scan
@@ -768,7 +772,7 @@ namespace MASIC.DataInput
             {
                 // Look up the end scan time then compute .AcqTimeEnd
                 var scanEnd = rawFileReader.ScanEnd;
-                rawFileReader.GetScanInfo(scanEnd, out ThermoRawFileReader.clsScanInfo scanInfo);
+                rawFileReader.GetScanInfo(scanEnd, out var scanInfo);
 
                 mDatasetFileInfo.AcqTimeEnd = mDatasetFileInfo.AcqTimeStart.AddMinutes(scanInfo.RetentionTime);
                 mDatasetFileInfo.ScanCount = rawFileReader.GetNumScans();
