@@ -461,7 +461,7 @@ namespace MASIC
                         return rValue;
 
                     case cmCorrelationMethodConstants.Spearman:
-                        CorrelateSpearman(dataList1, dataList2, out var diffInRanks, out _, out probabilityOfSignificance, out var RS, out _);
+                        CorrelateSpearman(dataList1, dataList2, out _, out _, out probabilityOfSignificance, out var RS, out _);
                         return RS;
 
                     case cmCorrelationMethodConstants.Kendall:
