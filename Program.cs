@@ -510,7 +510,7 @@ namespace MASIC
                 Console.WriteLine("The optional /Q switch will prevent the progress window from being shown");
                 Console.WriteLine();
 
-                Console.WriteLine("Program written by Matthew Monroe for the Department of Energy (PNNL, Richland, WA) in 2003");
+                Console.WriteLine("Program written by Matthew Monroe for the Department of Energy (PNNL, Richland, WA)");
                 Console.WriteLine("Version: " + GetAppVersion());
 
                 Console.WriteLine();

@@ -19,7 +19,7 @@ allowing the user to sort and filter the SIC list as desired.
 
 The application note describing MASIC is:
 Monroe ME et. al., Comput Biol Chem. 2008 Jun;32(3):215-217. More info is on 
-[PubMed](https://www.ncbi.nlm.nih.gov/pubmed/18440872)
+[PubMed](https://pubmed.ncbi.nlm.nih.gov/18440872/)
 
 ## Downloads
 
