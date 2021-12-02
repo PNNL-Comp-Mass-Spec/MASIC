@@ -161,7 +161,7 @@ namespace MASICBrowser
                 Console.WriteLine("The input file path is the MASIC results file to load");
                 Console.WriteLine();
 
-                Console.WriteLine("Program written by Matthew Monroe for the Department of Energy (PNNL, Richland, WA) in 2017");
+                Console.WriteLine("Program written by Matthew Monroe for the Department of Energy (PNNL, Richland, WA)");
                 Console.WriteLine("Version: " + GetAppVersion(PROGRAM_DATE));
 
                 Console.WriteLine();

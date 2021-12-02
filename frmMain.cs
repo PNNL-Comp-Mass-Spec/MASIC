@@ -1728,8 +1728,8 @@ namespace MASIC
         {
             var message = string.Empty;
 
-            message += "Program written by Matthew Monroe for the Department of Energy (PNNL, Richland, WA) in 2003" + Environment.NewLine;
-            message += "Copyright 2005, Battelle Memorial Institute.  All Rights Reserved." + Environment.NewLine + Environment.NewLine;
+            message += "Program written by Matthew Monroe for the Department of Energy (PNNL, Richland, WA)" + Environment.NewLine;
+            message += "Copyright 2021, Battelle Memorial Institute.  All Rights Reserved." + Environment.NewLine + Environment.NewLine;
 
             message += "This is version " + Application.ProductVersion + " (" + Program.PROGRAM_DATE + "). ";
             message += "Using MASIC PeakFinder DLL version " + mMasic.MASICPeakFinderDllVersion + Environment.NewLine + Environment.NewLine;

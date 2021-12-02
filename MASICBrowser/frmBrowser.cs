@@ -2697,7 +2697,7 @@ namespace MASICBrowser
             {
                 "The MASIC Browser can be used to visualize the SIC's created using MASIC.",
                 string.Empty,
-                "Program written by Matthew Monroe for the Department of Energy (PNNL, Richland, WA) in 2003",
+                "Program written by Matthew Monroe for the Department of Energy (PNNL, Richland, WA)",
                 "Copyright 2005, Battelle Memorial Institute.  All Rights Reserved.",
                 string.Empty,
                 "This is version " + Application.ProductVersion + " (" + PROGRAM_DATE + ")",
