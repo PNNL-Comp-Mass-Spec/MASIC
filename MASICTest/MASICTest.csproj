@@ -39,9 +39,6 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="ThermoRawFileReader">
-      <HintPath>..\Lib\ThermoRawFileReader.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="clsBinarySearchTests.cs" />
@@ -56,7 +53,10 @@
       <Version>3.13.1</Version>
     </PackageReference>
     <PackageReference Include="PRISM-Library">
-      <Version>2.6.41</Version>
+      <Version>2.6.42</Version>
+    </PackageReference>
+    <PackageReference Include="ThermoRawFileReader">
+      <Version>4.1.11</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
