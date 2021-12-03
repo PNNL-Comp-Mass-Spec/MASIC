@@ -95,7 +95,7 @@ Source: ..\ExampleData\CustomMZList_AcqTime.txt                                 
 Source: ..\ExampleData\CustomMZList.txt                                         ; DestDir: {app}
 
 Source: ..\Lib\netcdf.dll                                                ; DestDir: {app}
-Source: ..\Lib\RawFileReaderLicense.doc                                  ; DestDir: {app}
+Source: ..\RawFileReaderLicense.doc                                      ; DestDir: {app}
 
 [Dirs]
 Name: {commonappdata}\MASIC; Flags: uninsalwaysuninstall
