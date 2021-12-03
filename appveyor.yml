@@ -1,7 +1,12 @@
 version: 1.0.{build}
 image: Visual Studio 2019
+# NuGet package config steps:
+# https://stackoverflow.com/a/42911281/1179467
+install:
+  nuget sources add -Name PNNLCompMassSpec -Source https://ci.appveyor.com/nuget/pnnlcompmassspec-a6xbbb3j056m -UserName %nuget_user% -Password %nuget_password%
 nuget:
-  account_feed: true
+  account_feed: false
+  project_feed: false
 before_build:
 - cmd: nuget.exe restore MASIC_BuildAll.sln
 build:
