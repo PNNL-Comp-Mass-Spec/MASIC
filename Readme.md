@@ -351,6 +351,31 @@ Use `/CreateParamFile` to create an example parameter file named MASIC_ExampleSe
 
 The optional `/Q` switch will prevent the progress window from being shown (only applicable to the GUI version, MASIC.exe)
 
+## Compiling MASIC
+
+Steps for compiling MASIC from source code
+* Download the source code by cloning the [MASIC repository]([https://github.com/PNNL-Comp-Mass-Spec/MASIC]) from GitHub
+* Open with Visual Studio
+* Use the NuGet Package Manager GUI to remove the reference to local package ThermoRawFileReader
+  * Tools, NuGet Package Manager, Manager NuGet Packages for Solution
+  * Select the Installed tab
+  * Click ThermoRawFileReader
+  * Click Uninstall
+* Use the NuGet Package Manager GUI to add a reference to [OpenMcdf.Extensions](https://github.com/ironfede/openmcdf)
+  * Tools, NuGet Package Manager, Manager NuGet Packages for Solution
+  * Select the Browse tab
+  * Search for OpenMcdf.Extensions
+  * Select MASIC_Console.csproj and/or MASIC.csproj project
+  * Click Install 
+* Download the latest release of the [ThermoRawFileReader](https://github.com/PNNL-Comp-Mass-Spec/Thermo-Raw-File-Reader/releases) from GitHub
+* Add a reference to the following five DLLs, available in the ThermoRawFileReader release .zip file
+  * ThermoRawFileReader.dll
+  * ThermoFisher.CommonCore.Data.dll
+  * ThermoFisher.CommonCore.MassPrecisionEstimator.dll
+  * ThermoFisher.CommonCore.RawFileReader.dll
+  * ThermoFisher.CommonCore.BackgroundSubtraction.dll
+* Build the project
+
 ## Contacts
 
 Written by Matthew Monroe for the Department of Energy (PNNL, Richland, WA)\
