@@ -26,6 +26,8 @@ Source: ..\bin\Release\MSDataFileReader.dll                       ; DestDir: {ap
 Source: ..\bin\Release\netcdf.dll                                 ; DestDir: {app}
 Source: ..\bin\Release\NetCDFReader.dll                           ; DestDir: {app}
 Source: ..\bin\Release\Npgsql.dll                                 ; DestDir: {app}
+Source: ..\bin\Release\OpenMcdf.dll                               ; DestDir: {app}
+Source: ..\bin\Release\OpenMcdf.Extensions.dll                    ; DestDir: {app}
 Source: ..\bin\Release\OxyPlot.dll                                ; DestDir: {app}
 Source: ..\bin\Release\OxyPlot.Wpf.dll                            ; DestDir: {app}
 Source: ..\bin\Release\PRISM.dll                                  ; DestDir: {app}
@@ -35,9 +37,12 @@ Source: ..\bin\Release\ProgressFormNET.dll                        ; DestDir: {ap
 Source: ..\bin\Release\PSI_Interface.dll                          ; DestDir: {app}
 Source: ..\bin\Release\ShFolderBrowser.dll                        ; DestDir: {app}
 Source: ..\bin\Release\SpectraTypeClassifier.dll                  ; DestDir: {app}
+Source: ..\bin\Release\System.IO.FileSystem.AccessControl.dll     ; DestDir: {app}
 Source: ..\bin\Release\System.Memory.dll                          ; DestDir: {app}
 Source: ..\bin\Release\System.Numerics.Vectors.dll                ; DestDir: {app}
 Source: ..\bin\Release\System.Runtime.CompilerServices.Unsafe.dll ; DestDir: {app}
+Source: ..\bin\Release\System.Security.AccessControl.dll          ; DestDir: {app}
+Source: ..\bin\Release\System.Security.Principal.Windows.dll      ; DestDir: {app}
 Source: ..\bin\Release\System.Text.Encodings.Web.dll              ; DestDir: {app}
 Source: ..\bin\Release\System.Text.Json.dll                       ; DestDir: {app}
 Source: ..\bin\Release\System.Threading.Channels.dll              ; DestDir: {app}
