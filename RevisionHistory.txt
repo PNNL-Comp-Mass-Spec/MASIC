@@ -2,6 +2,7 @@ MASIC Change Log
 
 Version 3.2.8006; December 2, 2021
 	- Replace DLL references with ThermoRawFileReader NuGet package
+		- Uses ThermoFisher.CommonCore.RawFileReader.dll v5.0.0.71
 
 Version 3.2.7901; August 19, 2021
 	- Remove unused COM reference to MSFileReaderLib
