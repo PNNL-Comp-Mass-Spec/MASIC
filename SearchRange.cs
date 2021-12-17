@@ -67,7 +67,7 @@ namespace MASIC
         /// </summary>
         /// <param name="index"></param>
         // ReSharper disable once UnusedMember.Global
-        public int get_OriginalIndex(int index)
+        public int GetOriginalIndex(int index)
         {
             if (!mPointerArrayIsValid)
                 return -1;
