@@ -470,10 +470,10 @@ namespace MASIC.DataOutput
                     if (scanNumbers.Count > 0)
                     {
                         // Track peak width in seconds
-                        var scanIndexMatch = clsBinarySearch.BinarySearchFindNearest(
+                        var scanIndexMatch = BinarySearch.BinarySearchFindNearest(
                             scanNumbers,
                             parentIon.Value.OptimalPeakApexScanNumber,
-                            clsBinarySearch.MissingDataModeConstants.ReturnClosestPoint);
+                            BinarySearch.MissingDataModeConstants.ReturnClosestPoint);
 
                         var startScanIndex = (int)Math.Floor(scanIndexMatch - fwhmWidthScans / 2.0);
                         if (startScanIndex < 0)

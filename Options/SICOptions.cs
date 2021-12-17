@@ -170,7 +170,7 @@
         /// <summary>
         /// SIC peak finder options
         /// </summary>
-        public MASICPeakFinder.clsSICPeakFinderOptions SICPeakFinderOptions { get; set; }
+        public MASICPeakFinder.SICPeakFinderOptions SICPeakFinderOptions { get; set; }
 
         /// <summary>
         /// When true, replace zeros with the minimum positive value from MS data

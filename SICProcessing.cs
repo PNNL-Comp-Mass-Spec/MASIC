@@ -226,9 +226,9 @@ namespace MASIC
             }
         }
 
-        private clsSICStatsPeak ExtractSICDetailsFromFullSIC(
+        private SICStatsPeak ExtractSICDetailsFromFullSIC(
             int mzIndexWork,
-            List<clsBaselineNoiseStatsSegment> baselineNoiseStatSegments,
+            List<BaselineNoiseStatsSegment> baselineNoiseStatSegments,
             int fullSICDataCount,
             int[,] fullSICScanIndices,
             double[,] fullSICIntensities,
@@ -256,7 +256,7 @@ namespace MASIC
             var baselineNoiseStats = mMASICPeakFinder.LookupNoiseStatsUsingSegments(scanIndexObservedInFullSIC, baselineNoiseStatSegments);
 
             // Initialize the peak
-            var sicPeak = new clsSICStatsPeak
+            var sicPeak = new SICStatsPeak
             {
                 BaselineNoiseStats = baselineNoiseStats
             };
@@ -981,7 +981,7 @@ namespace MASIC
                     var currentParentIon = scanList.ParentIons[parentIonIndices[parentIonIndexPointer]];
 
                     // Clear udtSICPotentialAreaStatsForPeak
-                    currentParentIon.SICStats.SICPotentialAreaStatsForPeak = new clsSICPotentialAreaStats();
+                    currentParentIon.SICStats.SICPotentialAreaStatsForPeak = new SICPotentialAreaStats();
 
                     // Record the index in the Full SIC that the parent ion mass was first observed
                     // Search for .SurveyScanIndex in fullSICScanIndices
@@ -1087,9 +1087,9 @@ namespace MASIC
 
         private void UpdateSICStatsUsingLargestPeak(
             SICDetails sicDetails,
-            clsSICStatsPeak sicPeak,
+            SICStatsPeak sicPeak,
             MASICOptions masicOptions,
-            clsSICPotentialAreaStats potentialAreaStatsInFullSIC,
+            SICPotentialAreaStats potentialAreaStatsInFullSIC,
             ScanList scanList,
             IReadOnlyList<MzSearchInfo> mzSearchChunk,
             int mzIndexWork,
@@ -1174,8 +1174,8 @@ namespace MASIC
             ScanList scanList,
             int parentIonIndex,
             SICDetails sicDetails,
-            clsSICPotentialAreaStats potentialAreaStatsForPeak,
-            clsSICStatsPeak sicPeak,
+            SICPotentialAreaStats potentialAreaStatsForPeak,
+            SICStatsPeak sicPeak,
             bool peakIsValid)
         {
             try

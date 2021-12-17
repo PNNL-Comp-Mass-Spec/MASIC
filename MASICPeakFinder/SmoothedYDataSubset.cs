@@ -6,7 +6,7 @@ namespace MASICPeakFinder
     /// <summary>
     /// Container for tracking a subset of smoothed intensity data
     /// </summary>
-    public class clsSmoothedYDataSubset
+    public class SmoothedYDataSubset
     {
         /// <summary>
         /// Data count
@@ -26,7 +26,7 @@ namespace MASICPeakFinder
         /// <summary>
         /// Parameterless constructor
         /// </summary>
-        public clsSmoothedYDataSubset()
+        public SmoothedYDataSubset()
         {
             DataCount = 0;
             DataStartIndex = 0;
@@ -39,7 +39,7 @@ namespace MASICPeakFinder
         /// <param name="yData"></param>
         /// <param name="startIndex"></param>
         /// <param name="endIndex"></param>
-        public clsSmoothedYDataSubset(IList<double> yData, int startIndex, int endIndex)
+        public SmoothedYDataSubset(IList<double> yData, int startIndex, int endIndex)
         {
             if (yData == null || endIndex < startIndex || startIndex < 0)
             {

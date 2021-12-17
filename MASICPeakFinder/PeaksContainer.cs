@@ -6,7 +6,7 @@ namespace MASICPeakFinder
     /// <summary>
     /// Container for peak information
     /// </summary>
-    public class clsPeaksContainer
+    public class PeaksContainer
     {
         /// <summary>
         /// Original peak location index
@@ -36,7 +36,7 @@ namespace MASICPeakFinder
         /// <summary>
         /// List of peaks found in the data
         /// </summary>
-        public List<clsPeakInfo> Peaks { get; set; }
+        public List<PeakInfo> Peaks { get; set; }
 
         /// <summary>
         /// Minimum peak width, in points
@@ -61,18 +61,18 @@ namespace MASICPeakFinder
         /// <summary>
         /// Constructor
         /// </summary>
-        public clsPeaksContainer()
+        public PeaksContainer()
         {
-            Peaks = new List<clsPeakInfo>();
+            Peaks = new List<PeakInfo>();
         }
 
         /// <summary>
         /// Clone the peak
         /// </summary>
         /// <param name="skipSourceData"></param>
-        public clsPeaksContainer Clone(bool skipSourceData = false)
+        public PeaksContainer Clone(bool skipSourceData = false)
         {
-            var clonedContainer = new clsPeaksContainer
+            var clonedContainer = new PeaksContainer
             {
                 OriginalPeakLocationIndex = OriginalPeakLocationIndex,
                 SourceDataCount = SourceDataCount,

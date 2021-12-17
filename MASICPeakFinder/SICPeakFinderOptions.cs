@@ -3,7 +3,7 @@
     /// <summary>
     /// SIC peak finder options
     /// </summary>
-    public class clsSICPeakFinderOptions
+    public class SICPeakFinderOptions
     {
         // Ignore Spelling: Butterworth, Savitzky, Golay
 
@@ -31,7 +31,7 @@
         /// <summary>
         /// Baseline noise options
         /// </summary>
-        public clsBaselineNoiseOptions SICBaselineNoiseOptions { get; set; }
+        public BaselineNoiseOptions SICBaselineNoiseOptions { get; set; }
 
         /// <summary>
         /// Maximum distance that the edge of an identified peak can be away from the scan number that the parent ion was observed in if the identified peak does not contain the parent ion
@@ -152,7 +152,7 @@
         /// <summary>
         /// Baseline noise threshold options
         /// </summary>
-        public clsBaselineNoiseOptions MassSpectraNoiseThresholdOptions { get; set; }
+        public BaselineNoiseOptions MassSpectraNoiseThresholdOptions { get; set; }
 
         private int mInitialPeakWidthScansMaximum = 30;
         private double mInitialPeakWidthScansScaler = 0.5;

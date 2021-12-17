@@ -8,17 +8,17 @@ using NUnit.Framework;
 namespace MASICTest
 {
     [TestFixture]
-    public class clsBinarySearchTests
+    public class BinarySearchTests
     {
         // Ignore Spelling: \username
 
         private const string OUTPUT_FOLDER = @"\\proto-2\UnitTest_Files\MASIC\Results";
 
         [Test]
-        [TestCase(clsBinarySearch.MissingDataModeConstants.ReturnClosestPoint)]
-        [TestCase(clsBinarySearch.MissingDataModeConstants.ReturnPreviousPoint)]
-        [TestCase(clsBinarySearch.MissingDataModeConstants.ReturnNextPoint)]
-        public void TestSearchFunctionsInt(clsBinarySearch.MissingDataModeConstants missingDataMode)
+        [TestCase(BinarySearch.MissingDataModeConstants.ReturnClosestPoint)]
+        [TestCase(BinarySearch.MissingDataModeConstants.ReturnPreviousPoint)]
+        [TestCase(BinarySearch.MissingDataModeConstants.ReturnNextPoint)]
+        public void TestSearchFunctionsInt(BinarySearch.MissingDataModeConstants missingDataMode)
         {
             try
             {
@@ -66,7 +66,7 @@ namespace MASICTest
                     // Search intDataList for each number between intSearchValueStart and intSearchValueEnd
                     for (var dataPointToFind = searchValueStart; dataPointToFind <= searchValueEnd; dataPointToFind++)
                     {
-                        var indexMatch = clsBinarySearch.BinarySearchFindNearest(
+                        var indexMatch = BinarySearch.BinarySearchFindNearest(
                             dataPoints,
                             dataPointToFind,
                             missingDataMode);
@@ -79,7 +79,7 @@ namespace MASICTest
                     // Verify some of the results
                     switch (missingDataMode)
                     {
-                        case clsBinarySearch.MissingDataModeConstants.ReturnClosestPoint:
+                        case BinarySearch.MissingDataModeConstants.ReturnClosestPoint:
                             Assert.AreEqual(searchResults[10], 8);
                             Assert.AreEqual(searchResults[11], 12);
                             Assert.AreEqual(searchResults[89], 87);
@@ -87,7 +87,7 @@ namespace MASICTest
                             Assert.AreEqual(searchResults[91], 94);
 
                             break;
-                        case clsBinarySearch.MissingDataModeConstants.ReturnNextPoint:
+                        case BinarySearch.MissingDataModeConstants.ReturnNextPoint:
                             Assert.AreEqual(searchResults[10], 12);
                             Assert.AreEqual(searchResults[11], 12);
                             Assert.AreEqual(searchResults[12], 12);
@@ -96,7 +96,7 @@ namespace MASICTest
 
                             break;
 
-                        case clsBinarySearch.MissingDataModeConstants.ReturnPreviousPoint:
+                        case BinarySearch.MissingDataModeConstants.ReturnPreviousPoint:
                             Assert.AreEqual(searchResults[10], 8);
                             Assert.AreEqual(searchResults[11], 8);
                             Assert.AreEqual(searchResults[12], 12);
@@ -116,10 +116,10 @@ namespace MASICTest
         }
 
         [Test]
-        [TestCase(clsBinarySearch.MissingDataModeConstants.ReturnClosestPoint)]
-        [TestCase(clsBinarySearch.MissingDataModeConstants.ReturnPreviousPoint)]
-        [TestCase(clsBinarySearch.MissingDataModeConstants.ReturnNextPoint)]
-        public void TestSearchFunctionsDbl(clsBinarySearch.MissingDataModeConstants missingDataMode)
+        [TestCase(BinarySearch.MissingDataModeConstants.ReturnClosestPoint)]
+        [TestCase(BinarySearch.MissingDataModeConstants.ReturnPreviousPoint)]
+        [TestCase(BinarySearch.MissingDataModeConstants.ReturnNextPoint)]
+        public void TestSearchFunctionsDbl(BinarySearch.MissingDataModeConstants missingDataMode)
         {
             try
             {
@@ -168,7 +168,7 @@ namespace MASICTest
                     for (var index = searchValueStart; index <= searchValueEnd; index++)
                     {
                         var dataPointToFind = index + index / 10.0;
-                        var indexMatch = clsBinarySearch.BinarySearchFindNearest(dataPoints, dataPointToFind, missingDataMode);
+                        var indexMatch = BinarySearch.BinarySearchFindNearest(dataPoints, dataPointToFind, missingDataMode);
                         searchResults.Add(dataPointToFind, dataPoints[indexMatch]);
 
                         writer.WriteLine("{0}\t{1}\t{2}", dataPointToFind, dataPoints[indexMatch], indexMatch);
@@ -177,7 +177,7 @@ namespace MASICTest
                     // Verify some of the results
                     switch (missingDataMode)
                     {
-                        case clsBinarySearch.MissingDataModeConstants.ReturnClosestPoint:
+                        case BinarySearch.MissingDataModeConstants.ReturnClosestPoint:
                             Assert.AreEqual(searchResults[23.1], 20.69693846, 1E-06);
                             Assert.AreEqual(searchResults[24.2], 25.52025918, 1E-06);
                             Assert.AreEqual(searchResults[25.3], 25.52025918, 1E-06);
@@ -186,7 +186,7 @@ namespace MASICTest
                             Assert.AreEqual(searchResults[28.6], 30.627417, 1E-06);
 
                             break;
-                        case clsBinarySearch.MissingDataModeConstants.ReturnNextPoint:
+                        case BinarySearch.MissingDataModeConstants.ReturnNextPoint:
                             Assert.AreEqual(searchResults[23.1], 25.52025918, 1E-06);
                             Assert.AreEqual(searchResults[24.2], 25.52025918, 1E-06);
                             Assert.AreEqual(searchResults[25.3], 25.52025918, 1E-06);
@@ -196,7 +196,7 @@ namespace MASICTest
 
                             break;
 
-                        case clsBinarySearch.MissingDataModeConstants.ReturnPreviousPoint:
+                        case BinarySearch.MissingDataModeConstants.ReturnPreviousPoint:
                             Assert.AreEqual(searchResults[23.1], 20.69693846, 1E-06);
                             Assert.AreEqual(searchResults[24.2], 20.69693846, 1E-06);
                             Assert.AreEqual(searchResults[25.3], 20.69693846, 1E-06);

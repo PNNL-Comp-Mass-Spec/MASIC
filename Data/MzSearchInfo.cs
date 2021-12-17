@@ -52,7 +52,7 @@ namespace MASIC.Data
         /// <summary>
         /// List of baseline noise stat segments
         /// </summary>
-        public List<MASICPeakFinder.clsBaselineNoiseStatsSegment> BaselineNoiseStatSegments { get; set; }
+        public List<MASICPeakFinder.BaselineNoiseStatsSegment> BaselineNoiseStatSegments { get; set; }
 
         /// <summary>
         /// Show the search m/z and maximum intensity

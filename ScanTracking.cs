@@ -249,7 +249,7 @@ namespace MASIC
         private void ComputeNoiseLevelForMassSpectrum(
             ScanInfo scanInfo,
             MSSpectrum msSpectrum,
-            clsBaselineNoiseOptions noiseThresholdOptions)
+            BaselineNoiseOptions noiseThresholdOptions)
         {
             const bool IGNORE_NON_POSITIVE_DATA = true;
 
@@ -289,7 +289,7 @@ namespace MASIC
             DataInput.DataImport dataImportUtilities,
             SpectraCache spectraCache,
             MSSpectrum msSpectrum,
-            clsBaselineNoiseOptions noiseThresholdOptions,
+            BaselineNoiseOptions noiseThresholdOptions,
             bool discardLowIntensityData,
             bool compressData,
             double msDataResolution,

@@ -242,7 +242,7 @@ namespace MASIC.DataInput
             double noiseThresholdIntensity,
             double mzIgnoreRangeStart,
             double mzIgnoreRangeEnd,
-            MASICPeakFinder.clsBaselineNoiseOptions noiseThresholdOptions)
+            MASICPeakFinder.BaselineNoiseOptions noiseThresholdOptions)
         {
             var ionCountNew = 0;
 

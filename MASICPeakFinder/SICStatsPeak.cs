@@ -3,7 +3,7 @@
     /// <summary>
     /// Container for a SIC peak
     /// </summary>
-    public class clsSICStatsPeak
+    public class SICStatsPeak
     {
         /// <summary>
         /// Index that the SIC peak officially starts; Pointer to entry in .SICData()
@@ -71,28 +71,28 @@
         /// <summary>
         /// Baseline noise stats
         /// </summary>
-        public clsBaselineNoiseStats BaselineNoiseStats { get; set; }
+        public BaselineNoiseStats BaselineNoiseStats { get; set; }
 
         /// <summary>
         /// Statistical moments
         /// </summary>
-        public clsStatisticalMoments StatisticalMoments { get; set; }
+        public StatisticalMoments StatisticalMoments { get; set; }
 
         /// <summary>
         /// Constructor
         /// </summary>
-        public clsSICStatsPeak()
+        public SICStatsPeak()
         {
-            BaselineNoiseStats = new clsBaselineNoiseStats();
-            StatisticalMoments = new clsStatisticalMoments();
+            BaselineNoiseStats = new BaselineNoiseStats();
+            StatisticalMoments = new StatisticalMoments();
         }
 
         /// <summary>
         /// Clone this SIC peak
         /// </summary>
-        public clsSICStatsPeak Clone()
+        public SICStatsPeak Clone()
         {
-            return new clsSICStatsPeak
+            return new SICStatsPeak
             {
                 IndexBaseLeft = IndexBaseLeft,
                 IndexBaseRight = IndexBaseRight,

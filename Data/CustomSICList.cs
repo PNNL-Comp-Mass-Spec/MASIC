@@ -183,10 +183,10 @@ namespace MASIC.Data
                     }
                     else
                     {
-                        var fragScanIndexMatch = clsBinarySearch.BinarySearchFindNearest(
+                        var fragScanIndexMatch = BinarySearch.BinarySearchFindNearest(
                             scanList.MasterScanNumList,
                             surveyScanNumberAbsolute,
-                            clsBinarySearch.MissingDataModeConstants.ReturnClosestPoint);
+                            BinarySearch.MissingDataModeConstants.ReturnClosestPoint);
 
                         while (fragScanIndexMatch < scanList.MasterScanOrderCount && scanList.MasterScanOrder[fragScanIndexMatch].ScanType == ScanList.ScanTypeConstants.SurveyScan)
                         {

@@ -10,7 +10,7 @@
         /// <summary>
         /// SIC peak
         /// </summary>
-        public MASICPeakFinder.clsSICStatsPeak Peak { get; set; }
+        public MASICPeakFinder.SICStatsPeak Peak { get; set; }
 
         /// <summary>
         /// Scan type for peak indices (survey scan or frag scan)
@@ -35,14 +35,14 @@
         /// <summary>
         /// Potential area stats for the SIC peak
         /// </summary>
-        public MASICPeakFinder.clsSICPotentialAreaStats SICPotentialAreaStatsForPeak { get; set; }
+        public MASICPeakFinder.SICPotentialAreaStats SICPotentialAreaStatsForPeak { get; set; }
 
         /// <summary>
         /// Constructor
         /// </summary>
         public SICStats()
         {
-            Peak = new MASICPeakFinder.clsSICStatsPeak();
+            Peak = new MASICPeakFinder.SICStatsPeak();
         }
 
         /// <summary>

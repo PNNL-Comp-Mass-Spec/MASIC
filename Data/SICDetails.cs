@@ -17,7 +17,7 @@ namespace MASIC.Data
         /// <summary>
         /// Selected ion chromatogram data points
         /// </summary>
-        public readonly List<clsSICDataPoint> SICData;
+        public readonly List<SICDataPoint> SICData;
 
         /// <summary>
         /// Number of values in SICData
@@ -60,7 +60,7 @@ namespace MASIC.Data
         /// </summary>
         public SICDetails()
         {
-            SICData = new List<clsSICDataPoint>(16);
+            SICData = new List<SICDataPoint>(16);
         }
 
         /// <summary>
@@ -72,7 +72,7 @@ namespace MASIC.Data
         /// <param name="scanIndex"></param>
         public void AddData(int scanNumber, double intensity, double mass, int scanIndex)
         {
-            var dataPoint = new clsSICDataPoint(scanNumber, intensity, mass, scanIndex);
+            var dataPoint = new SICDataPoint(scanNumber, intensity, mass, scanIndex);
             SICData.Add(dataPoint);
         }
 

@@ -10,7 +10,7 @@ using ThermoRawFileReader;
 namespace MASICTest
 {
     [TestFixture]
-    public class clsTests : EventNotifier
+    public class Tests : EventNotifier
     {
         [Test]
         [TestCase(1000, 0, 1, 0, 1001.0073)]

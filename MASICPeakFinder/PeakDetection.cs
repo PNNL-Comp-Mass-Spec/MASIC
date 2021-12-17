@@ -20,7 +20,7 @@ namespace MASICPeakFinder
     /// Copyright 2005, Battelle Memorial Institute.  All Rights Reserved.
     /// </para>
     /// </summary>
-    internal class clsPeakDetection
+    internal class PeakDetection
     {
         // Ignore Spelling: cx, lan, struct
 
@@ -113,7 +113,7 @@ namespace MASICPeakFinder
         /// then if the maximum of yValues() is 50, the minimum intensity of identified peaks is 10, and not 2.5
         /// However, if the maximum of yValues() is 500, the minimum intensity of identified peaks is 50, and not 10
         /// </remarks>
-        public List<clsPeakInfo> DetectPeaks(
+        public List<PeakInfo> DetectPeaks(
             double[] xValues,
             double[] yValues,
             double intensityThresholdAbsoluteMinimum,
@@ -134,7 +134,7 @@ namespace MASICPeakFinder
             // In chromatography, the baseline peak widthInPoints = 4*sigma
 
             // Initialize the list of detected peaks
-            var detectedPeaks = new List<clsPeakInfo>(100);
+            var detectedPeaks = new List<PeakInfo>(100);
 
             try
             {
@@ -195,7 +195,7 @@ namespace MASICPeakFinder
                         {
                             // Actual peak
 
-                            var newPeak = new clsPeakInfo(index);
+                            var newPeak = new PeakInfo(index);
 
                             if (useValleysForPeakWidth)
                             {
@@ -234,7 +234,7 @@ namespace MASICPeakFinder
             int sourceDataCount,
             IReadOnlyList<double> xValues,
             IReadOnlyList<double> yValues,
-            clsPeakInfo peak)
+            PeakInfo peak)
         {
             if (peak.PeakWidth == 0)
             {
@@ -284,7 +284,7 @@ namespace MASICPeakFinder
             int sourceDataCount,
             IReadOnlyList<double> yValues,
             IReadOnlyList<double> firstDerivative,
-            clsPeakInfo newPeak,
+            PeakInfo newPeak,
             int index,
             double intensityThreshold,
             int peakHalfWidth
@@ -377,7 +377,7 @@ namespace MASICPeakFinder
             int sourceDataCount,
             IReadOnlyList<double> yValues,
             IReadOnlyList<double> secondDerivative,
-            clsPeakInfo newPeak,
+            PeakInfo newPeak,
             int index,
             int peakWidthInSigma)
         {
@@ -486,7 +486,7 @@ namespace MASICPeakFinder
         private void MovePeakLocationToMax(
             int sourceDataCount,
             IReadOnlyList<double> yValues,
-            clsPeakInfo peak,
+            PeakInfo peak,
             int peakWidthPointsMinimum)
         {
             // The peak finder often determines the peak center to be a few points away from the peak apex -- check for this

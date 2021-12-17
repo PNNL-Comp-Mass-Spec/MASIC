@@ -634,7 +634,7 @@ namespace MASIC
                     }
 
                     // Initialize the peak
-                    scanList.ParentIons[parentIonIndex].SICStats.Peak = new clsSICStatsPeak();
+                    scanList.ParentIons[parentIonIndex].SICStats.Peak = new SICStatsPeak();
 
                     // Find the data point with the maximum intensity
                     double maximumIntensity = 0;
@@ -662,7 +662,7 @@ namespace MASIC
                     var parentIon = scanList.ParentIons[parentIonIndex];
 
                     // Clear potentialAreaStatsForPeak
-                    parentIon.SICStats.SICPotentialAreaStatsForPeak = new clsSICPotentialAreaStats();
+                    parentIon.SICStats.SICPotentialAreaStatsForPeak = new SICPotentialAreaStats();
 
                     var peakIsValid = peakFinder.FindSICPeakAndArea(sicDetails.SICData,
                                                                     out var potentialAreaStatsForPeakOut,

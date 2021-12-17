@@ -3,7 +3,7 @@
     /// <summary>
     /// Selected ion chromatogram data point
     /// </summary>
-    public class clsSICDataPoint
+    public class SICDataPoint
     {
         /// <summary>
         /// Scan Index (pointer into .SurveyScans)
@@ -31,7 +31,7 @@
         /// <param name="scanNumber"></param>
         /// <param name="intensity"></param>
         /// <param name="mass"></param>
-        public clsSICDataPoint(int scanNumber, double intensity, double mass)
+        public SICDataPoint(int scanNumber, double intensity, double mass)
             : this(scanNumber, intensity, mass, 0)
         {
         }
@@ -43,7 +43,7 @@
         /// <param name="intensity"></param>
         /// <param name="mass"></param>
         /// <param name="index"></param>
-        public clsSICDataPoint(int scanNumber, double intensity, double mass, int index)
+        public SICDataPoint(int scanNumber, double intensity, double mass, int index)
         {
             ScanNumber = scanNumber;
             Intensity = intensity;

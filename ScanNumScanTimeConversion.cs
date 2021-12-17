@@ -27,18 +27,18 @@ namespace MASIC
                 if (scanType is CustomSICList.CustomSICScanTypeConstants.Absolute or CustomSICList.CustomSICScanTypeConstants.Relative)
                 {
                     var absoluteScanNumber = ScanOrAcqTimeToAbsolute(scanList, scanOrAcqTime, scanType, false);
-                    return clsBinarySearch.BinarySearchFindNearest(
+                    return BinarySearch.BinarySearchFindNearest(
                         scanList.MasterScanNumList,
                         absoluteScanNumber,
-                        clsBinarySearch.MissingDataModeConstants.ReturnClosestPoint);
+                        BinarySearch.MissingDataModeConstants.ReturnClosestPoint);
                 }
 
                 // scanType = CustomSICScanTypeConstants.AcquisitionTime
                 // Find the closest match in scanList.MasterScanTimeList
-                return clsBinarySearch.BinarySearchFindNearest(
+                return BinarySearch.BinarySearchFindNearest(
                     scanList.MasterScanTimeList,
                     scanOrAcqTime,
-                    clsBinarySearch.MissingDataModeConstants.ReturnClosestPoint);
+                    BinarySearch.MissingDataModeConstants.ReturnClosestPoint);
             }
             catch (Exception ex)
             {

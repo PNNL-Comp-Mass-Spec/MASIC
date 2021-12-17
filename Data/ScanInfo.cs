@@ -117,7 +117,7 @@ namespace MASIC.Data
         /// <summary>
         /// Baseline noise stats
         /// </summary>
-        public MASICPeakFinder.clsBaselineNoiseStats BaselineNoiseStats { get; set; }
+        public MASICPeakFinder.BaselineNoiseStats BaselineNoiseStats { get; set; }
 
         /// <summary>
         /// Constructor for a MS1 scan

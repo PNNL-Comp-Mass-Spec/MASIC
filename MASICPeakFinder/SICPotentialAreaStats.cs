@@ -3,7 +3,7 @@
     /// <summary>
     /// SIC potential area stats
     /// </summary>
-    public class clsSICPotentialAreaStats
+    public class SICPotentialAreaStats
     {
         /// <summary>
         /// Minimum potential peak area

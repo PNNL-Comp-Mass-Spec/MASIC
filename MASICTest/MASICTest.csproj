@@ -41,10 +41,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="clsBinarySearchTests.cs" />
-    <Compile Include="clsDatabaseTests.cs" />
-    <Compile Include="clsPeakFinderTests.cs" />
-    <Compile Include="clsTests.cs" />
+    <Compile Include="BinarySearchTests.cs" />
+    <Compile Include="DatabaseTests.cs" />
+    <Compile Include="PeakFinderTests.cs" />
+    <Compile Include="Tests.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

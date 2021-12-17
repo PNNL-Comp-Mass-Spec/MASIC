@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -48,20 +48,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="clsBinarySearch.cs" />
-    <Compile Include="clsBaselineNoiseOptions.cs" />
-    <Compile Include="clsBaselineNoiseStats.cs" />
-    <Compile Include="clsBaselineNoiseStatsSegment.cs" />
+    <Compile Include="BinarySearch.cs" />
+    <Compile Include="BaselineNoiseOptions.cs" />
+    <Compile Include="BaselineNoiseStats.cs" />
+    <Compile Include="BaselineNoiseStatsSegment.cs" />
     <Compile Include="clsMASICPeakFinder.cs" />
-    <Compile Include="clsPeakDetection.cs" />
-    <Compile Include="clsPeakInfo.cs" />
-    <Compile Include="clsPeaksContainer.cs" />
-    <Compile Include="clsSICDataPoint.cs" />
-    <Compile Include="clsSICPeakFinderOptions.cs" />
-    <Compile Include="clsSICPotentialAreaStats.cs" />
-    <Compile Include="clsSICStatsPeak.cs" />
-    <Compile Include="clsSmoothedYDataSubset.cs" />
-    <Compile Include="clsStatisticalMoments.cs" />
+    <Compile Include="PeakDetection.cs" />
+    <Compile Include="PeakInfo.cs" />
+    <Compile Include="PeaksContainer.cs" />
+    <Compile Include="SICDataPoint.cs" />
+    <Compile Include="SICPeakFinderOptions.cs" />
+    <Compile Include="SICPotentialAreaStats.cs" />
+    <Compile Include="SICStatsPeak.cs" />
+    <Compile Include="SmoothedYDataSubset.cs" />
+    <Compile Include="StatisticalMoments.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

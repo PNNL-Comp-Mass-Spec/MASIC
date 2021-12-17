@@ -6,7 +6,7 @@ using NUnit.Framework;
 namespace MASICTest
 {
     [TestFixture]
-    public class clsPeakFinderTests
+    public class PeakFinderTests
     {
         private clsMASICPeakFinder mMASICPeakFinder;
 
@@ -21,7 +21,7 @@ namespace MASICTest
         {
             const int ABSOLUTE_MINIMUM_VALUE = 4;
 
-            var sicData = new List<clsSICDataPoint>();
+            var sicData = new List<SICDataPoint>();
             var values = new List<double>();
 
             var minimumPositiveValueNoData = mMASICPeakFinder.FindMinimumPositiveValue(sicData, ABSOLUTE_MINIMUM_VALUE);
@@ -31,7 +31,7 @@ namespace MASICTest
             for (var i = 1; i <= 10; i++)
             {
                 var intensity = i - 3;
-                var sicPoint = new clsSICDataPoint(i, intensity, i * 100);
+                var sicPoint = new SICDataPoint(i, intensity, i * 100);
                 sicData.Add(sicPoint);
                 values.Add(intensity);
 
@@ -48,7 +48,7 @@ namespace MASICTest
             for (var i = 11; i <= 20; i++)
             {
                 var intensity = i - 3;
-                var sicPoint = new clsSICDataPoint(i, intensity, i * 100);
+                var sicPoint = new SICDataPoint(i, intensity, i * 100);
                 sicData.Add(sicPoint);
                 values.Add(intensity);
 

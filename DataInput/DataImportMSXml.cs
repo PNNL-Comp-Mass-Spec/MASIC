@@ -1522,7 +1522,7 @@ namespace MASIC.DataInput
             MSSpectrum msSpectrum,
             ScanInfo scanInfo,
             SpectraCache spectraCache,
-            clsBaselineNoiseOptions noiseThresholdOptions,
+            BaselineNoiseOptions noiseThresholdOptions,
             bool discardLowIntensityData,
             bool compressSpectraData,
             double msDataResolution,

@@ -3,7 +3,7 @@
     /// <summary>
     /// Options for computing the baseline noise value
     /// </summary>
-    public class clsBaselineNoiseOptions
+    public class BaselineNoiseOptions
     {
         /// <summary>
         /// Method to use to determine the baseline noise level
@@ -47,9 +47,9 @@
         /// <summary>
         /// Return a new instance of clsBaselineNoiseOptions with copied options
         /// </summary>
-        public clsBaselineNoiseOptions Clone()
+        public BaselineNoiseOptions Clone()
         {
-            return (clsBaselineNoiseOptions)MemberwiseClone();
+            return (BaselineNoiseOptions)MemberwiseClone();
         }
     }
 }

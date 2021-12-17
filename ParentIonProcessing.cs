@@ -286,7 +286,7 @@ namespace MASIC
             int parentIonIndex1,
             int parentIonIndex2,
             BinningOptions binningOptions,
-            MASICPeakFinder.clsBaselineNoiseOptions noiseThresholdOptions,
+            MASICPeakFinder.BaselineNoiseOptions noiseThresholdOptions,
             DataInput.DataImport dataImportUtilities)
         {
             float highestSimilarityScore;

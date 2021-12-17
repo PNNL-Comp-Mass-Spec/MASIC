@@ -3,7 +3,7 @@
     /// <summary>
     /// Class for tracking baseline noise stats
     /// </summary>
-    public class clsBaselineNoiseStats
+    public class BaselineNoiseStats
     {
         /// <summary>
         /// Typically the average of the data being sampled to determine the baseline noise estimate
@@ -28,7 +28,7 @@
         /// <summary>
         /// Constructor
         /// </summary>
-        public clsBaselineNoiseStats()
+        public BaselineNoiseStats()
         {
             NoiseThresholdModeUsed = clsMASICPeakFinder.NoiseThresholdModes.AbsoluteThreshold;
         }
@@ -36,9 +36,9 @@
         /// <summary>
         /// Clone an instance of this class
         /// </summary>
-        public clsBaselineNoiseStats Clone()
+        public BaselineNoiseStats Clone()
         {
-            return new clsBaselineNoiseStats
+            return new BaselineNoiseStats
             {
                 NoiseLevel = NoiseLevel,
                 NoiseStDev = NoiseStDev,

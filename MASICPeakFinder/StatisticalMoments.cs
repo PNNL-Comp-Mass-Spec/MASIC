@@ -3,7 +3,7 @@
     /// <summary>
     /// Statistical moments options
     /// </summary>
-    public class clsStatisticalMoments
+    public class StatisticalMoments
     {
         // Ignore Spelling: Kolmogorov, Smirnov
 
@@ -42,9 +42,9 @@
         /// <summary>
         /// Clone the settings tracked by this class
         /// </summary>
-        public clsStatisticalMoments Clone()
+        public StatisticalMoments Clone()
         {
-            return new clsStatisticalMoments
+            return new StatisticalMoments
             {
                 Area = Area,
                 CenterOfMassScan = CenterOfMassScan,

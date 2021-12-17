@@ -3,7 +3,7 @@
     /// <summary>
     /// Peak info container
     /// </summary>
-    public class clsPeakInfo
+    public class PeakInfo
     {
         /// <summary>
         /// Data index of the peak center
@@ -34,7 +34,7 @@
         /// Constructor
         /// </summary>
         /// <param name="locationIndex">Index of this peak in the data arrays</param>
-        public clsPeakInfo(int locationIndex)
+        public PeakInfo(int locationIndex)
         {
             PeakLocation = locationIndex;
         }
@@ -47,9 +47,9 @@
         /// <summary>
         /// Duplicate an instance of this class
         /// </summary>
-        public clsPeakInfo Clone()
+        public PeakInfo Clone()
         {
-            return new clsPeakInfo(PeakLocation)
+            return new PeakInfo(PeakLocation)
             {
                 LeftEdge = LeftEdge,
                 RightEdge = RightEdge,

@@ -622,7 +622,7 @@ namespace MASIC.DataInput
             XRawFileIO rawFileReader,
             SpectraCache spectraCache,
             ScanInfo scanInfo,
-            clsBaselineNoiseOptions noiseThresholdOptions,
+            BaselineNoiseOptions noiseThresholdOptions,
             bool discardLowIntensityData,
             bool compressSpectraData,
             double msDataResolution,

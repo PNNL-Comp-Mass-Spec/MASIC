@@ -5,12 +5,12 @@ namespace MASICPeakFinder
     /// <summary>
     /// Baseline noise stats segment
     /// </summary>
-    public class clsBaselineNoiseStatsSegment
+    public class BaselineNoiseStatsSegment
     {
         /// <summary>
         /// Baseline noise stats
         /// </summary>
-        public clsBaselineNoiseStats BaselineNoiseStats { get; set; }
+        public BaselineNoiseStats BaselineNoiseStats { get; set; }
 
         /// <summary>
         /// Segment start index
@@ -26,16 +26,16 @@ namespace MASICPeakFinder
         /// Obsolete constructor
         /// </summary>
         [Obsolete("Use the constructor that takes an instance of clsBaselineNoiseStats")]
-        public clsBaselineNoiseStatsSegment()
+        public BaselineNoiseStatsSegment()
         {
-            BaselineNoiseStats = new clsBaselineNoiseStats();
+            BaselineNoiseStats = new BaselineNoiseStats();
         }
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="noiseStats"></param>
-        public clsBaselineNoiseStatsSegment(clsBaselineNoiseStats noiseStats)
+        public BaselineNoiseStatsSegment(BaselineNoiseStats noiseStats)
         {
             BaselineNoiseStats = noiseStats;
         }

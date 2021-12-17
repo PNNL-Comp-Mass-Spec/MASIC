@@ -81,7 +81,7 @@ namespace MASIC.DataOutput
             ScanList scanList,
             int parentIonIndex,
             SICDetails sicDetails,
-            MASICPeakFinder.clsSmoothedYDataSubset smoothedYDataSubset,
+            MASICPeakFinder.SmoothedYDataSubset smoothedYDataSubset,
             DataOutput dataOutputHandler)
         {
             var lastGoodLoc = "Start";
