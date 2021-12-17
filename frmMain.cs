@@ -1116,9 +1116,9 @@ namespace MASIC
         private void PopulateComboBoxes()
         {
             cboExportRawDataFileFormat.Items.Clear();
-            cboExportRawDataFileFormat.Items.Insert((int)RawDataExportOptions.eExportRawDataFileFormatConstants.PEKFile, "PEK File");
-            cboExportRawDataFileFormat.Items.Insert((int)RawDataExportOptions.eExportRawDataFileFormatConstants.CSVFile, "DeconTools CSV File");
-            cboExportRawDataFileFormat.SelectedIndex = (int)RawDataExportOptions.eExportRawDataFileFormatConstants.CSVFile;
+            cboExportRawDataFileFormat.Items.Insert((int)RawDataExportOptions.ExportRawDataFileFormatConstants.PEKFile, "PEK File");
+            cboExportRawDataFileFormat.Items.Insert((int)RawDataExportOptions.ExportRawDataFileFormatConstants.CSVFile, "DeconTools CSV File");
+            cboExportRawDataFileFormat.SelectedIndex = (int)RawDataExportOptions.ExportRawDataFileFormatConstants.CSVFile;
 
             cboSICNoiseThresholdMode.Items.Clear();
             cboSICNoiseThresholdMode.Items.Insert((int)MASICPeakFinder.clsMASICPeakFinder.NoiseThresholdModes.AbsoluteThreshold, "Absolute Threshold");
@@ -1830,7 +1830,7 @@ namespace MASIC
                 var exportOptions = masicOptions.RawDataExportOptions;
 
                 exportOptions.ExportEnabled = chkExportRawSpectraData.Checked;
-                exportOptions.FileFormat = (RawDataExportOptions.eExportRawDataFileFormatConstants)cboExportRawDataFileFormat.SelectedIndex;
+                exportOptions.FileFormat = (RawDataExportOptions.ExportRawDataFileFormatConstants)cboExportRawDataFileFormat.SelectedIndex;
 
                 exportOptions.IncludeMSMS = chkExportRawDataIncludeMSMS.Checked;
                 exportOptions.RenumberScans = chkExportRawDataRenumberScans.Checked;

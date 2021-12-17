@@ -14,7 +14,7 @@ namespace MASIC
     /// </summary>
     public class ReporterIonProcessor : MasicEventNotifier
     {
-        // Ignore Spelling: Uniquify
+        // Ignore Spelling: plex, Uniquify
 
         /// <summary>
         /// Column prefix for reporter ion data in the output file
@@ -51,7 +51,7 @@ namespace MASIC
 
             try
             {
-                // Use XrawFileIO to read the .Raw files
+                // Use XRawFileIO to read the .Raw files
                 var readerOptions = new ThermoReaderOptions
                 {
                     LoadMSMethodInfo = false,
@@ -65,7 +65,7 @@ namespace MASIC
 
                 if (inputFilePathFull.EndsWith(DataInput.DataImport.THERMO_RAW_FILE_EXTENSION, StringComparison.OrdinalIgnoreCase))
                 {
-                    // Processing a thermo .Raw file
+                    // Processing a Thermo .Raw file
                     // Check whether any of the fragmentation scans has IsFTMS true
                     for (var masterOrderIndex = 0; masterOrderIndex < scanList.MasterScanOrderCount; masterOrderIndex++)
                     {
@@ -91,8 +91,8 @@ namespace MASIC
 
                 if (mOptions.ReporterIons.ReporterIonList.Count == 0)
                 {
-                    // No reporter ions defined; default to ITraq
-                    mOptions.ReporterIons.SetReporterIonMassMode(ReporterIons.ReporterIonMassModeConstants.ITraqFourMZ);
+                    // No reporter ions defined; default to 11-plex TMT
+                    mOptions.ReporterIons.SetReporterIonMassMode(ReporterIons.ReporterIonMassModeConstants.TMTElevenMZ);
                 }
 
                 // Populate array reporterIons, which we will sort by m/z
@@ -124,6 +124,7 @@ namespace MASIC
                     "ParentIonMZ",
                     "BasePeakIntensity",
                     "BasePeakMZ",
+                    "ParentScan",
                     "ReporterIonIntensityMax"
                 };
 
@@ -223,12 +224,21 @@ namespace MASIC
 
                 UpdateProgress(0, "Searching for reporter ions");
 
+                // Keys in this dictionary are scan number, values are the data columns for each scan
+                var cachedDataToWrite = new SortedDictionary<int, List<string>>();
+
                 for (var masterOrderIndex = 0; masterOrderIndex < scanList.MasterScanOrderCount; masterOrderIndex++)
                 {
                     var scanPointer = scanList.MasterScanOrder[masterOrderIndex].ScanIndexPointer;
                     if (scanList.MasterScanOrder[masterOrderIndex].ScanType == ScanList.ScanTypeConstants.SurveyScan)
                     {
-                        // Skip Survey Scans
+                        // Survey scan; write the cached data, then move on to the next scan
+                        if (cachedDataToWrite.Count > 0)
+                        {
+                            WriteCachedReporterIons(writer, cachedDataToWrite, TAB_DELIMITER);
+                            cachedDataToWrite.Clear();
+                        }
+
                         continue;
                     }
 
@@ -240,9 +250,8 @@ namespace MASIC
                         scanList,
                         spectraCache,
                         scanList.FragScans[scanPointer],
-                        writer,
+                        cachedDataToWrite,
                         reporterIons,
-                        TAB_DELIMITER,
                         saveUncorrectedIntensities,
                         mOptions.ReporterIons.ReporterIonSaveObservedMasses);
 
@@ -277,6 +286,38 @@ namespace MASIC
             }
         }
 
+        private void WriteCachedReporterIons(
+            TextWriter writer,
+            SortedDictionary<int, List<string>> cachedDataToWrite,
+            char delimiter)
+        {
+            if (mOptions.ReporterIons.UseMS3ReporterIonsForParentMS2Spectra)
+            {
+                // Look for MS3 spectra
+                // If found, possibly copy the reporter ion data to parent MS2 spectra
+                // If mOptions.ReporterIons.AlwaysUseMS3ReporterIonsForParents is true, always copy
+                // If false, examine reporter ions in the parent MS2 spectra and copy if missing / sparse
+
+                bool copyReporterIonData;
+
+                if (mOptions.ReporterIons.AlwaysUseMS3ReporterIonsForParents)
+                {
+                    copyReporterIonData = true;
+                }
+                else
+                {
+                }
+
+                // ToDo: Copy values from MS3 spectra to MS2 spectra
+
+            }
+
+            foreach (var cachedLine in cachedDataToWrite)
+            {
+                writer.WriteLine(string.Join(delimiter.ToString(), cachedLine.Value));
+            }
+        }
+
         private readonly ITraqIntensityCorrection intensityCorrector = new(
             ReporterIons.ReporterIonMassModeConstants.CustomOrNone,
             ITraqIntensityCorrection.CorrectionFactorsiTRAQ4Plex.ABSciex);
@@ -292,9 +333,8 @@ namespace MASIC
         /// <param name="scanList"></param>
         /// <param name="spectraCache"></param>
         /// <param name="currentScan"></param>
-        /// <param name="writer"></param>
+        /// <param name="cachedDataToWrite"></param>
         /// <param name="reporterIons"></param>
-        /// <param name="delimiter"></param>
         /// <param name="saveUncorrectedIntensities"></param>
         /// <param name="saveObservedMasses"></param>
         private void FindReporterIonsWork(
@@ -305,9 +345,8 @@ namespace MASIC
             ScanList scanList,
             SpectraCache spectraCache,
             ScanInfo currentScan,
-            TextWriter writer,
+            IDictionary<int, List<string>> cachedDataToWrite,
             IList<ReporterIonInfo> reporterIons,
-            char delimiter,
             bool saveUncorrectedIntensities,
             bool saveObservedMasses)
         {
@@ -345,7 +384,8 @@ namespace MASIC
                 currentScan.FragScanInfo.CollisionMode,
                 StringUtilities.DblToString(parentIonMZ, 2),
                 StringUtilities.DblToString(currentScan.BasePeakIonIntensity, 2),
-                StringUtilities.DblToString(currentScan.BasePeakIonMZ, 4)
+                StringUtilities.DblToString(currentScan.BasePeakIonMZ, 4),
+                parentScan.ToString()
             };
 
             var reporterIntensityList = new List<string>(reporterIons.Count);
@@ -546,7 +586,8 @@ namespace MASIC
             // Resize the target list capacity to large enough to hold all data.
             dataColumns.Capacity = reporterIntensityList.Count + 3 + obsMZList.Count + uncorrectedIntensityList.Count +
                                    ftmsSignalToNoise.Count + ftmsResolution.Count;
-            // Append the maximum reporter ion intensity then the individual reporter ion intensities
+
+            // Append the maximum reporter ion intensity, then the individual reporter ion intensities
             dataColumns.Add(StringUtilities.DblToString(reporterIntensityMax, 2));
             dataColumns.AddRange(reporterIntensityList);
 
@@ -580,7 +621,7 @@ namespace MASIC
                 //    dataColumns.AddRange(ftmsLabelDataMz)
             }
 
-            writer.WriteLine(string.Join(delimiter.ToString(), dataColumns));
+            cachedDataToWrite.Add(currentScan.ScanNumber, dataColumns);
         }
 
         /// <summary>

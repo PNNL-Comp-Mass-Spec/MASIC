@@ -473,7 +473,7 @@ namespace MASIC.DataOutput
                         var scanIndexMatch = clsBinarySearch.BinarySearchFindNearest(
                             scanNumbers,
                             parentIon.Value.OptimalPeakApexScanNumber,
-                            clsBinarySearch.eMissingDataModeConstants.ReturnClosestPoint);
+                            clsBinarySearch.MissingDataModeConstants.ReturnClosestPoint);
 
                         var startScanIndex = (int)Math.Floor(scanIndexMatch - fwhmWidthScans / 2.0);
                         if (startScanIndex < 0)

@@ -57,7 +57,7 @@ namespace MASIC
         /// <summary>
         /// Correlation method
         /// </summary>
-        public enum cmCorrelationMethodConstants
+        public enum CorrelationMethodConstants
         {
             /// <summary>
             /// Pearson correlation
@@ -414,7 +414,7 @@ namespace MASIC
         public float Correlate(
             IReadOnlyList<float> dataList1,
             IReadOnlyList<float> dataList2,
-            cmCorrelationMethodConstants correlationMethod)
+            CorrelationMethodConstants correlationMethod)
         {
             // ReSharper disable once NotAccessedVariable
             float probabilityOfSignificance;
@@ -456,15 +456,15 @@ namespace MASIC
 
                 switch (correlationMethod)
                 {
-                    case cmCorrelationMethodConstants.Pearson:
+                    case CorrelationMethodConstants.Pearson:
                         CorrelatePearson(dataList1, dataList2, out var rValue, out probabilityOfSignificance, out _);
                         return rValue;
 
-                    case cmCorrelationMethodConstants.Spearman:
+                    case CorrelationMethodConstants.Spearman:
                         CorrelateSpearman(dataList1, dataList2, out _, out _, out probabilityOfSignificance, out var RS, out _);
                         return RS;
 
-                    case cmCorrelationMethodConstants.Kendall:
+                    case CorrelationMethodConstants.Kendall:
                         // ReSharper disable once IdentifierTypo
                         CorrelateKendall(dataList1, dataList2, out var kendallsTau, out _, out probabilityOfSignificance);
                         return kendallsTau;

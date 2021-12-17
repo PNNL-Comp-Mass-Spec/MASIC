@@ -544,7 +544,7 @@ namespace MASIC.Options
                         XML_SECTION_EXPORT_OPTIONS, "ExportRawSpectraData", RawDataExportOptions.ExportEnabled);
 
                     RawDataExportOptions.FileFormat =
-                        (RawDataExportOptions.eExportRawDataFileFormatConstants)reader.GetParam(
+                        (RawDataExportOptions.ExportRawDataFileFormatConstants)reader.GetParam(
                             XML_SECTION_EXPORT_OPTIONS,
                             "ExportRawDataFileFormat",
                             (int)RawDataExportOptions.FileFormat);

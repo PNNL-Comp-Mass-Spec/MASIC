@@ -40,7 +40,7 @@ namespace MASIC.DataOutput
                 var surveyScanIndexMatch = clsBinarySearch.BinarySearchFindNearest(
                     scanList.MasterScanNumList,
                     surveyScanNumberAbsolute,
-                    clsBinarySearch.eMissingDataModeConstants.ReturnClosestPoint);
+                    clsBinarySearch.MissingDataModeConstants.ReturnClosestPoint);
 
                 while (surveyScanIndexMatch >= 0 && scanList.MasterScanOrder[surveyScanIndexMatch].ScanType == ScanList.ScanTypeConstants.FragScan)
                 {

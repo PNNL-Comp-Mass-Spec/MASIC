@@ -44,12 +44,12 @@ namespace MASIC.DataOutput
 
                 switch (mOptions.RawDataExportOptions.FileFormat)
                 {
-                    case RawDataExportOptions.eExportRawDataFileFormatConstants.PEKFile:
+                    case RawDataExportOptions.ExportRawDataFileFormatConstants.PEKFile:
                         outputFilePath = DataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, DataOutput.OutputFileTypeConstants.PEKFile);
                         dataWriter = new StreamWriter(outputFilePath);
                         scanInfoWriter = null;
                         break;
-                    case RawDataExportOptions.eExportRawDataFileFormatConstants.CSVFile:
+                    case RawDataExportOptions.ExportRawDataFileFormatConstants.CSVFile:
                         outputFilePath = DataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, DataOutput.OutputFileTypeConstants.DeconToolsIsosFile);
 
                         var outputFilePath2 = DataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, DataOutput.OutputFileTypeConstants.DeconToolsScansFile);
@@ -362,11 +362,11 @@ namespace MASIC.DataOutput
         {
             switch (mOptions.RawDataExportOptions.FileFormat)
             {
-                case RawDataExportOptions.eExportRawDataFileFormatConstants.PEKFile:
+                case RawDataExportOptions.ExportRawDataFileFormatConstants.PEKFile:
                     SavePEKFileToDiskWork(dataWriter, currentScan, spectraCache, inputFileName, fragmentationScan, ref spectrumExportCount);
                     break;
 
-                case RawDataExportOptions.eExportRawDataFileFormatConstants.CSVFile:
+                case RawDataExportOptions.ExportRawDataFileFormatConstants.CSVFile:
                     SaveCSVFilesToDiskWork(dataWriter, scanInfoWriter, currentScan, spectraCache, fragmentationScan, ref spectrumExportCount);
                     break;
 

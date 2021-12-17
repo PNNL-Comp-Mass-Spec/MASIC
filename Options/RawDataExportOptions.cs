@@ -8,7 +8,7 @@
         /// <summary>
         /// Raw data export file formats
         /// </summary>
-        public enum eExportRawDataFileFormatConstants
+        public enum ExportRawDataFileFormatConstants
         {
             /// <summary>
             /// ICR-2LS .pek file
@@ -29,7 +29,7 @@
         /// <summary>
         /// Raw data export file format
         /// </summary>
-        public eExportRawDataFileFormatConstants FileFormat { get; set; }
+        public ExportRawDataFileFormatConstants FileFormat { get; set; }
 
         /// <summary>
         /// When true, include MS/MS spectra
@@ -63,7 +63,7 @@
         {
             ExportEnabled = false;
 
-            FileFormat = eExportRawDataFileFormatConstants.CSVFile;
+            FileFormat = ExportRawDataFileFormatConstants.CSVFile;
             IncludeMSMS = false;
             RenumberScans = false;
 

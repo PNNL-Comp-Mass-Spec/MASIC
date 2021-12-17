@@ -30,7 +30,7 @@ namespace MASIC
                     return clsBinarySearch.BinarySearchFindNearest(
                         scanList.MasterScanNumList,
                         absoluteScanNumber,
-                        clsBinarySearch.eMissingDataModeConstants.ReturnClosestPoint);
+                        clsBinarySearch.MissingDataModeConstants.ReturnClosestPoint);
                 }
 
                 // scanType = CustomSICScanTypeConstants.AcquisitionTime
@@ -38,7 +38,7 @@ namespace MASIC
                 return clsBinarySearch.BinarySearchFindNearest(
                     scanList.MasterScanTimeList,
                     scanOrAcqTime,
-                    clsBinarySearch.eMissingDataModeConstants.ReturnClosestPoint);
+                    clsBinarySearch.MissingDataModeConstants.ReturnClosestPoint);
             }
             catch (Exception ex)
             {

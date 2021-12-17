@@ -394,7 +394,7 @@ namespace MASIC
                 var dataComparer = new Correlation(binningOptions);
                 RegisterEvents(dataComparer);
 
-                const Correlation.cmCorrelationMethodConstants correlationMethod = Correlation.cmCorrelationMethodConstants.Pearson;
+                const Correlation.CorrelationMethodConstants correlationMethod = Correlation.CorrelationMethodConstants.Pearson;
 
                 // Bin the data in the first spectrum
                 var success = CompareSpectraBinData(dataComparer, fragSpectrum1, binnedSpectrum1);

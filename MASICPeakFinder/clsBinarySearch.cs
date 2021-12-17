@@ -14,7 +14,7 @@ namespace MASICPeakFinder
         /// <summary>
         /// Options for handling missing data
         /// </summary>
-        public enum eMissingDataModeConstants
+        public enum MissingDataModeConstants
         {
             /// <summary>
             /// Return the closest point
@@ -43,7 +43,7 @@ namespace MASICPeakFinder
         public static int BinarySearchFindNearest(
             List<int> listToSearch,
             int itemToFind,
-            eMissingDataModeConstants missingDataMode)
+            MissingDataModeConstants missingDataMode)
         {
             if (listToSearch == null || listToSearch.Count == 0)
                 return -1;
@@ -71,10 +71,10 @@ namespace MASICPeakFinder
 
             switch (missingDataMode)
             {
-                case eMissingDataModeConstants.ReturnNextPoint:
+                case MissingDataModeConstants.ReturnNextPoint:
                     return index;
 
-                case eMissingDataModeConstants.ReturnPreviousPoint:
+                case MissingDataModeConstants.ReturnPreviousPoint:
                     return index - 1;
 
                 default:
@@ -101,7 +101,7 @@ namespace MASICPeakFinder
         public static int BinarySearchFindNearest(
             List<float> listToSearch,
             float itemToFind,
-            eMissingDataModeConstants missingDataMode)
+            MissingDataModeConstants missingDataMode)
         {
             if (listToSearch == null || listToSearch.Count == 0)
                 return -1;
@@ -129,10 +129,10 @@ namespace MASICPeakFinder
 
             switch (missingDataMode)
             {
-                case eMissingDataModeConstants.ReturnNextPoint:
+                case MissingDataModeConstants.ReturnNextPoint:
                     return index;
 
-                case eMissingDataModeConstants.ReturnPreviousPoint:
+                case MissingDataModeConstants.ReturnPreviousPoint:
                     return index - 1;
 
                 default:
@@ -159,7 +159,7 @@ namespace MASICPeakFinder
         public static int BinarySearchFindNearest(
             List<double> listToSearch,
             double itemToFind,
-            eMissingDataModeConstants missingDataMode)
+            MissingDataModeConstants missingDataMode)
         {
             if (listToSearch == null || listToSearch.Count == 0)
                 return -1;
@@ -187,10 +187,10 @@ namespace MASICPeakFinder
 
             switch (missingDataMode)
             {
-                case eMissingDataModeConstants.ReturnNextPoint:
+                case MissingDataModeConstants.ReturnNextPoint:
                     return index;
 
-                case eMissingDataModeConstants.ReturnPreviousPoint:
+                case MissingDataModeConstants.ReturnPreviousPoint:
                     return index - 1;
 
                 default:

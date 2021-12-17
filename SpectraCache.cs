@@ -37,7 +37,7 @@ namespace MASIC
 
         private const int SPECTRUM_CACHE_MAX_FILE_AGE_HOURS = 12;
 
-        private enum eCacheStateConstants
+        private enum CacheStateConstants
         {
             /// <summary>
             /// No data present
@@ -181,12 +181,12 @@ namespace MASIC
                 {
                     // Replace the spectrum data with spectrum
                     cacheItem.Scan.ReplaceData(spectrum, scanNumber);
-                    cacheItem.CacheState = eCacheStateConstants.NeverCached;
+                    cacheItem.CacheState = CacheStateConstants.NeverCached;
                 }
                 else
                 {
                     // Need to add the spectrum
-                    AddItemToSpectraPool(new ScanMemoryCacheItem(spectrum, eCacheStateConstants.NeverCached));
+                    AddItemToSpectraPool(new ScanMemoryCacheItem(spectrum, CacheStateConstants.NeverCached));
                 }
 
                 return true;
@@ -409,22 +409,22 @@ namespace MASIC
             if (spectraPool.AddNew(itemToAdd, out var cacheItem))
             {
                 // An item was removed from the spectraPool. Write it to the disk cache if needed.
-                if (cacheItem.CacheState == eCacheStateConstants.LoadedFromCache)
+                if (cacheItem.CacheState == CacheStateConstants.LoadedFromCache)
                 {
                     // Already cached previously, simply reset the slot
                 }
-                else if (cacheItem.CacheState == eCacheStateConstants.NeverCached &&
+                else if (cacheItem.CacheState == CacheStateConstants.NeverCached &&
                          ValidatePageFileIO(true))
                 {
                     // Store all of the spectra in one large file
                     CacheSpectrumWork(cacheItem.Scan);
                 }
 
-                if (cacheItem.CacheState != eCacheStateConstants.UnusedSlot)
+                if (cacheItem.CacheState != CacheStateConstants.UnusedSlot)
                 {
                     // Reset .ScanNumber, .IonCount, and .CacheState
                     cacheItem.Scan.Clear(0);
-                    cacheItem.CacheState = eCacheStateConstants.UnusedSlot;
+                    cacheItem.CacheState = CacheStateConstants.UnusedSlot;
 
                     CacheEventCount++;
                 }
@@ -494,7 +494,7 @@ namespace MASIC
         private bool UnCacheSpectrum(int scanNumber, out MSSpectrum msSpectrum)
         {
             // Make sure we have a valid object
-            var cacheItem = new ScanMemoryCacheItem(new MSSpectrum(scanNumber), eCacheStateConstants.LoadedFromCache);
+            var cacheItem = new ScanMemoryCacheItem(new MSSpectrum(scanNumber), CacheStateConstants.LoadedFromCache);
 
             msSpectrum = cacheItem.Scan;
 
@@ -506,7 +506,7 @@ namespace MASIC
                 msSpectrum.Clear(scanNumber);
             }
 
-            cacheItem.CacheState = eCacheStateConstants.LoadedFromCache;
+            cacheItem.CacheState = CacheStateConstants.LoadedFromCache;
             AddItemToSpectraPool(cacheItem);
 
             return true;
@@ -714,7 +714,7 @@ namespace MASIC
             /// <summary>
             /// Cache state
             /// </summary>
-            public eCacheStateConstants CacheState { get; set; }
+            public CacheStateConstants CacheState { get; set; }
 
             /// <summary>
             /// Mass Spectrum
@@ -726,7 +726,7 @@ namespace MASIC
             /// </summary>
             /// <param name="scan"></param>
             /// <param name="cacheState"></param>
-            public ScanMemoryCacheItem(MSSpectrum scan, eCacheStateConstants cacheState = eCacheStateConstants.NeverCached)
+            public ScanMemoryCacheItem(MSSpectrum scan, CacheStateConstants cacheState = CacheStateConstants.NeverCached)
             {
                 Scan = scan;
                 CacheState = cacheState;
