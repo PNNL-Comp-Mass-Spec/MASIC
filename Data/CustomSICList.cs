@@ -5,12 +5,12 @@ using System.Linq;
 using MASICPeakFinder;
 using PRISM;
 
-namespace MASIC
+namespace MASIC.Data
 {
     /// <summary>
     /// Custom SIC list container
     /// </summary>
-    public class clsCustomSICList : EventNotifier
+    public class CustomSICList : EventNotifier
     {
         // Ignore Spelling: frag, acq, Da
 
@@ -90,7 +90,7 @@ namespace MASIC
         /// <summary>
         /// List of m/z values to search for
         /// </summary>
-        public List<clsCustomMZSearchSpec> CustomMZSearchValues { get; }
+        public List<CustomMZSearchSpec> CustomMZSearchValues { get; }
 
         /// <summary>
         /// When True, only search for the m/z values listed in the custom m/z list
@@ -122,9 +122,9 @@ namespace MASIC
         /// <summary>
         /// Constructor
         /// </summary>
-        public clsCustomSICList()
+        public CustomSICList()
         {
-            CustomMZSearchValues = new List<clsCustomMZSearchSpec>();
+            CustomMZSearchValues = new List<CustomMZSearchSpec>();
         }
 
         /// <summary>
@@ -135,7 +135,7 @@ namespace MASIC
         /// <param name="sicToleranceIsPPM"></param>
         /// <param name="defaultScanOrAcqTimeTolerance"></param>
         public void AddCustomSICValues(
-            clsScanList scanList,
+            ScanList scanList,
             double defaultSICTolerance,
             bool sicToleranceIsPPM,
             float defaultScanOrAcqTimeTolerance)
@@ -150,13 +150,13 @@ namespace MASIC
                     return;
                 }
 
-                var scanNumScanConverter = new clsScanNumScanTimeConversion();
+                var scanNumScanConverter = new ScanNumScanTimeConversion();
                 RegisterEvents(scanNumScanConverter);
 
                 foreach (var customMzSearchValue in CustomMZSearchValues)
                 {
                     // Add a new parent ion entry to .ParentIons() for this custom MZ value
-                    var currentParentIon = new clsParentIonInfo(customMzSearchValue.MZ);
+                    var currentParentIon = new ParentIonInfo(customMzSearchValue.MZ);
 
                     if (customMzSearchValue.ScanOrAcqTimeCenter < float.Epsilon)
                     {
@@ -188,7 +188,7 @@ namespace MASIC
                             surveyScanNumberAbsolute,
                             clsBinarySearch.eMissingDataModeConstants.ReturnClosestPoint);
 
-                        while (fragScanIndexMatch < scanList.MasterScanOrderCount && scanList.MasterScanOrder[fragScanIndexMatch].ScanType == clsScanList.ScanTypeConstants.SurveyScan)
+                        while (fragScanIndexMatch < scanList.MasterScanOrderCount && scanList.MasterScanOrder[fragScanIndexMatch].ScanType == ScanList.ScanTypeConstants.SurveyScan)
                         {
                             fragScanIndexMatch++;
                         }
@@ -197,7 +197,7 @@ namespace MASIC
                         {
                             // Did not find the next frag scan; find the previous frag scan
                             fragScanIndexMatch--;
-                            while (fragScanIndexMatch > 0 && scanList.MasterScanOrder[fragScanIndexMatch].ScanType == clsScanList.ScanTypeConstants.SurveyScan)
+                            while (fragScanIndexMatch > 0 && scanList.MasterScanOrder[fragScanIndexMatch].ScanType == ScanList.ScanTypeConstants.SurveyScan)
                             {
                                 fragScanIndexMatch--;
                             }
@@ -209,7 +209,7 @@ namespace MASIC
                         // This is a custom SIC-based parent ion
                         // Prior to August 2014, we set .FragScanIndices[0] = 0, which made it appear that the fragmentation scan was the first MS2 spectrum in the dataset for all custom SICs
                         // This caused undesirable display results in MASIC browser, so we now set it to the next MS2 scan that occurs after the survey scan (parent scan)
-                        if (scanList.MasterScanOrder[fragScanIndexMatch].ScanType == clsScanList.ScanTypeConstants.FragScan)
+                        if (scanList.MasterScanOrder[fragScanIndexMatch].ScanType == ScanList.ScanTypeConstants.FragScan)
                         {
                             currentParentIon.FragScanIndices.Add(scanList.MasterScanOrder[fragScanIndexMatch].ScanIndexPointer);
                         }
@@ -228,7 +228,7 @@ namespace MASIC
                     {
                         if (sicToleranceIsPPM)
                         {
-                            currentParentIon.CustomSICPeakMZToleranceDa = clsUtilities.PPMToMass(defaultSICTolerance, currentParentIon.MZ);
+                            currentParentIon.CustomSICPeakMZToleranceDa = Utilities.PPMToMass(defaultSICTolerance, currentParentIon.MZ);
                         }
                         else
                         {
@@ -278,7 +278,7 @@ namespace MASIC
         /// Append a custom m/z value to CustomMZSearchValues
         /// </summary>
         /// <param name="mzSearchSpec"></param>
-        public void AddMzSearchTarget(clsCustomMZSearchSpec mzSearchSpec)
+        public void AddMzSearchTarget(CustomMZSearchSpec mzSearchSpec)
         {
             if (CustomMZSearchValues.Count > 0)
             {
@@ -350,7 +350,7 @@ namespace MASIC
                     continue;
                 }
 
-                var mzSearchSpec = new clsCustomMZSearchSpec(targetMz)
+                var mzSearchSpec = new CustomMZSearchSpec(targetMz)
                 {
                     MZToleranceDa = 0,
                     ScanOrAcqTimeCenter = 0,                 // Set to 0 to indicate that the entire file should be searched
@@ -359,7 +359,7 @@ namespace MASIC
 
                 if (scanCenters.Count > index)
                 {
-                    if (clsUtilities.IsNumber(scanCenters[index]))
+                    if (Utilities.IsNumber(scanCenters[index]))
                     {
                         if (ScanToleranceType == CustomSICScanTypeConstants.Absolute)
                         {
@@ -375,7 +375,7 @@ namespace MASIC
 
                 if (scanTolerances.Count > index)
                 {
-                    if (clsUtilities.IsNumber(scanTolerances[index]))
+                    if (Utilities.IsNumber(scanTolerances[index]))
                     {
                         if (ScanToleranceType == CustomSICScanTypeConstants.Absolute)
                         {
@@ -391,7 +391,7 @@ namespace MASIC
 
                 if (mzToleranceDa.Count > index)
                 {
-                    if (clsUtilities.IsNumber(mzToleranceDa[index]))
+                    if (Utilities.IsNumber(mzToleranceDa[index]))
                     {
                         mzSearchSpec.MZToleranceDa = double.Parse(mzToleranceDa[index]);
                     }
@@ -498,7 +498,7 @@ namespace MASIC
 
             for (var index = 0; index < mzList.Length; index++)
             {
-                var mzSearchSpec = new clsCustomMZSearchSpec(mzList[index]);
+                var mzSearchSpec = new CustomMZSearchSpec(mzList[index]);
 
                 if (mzToleranceList.Length > index && mzToleranceList[index] > 0)
                 {
@@ -554,7 +554,7 @@ namespace MASIC
         public bool SetCustomSICListValues(
             CustomSICScanTypeConstants scanType,
             float scanOrAcqTimeToleranceValue,
-            List<clsCustomMZSearchSpec> mzSearchSpecs)
+            List<CustomMZSearchSpec> mzSearchSpecs)
         {
             ResetMzSearchValues();
 

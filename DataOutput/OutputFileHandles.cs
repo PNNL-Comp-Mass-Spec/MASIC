@@ -6,7 +6,7 @@ namespace MASIC.DataOutput
     /// <summary>
     /// Container for output file handles
     /// </summary>
-    public class clsOutputFileHandles : clsMasicEventNotifier
+    public class OutputFileHandles : MasicEventNotifier
     {
         /// <summary>
         /// Scan stats file

@@ -1,4 +1,5 @@
 ﻿using System;
+using MASIC.Data;
 
 namespace MASIC
 {
@@ -19,7 +20,7 @@ namespace MASIC
     /// CorrectionFactorsiTRAQ4Plex.BroadInstitute
     /// </remarks>
     // ReSharper restore CommentTypo
-    public class clsITraqIntensityCorrection
+    public class ITraqIntensityCorrection
     {
         // ReSharper disable CommentTypo
 
@@ -82,7 +83,7 @@ namespace MASIC
         /// <summary>
         /// Reporter ion mode
         /// </summary>
-        public clsReporterIons.ReporterIonMassModeConstants ReporterIonMode { get; private set; }
+        public ReporterIons.ReporterIonMassModeConstants ReporterIonMode { get; private set; }
 
         /// <summary>
         /// 4-plex iTRAQ correction factor type
@@ -94,7 +95,7 @@ namespace MASIC
         /// </summary>
         /// <param name="reporterIonMode">iTRAQ or TMT mode</param>
         // ReSharper disable once UnusedMember.Global
-        public clsITraqIntensityCorrection(clsReporterIons.ReporterIonMassModeConstants reporterIonMode)
+        public ITraqIntensityCorrection(ReporterIons.ReporterIonMassModeConstants reporterIonMode)
             : this(reporterIonMode, CorrectionFactorsiTRAQ4Plex.ABSciex)
         {
         }
@@ -105,14 +106,14 @@ namespace MASIC
         /// <param name="reporterIonMode">iTRAQ or TMT mode</param>
         /// <param name="iTraqCorrectionFactorType">Correction factor type for 4-plex iTRAQ</param>
         /// <remarks>The iTraqCorrectionFactorType parameter is only used if reporterIonMode is ITraqFourMZ</remarks>
-        public clsITraqIntensityCorrection(clsReporterIons.ReporterIonMassModeConstants reporterIonMode, CorrectionFactorsiTRAQ4Plex iTraqCorrectionFactorType)
+        public ITraqIntensityCorrection(ReporterIons.ReporterIonMassModeConstants reporterIonMode, CorrectionFactorsiTRAQ4Plex iTraqCorrectionFactorType)
         {
             ReporterIonMode = reporterIonMode;
             ITraq4PlexCorrectionFactorType = iTraqCorrectionFactorType;
 
             mMatrixUtility = new MatrixDecompositionUtility.LUDecomposition();
 
-            if (ReporterIonMode == clsReporterIons.ReporterIonMassModeConstants.CustomOrNone)
+            if (ReporterIonMode == ReporterIons.ReporterIonMassModeConstants.CustomOrNone)
             {
                 return;
             }
@@ -125,7 +126,7 @@ namespace MASIC
         /// </summary>
         /// <param name="reporterIonMode"></param>
         // ReSharper disable once UnusedMember.Global
-        public void UpdateReporterIonMode(clsReporterIons.ReporterIonMassModeConstants reporterIonMode)
+        public void UpdateReporterIonMode(ReporterIons.ReporterIonMassModeConstants reporterIonMode)
         {
             UpdateReporterIonMode(reporterIonMode, ITraq4PlexCorrectionFactorType);
         }
@@ -135,7 +136,7 @@ namespace MASIC
         /// </summary>
         /// <param name="reporterIonMode"></param>
         /// <param name="iTraqCorrectionFactorType"></param>
-        public void UpdateReporterIonMode(clsReporterIons.ReporterIonMassModeConstants reporterIonMode, CorrectionFactorsiTRAQ4Plex iTraqCorrectionFactorType)
+        public void UpdateReporterIonMode(ReporterIons.ReporterIonMassModeConstants reporterIonMode, CorrectionFactorsiTRAQ4Plex iTraqCorrectionFactorType)
         {
             if (ReporterIonMode != reporterIonMode || ITraq4PlexCorrectionFactorType != iTraqCorrectionFactorType)
             {
@@ -182,7 +183,7 @@ namespace MASIC
         public bool ApplyCorrection(double[] reporterIonIntensities, bool debugShowIntensities = false)
         {
             var matrixSize = GetMatrixLength(ReporterIonMode);
-            var reporterIonMode = clsReporterIons.GetReporterIonModeDescription(ReporterIonMode);
+            var reporterIonMode = ReporterIons.GetReporterIonModeDescription(ReporterIonMode);
 
             if (reporterIonIntensities.Length != matrixSize)
             {
@@ -251,16 +252,16 @@ namespace MASIC
             return true;
         }
 
-        private int GetMatrixLength(clsReporterIons.ReporterIonMassModeConstants reporterIonMode)
+        private int GetMatrixLength(ReporterIons.ReporterIonMassModeConstants reporterIonMode)
         {
             return reporterIonMode switch
             {
-                clsReporterIons.ReporterIonMassModeConstants.ITraqFourMZ => FOUR_PLEX_MATRIX_LENGTH,
-                clsReporterIons.ReporterIonMassModeConstants.ITraqEightMZHighRes => EIGHT_PLEX_HIGH_RES_MATRIX_LENGTH,
-                clsReporterIons.ReporterIonMassModeConstants.ITraqEightMZLowRes => EIGHT_PLEX_LOW_RES_MATRIX_LENGTH,
-                clsReporterIons.ReporterIonMassModeConstants.TMTTenMZ => TEN_PLEX_TMT_MATRIX_LENGTH,
-                clsReporterIons.ReporterIonMassModeConstants.TMTElevenMZ => ELEVEN_PLEX_TMT_MATRIX_LENGTH,
-                clsReporterIons.ReporterIonMassModeConstants.TMTSixteenMZ => SIXTEEN_PLEX_TMT_MATRIX_LENGTH,
+                ReporterIons.ReporterIonMassModeConstants.ITraqFourMZ => FOUR_PLEX_MATRIX_LENGTH,
+                ReporterIons.ReporterIonMassModeConstants.ITraqEightMZHighRes => EIGHT_PLEX_HIGH_RES_MATRIX_LENGTH,
+                ReporterIons.ReporterIonMassModeConstants.ITraqEightMZLowRes => EIGHT_PLEX_LOW_RES_MATRIX_LENGTH,
+                ReporterIons.ReporterIonMassModeConstants.TMTTenMZ => TEN_PLEX_TMT_MATRIX_LENGTH,
+                ReporterIons.ReporterIonMassModeConstants.TMTElevenMZ => ELEVEN_PLEX_TMT_MATRIX_LENGTH,
+                ReporterIons.ReporterIonMassModeConstants.TMTSixteenMZ => SIXTEEN_PLEX_TMT_MATRIX_LENGTH,
                 _ => throw new ArgumentOutOfRangeException("Invalid value for reporterIonMode in GetMatrixLength: " + reporterIonMode)
             };
         }
@@ -310,7 +311,7 @@ namespace MASIC
 
             switch (ReporterIonMode)
             {
-                case clsReporterIons.ReporterIonMassModeConstants.ITraqFourMZ:
+                case ReporterIons.ReporterIonMassModeConstants.ITraqFourMZ:
                     if (ITraq4PlexCorrectionFactorType == CorrectionFactorsiTRAQ4Plex.ABSciex)
                     {
                         // 4-plex ITraq, isotope contribution table
@@ -372,7 +373,7 @@ namespace MASIC
                     mCoeffs[3, 3] = udtIsoPct117.Zero;
                     break;
 
-                case clsReporterIons.ReporterIonMassModeConstants.ITraqEightMZHighRes:
+                case ReporterIons.ReporterIonMassModeConstants.ITraqEightMZHighRes:
                     // 8-plex ITraq, isotope contribution table for High Res MS/MS
                     // Source percentages provided by Applied Biosystems
                     // Note there is a 2 Da jump between 119 and 121, which is why 7.44 and 0.87 are not included in mCoeffs()
@@ -442,7 +443,7 @@ namespace MASIC
                     mCoeffs[7, 7] = udtIsoPct121.Zero;
                     break;
 
-                case clsReporterIons.ReporterIonMassModeConstants.ITraqEightMZLowRes:
+                case ReporterIons.ReporterIonMassModeConstants.ITraqEightMZLowRes:
                     // 8-plex ITraq, isotope contribution table for Low Res MS/MS
 
                     // ReSharper disable CommentTypo
@@ -527,8 +528,8 @@ namespace MASIC
                     mCoeffs[8, 8] = udtIsoPct121.Zero;
                     break;
 
-                case clsReporterIons.ReporterIonMassModeConstants.TMTTenMZ:
-                case clsReporterIons.ReporterIonMassModeConstants.TMTElevenMZ:
+                case ReporterIons.ReporterIonMassModeConstants.TMTTenMZ:
+                case ReporterIons.ReporterIonMassModeConstants.TMTElevenMZ:
                     // 10-plex TMT and 11-plex TMT, isotope contribution table for High Res MS/MS
                     // Source percentages provided by Thermo
 
@@ -686,7 +687,7 @@ namespace MASIC
 
                     break;
 
-                case clsReporterIons.ReporterIonMassModeConstants.TMTSixteenMZ:
+                case ReporterIons.ReporterIonMassModeConstants.TMTSixteenMZ:
                     // 16-plex TMT, isotope contribution table for High Res MS/MS
                     // Source percentages provided by Thermo
 

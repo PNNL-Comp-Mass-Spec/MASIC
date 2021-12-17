@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using ThermoRawFileReader;
 
-namespace MASIC
+namespace MASIC.Data
 {
     /// <summary>
     /// Used to track all spectra (scans) in the instrument data file
     /// </summary>
-    public class clsScanList : clsMasicEventNotifier
+    public class ScanList : MasicEventNotifier
     {
         /// <summary>
         /// Scan types
@@ -61,12 +61,12 @@ namespace MASIC
         /// <summary>
         /// List of survey scans, the order is the same as in the original data file, and thus is by increasing scan number
         /// </summary>
-        public readonly List<clsScanInfo> SurveyScans;
+        public readonly List<ScanInfo> SurveyScans;
 
         /// <summary>
         /// List of fragmentation scans, the order is the same as in the original data file, and thus is by increasing scan number
         /// </summary>
-        public readonly List<clsScanInfo> FragScans;
+        public readonly List<ScanInfo> FragScans;
 
         /// <summary>
         /// List holding pointers to either the SurveyScans or FragScans lists, in order of scan number
@@ -86,7 +86,7 @@ namespace MASIC
         /// <summary>
         /// List of parent ions
         /// </summary>
-        public readonly List<clsParentIonInfo> ParentIons;
+        public readonly List<ParentIonInfo> ParentIons;
 
         /// <summary>
         /// Number of items in MasterScanOrder
@@ -111,16 +111,16 @@ namespace MASIC
         /// <summary>
         /// Constructor
         /// </summary>
-        public clsScanList()
+        public ScanList()
         {
-            SurveyScans = new List<clsScanInfo>(8);
-            FragScans = new List<clsScanInfo>(8);
+            SurveyScans = new List<ScanInfo>(8);
+            FragScans = new List<ScanInfo>(8);
 
             MasterScanOrder = new List<ScanOrderPointerType>(8);
             MasterScanNumList = new List<int>(8);
             MasterScanTimeList = new List<float>(8);
 
-            ParentIons = new List<clsParentIonInfo>(8);
+            ParentIons = new List<ParentIonInfo>(8);
         }
 
         /// <summary>
@@ -260,10 +260,10 @@ namespace MASIC
             ParentIons.Capacity = ParentIons.Count;
         }
 
-        private clsScanInfo GetFakeSurveyScan(int scanNumber, float scanTime)
+        private ScanInfo GetFakeSurveyScan(int scanNumber, float scanTime)
         {
             // ReSharper disable once UseObjectOrCollectionInitializer
-            var surveyScan = new clsScanInfo
+            var surveyScan = new ScanInfo
             {
                 ScanNumber = scanNumber,
                 ScanTime = scanTime,

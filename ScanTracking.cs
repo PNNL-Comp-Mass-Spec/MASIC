@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using MASIC.Data;
 using MASIC.DatasetStats;
 using MASIC.Options;
 using MASICPeakFinder;
@@ -9,7 +10,7 @@ namespace MASIC
     /// <summary>
     /// Class for tracking scan metadata
     /// </summary>
-    public class clsScanTracking : clsMasicEventNotifier
+    public class ScanTracking : MasicEventNotifier
     {
         /// <summary>
         /// Absolute maximum number of ions that will be tracked for a mass spectrum
@@ -21,7 +22,7 @@ namespace MASIC
         /// </summary>
         public List<ScanStatsEntry> ScanStats { get; }
 
-        private readonly clsReporterIons mReporterIons;
+        private readonly ReporterIons mReporterIons;
 
         private readonly clsMASICPeakFinder mPeakFinder;
 
@@ -34,7 +35,7 @@ namespace MASIC
         /// </summary>
         /// <param name="reporterIons"></param>
         /// <param name="peakFinder"></param>
-        public clsScanTracking(clsReporterIons reporterIons, clsMASICPeakFinder peakFinder)
+        public ScanTracking(ReporterIons reporterIons, clsMASICPeakFinder peakFinder)
         {
             mReporterIons = reporterIons;
             mPeakFinder = peakFinder;
@@ -109,7 +110,7 @@ namespace MASIC
         }
 
         private void CompressSpectraData(
-            clsMSSpectrum msSpectrum,
+            MSSpectrum msSpectrum,
             double msDataResolution,
             double mzIgnoreRangeStart,
             double mzIgnoreRangeEnd)
@@ -197,13 +198,13 @@ namespace MASIC
                 // Only combine data if the first data point has a positive intensity value
                 if (msSpectrum.IonsIntensity[index] > 0)
                 {
-                    var pointInIgnoreRange = clsUtilities.CheckPointInMZIgnoreRange(msSpectrum.IonsMZ[index], mzIgnoreRangeStart, mzIgnoreRangeEnd);
+                    var pointInIgnoreRange = Utilities.CheckPointInMZIgnoreRange(msSpectrum.IonsMZ[index], mzIgnoreRangeStart, mzIgnoreRangeEnd);
 
                     if (!pointInIgnoreRange)
                     {
                         for (var comparisonIndex = index + 1; comparisonIndex < msSpectrum.IonCount; comparisonIndex++)
                         {
-                            if (clsUtilities.CheckPointInMZIgnoreRange(msSpectrum.IonsMZ[comparisonIndex], mzIgnoreRangeStart, mzIgnoreRangeEnd))
+                            if (Utilities.CheckPointInMZIgnoreRange(msSpectrum.IonsMZ[comparisonIndex], mzIgnoreRangeStart, mzIgnoreRangeEnd))
                             {
                                 // Reached the ignore range; do not allow to be combined with the current data point
                                 break;
@@ -246,8 +247,8 @@ namespace MASIC
         }
 
         private void ComputeNoiseLevelForMassSpectrum(
-            clsScanInfo scanInfo,
-            clsMSSpectrum msSpectrum,
+            ScanInfo scanInfo,
+            MSSpectrum msSpectrum,
             clsBaselineNoiseOptions noiseThresholdOptions)
         {
             const bool IGNORE_NON_POSITIVE_DATA = true;
@@ -284,10 +285,10 @@ namespace MASIC
         /// <param name="keepRawSpectrum"></param>
         /// <returns>True if success false if an error</returns>
         public bool ProcessAndStoreSpectrum(
-            clsScanInfo scanInfo,
-            DataInput.clsDataImport dataImportUtilities,
-            clsSpectraCache spectraCache,
-            clsMSSpectrum msSpectrum,
+            ScanInfo scanInfo,
+            DataInput.DataImport dataImportUtilities,
+            SpectraCache spectraCache,
+            MSSpectrum msSpectrum,
             clsBaselineNoiseOptions noiseThresholdOptions,
             bool discardLowIntensityData,
             bool compressData,

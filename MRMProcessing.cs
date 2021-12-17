@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using MASIC.Data;
 using MASIC.DataOutput;
 using MASIC.Options;
 using MASICPeakFinder;
@@ -12,7 +13,7 @@ namespace MASIC
     /// <summary>
     /// MRM processing class
     /// </summary>
-    public class clsMRMProcessing : clsMasicEventNotifier
+    public class MRMProcessing : MasicEventNotifier
     {
         // Ignore Spelling: crosstab, mrm, srm
 
@@ -28,16 +29,16 @@ namespace MASIC
         }
 
         private readonly MASICOptions mOptions;
-        private readonly clsDataAggregation mDataAggregation;
-        private readonly clsDataOutput mDataOutputHandler;
+        private readonly DataAggregation mDataAggregation;
+        private readonly DataOutput.DataOutput mDataOutputHandler;
 
         /// <summary>
         /// Constructor
         /// </summary>
-        public clsMRMProcessing(MASICOptions masicOptions, clsDataOutput dataOutputHandler)
+        public MRMProcessing(MASICOptions masicOptions, DataOutput.DataOutput dataOutputHandler)
         {
             mOptions = masicOptions;
-            mDataAggregation = new clsDataAggregation();
+            mDataAggregation = new DataAggregation();
             RegisterEvents(mDataAggregation);
 
             mDataOutputHandler = dataOutputHandler;
@@ -54,14 +55,14 @@ namespace MASIC
         }
 
         private bool DetermineMRMSettings(
-            clsScanList scanList,
-            out List<clsMRMScanInfo> mrmSettings,
+            ScanList scanList,
+            out List<MRMScanInfo> mrmSettings,
             out List<SRMListType> srmList)
         {
             // Returns true if this dataset has MRM data and if it is parsed successfully
             // Returns false if the dataset does not have MRM data, or if an error occurs
 
-            mrmSettings = new List<clsMRMScanInfo>(200);
+            mrmSettings = new List<MRMScanInfo>(200);
             srmList = new List<SRMListType>(600); // Assume there are 3 fragmentation masses for each parent mass
 
             try
@@ -70,7 +71,7 @@ namespace MASIC
                 UpdateProgress(0, "Determining MRM settings");
 
                 // Initialize the tracking arrays
-                var mrmHashToIndexMap = new Dictionary<string, clsMRMScanInfo>();
+                var mrmHashToIndexMap = new Dictionary<string, MRMScanInfo>();
 
                 // Construct a list of the MRM search values used
                 foreach (var fragScan in scanList.FragScans)
@@ -146,11 +147,11 @@ namespace MASIC
         /// </summary>
         /// <param name="sourceInfo"></param>
         /// <param name="parentIonMZ"></param>
-        public static clsMRMScanInfo DuplicateMRMInfo(
+        public static MRMScanInfo DuplicateMRMInfo(
             MRMInfo sourceInfo,
             double parentIonMZ)
         {
-            var targetInfo = new clsMRMScanInfo
+            var targetInfo = new MRMScanInfo
             {
                 ParentIonMZ = parentIonMZ,
                 MRMMassCount = sourceInfo.MRMMassList.Count,
@@ -175,9 +176,9 @@ namespace MASIC
         /// Duplicate MRM info
         /// </summary>
         /// <param name="sourceInfo"></param>
-        private clsMRMScanInfo DuplicateMRMInfo(clsMRMScanInfo sourceInfo)
+        private MRMScanInfo DuplicateMRMInfo(MRMScanInfo sourceInfo)
         {
-            var targetInfo = new clsMRMScanInfo
+            var targetInfo = new MRMScanInfo
             {
                 ParentIonMZ = sourceInfo.ParentIonMZ,
                 MRMMassCount = sourceInfo.MRMMassCount,
@@ -206,8 +207,8 @@ namespace MASIC
         /// <param name="inputFileName"></param>
         /// <param name="outputDirectoryPath"></param>
         public bool ExportMRMDataToDisk(
-            clsScanList scanList,
-            clsSpectraCache spectraCache,
+            ScanList scanList,
+            SpectraCache spectraCache,
             string inputFileName,
             string outputDirectoryPath)
         {
@@ -230,9 +231,9 @@ namespace MASIC
         /// <param name="outputDirectoryPath"></param>
         /// <returns>True if the MRM data is successfully written to disk, or if the mrmSettings list is empty</returns>
         private bool ExportMRMDataToDisk(
-            clsScanList scanList,
-            clsSpectraCache spectraCache,
-            IReadOnlyList<clsMRMScanInfo> mrmSettings,
+            ScanList scanList,
+            SpectraCache spectraCache,
+            IReadOnlyList<MRMScanInfo> mrmSettings,
             IReadOnlyList<SRMListType> srmList,
             string inputFileName,
             string outputDirectoryPath)
@@ -255,12 +256,12 @@ namespace MASIC
                 UpdateProgress(0, "Exporting MRM data");
 
                 // Write out the MRM Settings
-                var mrmSettingsFilePath = clsDataOutput.ConstructOutputFilePath(
-                    inputFileName, outputDirectoryPath, clsDataOutput.OutputFileTypeConstants.MRMSettingsFile);
+                var mrmSettingsFilePath = DataOutput.DataOutput.ConstructOutputFilePath(
+                    inputFileName, outputDirectoryPath, DataOutput.DataOutput.OutputFileTypeConstants.MRMSettingsFile);
 
                 using var settingsWriter = new StreamWriter(mrmSettingsFilePath);
 
-                settingsWriter.WriteLine(mDataOutputHandler.GetHeadersForOutputFile(scanList, clsDataOutput.OutputFileTypeConstants.MRMSettingsFile));
+                settingsWriter.WriteLine(mDataOutputHandler.GetHeadersForOutputFile(scanList, DataOutput.DataOutput.OutputFileTypeConstants.MRMSettingsFile));
 
                 var dataColumns = new List<string>(7);
 
@@ -294,17 +295,17 @@ namespace MASIC
                     if (mOptions.WriteMRMDataList)
                     {
                         // Write out the raw MRM Data
-                        var dataFilePath = clsDataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, clsDataOutput.OutputFileTypeConstants.MRMDatafile);
+                        var dataFilePath = DataOutput.DataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, DataOutput.DataOutput.OutputFileTypeConstants.MRMDatafile);
                         dataWriter = new StreamWriter(dataFilePath);
 
                         // Write the file headers
-                        dataWriter.WriteLine(mDataOutputHandler.GetHeadersForOutputFile(scanList, clsDataOutput.OutputFileTypeConstants.MRMDatafile));
+                        dataWriter.WriteLine(mDataOutputHandler.GetHeadersForOutputFile(scanList, DataOutput.DataOutput.OutputFileTypeConstants.MRMDatafile));
                     }
 
                     if (mOptions.WriteMRMIntensityCrosstab)
                     {
                         // Write out the raw MRM Data
-                        var crosstabFilePath = clsDataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, clsDataOutput.OutputFileTypeConstants.MRMCrosstabFile);
+                        var crosstabFilePath = DataOutput.DataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, DataOutput.DataOutput.OutputFileTypeConstants.MRMCrosstabFile);
                         crosstabWriter = new StreamWriter(crosstabFilePath);
 
                         // Initialize the crosstab header variable using the data in srmList()
@@ -502,7 +503,7 @@ namespace MASIC
             }
         }
 
-        private string GenerateMRMInfoHash(clsMRMScanInfo mrmScanInfo)
+        private string GenerateMRMInfoHash(MRMScanInfo mrmScanInfo)
         {
             var hashValue = mrmScanInfo.ParentIonMZ + "_" + mrmScanInfo.MRMMassCount;
 
@@ -519,7 +520,7 @@ namespace MASIC
 
         private bool MRMParentDaughterMatch(
             SRMListType udtSRMListEntry,
-            clsMRMScanInfo mrmSettingsEntry,
+            MRMScanInfo mrmSettingsEntry,
             int mrmMassIndex)
         {
             return MRMParentDaughterMatch(
@@ -551,19 +552,19 @@ namespace MASIC
         /// <param name="peakFinder"></param>
         /// <param name="parentIonsProcessed"></param>
         public bool ProcessMRMList(
-            clsScanList scanList,
-            clsSpectraCache spectraCache,
-            clsSICProcessing sicProcessor,
-            clsXMLResultsWriter xmlResultsWriter,
+            ScanList scanList,
+            SpectraCache spectraCache,
+            SICProcessing sicProcessor,
+            XMLResultsWriter xmlResultsWriter,
             clsMASICPeakFinder peakFinder,
             ref int parentIonsProcessed)
         {
             try
             {
                 // Initialize sicDetails
-                var sicDetails = new clsSICDetails();
+                var sicDetails = new SICDetails();
                 sicDetails.Reset();
-                sicDetails.SICScanType = clsScanList.ScanTypeConstants.FragScan;
+                sicDetails.SICScanType = ScanList.ScanTypeConstants.FragScan;
 
                 for (var parentIonIndex = 0; parentIonIndex < scanList.ParentIons.Count; parentIonIndex++)
                 {

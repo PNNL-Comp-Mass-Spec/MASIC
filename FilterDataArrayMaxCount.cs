@@ -12,7 +12,7 @@ namespace MASIC
     /// This method will determine which data points to retain
     /// For the remaining points, their data values will be changed to SkipDataPointFlag (defaults to -1)
     /// </remarks>
-    public class clsFilterDataArrayMaxCount
+    public class FilterDataArrayMaxCount
     {
         private const int INITIAL_MEMORY_RESERVE = 50000;
 
@@ -74,7 +74,7 @@ namespace MASIC
         /// <summary>
         /// Constructor
         /// </summary>
-        public clsFilterDataArrayMaxCount()
+        public FilterDataArrayMaxCount()
             : this(INITIAL_MEMORY_RESERVE)
         {
         }
@@ -83,7 +83,7 @@ namespace MASIC
         /// Constructor
         /// </summary>
         /// <param name="initialCapacity"></param>
-        public clsFilterDataArrayMaxCount(int initialCapacity)
+        public FilterDataArrayMaxCount(int initialCapacity)
         {
             SkipDataPointFlag = DEFAULT_SKIP_DATA_POINT_FLAG;
             Clear(initialCapacity);

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using MASIC.Data;
 using PRISM;
 
 namespace MASIC
@@ -8,7 +9,7 @@ namespace MASIC
     /// This class looks for ions in a given m/z range and combines their intensity values
     /// (reporting either the summed value or the maximum value)
     /// </summary>
-    public class clsDataAggregation : EventNotifier
+    public class DataAggregation : EventNotifier
     {
         // Ignore Spelling: uncaching
 
@@ -29,7 +30,7 @@ namespace MASIC
         /// For sparse spectra, you can alternatively use FindMaxValueInMZRange
         /// </remarks>
         public double AggregateIonsInRange(
-            clsMSSpectrum msSpectrum,
+            MSSpectrum msSpectrum,
             double searchMZ,
             double searchToleranceHalfWidth,
             out int ionMatchCount,
@@ -108,8 +109,8 @@ namespace MASIC
         /// As an alternative to this function, use AggregateIonsInRange
         /// </remarks>
         public bool FindMaxValueInMZRange(
-            clsSpectraCache spectraCache,
-            clsScanInfo currentScan,
+            SpectraCache spectraCache,
+            ScanInfo currentScan,
             double mzStart,
             double mzEnd,
             out double bestMatchMZ,

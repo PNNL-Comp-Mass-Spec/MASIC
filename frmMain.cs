@@ -22,6 +22,7 @@ using System.IO;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
+using MASIC.Data;
 using MASIC.DataInput;
 using MASIC.Options;
 using PRISM;
@@ -58,7 +59,7 @@ namespace MASIC
             mCacheOptions = new SpectrumCacheOptions();
             mDefaultCustomSICList = new List<CustomSICEntryType>();
             mLogMessages = new List<string>();
-            mReporterIonIndexToModeMap = new Dictionary<int, clsReporterIons.ReporterIonMassModeConstants>();
+            mReporterIonIndexToModeMap = new Dictionary<int, ReporterIons.ReporterIonMassModeConstants>();
             InitializeControls();
             mMasic = new clsMASIC();
             RegisterEvents(mMasic);
@@ -111,9 +112,9 @@ namespace MASIC
         // ReSharper disable once CollectionNeverQueried.Local
         private readonly List<string> mLogMessages;
 
-        private readonly Dictionary<int, clsReporterIons.ReporterIonMassModeConstants> mReporterIonIndexToModeMap;
+        private readonly Dictionary<int, ReporterIons.ReporterIonMassModeConstants> mReporterIonIndexToModeMap;
 
-        private clsReporterIons.ReporterIonMassModeConstants SelectedReporterIonMode
+        private ReporterIons.ReporterIonMassModeConstants SelectedReporterIonMode
         {
             get
             {
@@ -176,7 +177,7 @@ namespace MASIC
             mDefaultCustomSICList.Add(customSicEntryItem);
         }
 
-        private void AppendReporterIonMassMode(clsReporterIons.ReporterIonMassModeConstants reporterIonMassMode, string description)
+        private void AppendReporterIonMassMode(ReporterIons.ReporterIonMassModeConstants reporterIonMassMode, string description)
         {
             cboReporterIonMassMode.Items.Add(description);
             var currentIndex = cboReporterIonMassMode.Items.Count - 1;
@@ -232,7 +233,7 @@ namespace MASIC
             if (ClearCustomSICList(confirmReplaceExistingResults))
             {
                 // The default values use relative times, so make sure that mode is enabled
-                SetCustomSICToleranceType(clsCustomSICList.CustomSICScanTypeConstants.Relative);
+                SetCustomSICToleranceType(CustomSICList.CustomSICScanTypeConstants.Relative);
                 txtCustomSICScanOrAcqTimeTolerance.Text = defaultScanOrAcqTimeTolerance.ToString(CultureInfo.InvariantCulture);
                 foreach (var item in mDefaultCustomSICList)
                 {
@@ -270,7 +271,7 @@ namespace MASIC
 
         private void AutoToggleReporterIonStatsEnabled()
         {
-            if (SelectedReporterIonMode == clsReporterIons.ReporterIonMassModeConstants.CustomOrNone)
+            if (SelectedReporterIonMode == ReporterIons.ReporterIonMassModeConstants.CustomOrNone)
             {
                 if (chkReporterIonStatsEnabled.Checked)
                 {
@@ -287,14 +288,14 @@ namespace MASIC
         {
             if (chkReporterIonStatsEnabled.Checked)
             {
-                if (SelectedReporterIonMode == clsReporterIons.ReporterIonMassModeConstants.CustomOrNone)
+                if (SelectedReporterIonMode == ReporterIons.ReporterIonMassModeConstants.CustomOrNone)
                 {
-                    SelectedReporterIonMode = clsReporterIons.ReporterIonMassModeConstants.ITraqFourMZ;
+                    SelectedReporterIonMode = ReporterIons.ReporterIonMassModeConstants.ITraqFourMZ;
                 }
             }
-            else if (SelectedReporterIonMode != clsReporterIons.ReporterIonMassModeConstants.CustomOrNone)
+            else if (SelectedReporterIonMode != ReporterIons.ReporterIonMassModeConstants.CustomOrNone)
             {
-                SelectedReporterIonMode = clsReporterIons.ReporterIonMassModeConstants.CustomOrNone;
+                SelectedReporterIonMode = ReporterIons.ReporterIonMassModeConstants.CustomOrNone;
             }
         }
 
@@ -423,14 +424,14 @@ namespace MASIC
             msg.Clear();
             msg.Append("Select a comma or tab delimited file to read custom SIC search values from, ");
             msg.Append("or define them in the Custom SIC Values table below.  If using the file, ");
-            msg.Append("allowed column names are: ").Append(clsCustomSICListReader.GetCustomMZFileColumnHeaders()).Append(".  ");
+            msg.Append("allowed column names are: ").Append(CustomSICListReader.GetCustomMZFileColumnHeaders()).Append(".  ");
             msg.Append("Note: use " +
-                clsCustomSICListReader.CUSTOM_SIC_COLUMN_SCAN_TIME + " and " +
-                clsCustomSICListReader.CUSTOM_SIC_COLUMN_TIME_TOLERANCE + " only when specifying ");
+                CustomSICListReader.CUSTOM_SIC_COLUMN_SCAN_TIME + " and " +
+                CustomSICListReader.CUSTOM_SIC_COLUMN_TIME_TOLERANCE + " only when specifying ");
 
             msg.Append("acquisition time-based values.  When doing so, do not include " +
-                clsCustomSICListReader.CUSTOM_SIC_COLUMN_SCAN_CENTER + " and " +
-                clsCustomSICListReader.CUSTOM_SIC_COLUMN_SCAN_TOLERANCE + ".");
+                CustomSICListReader.CUSTOM_SIC_COLUMN_SCAN_CENTER + " and " +
+                CustomSICListReader.CUSTOM_SIC_COLUMN_SCAN_TOLERANCE + ".");
 
             txtCustomSICFileDescription.Text = msg.ToString();
         }
@@ -567,7 +568,7 @@ namespace MASIC
 
                 if (optSICTolerancePPM.Checked)
                 {
-                    defaultMZTolerance = clsUtilities.PPMToMass(defaultMZTolerance, 1000);
+                    defaultMZTolerance = Utilities.PPMToMass(defaultMZTolerance, 1000);
                 }
             }
             catch (Exception)
@@ -585,28 +586,28 @@ namespace MASIC
             }
         }
 
-        private clsCustomSICList.CustomSICScanTypeConstants GetCustomSICScanToleranceType()
+        private CustomSICList.CustomSICScanTypeConstants GetCustomSICScanToleranceType()
         {
             if (optCustomSICScanToleranceAbsolute.Checked)
             {
-                return clsCustomSICList.CustomSICScanTypeConstants.Absolute;
+                return CustomSICList.CustomSICScanTypeConstants.Absolute;
             }
 
             if (optCustomSICScanToleranceRelative.Checked)
             {
-                return clsCustomSICList.CustomSICScanTypeConstants.Relative;
+                return CustomSICList.CustomSICScanTypeConstants.Relative;
             }
 
             if (optCustomSICScanToleranceAcqTime.Checked)
             {
-                return clsCustomSICList.CustomSICScanTypeConstants.AcquisitionTime;
+                return CustomSICList.CustomSICScanTypeConstants.AcquisitionTime;
             }
 
             // Assume absolute
-            return clsCustomSICList.CustomSICScanTypeConstants.Absolute;
+            return CustomSICList.CustomSICScanTypeConstants.Absolute;
         }
 
-        private int GetReporterIonIndexFromMode(clsReporterIons.ReporterIonMassModeConstants reporterIonMassMode)
+        private int GetReporterIonIndexFromMode(ReporterIons.ReporterIonMassModeConstants reporterIonMassMode)
         {
             foreach (var item in mReporterIonIndexToModeMap)
             {
@@ -619,7 +620,7 @@ namespace MASIC
             throw new InvalidEnumArgumentException("Dictionary mReporterIonIndexToModeMap is missing enum " + reporterIonMassMode);
         }
 
-        private clsReporterIons.ReporterIonMassModeConstants GetReporterIonModeFromIndex(int comboboxIndex)
+        private ReporterIons.ReporterIonMassModeConstants GetReporterIonModeFromIndex(int comboboxIndex)
         {
             if (mReporterIonIndexToModeMap.TryGetValue(comboboxIndex, out var reporterIonMassMode))
             {
@@ -629,7 +630,7 @@ namespace MASIC
             throw new Exception("Dictionary mReporterIonIndexToModeMap is missing index " + comboboxIndex);
         }
 
-        private clsReporterIons.ReporterIonMassModeConstants GetSelectedReporterIonMode()
+        private ReporterIons.ReporterIonMassModeConstants GetSelectedReporterIonMode()
         {
             return GetReporterIonModeFromIndex(cboReporterIonMassMode.SelectedIndex);
         }
@@ -1137,29 +1138,29 @@ namespace MASIC
             cboReporterIonMassMode.Items.Clear();
             mReporterIonIndexToModeMap.Clear();
 
-            AppendReporterIonMassMode(clsReporterIons.ReporterIonMassModeConstants.CustomOrNone, "None");
+            AppendReporterIonMassMode(ReporterIons.ReporterIonMassModeConstants.CustomOrNone, "None");
 
-            AppendReporterIonMassMode(clsReporterIons.ReporterIonMassModeConstants.Acetylation, "Acetylated K");
-            AppendReporterIonMassMode(clsReporterIons.ReporterIonMassModeConstants.FrackingAmine20160217, "Fracking Amine 20160217: 157.089, 170.097, and 234.059");
-            AppendReporterIonMassMode(clsReporterIons.ReporterIonMassModeConstants.FSFACustomCarbonyl, "FSFACustomCarbonyl");
-            AppendReporterIonMassMode(clsReporterIons.ReporterIonMassModeConstants.FSFACustomCarboxylic, "FSFACustomCarboxylic");
-            AppendReporterIonMassMode(clsReporterIons.ReporterIonMassModeConstants.FSFACustomHydroxyl, "FSFACustomHydroxyl");
-            AppendReporterIonMassMode(clsReporterIons.ReporterIonMassModeConstants.HemeCFragment, "Heme C: 616.18 and 617.19");
-            AppendReporterIonMassMode(clsReporterIons.ReporterIonMassModeConstants.ITraqETDThreeMZ, "iTraq ETD: 101, 102, and 104");
-            AppendReporterIonMassMode(clsReporterIons.ReporterIonMassModeConstants.ITraqFourMZ, "iTraq: 114, 115, 116, and 117");
-            AppendReporterIonMassMode(clsReporterIons.ReporterIonMassModeConstants.ITraqEightMZHighRes, "iTraq 8 for High Res MS/MS: 113, 114, ... 121");
-            AppendReporterIonMassMode(clsReporterIons.ReporterIonMassModeConstants.ITraqEightMZLowRes, "iTraq 8 for Low Res MS/MS (Considers 120 m/z for immonium loss from phenylalanine)");
-            AppendReporterIonMassMode(clsReporterIons.ReporterIonMassModeConstants.LycAcetFragment, "Lys Acet: 126.091 and 127.095");
-            AppendReporterIonMassMode(clsReporterIons.ReporterIonMassModeConstants.NativeOGlcNAc, "Native OGlcNAc: 126.055, 138.055, 144.065, 168.066, 186.076, 204.087, and 366.14");
-            AppendReporterIonMassMode(clsReporterIons.ReporterIonMassModeConstants.OGlcNAc, "OGlcNAc: 204.087, 300.13, and 503.21");
-            AppendReporterIonMassMode(clsReporterIons.ReporterIonMassModeConstants.PCGalnaz, "PCGalnaz: 300.13 and 503.21");
-            AppendReporterIonMassMode(clsReporterIons.ReporterIonMassModeConstants.TMTTwoMZ, "TMT 2: 126, 127");
-            AppendReporterIonMassMode(clsReporterIons.ReporterIonMassModeConstants.TMTSixMZ, "TMT 6: 126, 127, 128, 129, 130, 131");
-            AppendReporterIonMassMode(clsReporterIons.ReporterIonMassModeConstants.TMTTenMZ, "TMT 10: 126, 127N, 127C, 128N, 128C, 129N, 129C, 130N, 130C, 131");
-            AppendReporterIonMassMode(clsReporterIons.ReporterIonMassModeConstants.TMTElevenMZ, "TMT 11: 126, 127N, 127C, 128N, 128C, 129N, 129C, 130N, 130C, 131N, 131C");
-            AppendReporterIonMassMode(clsReporterIons.ReporterIonMassModeConstants.TMTSixteenMZ, "TMT 16: 126, 127N, 127C, ... 132N, 132C, 133N, 133C, 134N");
+            AppendReporterIonMassMode(ReporterIons.ReporterIonMassModeConstants.Acetylation, "Acetylated K");
+            AppendReporterIonMassMode(ReporterIons.ReporterIonMassModeConstants.FrackingAmine20160217, "Fracking Amine 20160217: 157.089, 170.097, and 234.059");
+            AppendReporterIonMassMode(ReporterIons.ReporterIonMassModeConstants.FSFACustomCarbonyl, "FSFACustomCarbonyl");
+            AppendReporterIonMassMode(ReporterIons.ReporterIonMassModeConstants.FSFACustomCarboxylic, "FSFACustomCarboxylic");
+            AppendReporterIonMassMode(ReporterIons.ReporterIonMassModeConstants.FSFACustomHydroxyl, "FSFACustomHydroxyl");
+            AppendReporterIonMassMode(ReporterIons.ReporterIonMassModeConstants.HemeCFragment, "Heme C: 616.18 and 617.19");
+            AppendReporterIonMassMode(ReporterIons.ReporterIonMassModeConstants.ITraqETDThreeMZ, "iTraq ETD: 101, 102, and 104");
+            AppendReporterIonMassMode(ReporterIons.ReporterIonMassModeConstants.ITraqFourMZ, "iTraq: 114, 115, 116, and 117");
+            AppendReporterIonMassMode(ReporterIons.ReporterIonMassModeConstants.ITraqEightMZHighRes, "iTraq 8 for High Res MS/MS: 113, 114, ... 121");
+            AppendReporterIonMassMode(ReporterIons.ReporterIonMassModeConstants.ITraqEightMZLowRes, "iTraq 8 for Low Res MS/MS (Considers 120 m/z for immonium loss from phenylalanine)");
+            AppendReporterIonMassMode(ReporterIons.ReporterIonMassModeConstants.LycAcetFragment, "Lys Acet: 126.091 and 127.095");
+            AppendReporterIonMassMode(ReporterIons.ReporterIonMassModeConstants.NativeOGlcNAc, "Native OGlcNAc: 126.055, 138.055, 144.065, 168.066, 186.076, 204.087, and 366.14");
+            AppendReporterIonMassMode(ReporterIons.ReporterIonMassModeConstants.OGlcNAc, "OGlcNAc: 204.087, 300.13, and 503.21");
+            AppendReporterIonMassMode(ReporterIons.ReporterIonMassModeConstants.PCGalnaz, "PCGalnaz: 300.13 and 503.21");
+            AppendReporterIonMassMode(ReporterIons.ReporterIonMassModeConstants.TMTTwoMZ, "TMT 2: 126, 127");
+            AppendReporterIonMassMode(ReporterIons.ReporterIonMassModeConstants.TMTSixMZ, "TMT 6: 126, 127, 128, 129, 130, 131");
+            AppendReporterIonMassMode(ReporterIons.ReporterIonMassModeConstants.TMTTenMZ, "TMT 10: 126, 127N, 127C, 128N, 128C, 129N, 129C, 130N, 130C, 131");
+            AppendReporterIonMassMode(ReporterIons.ReporterIonMassModeConstants.TMTElevenMZ, "TMT 11: 126, 127N, 127C, 128N, 128C, 129N, 129C, 130N, 130C, 131N, 131C");
+            AppendReporterIonMassMode(ReporterIons.ReporterIonMassModeConstants.TMTSixteenMZ, "TMT 16: 126, 127N, 127C, ... 132N, 132C, 133N, 133C, 134N");
 
-            SelectedReporterIonMode = clsReporterIons.ReporterIonMassModeConstants.CustomOrNone;
+            SelectedReporterIonMode = ReporterIons.ReporterIonMassModeConstants.CustomOrNone;
         }
 
         private void ProcessFileUsingMASIC()
@@ -1663,21 +1664,21 @@ namespace MASIC
 
         private void SetConnectionStringToPNNLServer()
         {
-            txtDatabaseConnectionString.Text = clsDatabaseAccess.DATABASE_CONNECTION_STRING_DEFAULT;
-            txtDatasetInfoQuerySQL.Text = clsDatabaseAccess.DATABASE_DATASET_INFO_QUERY_DEFAULT;
+            txtDatabaseConnectionString.Text = DatabaseAccess.DATABASE_CONNECTION_STRING_DEFAULT;
+            txtDatasetInfoQuerySQL.Text = DatabaseAccess.DATABASE_DATASET_INFO_QUERY_DEFAULT;
         }
 
-        private void SetCustomSICToleranceType(clsCustomSICList.CustomSICScanTypeConstants customSICScanToleranceType)
+        private void SetCustomSICToleranceType(CustomSICList.CustomSICScanTypeConstants customSICScanToleranceType)
         {
             switch (customSICScanToleranceType)
             {
-                case clsCustomSICList.CustomSICScanTypeConstants.Absolute:
+                case CustomSICList.CustomSICScanTypeConstants.Absolute:
                     optCustomSICScanToleranceAbsolute.Checked = true;
                     break;
-                case clsCustomSICList.CustomSICScanTypeConstants.Relative:
+                case CustomSICList.CustomSICScanTypeConstants.Relative:
                     optCustomSICScanToleranceRelative.Checked = true;
                     break;
-                case clsCustomSICList.CustomSICScanTypeConstants.AcquisitionTime:
+                case CustomSICList.CustomSICScanTypeConstants.AcquisitionTime:
                     optCustomSICScanToleranceAcqTime.Checked = true;
                     break;
                 default:
@@ -1762,12 +1763,12 @@ namespace MASIC
             var timeTolerance = false;
             switch (GetCustomSICScanToleranceType())
             {
-                case clsCustomSICList.CustomSICScanTypeConstants.Relative:
+                case CustomSICList.CustomSICScanTypeConstants.Relative:
                     DataGridUtils.AppendColumnToTableStyle(tsCustomSICValues, COL_NAME_SCAN_CENTER, "Relative Scan Number (0 to 1)", 170);
                     DataGridUtils.AppendColumnToTableStyle(tsCustomSICValues, COL_NAME_SCAN_TOLERANCE, "Scan Tolerance", 90);
                     break;
 
-                case clsCustomSICList.CustomSICScanTypeConstants.AcquisitionTime:
+                case CustomSICList.CustomSICScanTypeConstants.AcquisitionTime:
                     DataGridUtils.AppendColumnToTableStyle(tsCustomSICValues, COL_NAME_SCAN_CENTER, "Acq time (minutes)", 110);
                     DataGridUtils.AppendColumnToTableStyle(tsCustomSICValues, COL_NAME_SCAN_TOLERANCE, "Time Tolerance", 90);
                     timeTolerance = true;
@@ -2044,7 +2045,7 @@ namespace MASIC
 
                 // Update .ReporterIonToleranceDa based on txtReporterIonMZToleranceDa
                 reporterIonOptions.ReporterIonToleranceDaDefault = TextBoxUtils.ParseTextBoxValueDbl(txtReporterIonMZToleranceDa, "", out parseError,
-                                                                                                     clsReporterIons.REPORTER_ION_TOLERANCE_DA_DEFAULT, false);
+                                                                                                     ReporterIons.REPORTER_ION_TOLERANCE_DA_DEFAULT, false);
                 reporterIonOptions.SetReporterIonMassMode(reporterIonOptions.ReporterIonMassMode, reporterIonOptions.ReporterIonToleranceDaDefault);
 
                 reporterIonOptions.ReporterIonApplyAbundanceCorrection = chkReporterIonApplyAbundanceCorrection.Checked;
@@ -2064,7 +2065,7 @@ namespace MASIC
                 var customSICFileName = txtCustomSICFileName.Text.Trim();
                 masicOptions.CustomSICList.CustomSICListFileName = customSICFileName;
 
-                var mzSearchSpecs = new List<clsCustomMZSearchSpec>();
+                var mzSearchSpecs = new List<CustomMZSearchSpec>();
 
                 // Only use the data in table CUSTOM_SIC_VALUES_DATA_TABLE if the CustomSicFileName is empty
                 if (string.IsNullOrWhiteSpace(customSICFileName))
@@ -2075,7 +2076,7 @@ namespace MASIC
                             currentRow[1] != null && double.TryParse(currentRow[1].ToString(), out var col1))
                         {
                             var targetMz = col0;
-                            var mzSearchSpec = new clsCustomMZSearchSpec(targetMz)
+                            var mzSearchSpec = new CustomMZSearchSpec(targetMz)
                             {
                                 MZToleranceDa = col1,
                                 ScanOrAcqTimeCenter = Convert.ToSingle(currentRow[2]),
@@ -2088,23 +2089,23 @@ namespace MASIC
                     }
                 }
 
-                clsCustomSICList.CustomSICScanTypeConstants scanType;
+                CustomSICList.CustomSICScanTypeConstants scanType;
                 if (optCustomSICScanToleranceAbsolute.Checked)
                 {
-                    scanType = clsCustomSICList.CustomSICScanTypeConstants.Absolute;
+                    scanType = CustomSICList.CustomSICScanTypeConstants.Absolute;
                 }
                 else if (optCustomSICScanToleranceRelative.Checked)
                 {
-                    scanType = clsCustomSICList.CustomSICScanTypeConstants.Relative;
+                    scanType = CustomSICList.CustomSICScanTypeConstants.Relative;
                 }
                 else if (optCustomSICScanToleranceAcqTime.Checked)
                 {
-                    scanType = clsCustomSICList.CustomSICScanTypeConstants.AcquisitionTime;
+                    scanType = CustomSICList.CustomSICScanTypeConstants.AcquisitionTime;
                 }
                 else
                 {
                     // Assume absolute
-                    scanType = clsCustomSICList.CustomSICScanTypeConstants.Absolute;
+                    scanType = CustomSICList.CustomSICScanTypeConstants.Absolute;
                 }
 
                 var scanOrAcqTimeTolerance = TextBoxUtils.ParseTextBoxValueFloat(txtCustomSICScanOrAcqTimeTolerance, lblCustomSICScanTolerance.Text + " must be a value", out parseError);
@@ -2123,10 +2124,10 @@ namespace MASIC
 
         private bool ValidateSettings(clsMASIC masicInstance)
         {
-            if (masicInstance.Options.ReporterIons.ReporterIonMassMode == clsReporterIons.ReporterIonMassModeConstants.CustomOrNone)
+            if (masicInstance.Options.ReporterIons.ReporterIonMassMode == ReporterIons.ReporterIonMassModeConstants.CustomOrNone)
                 return true;
 
-            if (masicInstance.Options.ReporterIons.ReporterIonMassMode == clsReporterIons.ReporterIonMassModeConstants.ITraqEightMZHighRes)
+            if (masicInstance.Options.ReporterIons.ReporterIonMassMode == ReporterIons.ReporterIonMassModeConstants.ITraqEightMZHighRes)
             {
                 // Make sure the tolerance is less than 0.03 Da; if not, warn the user
                 if (masicInstance.Options.ReporterIons.ReporterIonToleranceDaDefault > 0.03)
@@ -2146,7 +2147,7 @@ namespace MASIC
                     }
                 }
             }
-            else if (masicInstance.Options.ReporterIons.ReporterIonMassMode == clsReporterIons.ReporterIonMassModeConstants.ITraqEightMZLowRes)
+            else if (masicInstance.Options.ReporterIons.ReporterIonMassMode == ReporterIons.ReporterIonMassModeConstants.ITraqEightMZLowRes)
             {
                 // Make sure the tolerance is at least 0.1 Da; if not, warn the user
                 if (masicInstance.Options.ReporterIons.ReporterIonToleranceDaDefault < 0.1)

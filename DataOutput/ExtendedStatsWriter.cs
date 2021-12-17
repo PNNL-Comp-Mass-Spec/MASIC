@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using MASIC.Data;
 using MASIC.Options;
 
 namespace MASIC.DataOutput
@@ -9,7 +10,7 @@ namespace MASIC.DataOutput
     /// <summary>
     /// Extended scan stats writer
     /// </summary>
-    public class clsExtendedStatsWriter : clsMasicEventNotifier
+    public class ExtendedStatsWriter : MasicEventNotifier
     {
         /// <summary>
         /// Collision mode column name
@@ -38,7 +39,7 @@ namespace MASIC.DataOutput
         /// <summary>
         /// Constructor
         /// </summary>
-        public clsExtendedStatsWriter(MASICOptions masicOptions)
+        public ExtendedStatsWriter(MASICOptions masicOptions)
         {
             mExtendedHeaderNameMap = new List<KeyValuePair<string, int>>();
             mOptions = masicOptions;
@@ -157,8 +158,8 @@ namespace MASIC.DataOutput
         /// <remarks>mExtendedHeaderNameMap is updated so that constant header values are removed from it</remarks>
         public string ExtractConstantExtendedHeaderValues(
             out List<int> nonConstantHeaderIDs,
-            IList<clsScanInfo> surveyScans,
-            IList<clsScanInfo> fragScans,
+            IList<ScanInfo> surveyScans,
+            IList<ScanInfo> fragScans,
             char delimiter)
         {
             var cTrimChars = new[] { ':', ' ' };
@@ -329,9 +330,9 @@ namespace MASIC.DataOutput
             return string.Join(Environment.NewLine, consolidatedValueList);
         }
 
-        private clsScanInfo GetScanByMasterScanIndex(clsScanList scanList, int masterScanIndex)
+        private ScanInfo GetScanByMasterScanIndex(ScanList scanList, int masterScanIndex)
         {
-            var currentScan = new clsScanInfo();
+            var currentScan = new ScanInfo();
             if (scanList.MasterScanOrder != null)
             {
                 if (masterScanIndex < 0)
@@ -345,12 +346,12 @@ namespace MASIC.DataOutput
 
                 switch (scanList.MasterScanOrder[masterScanIndex].ScanType)
                 {
-                    case clsScanList.ScanTypeConstants.SurveyScan:
+                    case ScanList.ScanTypeConstants.SurveyScan:
                         // Survey scan
                         currentScan = scanList.SurveyScans[scanList.MasterScanOrder[masterScanIndex].ScanIndexPointer];
                         break;
 
-                    case clsScanList.ScanTypeConstants.FragScan:
+                    case ScanList.ScanTypeConstants.FragScan:
                         // Fragmentation Scan
                         currentScan = scanList.FragScans[scanList.MasterScanOrder[masterScanIndex].ScanIndexPointer];
                         break;
@@ -373,7 +374,7 @@ namespace MASIC.DataOutput
         /// <param name="includeHeaders"></param>
         /// <returns>True if successful, false if an error</returns>
         public bool SaveExtendedScanStatsFiles(
-            clsScanList scanList,
+            ScanList scanList,
             string inputFileName,
             string outputDirectoryPath,
             bool includeHeaders)
@@ -388,8 +389,8 @@ namespace MASIC.DataOutput
             {
                 UpdateProgress(0, "Saving extended scan stats to flat file");
 
-                var extendedConstantHeaderOutputFilePath = clsDataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, clsDataOutput.OutputFileTypeConstants.ScanStatsExtendedConstantFlatFile);
-                extendedNonConstantHeaderOutputFilePath = clsDataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, clsDataOutput.OutputFileTypeConstants.ScanStatsExtendedFlatFile);
+                var extendedConstantHeaderOutputFilePath = DataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, DataOutput.OutputFileTypeConstants.ScanStatsExtendedConstantFlatFile);
+                extendedNonConstantHeaderOutputFilePath = DataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, DataOutput.OutputFileTypeConstants.ScanStatsExtendedFlatFile);
 
                 ReportMessage("Saving extended scan stats flat file to disk: " + Path.GetFileName(extendedNonConstantHeaderOutputFilePath));
 

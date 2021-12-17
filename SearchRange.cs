@@ -12,17 +12,17 @@ namespace MASIC
     /// To prevent this behavior, and save memory by not populating mPointerIndices, set UsePointerIndexArray = False
     /// </para>
     /// </summary>
-    public class clsSearchRange
+    public class SearchRange
     {
         /// <summary>
         /// Constructor
         /// </summary>
-        public clsSearchRange()
+        public SearchRange()
         {
             InitializeLocalVariables();
         }
 
-        private enum eDataTypeToUse
+        private enum DataTypeToUse
         {
             NoDataPresent = 0,
             IntegerType = 1,
@@ -30,7 +30,7 @@ namespace MASIC
             DoubleType = 3
         }
 
-        private eDataTypeToUse mDataType;
+        private DataTypeToUse mDataType;
 
         private int[] mDataInt;
         private float[] mDataSingle;
@@ -53,10 +53,10 @@ namespace MASIC
             {
                 return mDataType switch
                 {
-                    eDataTypeToUse.IntegerType => mDataInt.Length,
-                    eDataTypeToUse.FloatType => mDataSingle.Length,
-                    eDataTypeToUse.DoubleType => mDataDouble.Length,
-                    eDataTypeToUse.NoDataPresent => 0,
+                    DataTypeToUse.IntegerType => mDataInt.Length,
+                    DataTypeToUse.FloatType => mDataSingle.Length,
+                    DataTypeToUse.DoubleType => mDataDouble.Length,
+                    DataTypeToUse.NoDataPresent => 0,
                     _ => throw new Exception("Unknown data type encountered: " + mDataType)
                 };
             }
@@ -314,16 +314,16 @@ namespace MASIC
 
         private void ClearUnusedData()
         {
-            if (mDataType != eDataTypeToUse.IntegerType)
+            if (mDataType != DataTypeToUse.IntegerType)
                 mDataInt = Array.Empty<int>();
 
-            if (mDataType != eDataTypeToUse.FloatType)
+            if (mDataType != DataTypeToUse.FloatType)
                 mDataSingle = Array.Empty<float>();
 
-            if (mDataType != eDataTypeToUse.DoubleType)
+            if (mDataType != DataTypeToUse.DoubleType)
                 mDataDouble = Array.Empty<double>();
 
-            if (mDataType == eDataTypeToUse.NoDataPresent)
+            if (mDataType == DataTypeToUse.NoDataPresent)
             {
                 mPointerArrayIsValid = false;
             }
@@ -335,7 +335,7 @@ namespace MASIC
         // ReSharper disable once UnusedMember.Global
         public void ClearData()
         {
-            mDataType = eDataTypeToUse.NoDataPresent;
+            mDataType = DataTypeToUse.NoDataPresent;
             ClearUnusedData();
         }
 
@@ -372,7 +372,7 @@ namespace MASIC
                         mPointerArrayIsValid = false;
                     }
 
-                    mDataType = eDataTypeToUse.IntegerType;
+                    mDataType = DataTypeToUse.IntegerType;
                     success = true;
                 }
             }
@@ -419,7 +419,7 @@ namespace MASIC
                         mPointerArrayIsValid = false;
                     }
 
-                    mDataType = eDataTypeToUse.FloatType;
+                    mDataType = DataTypeToUse.FloatType;
                     success = true;
                 }
             }
@@ -465,7 +465,7 @@ namespace MASIC
                         mPointerArrayIsValid = false;
                     }
 
-                    mDataType = eDataTypeToUse.DoubleType;
+                    mDataType = DataTypeToUse.DoubleType;
                     success = true;
                 }
             }
@@ -495,12 +495,12 @@ namespace MASIC
             matchIndexStart = -1;
             matchIndexEnd = -1;
 
-            if (mDataType != eDataTypeToUse.IntegerType)
+            if (mDataType != DataTypeToUse.IntegerType)
             {
                 matchFound = mDataType switch
                 {
-                    eDataTypeToUse.FloatType => FindValueRange((float)searchValue, toleranceHalfWidth, out matchIndexStart, out matchIndexEnd),
-                    eDataTypeToUse.DoubleType => FindValueRange((double)searchValue, toleranceHalfWidth, out matchIndexStart, out matchIndexEnd),
+                    DataTypeToUse.FloatType => FindValueRange((float)searchValue, toleranceHalfWidth, out matchIndexStart, out matchIndexEnd),
+                    DataTypeToUse.DoubleType => FindValueRange((double)searchValue, toleranceHalfWidth, out matchIndexStart, out matchIndexEnd),
                     _ => false
                 };
             }
@@ -556,13 +556,13 @@ namespace MASIC
             matchIndexStart = -1;
             matchIndexEnd = -1;
 
-            if (mDataType != eDataTypeToUse.DoubleType)
+            if (mDataType != DataTypeToUse.DoubleType)
             {
                 matchFound = mDataType switch
                 {
-                    eDataTypeToUse.IntegerType => FindValueRange((int)Math.Round(searchValue), (int)Math.Round(toleranceHalfWidth),
+                    DataTypeToUse.IntegerType => FindValueRange((int)Math.Round(searchValue), (int)Math.Round(toleranceHalfWidth),
                         out matchIndexStart, out matchIndexEnd),
-                    eDataTypeToUse.FloatType => FindValueRange((float)searchValue, (float)toleranceHalfWidth, out matchIndexStart, out matchIndexEnd),
+                    DataTypeToUse.FloatType => FindValueRange((float)searchValue, (float)toleranceHalfWidth, out matchIndexStart, out matchIndexEnd),
                     _ => false
                 };
             }
@@ -618,13 +618,13 @@ namespace MASIC
             matchIndexStart = -1;
             matchIndexEnd = -1;
 
-            if (mDataType != eDataTypeToUse.FloatType)
+            if (mDataType != DataTypeToUse.FloatType)
             {
                 matchFound = mDataType switch
                 {
-                    eDataTypeToUse.IntegerType => FindValueRange((int)Math.Round(searchValue), (int)Math.Round(toleranceHalfWidth),
+                    DataTypeToUse.IntegerType => FindValueRange((int)Math.Round(searchValue), (int)Math.Round(toleranceHalfWidth),
                         out matchIndexStart, out matchIndexEnd),
-                    eDataTypeToUse.DoubleType => FindValueRange((double)searchValue, toleranceHalfWidth, out matchIndexStart, out matchIndexEnd),
+                    DataTypeToUse.DoubleType => FindValueRange((double)searchValue, toleranceHalfWidth, out matchIndexStart, out matchIndexEnd),
                     _ => false
                 };
             }
@@ -692,18 +692,18 @@ namespace MASIC
         {
             try
             {
-                if (mDataType == eDataTypeToUse.NoDataPresent)
+                if (mDataType == DataTypeToUse.NoDataPresent)
                 {
                     return 0;
                 }
 
                 switch (mDataType)
                 {
-                    case eDataTypeToUse.IntegerType:
+                    case DataTypeToUse.IntegerType:
                         return mDataInt[index];
-                    case eDataTypeToUse.FloatType:
+                    case DataTypeToUse.FloatType:
                         return mDataSingle[index];
-                    case eDataTypeToUse.DoubleType:
+                    case DataTypeToUse.DoubleType:
                         return mDataDouble[index];
                 }
             }
@@ -759,7 +759,7 @@ namespace MASIC
         /// <returns>The value, or 0 if no data, an invalid index, or an error</returns>
         public double GetValueByOriginalIndex(int indexOriginal)
         {
-            if (!mPointerArrayIsValid || mDataType == eDataTypeToUse.NoDataPresent)
+            if (!mPointerArrayIsValid || mDataType == DataTypeToUse.NoDataPresent)
             {
                 return 0;
             }
@@ -771,11 +771,11 @@ namespace MASIC
                 {
                     switch (mDataType)
                     {
-                        case eDataTypeToUse.IntegerType:
+                        case DataTypeToUse.IntegerType:
                             return mDataInt[mPointerIndices[index]];
-                        case eDataTypeToUse.FloatType:
+                        case DataTypeToUse.FloatType:
                             return mDataSingle[mPointerIndices[index]];
-                        case eDataTypeToUse.DoubleType:
+                        case DataTypeToUse.DoubleType:
                             return mDataDouble[mPointerIndices[index]];
                     }
                 }
@@ -812,7 +812,7 @@ namespace MASIC
 
         private void InitializeLocalVariables()
         {
-            mDataType = eDataTypeToUse.NoDataPresent;
+            mDataType = DataTypeToUse.NoDataPresent;
             ClearUnusedData();
 
             UsePointerIndexArray = true;

@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
 using ThermoRawFileReader;
 
-namespace MASIC
+namespace MASIC.Data
 {
     /// <summary>
     /// Container for scan metadata
     /// </summary>
-    public class clsScanInfo
+    public class ScanInfo
     {
         /// <summary>
         /// Ranges from 1 to the number of scans in the datafile
@@ -90,12 +90,12 @@ namespace MASIC
         /// <summary>
         /// Information specific to fragmentation scans
         /// </summary>
-        public clsFragScanInfo FragScanInfo { get; }
+        public FragScanInfo FragScanInfo { get; }
 
         /// <summary>
         /// Information specific to MRM/SRM scans
         /// </summary>
-        public clsMRMScanInfo MRMScanInfo { get; set; }
+        public MRMScanInfo MRMScanInfo { get; set; }
 
         /// <summary>
         /// Keys are ID values pointing to mExtendedHeaderNameMap (where the name is defined); values are the string or numeric values for the settings
@@ -122,7 +122,7 @@ namespace MASIC
         /// <summary>
         /// Constructor for a MS1 scan
         /// </summary>
-        public clsScanInfo()
+        public ScanInfo()
             : this(0)
         {
         }
@@ -130,12 +130,12 @@ namespace MASIC
         /// <summary>
         /// Constructor for a MS2 scan
         /// </summary>
-        public clsScanInfo(double fragScanParentIonMz)
+        public ScanInfo(double fragScanParentIonMz)
         {
             MRMScanType = MRMScanTypeConstants.NotMRM;
 
-            FragScanInfo = new clsFragScanInfo(fragScanParentIonMz);
-            MRMScanInfo = new clsMRMScanInfo();
+            FragScanInfo = new FragScanInfo(fragScanParentIonMz);
+            MRMScanInfo = new MRMScanInfo();
 
             ExtendedHeaderInfo = new Dictionary<int, string>();
         }

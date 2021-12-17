@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using MASIC.Data;
 using MASIC.Options;
 using MASICPeakFinder;
 using PRISM;
@@ -62,19 +63,19 @@ namespace MASIC.DataOutput
         /// Parent ions loaded from the SICStats file
         /// </summary>
         /// <remarks>Keys are parent ion index, values are parent ion info</remarks>
-        private readonly Dictionary<int, clsParentIonInfo> mParentIons;
+        private readonly Dictionary<int, ParentIonInfo> mParentIons;
 
         /// <summary>
         /// Scan data loaded from the ScanStats file
         /// </summary>
         /// <remarks>Keys are scan number, values are scan info</remarks>
-        private readonly Dictionary<int, clsScanInfo> mScanList;
+        private readonly Dictionary<int, ScanInfo> mScanList;
 
         /// <summary>
         /// Reporter ion columns in the ReporterIons file
         /// </summary>
         /// <remarks>Keys are column index, values are reporter ion info</remarks>
-        private readonly Dictionary<int, clsReporterIonInfo> mReporterIonInfo;
+        private readonly Dictionary<int, ReporterIonInfo> mReporterIonInfo;
 
         /// <summary>
         /// Reporter ion abundance data in the ReporterIons file
@@ -171,10 +172,10 @@ namespace MASIC.DataOutput
         {
             Options = options;
 
-            mScanList = new Dictionary<int, clsScanInfo>();
-            mParentIons = new Dictionary<int, clsParentIonInfo>();
+            mScanList = new Dictionary<int, ScanInfo>();
+            mParentIons = new Dictionary<int, ParentIonInfo>();
 
-            mReporterIonInfo = new Dictionary<int, clsReporterIonInfo>();
+            mReporterIonInfo = new Dictionary<int, ReporterIonInfo>();
             mReporterIonAbundances = new Dictionary<int, Dictionary<int, double>>();
 
             PeakAreaHistogram = new Dictionary<float, int>();
@@ -678,7 +679,7 @@ namespace MASIC.DataOutput
                         {
                             var columnName = dataValues[columnIndex];
 
-                            if (columnMap.ContainsValue(columnIndex) || !columnName.StartsWith(clsReporterIonProcessor.REPORTER_ION_COLUMN_PREFIX))
+                            if (columnMap.ContainsValue(columnIndex) || !columnName.StartsWith(ReporterIonProcessor.REPORTER_ION_COLUMN_PREFIX))
                                 continue;
 
                             var reporterIonMatch = reporterIonMzMatcher.Match(columnName);
@@ -695,7 +696,7 @@ namespace MASIC.DataOutput
                             }
 
                             var reporterIonMz = double.Parse(reporterIonMatch.Groups["Mz"].Value);
-                            var reporterIon = new clsReporterIonInfo(reporterIonMz);
+                            var reporterIon = new ReporterIonInfo(reporterIonMz);
 
                             mReporterIonInfo.Add(columnIndex, reporterIon);
                             mReporterIonAbundances.Add(columnIndex, new Dictionary<int, double>());
@@ -819,7 +820,7 @@ namespace MASIC.DataOutput
                     var ionCountRaw = DbUtils.GetColumnValue(dataValues, columnMap, ScanStatsColumns.IonCountRaw, 0);
                     var scanTypeName = DbUtils.GetColumnValue(dataValues, columnMap, ScanStatsColumns.ScanTypeName);
 
-                    var scanInfo = new clsScanInfo
+                    var scanInfo = new ScanInfo
                     {
                         ScanNumber = scanNumber,
                         ScanTime = (float)scanTime,
@@ -933,7 +934,7 @@ namespace MASIC.DataOutput
                     var peakArea = DbUtils.GetColumnValue(dataValues, columnMap, SICStatsColumns.PeakArea, 0.0);
                     var parentIonIntensity = DbUtils.GetColumnValue(dataValues, columnMap, SICStatsColumns.ParentIonIntensity, 0.0);
 
-                    var parentIon = new clsParentIonInfo(parentIonMz)
+                    var parentIon = new ParentIonInfo(parentIonMz)
                     {
                         OptimalPeakApexScanNumber = optimalPeakApexScanNumber
                     };
@@ -1061,12 +1062,12 @@ namespace MASIC.DataOutput
 
                 var sicStatsLoaded = LoadSICStats(sicStatsFilePath);
 
-                var scanStatsFilePath = clsUtilities.ReplaceSuffix(sicStatsFilePath, clsDataOutput.SIC_STATS_FILE_SUFFIX, clsDataOutput.SCAN_STATS_FILE_SUFFIX);
+                var scanStatsFilePath = Utilities.ReplaceSuffix(sicStatsFilePath, DataOutput.SIC_STATS_FILE_SUFFIX, DataOutput.SCAN_STATS_FILE_SUFFIX);
 
                 // ReSharper disable once UnusedVariable
                 var scanStatsLoaded = LoadScanStats(scanStatsFilePath);
 
-                var reporterIonsFilePath = clsUtilities.ReplaceSuffix(sicStatsFilePath, clsDataOutput.SIC_STATS_FILE_SUFFIX, clsDataOutput.REPORTER_IONS_FILE_SUFFIX);
+                var reporterIonsFilePath = Utilities.ReplaceSuffix(sicStatsFilePath, DataOutput.SIC_STATS_FILE_SUFFIX, DataOutput.REPORTER_IONS_FILE_SUFFIX);
                 var reporterIonsLoaded = LoadReporterIons(reporterIonsFilePath);
 
                 if (sicStatsLoaded)

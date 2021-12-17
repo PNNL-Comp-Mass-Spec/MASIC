@@ -1,4 +1,5 @@
 ﻿using System;
+using MASIC.Data;
 using MASICPeakFinder;
 using PRISM;
 
@@ -7,7 +8,7 @@ namespace MASIC
     /// <summary>
     /// Class for converting from scan number to acquisition time
     /// </summary>
-    public class clsScanNumScanTimeConversion : EventNotifier
+    public class ScanNumScanTimeConversion : EventNotifier
     {
         /// <summary>
         /// Find the index of the scan closest to scanOrAcqTime (searching both Survey and Fragmentation Scans using the MasterScanList)
@@ -17,13 +18,13 @@ namespace MASIC
         /// <param name="scanType">Specifies what type of value scanOrAcqTime is; 0=absolute, 1=relative, 2=acquisition time (aka elution time)</param>
         /// <returns>The index of the scan closest to scanOrAcqTime, or 0 if an error</returns>
         private int FindNearestScanNumIndex(
-            clsScanList scanList,
+            ScanList scanList,
             float scanOrAcqTime,
-            clsCustomSICList.CustomSICScanTypeConstants scanType)
+            CustomSICList.CustomSICScanTypeConstants scanType)
         {
             try
             {
-                if (scanType is clsCustomSICList.CustomSICScanTypeConstants.Absolute or clsCustomSICList.CustomSICScanTypeConstants.Relative)
+                if (scanType is CustomSICList.CustomSICScanTypeConstants.Absolute or CustomSICList.CustomSICScanTypeConstants.Relative)
                 {
                     var absoluteScanNumber = ScanOrAcqTimeToAbsolute(scanList, scanOrAcqTime, scanType, false);
                     return clsBinarySearch.BinarySearchFindNearest(
@@ -53,9 +54,9 @@ namespace MASIC
         /// <param name="scanOrAcqTime">Scan or acquisition time</param>
         /// <param name="scanType">Type for scanOrAcqTime; should be Absolute, Relative, or AcquisitionTime</param>
         public int FindNearestSurveyScanIndex(
-            clsScanList scanList,
+            ScanList scanList,
             float scanOrAcqTime,
-            clsCustomSICList.CustomSICScanTypeConstants scanType)
+            CustomSICList.CustomSICScanTypeConstants scanType)
         {
             try
             {
@@ -111,9 +112,9 @@ namespace MASIC
         /// <param name="scanType">Type of the value to convert; 0=Absolute, 1=Relative, 2=Acquisition Time (aka elution time)</param>
         /// <param name="convertingRangeOrTolerance">True when converting a range</param>
         public int ScanOrAcqTimeToAbsolute(
-            clsScanList scanList,
+            ScanList scanList,
             float scanOrAcqTime,
-            clsCustomSICList.CustomSICScanTypeConstants scanType,
+            CustomSICList.CustomSICScanTypeConstants scanType,
             bool convertingRangeOrTolerance)
         {
             try
@@ -122,13 +123,13 @@ namespace MASIC
 
                 switch (scanType)
                 {
-                    case clsCustomSICList.CustomSICScanTypeConstants.Absolute:
+                    case CustomSICList.CustomSICScanTypeConstants.Absolute:
                         // scanOrAcqTime is an absolute scan number (or range of scan numbers)
                         // No conversion needed; simply return the value
                         absoluteScanNumber = (int)Math.Round(scanOrAcqTime);
                         break;
 
-                    case clsCustomSICList.CustomSICScanTypeConstants.Relative:
+                    case CustomSICList.CustomSICScanTypeConstants.Relative:
                         // scanOrAcqTime is a fraction of the total number of scans (for example, 0.5)
 
                         // Use the total range of scan numbers
@@ -145,7 +146,7 @@ namespace MASIC
 
                         break;
 
-                    case clsCustomSICList.CustomSICScanTypeConstants.AcquisitionTime:
+                    case CustomSICList.CustomSICScanTypeConstants.AcquisitionTime:
                         // scanOrAcqTime is an elution time value
                         // If convertingRangeOrTolerance = False, look for the scan that is nearest to scanOrAcqTime
                         // If convertingRangeOrTolerance = True, convert scanOrAcqTime to a relative scan range and then
@@ -161,7 +162,7 @@ namespace MASIC
 
                             var relativeTime = scanOrAcqTime / totalRunTime;
 
-                            absoluteScanNumber = ScanOrAcqTimeToAbsolute(scanList, relativeTime, clsCustomSICList.CustomSICScanTypeConstants.Relative, true);
+                            absoluteScanNumber = ScanOrAcqTimeToAbsolute(scanList, relativeTime, CustomSICList.CustomSICScanTypeConstants.Relative, true);
                         }
                         else
                         {
@@ -198,16 +199,16 @@ namespace MASIC
         /// <param name="scanType"></param>
         /// <param name="convertingRangeOrTolerance"></param>
         public float ScanOrAcqTimeToScanTime(
-            clsScanList scanList,
+            ScanList scanList,
             float scanOrAcqTime,
-            clsCustomSICList.CustomSICScanTypeConstants scanType,
+            CustomSICList.CustomSICScanTypeConstants scanType,
             bool convertingRangeOrTolerance)
         {
             try
             {
                 switch (scanType)
                 {
-                    case clsCustomSICList.CustomSICScanTypeConstants.Absolute:
+                    case CustomSICList.CustomSICScanTypeConstants.Absolute:
                         // scanOrAcqTime is an absolute scan number (or range of scan numbers)
 
                         // If convertingRangeOrTolerance = False, look for the scan that is nearest to scanOrAcqTime
@@ -225,7 +226,7 @@ namespace MASIC
 
                             var relativeTime = scanOrAcqTime / totalScans;
 
-                            return ScanOrAcqTimeToScanTime(scanList, relativeTime, clsCustomSICList.CustomSICScanTypeConstants.Relative, true);
+                            return ScanOrAcqTimeToScanTime(scanList, relativeTime, CustomSICList.CustomSICScanTypeConstants.Relative, true);
                         }
                         else
                         {
@@ -238,7 +239,7 @@ namespace MASIC
 
                         break;
 
-                    case clsCustomSICList.CustomSICScanTypeConstants.Relative:
+                    case CustomSICList.CustomSICScanTypeConstants.Relative:
                         // scanOrAcqTime is a fraction of the total number of scans (for example, 0.5)
 
                         // Use the total range of scan times
@@ -253,7 +254,7 @@ namespace MASIC
                             return 0;
                         }
 
-                    case clsCustomSICList.CustomSICScanTypeConstants.AcquisitionTime:
+                    case CustomSICList.CustomSICScanTypeConstants.AcquisitionTime:
                         // scanOrAcqTime is an elution time value (or elution time range)
                         // No conversion needed; simply return the value
                         return scanOrAcqTime;

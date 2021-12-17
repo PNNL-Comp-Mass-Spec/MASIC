@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using MASIC.Data;
 using MASIC.DatasetStats;
 using MASIC.Options;
 using PRISM;
@@ -10,7 +11,7 @@ namespace MASIC.DataOutput
     /// <summary>
     /// Methods for writing data to the scan stats, SIC stats, and report ions .txt files
     /// </summary>
-    public class clsDataOutput : clsMasicEventNotifier
+    public class DataOutput : MasicEventNotifier
     {
         // Ignore Spelling: crosstab
 
@@ -172,24 +173,24 @@ namespace MASIC.DataOutput
         /// <summary>
         /// Output file handles
         /// </summary>
-        public clsOutputFileHandles OutputFileHandles { get; }
+        public OutputFileHandles OutputFileHandles { get; }
 
         /// <summary>
         /// Extended scan stats writer
         /// </summary>
-        public clsExtendedStatsWriter ExtendedStatsWriter { get; }
+        public ExtendedStatsWriter ExtendedStatsWriter { get; }
 
         /// <summary>
         /// Constructor
         /// </summary>
-        public clsDataOutput(MASICOptions masicOptions)
+        public DataOutput(MASICOptions masicOptions)
         {
             mOptions = masicOptions;
 
-            OutputFileHandles = new clsOutputFileHandles();
+            OutputFileHandles = new OutputFileHandles();
             RegisterEvents(OutputFileHandles);
 
-            ExtendedStatsWriter = new clsExtendedStatsWriter(mOptions);
+            ExtendedStatsWriter = new ExtendedStatsWriter(mOptions);
             RegisterEvents(ExtendedStatsWriter);
         }
 
@@ -498,7 +499,7 @@ namespace MASIC.DataOutput
 
                         // Read the CustomSICValues and populate
 
-                        var customSICListCompare = new clsCustomSICList();
+                        var customSICListCompare = new CustomSICList();
 
                         matchingNodeList = rootElement.GetElementsByTagName("CustomSICValues");
                         if (matchingNodeList == null || matchingNodeList.Count != 1)
@@ -536,56 +537,56 @@ namespace MASIC.DataOutput
                         var sicOptions = masicOptions.SICOptions;
 
                         // Check if the processing options match
-                        validExistingResultsFound = clsUtilities.ValuesMatch(sicOptionsCompare.SICTolerance, sicOptions.SICTolerance, 3) &&
+                        validExistingResultsFound = Utilities.ValuesMatch(sicOptionsCompare.SICTolerance, sicOptions.SICTolerance, 3) &&
                             sicOptionsCompare.SICToleranceIsPPM == sicOptions.SICToleranceIsPPM &&
                             sicOptionsCompare.RefineReportedParentIonMZ == sicOptions.RefineReportedParentIonMZ &&
                             sicOptionsCompare.ScanRangeStart == sicOptions.ScanRangeStart &&
                             sicOptionsCompare.ScanRangeEnd == sicOptions.ScanRangeEnd &&
-                            clsUtilities.ValuesMatch(sicOptionsCompare.RTRangeStart, sicOptions.RTRangeStart, 2) &&
-                            clsUtilities.ValuesMatch(sicOptionsCompare.RTRangeEnd, sicOptions.RTRangeEnd, 2) &&
+                            Utilities.ValuesMatch(sicOptionsCompare.RTRangeStart, sicOptions.RTRangeStart, 2) &&
+                            Utilities.ValuesMatch(sicOptionsCompare.RTRangeEnd, sicOptions.RTRangeEnd, 2) &&
                             sicOptionsCompare.CompressMSSpectraData == sicOptions.CompressMSSpectraData &&
                             sicOptionsCompare.CompressMSMSSpectraData == sicOptions.CompressMSMSSpectraData &&
-                            clsUtilities.ValuesMatch(sicOptionsCompare.CompressToleranceDivisorForDa, sicOptions.CompressToleranceDivisorForDa, 2) &&
-                            clsUtilities.ValuesMatch(sicOptionsCompare.CompressToleranceDivisorForPPM, sicOptions.CompressToleranceDivisorForDa, 2) &&
-                            clsUtilities.ValuesMatch(sicOptionsCompare.MaxSICPeakWidthMinutesBackward, sicOptions.MaxSICPeakWidthMinutesBackward, 2) &&
-                            clsUtilities.ValuesMatch(sicOptionsCompare.MaxSICPeakWidthMinutesForward, sicOptions.MaxSICPeakWidthMinutesForward, 2) &&
+                            Utilities.ValuesMatch(sicOptionsCompare.CompressToleranceDivisorForDa, sicOptions.CompressToleranceDivisorForDa, 2) &&
+                            Utilities.ValuesMatch(sicOptionsCompare.CompressToleranceDivisorForPPM, sicOptions.CompressToleranceDivisorForDa, 2) &&
+                            Utilities.ValuesMatch(sicOptionsCompare.MaxSICPeakWidthMinutesBackward, sicOptions.MaxSICPeakWidthMinutesBackward, 2) &&
+                            Utilities.ValuesMatch(sicOptionsCompare.MaxSICPeakWidthMinutesForward, sicOptions.MaxSICPeakWidthMinutesForward, 2) &&
                             sicOptionsCompare.ReplaceSICZeroesWithMinimumPositiveValueFromMSData == sicOptions.ReplaceSICZeroesWithMinimumPositiveValueFromMSData &&
-                            clsUtilities.ValuesMatch(sicOptionsCompare.SICPeakFinderOptions.IntensityThresholdFractionMax, sicOptions.SICPeakFinderOptions.IntensityThresholdFractionMax) &&
-                            clsUtilities.ValuesMatch(sicOptionsCompare.SICPeakFinderOptions.IntensityThresholdAbsoluteMinimum, sicOptions.SICPeakFinderOptions.IntensityThresholdAbsoluteMinimum) &&
+                            Utilities.ValuesMatch(sicOptionsCompare.SICPeakFinderOptions.IntensityThresholdFractionMax, sicOptions.SICPeakFinderOptions.IntensityThresholdFractionMax) &&
+                            Utilities.ValuesMatch(sicOptionsCompare.SICPeakFinderOptions.IntensityThresholdAbsoluteMinimum, sicOptions.SICPeakFinderOptions.IntensityThresholdAbsoluteMinimum) &&
                             sicOptionsCompare.SICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseMode == sicOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseMode &&
-                            clsUtilities.ValuesMatch(sicOptionsCompare.SICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseLevelAbsolute, sicOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseLevelAbsolute) &&
-                            clsUtilities.ValuesMatch(sicOptionsCompare.SICPeakFinderOptions.SICBaselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage, sicOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage) &&
-                            clsUtilities.ValuesMatch(sicOptionsCompare.SICPeakFinderOptions.SICBaselineNoiseOptions.MinimumSignalToNoiseRatio, sicOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.MinimumSignalToNoiseRatio) &&
+                            Utilities.ValuesMatch(sicOptionsCompare.SICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseLevelAbsolute, sicOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseLevelAbsolute) &&
+                            Utilities.ValuesMatch(sicOptionsCompare.SICPeakFinderOptions.SICBaselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage, sicOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage) &&
+                            Utilities.ValuesMatch(sicOptionsCompare.SICPeakFinderOptions.SICBaselineNoiseOptions.MinimumSignalToNoiseRatio, sicOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.MinimumSignalToNoiseRatio) &&
                             sicOptionsCompare.SICPeakFinderOptions.MaxDistanceScansNoOverlap == sicOptions.SICPeakFinderOptions.MaxDistanceScansNoOverlap &&
-                            clsUtilities.ValuesMatch(sicOptionsCompare.SICPeakFinderOptions.MaxAllowedUpwardSpikeFractionMax, sicOptions.SICPeakFinderOptions.MaxAllowedUpwardSpikeFractionMax) &&
-                            clsUtilities.ValuesMatch(sicOptionsCompare.SICPeakFinderOptions.InitialPeakWidthScansScaler, sicOptions.SICPeakFinderOptions.InitialPeakWidthScansScaler) &&
+                            Utilities.ValuesMatch(sicOptionsCompare.SICPeakFinderOptions.MaxAllowedUpwardSpikeFractionMax, sicOptions.SICPeakFinderOptions.MaxAllowedUpwardSpikeFractionMax) &&
+                            Utilities.ValuesMatch(sicOptionsCompare.SICPeakFinderOptions.InitialPeakWidthScansScaler, sicOptions.SICPeakFinderOptions.InitialPeakWidthScansScaler) &&
                             sicOptionsCompare.SICPeakFinderOptions.InitialPeakWidthScansMaximum == sicOptions.SICPeakFinderOptions.InitialPeakWidthScansMaximum &&
                             sicOptionsCompare.SICPeakFinderOptions.FindPeaksOnSmoothedData == sicOptions.SICPeakFinderOptions.FindPeaksOnSmoothedData &&
                             sicOptionsCompare.SICPeakFinderOptions.SmoothDataRegardlessOfMinimumPeakWidth == sicOptions.SICPeakFinderOptions.SmoothDataRegardlessOfMinimumPeakWidth &&
                             sicOptionsCompare.SICPeakFinderOptions.UseButterworthSmooth == sicOptions.SICPeakFinderOptions.UseButterworthSmooth &&
-                            clsUtilities.ValuesMatch(sicOptionsCompare.SICPeakFinderOptions.ButterworthSamplingFrequency, sicOptions.SICPeakFinderOptions.ButterworthSamplingFrequency) &&
+                            Utilities.ValuesMatch(sicOptionsCompare.SICPeakFinderOptions.ButterworthSamplingFrequency, sicOptions.SICPeakFinderOptions.ButterworthSamplingFrequency) &&
                             sicOptionsCompare.SICPeakFinderOptions.ButterworthSamplingFrequencyDoubledForSIMData == sicOptions.SICPeakFinderOptions.ButterworthSamplingFrequencyDoubledForSIMData &&
                             sicOptionsCompare.SICPeakFinderOptions.UseSavitzkyGolaySmooth == sicOptions.SICPeakFinderOptions.UseSavitzkyGolaySmooth &&
                             sicOptionsCompare.SICPeakFinderOptions.SavitzkyGolayFilterOrder == sicOptions.SICPeakFinderOptions.SavitzkyGolayFilterOrder &&
                             sicOptionsCompare.SaveSmoothedData == sicOptions.SaveSmoothedData &&
                             sicOptionsCompare.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseMode == sicOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseMode &&
-                            clsUtilities.ValuesMatch(sicOptionsCompare.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseLevelAbsolute, sicOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseLevelAbsolute) &&
-                            clsUtilities.ValuesMatch(sicOptionsCompare.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.TrimmedMeanFractionLowIntensityDataToAverage, sicOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.TrimmedMeanFractionLowIntensityDataToAverage) &&
-                            clsUtilities.ValuesMatch(sicOptionsCompare.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.MinimumSignalToNoiseRatio, sicOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.MinimumSignalToNoiseRatio) &&
-                            clsUtilities.ValuesMatch(sicOptionsCompare.SimilarIonMZToleranceHalfWidth, sicOptions.SimilarIonMZToleranceHalfWidth) &&
-                            clsUtilities.ValuesMatch(sicOptionsCompare.SimilarIonToleranceHalfWidthMinutes, sicOptions.SimilarIonToleranceHalfWidthMinutes) &&
-                            clsUtilities.ValuesMatch(sicOptionsCompare.SpectrumSimilarityMinimum, sicOptions.SpectrumSimilarityMinimum);
+                            Utilities.ValuesMatch(sicOptionsCompare.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseLevelAbsolute, sicOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseLevelAbsolute) &&
+                            Utilities.ValuesMatch(sicOptionsCompare.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.TrimmedMeanFractionLowIntensityDataToAverage, sicOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.TrimmedMeanFractionLowIntensityDataToAverage) &&
+                            Utilities.ValuesMatch(sicOptionsCompare.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.MinimumSignalToNoiseRatio, sicOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.MinimumSignalToNoiseRatio) &&
+                            Utilities.ValuesMatch(sicOptionsCompare.SimilarIonMZToleranceHalfWidth, sicOptions.SimilarIonMZToleranceHalfWidth) &&
+                            Utilities.ValuesMatch(sicOptionsCompare.SimilarIonToleranceHalfWidthMinutes, sicOptions.SimilarIonToleranceHalfWidthMinutes) &&
+                            Utilities.ValuesMatch(sicOptionsCompare.SpectrumSimilarityMinimum, sicOptions.SpectrumSimilarityMinimum);
 
                         if (validExistingResultsFound)
                         {
                             // Check if the binning options match
                             var binningOptions = masicOptions.BinningOptions;
 
-                            validExistingResultsFound = clsUtilities.ValuesMatch(binningOptionsCompare.StartX, binningOptions.StartX) &&
-                                clsUtilities.ValuesMatch(binningOptionsCompare.EndX, binningOptions.EndX) &&
-                                clsUtilities.ValuesMatch(binningOptionsCompare.BinSize, binningOptions.BinSize) &&
+                            validExistingResultsFound = Utilities.ValuesMatch(binningOptionsCompare.StartX, binningOptions.StartX) &&
+                                Utilities.ValuesMatch(binningOptionsCompare.EndX, binningOptions.EndX) &&
+                                Utilities.ValuesMatch(binningOptionsCompare.BinSize, binningOptions.BinSize) &&
                                 binningOptionsCompare.MaximumBinCount == binningOptions.MaximumBinCount &&
-                                clsUtilities.ValuesMatch(binningOptionsCompare.IntensityPrecisionPercent, binningOptions.IntensityPrecisionPercent) &&
+                                Utilities.ValuesMatch(binningOptionsCompare.IntensityPrecisionPercent, binningOptions.IntensityPrecisionPercent) &&
                                 binningOptionsCompare.Normalize == binningOptions.Normalize &&
                                 binningOptionsCompare.SumAllIntensitiesForBin == binningOptions.SumAllIntensitiesForBin;
                         }
@@ -598,7 +599,7 @@ namespace MASIC.DataOutput
                                 (customSICListCompare.RawTextMZToleranceDaList ?? string.Empty) == (masicOptions.CustomSICList.RawTextMZToleranceDaList ?? string.Empty) &&
                                 (customSICListCompare.RawTextScanOrAcqTimeCenterList ?? string.Empty) == (masicOptions.CustomSICList.RawTextScanOrAcqTimeCenterList ?? string.Empty) &&
                                 (customSICListCompare.RawTextScanOrAcqTimeToleranceList ?? string.Empty) == (masicOptions.CustomSICList.RawTextScanOrAcqTimeToleranceList ?? string.Empty) &&
-                                clsUtilities.ValuesMatch(customSICListCompare.ScanOrAcqTimeTolerance, masicOptions.CustomSICList.ScanOrAcqTimeTolerance) &&
+                                Utilities.ValuesMatch(customSICListCompare.ScanOrAcqTimeTolerance, masicOptions.CustomSICList.ScanOrAcqTimeTolerance) &&
                                 customSICListCompare.ScanToleranceType == masicOptions.CustomSICList.ScanToleranceType;
                         }
 
@@ -744,7 +745,7 @@ namespace MASIC.DataOutput
         public bool CreateDatasetInfoFile(
             string inputFileName,
             string outputDirectoryPath,
-            clsScanTracking scanTracking,
+            ScanTracking scanTracking,
             DatasetFileInfo datasetFileInfo)
         {
             var sampleInfo = new SampleInfo();
@@ -753,7 +754,7 @@ namespace MASIC.DataOutput
                 var datasetName = Path.GetFileNameWithoutExtension(inputFileName);
                 var datasetInfoFilePath = ConstructOutputFilePath(inputFileName, outputDirectoryPath, OutputFileTypeConstants.DatasetInfoFile);
 
-                var datasetStatsSummarizer = new clsDatasetStatsSummarizer();
+                var datasetStatsSummarizer = new DatasetStatsSummarizer();
 
                 var success = datasetStatsSummarizer.CreateDatasetInfoFile(
                     datasetName, datasetInfoFilePath,
@@ -781,7 +782,7 @@ namespace MASIC.DataOutput
         /// </summary>
         /// <param name="scanList"></param>
         /// <param name="outputFileType"></param>
-        public string GetHeadersForOutputFile(clsScanList scanList, OutputFileTypeConstants outputFileType)
+        public string GetHeadersForOutputFile(ScanList scanList, OutputFileTypeConstants outputFileType)
         {
             return GetHeadersForOutputFile(scanList, outputFileType, '\t');
         }
@@ -793,7 +794,7 @@ namespace MASIC.DataOutput
         /// <param name="outputFileType"></param>
         /// <param name="delimiter"></param>
         public string GetHeadersForOutputFile(
-            clsScanList scanList, OutputFileTypeConstants outputFileType, char delimiter)
+            ScanList scanList, OutputFileTypeConstants outputFileType, char delimiter)
         {
             List<string> headerNames;
 
@@ -972,7 +973,7 @@ namespace MASIC.DataOutput
         /// <param name="outputDirectoryPath"></param>
         /// <returns>True if success, false if an error</returns>
         public bool SaveHeaderGlossary(
-            clsScanList scanList,
+            ScanList scanList,
             string inputFileName,
             string outputDirectoryPath)
         {
@@ -1022,9 +1023,9 @@ namespace MASIC.DataOutput
         /// <returns>True if success, false if an error</returns>
         public bool SaveSICDataToText(
             SICOptions sicOptions,
-            clsScanList scanList,
+            ScanList scanList,
             int parentIonIndex,
-            clsSICDetails sicDetails)
+            SICDetails sicDetails)
         {
             try
             {

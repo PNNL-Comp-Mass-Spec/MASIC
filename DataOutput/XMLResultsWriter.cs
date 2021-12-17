@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.IO;
 using System.Xml;
+using MASIC.Data;
 using MASIC.DatasetStats;
 using MASIC.Options;
 using PRISM;
@@ -11,7 +12,7 @@ namespace MASIC.DataOutput
     /// <summary>
     /// XML results file writer
     /// </summary>
-    public class clsXMLResultsWriter : clsMasicEventNotifier
+    public class XMLResultsWriter : MasicEventNotifier
     {
         // ReSharper disable once CommentTypo
         // Ignore Spelling: frag, Da, UnCache, Butterworth, SavitzkyGolay, Zeroes, parention
@@ -22,7 +23,7 @@ namespace MASIC.DataOutput
         /// Constructor
         /// </summary>
         /// <param name="masicOptions"></param>
-        public clsXMLResultsWriter(MASICOptions masicOptions)
+        public XMLResultsWriter(MASICOptions masicOptions)
         {
             mOptions = masicOptions;
         }
@@ -77,11 +78,11 @@ namespace MASIC.DataOutput
         /// <param name="smoothedYDataSubset"></param>
         /// <param name="dataOutputHandler"></param>
         public bool SaveDataToXML(
-            clsScanList scanList,
+            ScanList scanList,
             int parentIonIndex,
-            clsSICDetails sicDetails,
+            SICDetails sicDetails,
             MASICPeakFinder.clsSmoothedYDataSubset smoothedYDataSubset,
-            clsDataOutput dataOutputHandler)
+            DataOutput dataOutputHandler)
         {
             var lastGoodLoc = "Start";
 
@@ -180,7 +181,7 @@ namespace MASIC.DataOutput
                     lastGoodLoc = "sicStatsPeak = currentParentIon.SICStats.Peak";
                     var sicStatsPeak = currentParentIon.SICStats.Peak;
 
-                    if (sicDetails.SICScanType == clsScanList.ScanTypeConstants.FragScan)
+                    if (sicDetails.SICScanType == ScanList.ScanTypeConstants.FragScan)
                     {
                         writer.WriteElementString("SICScanType", "FragScan");
                         writer.WriteElementString("PeakScanStart", scanList.FragScans[sicScanIndices[sicStatsPeak.IndexBaseLeft]].ScanNumber.ToString());
@@ -220,7 +221,7 @@ namespace MASIC.DataOutput
 
                     writer.WriteElementString("InterferenceScore", StringUtilities.ValueToString(interferenceScore, 4));
 
-                    if (sicDetails.SICScanType == clsScanList.ScanTypeConstants.FragScan)
+                    if (sicDetails.SICScanType == ScanList.ScanTypeConstants.FragScan)
                     {
                         writer.WriteElementString("SICScanStart", scanList.FragScans[sicScanIndices[0]].ScanNumber.ToString());
                     }
@@ -444,10 +445,10 @@ namespace MASIC.DataOutput
         /// <param name="processingStats"></param>
         /// <param name="processingTimeSec"></param>
         public bool XMLOutputFileFinalize(
-            clsDataOutput dataOutputHandler,
-            clsScanList scanList,
-            clsSpectraCache spectraCache,
-            clsProcessingStats processingStats,
+            DataOutput dataOutputHandler,
+            ScanList scanList,
+            SpectraCache spectraCache,
+            ProcessingStats processingStats,
             float processingTimeSec)
         {
             var writer = dataOutputHandler.OutputFileHandles.XMLFileForSICs;
@@ -502,9 +503,9 @@ namespace MASIC.DataOutput
         public bool XMLOutputFileInitialize(
             string inputFilePathFull,
             string outputDirectoryPath,
-            clsDataOutput dataOutputHandler,
-            clsScanList scanList,
-            clsSpectraCache spectraCache,
+            DataOutput dataOutputHandler,
+            ScanList scanList,
+            SpectraCache spectraCache,
             SICOptions sicOptions,
             BinningOptions binningOptions)
         {
@@ -512,7 +513,7 @@ namespace MASIC.DataOutput
 
             try
             {
-                xmlOutputFilePath = clsDataOutput.ConstructOutputFilePath(inputFilePathFull, outputDirectoryPath, clsDataOutput.OutputFileTypeConstants.XMLFile);
+                xmlOutputFilePath = DataOutput.ConstructOutputFilePath(inputFilePathFull, outputDirectoryPath, DataOutput.OutputFileTypeConstants.XMLFile);
 
                 dataOutputHandler.OutputFileHandles.XMLFileForSICs = new XmlTextWriter(xmlOutputFilePath, System.Text.Encoding.UTF8);
                 var writer = dataOutputHandler.OutputFileHandles.XMLFileForSICs;
@@ -545,7 +546,7 @@ namespace MASIC.DataOutput
                 writer.WriteElementString("SourceFileDateTime", lastModTimeText);
                 writer.WriteElementString("SourceFileSizeBytes", fileSizeBytes);
 
-                writer.WriteElementString("MASICProcessingDate", DateTime.Now.ToString(clsDatasetStatsSummarizer.DATE_TIME_FORMAT_STRING));
+                writer.WriteElementString("MASICProcessingDate", DateTime.Now.ToString(DatasetStatsSummarizer.DATE_TIME_FORMAT_STRING));
                 writer.WriteElementString("MASICVersion", mOptions.MASICVersion);
                 writer.WriteElementString("MASICPeakFinderDllVersion", mOptions.PeakFinderVersion);
                 writer.WriteElementString("ScanCountTotal", scanList.MasterScanOrderCount.ToString());
@@ -569,7 +570,7 @@ namespace MASIC.DataOutput
                 // SIC Options
 
                 // "SICToleranceDa" is a legacy parameter; If the SIC tolerance is in PPM, "SICToleranceDa" is the Da tolerance at 1000 m/z
-                writer.WriteElementString("SICToleranceDa", clsParentIonProcessing.GetParentIonToleranceDa(sicOptions, 1000).ToString("0.0000"));
+                writer.WriteElementString("SICToleranceDa", ParentIonProcessing.GetParentIonToleranceDa(sicOptions, 1000).ToString("0.0000"));
 
                 writer.WriteElementString("SICTolerance", sicOptions.SICTolerance.ToString("0.0000"));
                 writer.WriteElementString("SICToleranceIsPPM", sicOptions.SICToleranceIsPPM.ToString());
@@ -686,7 +687,7 @@ namespace MASIC.DataOutput
             {
                 // Isolate the number
                 work = work.Substring(0, charIndex);
-                if (clsUtilities.IsNumber(work))
+                if (Utilities.IsNumber(work))
                 {
                     var currentValue = int.Parse(work);
 
@@ -709,7 +710,7 @@ namespace MASIC.DataOutput
         /// <param name="inputFileName"></param>
         /// <param name="outputDirectoryPath"></param>
         public bool XmlOutputFileUpdateEntries(
-            clsScanList scanList,
+            ScanList scanList,
             string inputFileName,
             string outputDirectoryPath)
         {
@@ -720,7 +721,7 @@ namespace MASIC.DataOutput
             const string OPTIMAL_PEAK_APEX_TAG_NAME = "OptimalPeakApexScanNumber";
             const string PEAK_APEX_OVERRIDE_PARENT_ION_TAG_NAME = "PeakApexOverrideParentIonIndex";
 
-            var xmlReadFilePath = clsDataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, clsDataOutput.OutputFileTypeConstants.XMLFile);
+            var xmlReadFilePath = DataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, DataOutput.OutputFileTypeConstants.XMLFile);
 
             var xmlOutputFilePath = Path.Combine(outputDirectoryPath, "__temp__MASICOutputFile.xml");
 
@@ -760,7 +761,7 @@ namespace MASIC.DataOutput
                                 if (charIndex > 0)
                                 {
                                     work = work.Substring(0, charIndex);
-                                    if (clsUtilities.IsNumber(work))
+                                    if (Utilities.IsNumber(work))
                                     {
                                         parentIonIndex = int.Parse(work);
                                         parentIonsProcessed++;

@@ -7,7 +7,7 @@ namespace MASIC.DataOutput
     /// <summary>
     /// Class for writing method settings and tune settings for Thermo files
     /// </summary>
-    public class clsThermoMetadataWriter : clsMasicEventNotifier
+    public class ThermoMetadataWriter : MasicEventNotifier
     {
         /// <summary>
         /// Write the instrument method file to disk
@@ -16,7 +16,7 @@ namespace MASIC.DataOutput
         /// <param name="dataOutputHandler"></param>
         public bool SaveMSMethodFile(
             XRawFileIO rawFileReader,
-            clsDataOutput dataOutputHandler)
+            DataOutput dataOutputHandler)
         {
             int instMethodCount;
             var outputFilePath = "?UndefinedFile?";
@@ -75,7 +75,7 @@ namespace MASIC.DataOutput
         /// <param name="dataOutputHandler"></param>
         public bool SaveMSTuneFile(
             XRawFileIO rawFileReader,
-            clsDataOutput dataOutputHandler)
+            DataOutput dataOutputHandler)
         {
             const char TAB_DELIMITER = '\t';
 

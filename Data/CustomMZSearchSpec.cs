@@ -1,9 +1,9 @@
-﻿namespace MASIC
+﻿namespace MASIC.Data
 {
     /// <summary>
     /// Metadata for creating a selected ion chromatogram of a custom m/z value
     /// </summary>
-    public class clsCustomMZSearchSpec
+    public class CustomMZSearchSpec
     {
         /// <summary>
         /// m/z to find
@@ -37,7 +37,7 @@
         /// Constructor
         /// </summary>
         /// <param name="targetMz"></param>
-        public clsCustomMZSearchSpec(double targetMz)
+        public CustomMZSearchSpec(double targetMz)
         {
             MZ = targetMz;
         }

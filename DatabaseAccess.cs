@@ -9,7 +9,7 @@ namespace MASIC
     /// <summary>
     /// Class for obtaining data from the DMS database
     /// </summary>
-    public class clsDatabaseAccess : clsMasicEventNotifier
+    public class DatabaseAccess : MasicEventNotifier
     {
         // ReSharper disable UnusedMember.Global
 
@@ -37,7 +37,7 @@ namespace MASIC
         /// Constructor
         /// </summary>
         /// <param name="masicOptions"></param>
-        public clsDatabaseAccess(MASICOptions masicOptions)
+        public DatabaseAccess(MASICOptions masicOptions)
         {
             mOptions = masicOptions;
         }

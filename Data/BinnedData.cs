@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
 
-namespace MASIC
+namespace MASIC.Data
 {
     /// <summary>
     /// Container for binned intensity values
     /// </summary>
     /// <remarks>Used when comparing spectra</remarks>
-    public class clsBinnedData
+    public class BinnedData
     {
         /// <summary>
         /// X value of the first bin
@@ -36,7 +36,7 @@ namespace MASIC
         /// <summary>
         /// Constructor
         /// </summary>
-        public clsBinnedData()
+        public BinnedData()
         {
             BinnedIntensities = new List<float>();
             BinnedIntensitiesOffset = new List<float>();

@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
 using ThermoRawFileReader;
 
-namespace MASIC
+namespace MASIC.Data
 {
     /// <summary>
     /// Container for MRM scan info
     /// </summary>
-    public class clsMRMScanInfo
+    public class MRMScanInfo
     {
         /// <summary>
         /// Parent ion m/z
@@ -36,7 +36,7 @@ namespace MASIC
         /// <summary>
         /// Constructor
         /// </summary>
-        public clsMRMScanInfo()
+        public MRMScanInfo()
         {
             MRMMassList = new List<MRMMassRangeType>();
             ScanCount = 0;

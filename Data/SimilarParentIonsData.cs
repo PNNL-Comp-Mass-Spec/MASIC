@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 
-namespace MASIC
+namespace MASIC.Data
 {
     /// <summary>
     /// Container for tracking similar parent ions
     /// </summary>
-    public class clsSimilarParentIonsData
+    public class SimilarParentIonsData
     {
         /// <summary>
         /// Pointer array of index values in the original data
@@ -25,17 +25,17 @@ namespace MASIC
         /// <summary>
         /// List of unique m/z values
         /// </summary>
-        public List<clsUniqueMZListItem> UniqueMZList { get; }
+        public List<UniqueMZListItem> UniqueMZList { get; }
 
         /// <summary>
         /// Constructor
         /// </summary>
-        public clsSimilarParentIonsData(int parentIonCount)
+        public SimilarParentIonsData(int parentIonCount)
         {
             MZPointerArray = new int[parentIonCount];
             IonUsed = new bool[parentIonCount];
 
-            UniqueMZList = new List<clsUniqueMZListItem>();
+            UniqueMZList = new List<UniqueMZListItem>();
         }
 
         /// <summary>

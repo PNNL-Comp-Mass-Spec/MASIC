@@ -6,7 +6,7 @@ namespace MASIC
     /// <summary>
     /// MASIC event notifier
     /// </summary>
-    public abstract class clsMasicEventNotifier : EventNotifier
+    public abstract class MasicEventNotifier : EventNotifier
     {
         // Ignore Spelling: uncache
 
@@ -67,7 +67,7 @@ namespace MASIC
         /// Register events
         /// </summary>
         /// <param name="sourceClass"></param>
-        protected void RegisterEvents(clsMasicEventNotifier sourceClass)
+        protected void RegisterEvents(MasicEventNotifier sourceClass)
         {
             base.RegisterEvents(sourceClass);
 
@@ -151,7 +151,7 @@ namespace MASIC
         /// Update cache stats
         /// </summary>
         /// <param name="spectraCache"></param>
-        protected void UpdateCacheStats(clsSpectraCache spectraCache)
+        protected void UpdateCacheStats(SpectraCache spectraCache)
         {
             OnUpdateCacheStats(spectraCache.CacheEventCount, spectraCache.UnCacheEventCount, spectraCache.SpectraPoolHitEventCount);
         }

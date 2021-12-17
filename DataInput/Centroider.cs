@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using MASIC.Data;
 
 namespace MASIC.DataInput
 {
@@ -20,7 +21,7 @@ namespace MASIC.DataInput
         /// <param name="intensities"></param>
         /// <param name="centroidedPrecursorIonsMz"></param>
         /// <param name="centroidedPrecursorIonsIntensity"></param>
-        public bool CentroidData(clsScanInfo scanInfo,
+        public bool CentroidData(ScanInfo scanInfo,
             double[] masses,
             double[] intensities,
             out double[] centroidedPrecursorIonsMz,
@@ -41,7 +42,7 @@ namespace MASIC.DataInput
         /// <param name="centroidedPrecursorIonsMz"></param>
         /// <param name="centroidedPrecursorIonsIntensity"></param>
         public bool CentroidData(
-            clsScanInfo scanInfo,
+            ScanInfo scanInfo,
             double[] masses,
             double[] intensities,
             double massResolution,

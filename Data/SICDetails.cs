@@ -2,17 +2,17 @@
 using System.Linq;
 using MASICPeakFinder;
 
-namespace MASIC
+namespace MASIC.Data
 {
     /// <summary>
     /// Container for a selected ion chromatogram
     /// </summary>
-    public class clsSICDetails
+    public class SICDetails
     {
         /// <summary>
         /// Indicates the type of scans that the SICScanIndices() array points to. Will normally be "SurveyScan", but for MRM data will be "FragScan"
         /// </summary>
-        public clsScanList.ScanTypeConstants SICScanType;
+        public ScanList.ScanTypeConstants SICScanType;
 
         /// <summary>
         /// Selected ion chromatogram data points
@@ -58,7 +58,7 @@ namespace MASIC
         /// <summary>
         /// Constructor
         /// </summary>
-        public clsSICDetails()
+        public SICDetails()
         {
             SICData = new List<clsSICDataPoint>(16);
         }
@@ -82,7 +82,7 @@ namespace MASIC
         public void Reset()
         {
             SICData.Clear();
-            SICScanType = clsScanList.ScanTypeConstants.SurveyScan;
+            SICScanType = ScanList.ScanTypeConstants.SurveyScan;
         }
 
         /// <summary>

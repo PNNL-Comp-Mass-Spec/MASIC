@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 
-namespace MASIC
+namespace MASIC.Data
 {
     /// <summary>
     /// Container for a unique m/z item
     /// </summary>
-    public class clsUniqueMZListItem
+    public class UniqueMZListItem
     {
         /// <summary>
         /// Average m/z
@@ -55,7 +55,7 @@ namespace MASIC
         /// <summary>
         /// Constructor
         /// </summary>
-        public clsUniqueMZListItem()
+        public UniqueMZListItem()
         {
             MatchIndices = new List<int>();
         }

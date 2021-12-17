@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using MASIC.Data;
 using MASIC.DataOutput;
 using MASIC.Options;
 using PRISM;
@@ -11,7 +12,7 @@ namespace MASIC
     /// <summary>
     /// Class for finding reporter ions
     /// </summary>
-    public class clsReporterIonProcessor : clsMasicEventNotifier
+    public class ReporterIonProcessor : MasicEventNotifier
     {
         // Ignore Spelling: Uniquify
 
@@ -26,7 +27,7 @@ namespace MASIC
         /// Constructor
         /// </summary>
         /// <param name="masicOptions"></param>
-        public clsReporterIonProcessor(MASICOptions masicOptions)
+        public ReporterIonProcessor(MASICOptions masicOptions)
         {
             mOptions = masicOptions;
         }
@@ -39,8 +40,8 @@ namespace MASIC
         /// <param name="inputFilePathFull">Full path to the input file</param>
         /// <param name="outputDirectoryPath"></param>
         public bool FindReporterIons(
-            clsScanList scanList,
-            clsSpectraCache spectraCache,
+            ScanList scanList,
+            SpectraCache spectraCache,
             string inputFilePathFull,
             string outputDirectoryPath)
         {
@@ -62,14 +63,14 @@ namespace MASIC
 
                 var includeFtmsColumns = false;
 
-                if (inputFilePathFull.EndsWith(DataInput.clsDataImport.THERMO_RAW_FILE_EXTENSION, StringComparison.OrdinalIgnoreCase))
+                if (inputFilePathFull.EndsWith(DataInput.DataImport.THERMO_RAW_FILE_EXTENSION, StringComparison.OrdinalIgnoreCase))
                 {
                     // Processing a thermo .Raw file
                     // Check whether any of the fragmentation scans has IsFTMS true
                     for (var masterOrderIndex = 0; masterOrderIndex < scanList.MasterScanOrderCount; masterOrderIndex++)
                     {
                         var scanPointer = scanList.MasterScanOrder[masterOrderIndex].ScanIndexPointer;
-                        if (scanList.MasterScanOrder[masterOrderIndex].ScanType == clsScanList.ScanTypeConstants.SurveyScan)
+                        if (scanList.MasterScanOrder[masterOrderIndex].ScanType == ScanList.ScanTypeConstants.SurveyScan)
                         {
                             // Skip survey scans
                             continue;
@@ -91,11 +92,11 @@ namespace MASIC
                 if (mOptions.ReporterIons.ReporterIonList.Count == 0)
                 {
                     // No reporter ions defined; default to ITraq
-                    mOptions.ReporterIons.SetReporterIonMassMode(clsReporterIons.ReporterIonMassModeConstants.ITraqFourMZ);
+                    mOptions.ReporterIons.SetReporterIonMassMode(ReporterIons.ReporterIonMassModeConstants.ITraqFourMZ);
                 }
 
                 // Populate array reporterIons, which we will sort by m/z
-                var reporterIons = new clsReporterIonInfo[mOptions.ReporterIons.ReporterIonList.Count];
+                var reporterIons = new ReporterIonInfo[mOptions.ReporterIons.ReporterIonList.Count];
 
                 var index = 0;
                 foreach (var reporterIon in mOptions.ReporterIons.ReporterIonList)
@@ -104,12 +105,12 @@ namespace MASIC
                     index++;
                 }
 
-                Array.Sort(reporterIons, new clsReportIonInfoComparer());
+                Array.Sort(reporterIons, new ReportIonInfoComparer());
 
-                outputFilePath = clsDataOutput.ConstructOutputFilePath(
+                outputFilePath = DataOutput.DataOutput.ConstructOutputFilePath(
                     Path.GetFileName(inputFilePathFull),
                     outputDirectoryPath,
-                    clsDataOutput.OutputFileTypeConstants.ReporterIonsFile);
+                    DataOutput.DataOutput.OutputFileTypeConstants.ReporterIonsFile);
 
                 using var writer = new StreamWriter(outputFilePath);
 
@@ -135,7 +136,7 @@ namespace MASIC
                 var saveUncorrectedIntensities =
                     mOptions.ReporterIons.ReporterIonApplyAbundanceCorrection && mOptions.ReporterIons.ReporterIonSaveUncorrectedIntensities;
 
-                var dataAggregation = new clsDataAggregation();
+                var dataAggregation = new DataAggregation();
                 RegisterEvents(dataAggregation);
 
                 for (var reporterIonIndex= 0; reporterIonIndex < reporterIons.Length; reporterIonIndex++)
@@ -150,9 +151,9 @@ namespace MASIC
 
                     string mzValue;
                     if (mOptions.ReporterIons.ReporterIonMassMode is
-                        clsReporterIons.ReporterIonMassModeConstants.TMTTenMZ or
-                        clsReporterIons.ReporterIonMassModeConstants.TMTElevenMZ or
-                        clsReporterIons.ReporterIonMassModeConstants.TMTSixteenMZ)
+                        ReporterIons.ReporterIonMassModeConstants.TMTTenMZ or
+                        ReporterIons.ReporterIonMassModeConstants.TMTElevenMZ or
+                        ReporterIons.ReporterIonMassModeConstants.TMTSixteenMZ)
                     {
                         mzValue = reporterIon.MZ.ToString("#0.000");
                     }
@@ -225,7 +226,7 @@ namespace MASIC
                 for (var masterOrderIndex = 0; masterOrderIndex < scanList.MasterScanOrderCount; masterOrderIndex++)
                 {
                     var scanPointer = scanList.MasterScanOrder[masterOrderIndex].ScanIndexPointer;
-                    if (scanList.MasterScanOrder[masterOrderIndex].ScanType == clsScanList.ScanTypeConstants.SurveyScan)
+                    if (scanList.MasterScanOrder[masterOrderIndex].ScanType == ScanList.ScanTypeConstants.SurveyScan)
                     {
                         // Skip Survey Scans
                         continue;
@@ -276,9 +277,9 @@ namespace MASIC
             }
         }
 
-        private readonly clsITraqIntensityCorrection intensityCorrector = new(
-            clsReporterIons.ReporterIonMassModeConstants.CustomOrNone,
-            clsITraqIntensityCorrection.CorrectionFactorsiTRAQ4Plex.ABSciex);
+        private readonly ITraqIntensityCorrection intensityCorrector = new(
+            ReporterIons.ReporterIonMassModeConstants.CustomOrNone,
+            ITraqIntensityCorrection.CorrectionFactorsiTRAQ4Plex.ABSciex);
 
         /// <summary>
         /// Looks for the reporter ion m/z values, +/- a tolerance
@@ -298,14 +299,14 @@ namespace MASIC
         /// <param name="saveObservedMasses"></param>
         private void FindReporterIonsWork(
             XRawFileIO rawFileReader,
-            clsDataAggregation dataAggregation,
+            DataAggregation dataAggregation,
             bool includeFtmsColumns,
             SICOptions sicOptions,
-            clsScanList scanList,
-            clsSpectraCache spectraCache,
-            clsScanInfo currentScan,
+            ScanList scanList,
+            SpectraCache spectraCache,
+            ScanInfo currentScan,
             TextWriter writer,
-            IList<clsReporterIonInfo> reporterIons,
+            IList<ReporterIonInfo> reporterIons,
             char delimiter,
             bool saveUncorrectedIntensities,
             bool saveObservedMasses)
@@ -424,12 +425,12 @@ namespace MASIC
             if (mOptions.ReporterIons.ReporterIonApplyAbundanceCorrection)
             {
                 if (mOptions.ReporterIons.ReporterIonMassMode is
-                    clsReporterIons.ReporterIonMassModeConstants.ITraqFourMZ or
-                    clsReporterIons.ReporterIonMassModeConstants.ITraqEightMZHighRes or
-                    clsReporterIons.ReporterIonMassModeConstants.ITraqEightMZLowRes or
-                    clsReporterIons.ReporterIonMassModeConstants.TMTTenMZ or
-                    clsReporterIons.ReporterIonMassModeConstants.TMTElevenMZ or
-                    clsReporterIons.ReporterIonMassModeConstants.TMTSixteenMZ)
+                    ReporterIons.ReporterIonMassModeConstants.ITraqFourMZ or
+                    ReporterIons.ReporterIonMassModeConstants.ITraqEightMZHighRes or
+                    ReporterIons.ReporterIonMassModeConstants.ITraqEightMZLowRes or
+                    ReporterIons.ReporterIonMassModeConstants.TMTTenMZ or
+                    ReporterIons.ReporterIonMassModeConstants.TMTElevenMZ or
+                    ReporterIons.ReporterIonMassModeConstants.TMTSixteenMZ)
                 {
                     // Correct the reporter ion intensities using the Reporter Ion Intensity Corrector class
 
@@ -586,7 +587,7 @@ namespace MASIC
         /// Reporter ion info comparison class
         /// </summary>
         /// <remarks>Compares m/z values</remarks>
-        protected class clsReportIonInfoComparer : IComparer<clsReporterIonInfo>
+        protected class ReportIonInfoComparer : IComparer<ReporterIonInfo>
         {
             /// <summary>
             /// Compare the m/z values of two reporter ions
@@ -594,7 +595,7 @@ namespace MASIC
             /// <param name="x"></param>
             /// <param name="y"></param>
             /// <returns>-1, 0, or 1</returns>
-            public int Compare(clsReporterIonInfo x, clsReporterIonInfo y)
+            public int Compare(ReporterIonInfo x, ReporterIonInfo y)
             {
                 var reporterIonInfoA = x;
                 var reporterIonInfoB = y;

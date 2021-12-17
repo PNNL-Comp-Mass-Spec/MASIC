@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using MASIC.Data;
 using MASIC.Options;
 
 namespace MASIC.DataOutput
@@ -7,15 +8,15 @@ namespace MASIC.DataOutput
     /// <summary>
     /// Spectrum data writer
     /// </summary>
-    public class clsSpectrumDataWriter : clsMasicEventNotifier
+    public class SpectrumDataWriter : MasicEventNotifier
     {
-        private readonly clsBPIWriter mBPIWriter;
+        private readonly BPIWriter mBPIWriter;
         private readonly MASICOptions mOptions;
 
         /// <summary>
         /// Constructor
         /// </summary>
-        public clsSpectrumDataWriter(clsBPIWriter bpiWriter, MASICOptions masicOptions)
+        public SpectrumDataWriter(BPIWriter bpiWriter, MASICOptions masicOptions)
         {
             mBPIWriter = bpiWriter;
             mOptions = masicOptions;
@@ -29,8 +30,8 @@ namespace MASIC.DataOutput
         /// <param name="inputFileName"></param>
         /// <param name="outputDirectoryPath"></param>
         public bool ExportRawDataToDisk(
-            clsScanList scanList,
-            clsSpectraCache spectraCache,
+            ScanList scanList,
+            SpectraCache spectraCache,
             string inputFileName,
             string outputDirectoryPath)
         {
@@ -44,14 +45,14 @@ namespace MASIC.DataOutput
                 switch (mOptions.RawDataExportOptions.FileFormat)
                 {
                     case RawDataExportOptions.eExportRawDataFileFormatConstants.PEKFile:
-                        outputFilePath = clsDataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, clsDataOutput.OutputFileTypeConstants.PEKFile);
+                        outputFilePath = DataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, DataOutput.OutputFileTypeConstants.PEKFile);
                         dataWriter = new StreamWriter(outputFilePath);
                         scanInfoWriter = null;
                         break;
                     case RawDataExportOptions.eExportRawDataFileFormatConstants.CSVFile:
-                        outputFilePath = clsDataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, clsDataOutput.OutputFileTypeConstants.DeconToolsIsosFile);
+                        outputFilePath = DataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, DataOutput.OutputFileTypeConstants.DeconToolsIsosFile);
 
-                        var outputFilePath2 = clsDataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, clsDataOutput.OutputFileTypeConstants.DeconToolsScansFile);
+                        var outputFilePath2 = DataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, DataOutput.OutputFileTypeConstants.DeconToolsScansFile);
 
                         dataWriter = new StreamWriter(outputFilePath);
                         scanInfoWriter = new StreamWriter(outputFilePath2);
@@ -76,7 +77,7 @@ namespace MASIC.DataOutput
                 for (var masterOrderIndex = 0; masterOrderIndex < scanList.MasterScanOrderCount; masterOrderIndex++)
                 {
                     var scanPointer = scanList.MasterScanOrder[masterOrderIndex].ScanIndexPointer;
-                    if (scanList.MasterScanOrder[masterOrderIndex].ScanType == clsScanList.ScanTypeConstants.SurveyScan)
+                    if (scanList.MasterScanOrder[masterOrderIndex].ScanType == ScanList.ScanTypeConstants.SurveyScan)
                     {
                         SaveRawDataToDiskWork(dataWriter, scanInfoWriter, scanList.SurveyScans[scanPointer], spectraCache, inputFileName, false, ref spectrumExportCount);
                     }
@@ -119,8 +120,8 @@ namespace MASIC.DataOutput
         private void SaveCSVFilesToDiskWork(
             StreamWriter dataWriter,
             StreamWriter scanInfoWriter,
-            clsScanInfo currentScan,
-            clsSpectraCache spectraCache,
+            ScanInfo currentScan,
+            SpectraCache spectraCache,
             bool fragmentationScan,
             ref int spectrumExportCount)
         {
@@ -212,7 +213,7 @@ namespace MASIC.DataOutput
                     {
                         const int charge = 1;
                         const int isoFit = 0;
-                        var mass = clsUtilities.ConvoluteMass(spectrum.IonsMZ[ionIndex], 1, 0);
+                        var mass = Utilities.ConvoluteMass(spectrum.IonsMZ[ionIndex], 1, 0);
                         const int peakFWHM = 0;
                         var signalToNoise = spectrum.IonsIntensity[ionIndex] / baselineNoiseLevel;
                         const int monoisotopicAbu = -10;
@@ -230,8 +231,8 @@ namespace MASIC.DataOutput
 
         private void SavePEKFileToDiskWork(
             TextWriter writer,
-            clsScanInfo currentScan,
-            clsSpectraCache spectraCache,
+            ScanInfo currentScan,
+            SpectraCache spectraCache,
             string inputFileName,
             bool fragmentationScan,
             ref int spectrumExportCount)
@@ -353,8 +354,8 @@ namespace MASIC.DataOutput
         private void SaveRawDataToDiskWork(
             StreamWriter dataWriter,
             StreamWriter scanInfoWriter,
-            clsScanInfo currentScan,
-            clsSpectraCache spectraCache,
+            ScanInfo currentScan,
+            SpectraCache spectraCache,
             string inputFileName,
             bool fragmentationScan,
             ref int spectrumExportCount)

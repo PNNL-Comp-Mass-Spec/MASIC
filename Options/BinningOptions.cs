@@ -81,7 +81,7 @@
         /// </summary>
         public void Reset()
         {
-            var defaultOptions = clsCorrelation.GetDefaultBinningOptions();
+            var defaultOptions = Correlation.GetDefaultBinningOptions();
 
             StartX = defaultOptions.StartX;
             EndX = defaultOptions.EndX;

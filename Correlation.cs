@@ -19,7 +19,7 @@ namespace MASIC
     /// They were later ported to VB.NET, then to C#
     /// </para>
     /// </summary>
-    public class clsCorrelation : EventNotifier
+    public class Correlation : EventNotifier
     {
         // ReSharper disable once CommentTypo
 
@@ -33,7 +33,7 @@ namespace MASIC
         /// <summary>
         /// Constructor
         /// </summary>
-        public clsCorrelation()
+        public Correlation()
             : this(GetDefaultBinningOptions())
         {
         }
@@ -42,7 +42,7 @@ namespace MASIC
         /// Constructor that includes binning options
         /// </summary>
         /// <param name="binningOptions"></param>
-        public clsCorrelation(BinningOptions binningOptions)
+        public Correlation(BinningOptions binningOptions)
         {
             mBinningOptions = binningOptions;
             NoiseThresholdIntensity = 0;

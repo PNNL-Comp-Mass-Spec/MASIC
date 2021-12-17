@@ -372,7 +372,7 @@ namespace MASIC.DataOutput
                 if (!statsSummarized)
                     return false;
 
-                var datasetName = clsUtilities.ReplaceSuffix(Path.GetFileName(sicStatsFilePath), clsDataOutput.SIC_STATS_FILE_SUFFIX, string.Empty);
+                var datasetName = Utilities.ReplaceSuffix(Path.GetFileName(sicStatsFilePath), DataOutput.SIC_STATS_FILE_SUFFIX, string.Empty);
 
                 var plotsGenerated = CreatePlots(datasetName, outputDirectory, out var plotFiles);
 

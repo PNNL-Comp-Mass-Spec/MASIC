@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using MASIC.Data;
 using MASIC.Options;
 
 namespace MASIC.DataInput
@@ -9,7 +10,7 @@ namespace MASIC.DataInput
     /// Class for reading spectra from .mgf and .cdf files
     /// </summary>
     // ReSharper disable once IdentifierTypo
-    public class clsDataImportMGFandCDF : clsDataImport
+    public class DataImportMGFandCDF : DataImport
     {
         // Ignore Spelling: Chemstation
 
@@ -21,11 +22,11 @@ namespace MASIC.DataInput
         /// <param name="parentIonProcessor"></param>
         /// <param name="scanTracking"></param>
         // ReSharper disable once IdentifierTypo
-        public clsDataImportMGFandCDF(
+        public DataImportMGFandCDF(
             MASICOptions masicOptions,
             MASICPeakFinder.clsMASICPeakFinder peakFinder,
-            clsParentIonProcessing parentIonProcessor,
-            clsScanTracking scanTracking)
+            ParentIonProcessing parentIonProcessor,
+            ScanTracking scanTracking)
             : base(masicOptions, peakFinder, parentIonProcessor, scanTracking)
         {
         }
@@ -43,9 +44,9 @@ namespace MASIC.DataInput
         // ReSharper disable once IdentifierTypo
         public bool ExtractScanInfoFromMGFandCDF(
             string filePath,
-            clsScanList scanList,
-            clsSpectraCache spectraCache,
-            DataOutput.clsDataOutput dataOutputHandler,
+            ScanList scanList,
+            SpectraCache spectraCache,
+            DataOutput.DataOutput dataOutputHandler,
             bool keepRawSpectra,
             bool keepMSMSSpectra)
         {
@@ -150,7 +151,7 @@ namespace MASIC.DataInput
 
                     if (mScanTracking.CheckScanInRange(scanNumber, scanTime, sicOptions))
                     {
-                        var newSurveyScan = new clsScanInfo
+                        var newSurveyScan = new ScanInfo
                         {
                             ScanNumber = scanNumber,
                             TotalIonIntensity = (float)scanTotalIntensity,    // Copy the Total Scan Intensity to .TotalIonIntensity
@@ -178,7 +179,7 @@ namespace MASIC.DataInput
 
                         if (success && intIonCount > 0)
                         {
-                            var msSpectrum = new clsMSSpectrum(scanNumber, mzData, intensityData, intIonCount);
+                            var msSpectrum = new MSSpectrum(scanNumber, mzData, intensityData, intIonCount);
 
                             double msDataResolution;
 
@@ -201,12 +202,12 @@ namespace MASIC.DataInput
                                 // However, if the lowest m/z value is < 100, use 100 m/z
                                 if (mzMin < 100)
                                 {
-                                    msDataResolution = clsParentIonProcessing.GetParentIonToleranceDa(sicOptions, 100) /
+                                    msDataResolution = ParentIonProcessing.GetParentIonToleranceDa(sicOptions, 100) /
                                         sicOptions.CompressToleranceDivisorForPPM;
                                 }
                                 else
                                 {
-                                    msDataResolution = clsParentIonProcessing.GetParentIonToleranceDa(sicOptions, mzMin) /
+                                    msDataResolution = ParentIonProcessing.GetParentIonToleranceDa(sicOptions, mzMin) /
                                         sicOptions.CompressToleranceDivisorForPPM;
                                 }
                             }
@@ -266,7 +267,7 @@ namespace MASIC.DataInput
                 // We can now initialize .MasterScanOrder()
                 var lastSurveyScanIndex = 0;
 
-                scanList.AddMasterScanEntry(clsScanList.ScanTypeConstants.SurveyScan, lastSurveyScanIndex);
+                scanList.AddMasterScanEntry(ScanList.ScanTypeConstants.SurveyScan, lastSurveyScanIndex);
 
                 var surveyScansRecorded = new SortedSet<int>
                 {
@@ -369,15 +370,15 @@ namespace MASIC.DataInput
                         if (!surveyScansRecorded.Contains(lastSurveyScanIndex))
                         {
                             surveyScansRecorded.Add(lastSurveyScanIndex);
-                            scanList.AddMasterScanEntry(clsScanList.ScanTypeConstants.SurveyScan,
+                            scanList.AddMasterScanEntry(ScanList.ScanTypeConstants.SurveyScan,
                                 lastSurveyScanIndex);
                         }
                     }
 
-                    scanList.AddMasterScanEntry(clsScanList.ScanTypeConstants.FragScan, scanList.FragScans.Count,
+                    scanList.AddMasterScanEntry(ScanList.ScanTypeConstants.FragScan, scanList.FragScans.Count,
                         spectrumInfo.ScanNumber, (float)scanTime);
 
-                    var newFragScan = new clsScanInfo
+                    var newFragScan = new ScanInfo
                     {
                         ScanNumber = spectrumInfo.ScanNumber,
                         ScanTime = (float)scanTime,
@@ -396,7 +397,7 @@ namespace MASIC.DataInput
 
                     scanList.FragScans.Add(newFragScan);
 
-                    var msSpectrum = new clsMSSpectrum(newFragScan.ScanNumber, spectrumInfo.MZList, spectrumInfo.IntensityList, spectrumInfo.DataCount);
+                    var msSpectrum = new MSSpectrum(newFragScan.ScanNumber, spectrumInfo.MZList, spectrumInfo.IntensityList, spectrumInfo.DataCount);
 
                     if (spectrumInfo.DataCount > 0)
                     {
@@ -487,7 +488,7 @@ namespace MASIC.DataInput
                         {
                             surveyScansRecorded.Add(lastSurveyScanIndex);
 
-                            scanList.AddMasterScanEntry(clsScanList.ScanTypeConstants.SurveyScan, lastSurveyScanIndex);
+                            scanList.AddMasterScanEntry(ScanList.ScanTypeConstants.SurveyScan, lastSurveyScanIndex);
                         }
                     }
                 }
@@ -499,9 +500,9 @@ namespace MASIC.DataInput
                 for (var scanIndex = 0; scanIndex < scanList.MasterScanOrderCount; scanIndex++)
                 {
                     var scanType = scanList.MasterScanOrder[scanIndex].ScanType;
-                    clsScanInfo currentScan;
+                    ScanInfo currentScan;
 
-                    if (scanType == clsScanList.ScanTypeConstants.SurveyScan)
+                    if (scanType == ScanList.ScanTypeConstants.SurveyScan)
                     {
                         // Survey scan
                         currentScan = scanList.SurveyScans[scanList.MasterScanOrder[scanIndex].ScanIndexPointer];
@@ -590,7 +591,7 @@ namespace MASIC.DataInput
         /// <returns>Closest elution time</returns>
         // ReSharper disable once IdentifierTypo
         private float InterpolateRTandFragScanNumber(
-            IList<clsScanInfo> surveyScans,
+            IList<ScanInfo> surveyScans,
             int lastSurveyScanIndex,
             int fragScanNumber,
             out int fragScanIteration)
@@ -697,7 +698,7 @@ namespace MASIC.DataInput
         /// Validate that .MasterScanOrder() really is sorted by scan number
         /// </summary>
         /// <param name="scanList"></param>
-        private void ValidateMasterScanOrderSorting(clsScanList scanList)
+        private void ValidateMasterScanOrderSorting(ScanList scanList)
         {
             // Cannot use an IComparer because .MasterScanOrder points into other arrays
 
@@ -728,7 +729,7 @@ namespace MASIC.DataInput
             {
                 // Reorder .MasterScanOrder, .MasterScanNumList, and .MasterScanTimeList
 
-                var udtMasterScanOrderListCopy = new clsScanList.ScanOrderPointerType[scanList.MasterScanOrder.Count];
+                var udtMasterScanOrderListCopy = new ScanList.ScanOrderPointerType[scanList.MasterScanOrder.Count];
                 var masterScanTimeListCopy = new float[scanList.MasterScanOrder.Count];
 
                 Array.Copy(scanList.MasterScanOrder.ToArray(), udtMasterScanOrderListCopy, scanList.MasterScanOrderCount);

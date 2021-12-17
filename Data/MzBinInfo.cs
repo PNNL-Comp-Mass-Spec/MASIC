@@ -1,9 +1,9 @@
-﻿namespace MASIC
+﻿namespace MASIC.Data
 {
     /// <summary>
     /// Container for a binned m/z value
     /// </summary>
-    public class clsMzBinInfo
+    public class MzBinInfo
     {
         // Ignore Spelling: Da
 

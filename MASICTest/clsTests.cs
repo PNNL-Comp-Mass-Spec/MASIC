@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using MASIC;
+using MASIC.Data;
 using MASIC.Options;
 using NUnit.Framework;
 using PRISM;
@@ -48,7 +49,7 @@ namespace MASICTest
         [TestCase(1000, -2, -3, 0, 0)]
         public void TestConvoluteMass(double massMZ, short currentCharge, short desiredCharge, double chargeCarrierMass, double expectedMass)
         {
-            var newMass = clsUtilities.ConvoluteMass(massMZ, currentCharge, desiredCharge, chargeCarrierMass);
+            var newMass = Utilities.ConvoluteMass(massMZ, currentCharge, desiredCharge, chargeCarrierMass);
 
             var currentChargeWithSign = GetChargeWithSign(currentCharge);
             var newChargeWithSign = GetChargeWithSign(desiredCharge);
@@ -93,16 +94,16 @@ namespace MASICTest
 
             var options = new MASICOptions(string.Empty, string.Empty);
             var peakFinder = new MASICPeakFinder.clsMASICPeakFinder();
-            var reporterIons = new clsReporterIons();
+            var reporterIons = new ReporterIons();
 
-            var parentIonProcessor = new clsParentIonProcessing(reporterIons);
-            var scanTracking = new clsScanTracking(reporterIons, peakFinder);
+            var parentIonProcessor = new ParentIonProcessing(reporterIons);
+            var scanTracking = new ScanTracking(reporterIons, peakFinder);
 
-            var dataImportUtilities = new MASIC.DataInput.clsDataImportThermoRaw(options, peakFinder, parentIonProcessor, scanTracking);
+            var dataImportUtilities = new MASIC.DataInput.DataImportThermoRaw(options, peakFinder, parentIonProcessor, scanTracking);
 
-            var mReporterIons = new clsReporterIons();
+            var mReporterIons = new ReporterIons();
 
-            var msSpectrum = new clsMSSpectrum(1000);
+            var msSpectrum = new MSSpectrum(1000);
 
             for (var mz = 500.0; mz < 1000; mz += 0.1)
             {
@@ -146,7 +147,7 @@ namespace MASICTest
             const float INTENSITY_MINIMUM = 10000;
             const float SCAN_TIME_SCALAR = 10;
 
-            var scanList = new clsScanList();
+            var scanList = new ScanList();
             var oRand = new Random();
 
             var lastSurveyScanIndexInMasterSeqOrder = -1;
@@ -159,7 +160,7 @@ namespace MASICTest
                 {
                     // Add a survey scan
                     // If this is a mzXML file that was processed with ReadW, .ScanHeaderText and .ScanTypeName will get updated by UpdateMSXMLScanType
-                    var newSurveyScan = new MASIC.clsScanInfo
+                    var newSurveyScan = new ScanInfo
                     {
                         ScanNumber = scanNumber,
                         ScanTime = scanNumber / SCAN_TIME_SCALAR,
@@ -189,13 +190,13 @@ namespace MASICTest
 
                     var intLastSurveyScanIndex = scanList.SurveyScans.Count - 1;
 
-                    scanList.AddMasterScanEntry(clsScanList.ScanTypeConstants.SurveyScan, intLastSurveyScanIndex);
+                    scanList.AddMasterScanEntry(ScanList.ScanTypeConstants.SurveyScan, intLastSurveyScanIndex);
                     lastSurveyScanIndexInMasterSeqOrder = scanList.MasterScanOrderCount - 1;
                 }
                 else
                 {
                     // If this is a mzXML file that was processed with ReadW, .ScanHeaderText and .ScanTypeName will get updated by UpdateMSXMLScanType
-                    var newFragScan = new MASIC.clsScanInfo
+                    var newFragScan = new ScanInfo
                     {
                         ScanNumber = scanNumber,
                         ScanTime = scanNumber / SCAN_TIME_SCALAR,
@@ -226,11 +227,11 @@ namespace MASICTest
                     newFragScan.IsFTMS = false;
 
                     scanList.FragScans.Add(newFragScan);
-                    scanList.AddMasterScanEntry(clsScanList.ScanTypeConstants.FragScan, scanList.FragScans.Count - 1);
+                    scanList.AddMasterScanEntry(ScanList.ScanTypeConstants.FragScan, scanList.FragScans.Count - 1);
                 }
             }
 
-            var scanNumScanConverter = new clsScanNumScanTimeConversion();
+            var scanNumScanConverter = new ScanNumScanTimeConversion();
             RegisterEvents(scanNumScanConverter);
 
             // Convert absolute values
@@ -271,8 +272,8 @@ namespace MASICTest
         /// <param name="relativeTime">Relative scan (value between 0 and 1)</param>
         /// <param name="scanTime">Scan time</param>
         private void TestScanConversionToAbsolute(
-            clsScanList scanList,
-            clsScanNumScanTimeConversion scanNumScanConverter,
+            ScanList scanList,
+            ScanNumScanTimeConversion scanNumScanConverter,
             KeyValuePair<int, int> scanNumber,
             KeyValuePair<float, float> relativeTime,
             KeyValuePair<float, float> scanTime)
@@ -280,15 +281,15 @@ namespace MASICTest
             try
             {
                 // Find the scan number corresponding to each of these values
-                float result1 = scanNumScanConverter.ScanOrAcqTimeToAbsolute(scanList, scanNumber.Key, clsCustomSICList.CustomSICScanTypeConstants.Absolute, false);
+                float result1 = scanNumScanConverter.ScanOrAcqTimeToAbsolute(scanList, scanNumber.Key, CustomSICList.CustomSICScanTypeConstants.Absolute, false);
                 Console.WriteLine(scanNumber.Key + " -> " + result1);
                 Assert.AreEqual(scanNumber.Value, result1, 1E-05);
 
-                float result2 = scanNumScanConverter.ScanOrAcqTimeToAbsolute(scanList, relativeTime.Key, clsCustomSICList.CustomSICScanTypeConstants.Relative, false);
+                float result2 = scanNumScanConverter.ScanOrAcqTimeToAbsolute(scanList, relativeTime.Key, CustomSICList.CustomSICScanTypeConstants.Relative, false);
                 Console.WriteLine(relativeTime.Key + " -> " + result2);
                 Assert.AreEqual(relativeTime.Value, result2, 1E-05);
 
-                float result3 = scanNumScanConverter.ScanOrAcqTimeToAbsolute(scanList, scanTime.Key, clsCustomSICList.CustomSICScanTypeConstants.AcquisitionTime, false);
+                float result3 = scanNumScanConverter.ScanOrAcqTimeToAbsolute(scanList, scanTime.Key, CustomSICList.CustomSICScanTypeConstants.AcquisitionTime, false);
                 Console.WriteLine(scanTime.Key + " -> " + result3);
                 Assert.AreEqual(scanTime.Value, result3, 1E-05);
 
@@ -308,20 +309,20 @@ namespace MASICTest
         /// <param name="scanNumber">Absolute scan number</param>
         /// <param name="relativeTime">Relative scan (value between 0 and 1)</param>
         /// <param name="scanTime">Scan time</param>
-        public void TestScanConversionToTime(clsScanList scanList, clsScanNumScanTimeConversion scanNumScanConverter, KeyValuePair<int, int> scanNumber, KeyValuePair<float, float> relativeTime, KeyValuePair<float, float> scanTime)
+        public void TestScanConversionToTime(ScanList scanList, ScanNumScanTimeConversion scanNumScanConverter, KeyValuePair<int, int> scanNumber, KeyValuePair<float, float> relativeTime, KeyValuePair<float, float> scanTime)
         {
             try
             {
                 // Find the scan time corresponding to each of these values
-                var result1 = scanNumScanConverter.ScanOrAcqTimeToScanTime(scanList, scanNumber.Key, clsCustomSICList.CustomSICScanTypeConstants.Absolute, false);
+                var result1 = scanNumScanConverter.ScanOrAcqTimeToScanTime(scanList, scanNumber.Key, CustomSICList.CustomSICScanTypeConstants.Absolute, false);
                 Console.WriteLine(scanNumber.Key + " -> " + result1 + " minutes");
                 Assert.AreEqual(scanNumber.Value, result1, 1E-05);
 
-                var result2 = scanNumScanConverter.ScanOrAcqTimeToScanTime(scanList, relativeTime.Key, clsCustomSICList.CustomSICScanTypeConstants.Relative, false);
+                var result2 = scanNumScanConverter.ScanOrAcqTimeToScanTime(scanList, relativeTime.Key, CustomSICList.CustomSICScanTypeConstants.Relative, false);
                 Console.WriteLine(relativeTime.Key + " -> " + result2 + " minutes");
                 Assert.AreEqual(relativeTime.Value, result2, 1E-05);
 
-                var result3 = scanNumScanConverter.ScanOrAcqTimeToScanTime(scanList, scanTime.Key, clsCustomSICList.CustomSICScanTypeConstants.AcquisitionTime, false);
+                var result3 = scanNumScanConverter.ScanOrAcqTimeToScanTime(scanList, scanTime.Key, CustomSICList.CustomSICScanTypeConstants.AcquisitionTime, false);
                 Console.WriteLine(scanTime.Key + " -> " + result3 + " minutes");
                 Assert.AreEqual(scanTime.Value, result3, 1E-05);
 

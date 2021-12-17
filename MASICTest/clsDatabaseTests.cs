@@ -56,7 +56,7 @@ namespace MASICTest
                 DatabaseConnectionString = connectionString
             };
 
-            var dbAccessor = new clsDatabaseAccess(options);
+            var dbAccessor = new DatabaseAccess(options);
 
             var datasetID = dbAccessor.LookupDatasetID(datasetName, strDatasetLookupFilePath, 1);
 

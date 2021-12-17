@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 
-namespace MASIC
+namespace MASIC.Data
 {
     /// <summary>
     /// Selected ion chromatogram search info
     /// </summary>
-    public class clsMzSearchInfo
+    public class MzSearchInfo
     {
         // Ignore Spelling: Da
 

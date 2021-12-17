@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using MASIC.Data;
 using PRISMDatabaseUtils;
 
 namespace MASIC.DataInput
@@ -8,7 +9,7 @@ namespace MASIC.DataInput
     /// <summary>
     /// Class for reading a custom SIC list file
     /// </summary>
-    public class clsCustomSICListReader : clsMasicEventNotifier
+    public class CustomSICListReader : MasicEventNotifier
     {
         private const string CUSTOM_SIC_COLUMN_MZ = "MZ";
 
@@ -47,7 +48,7 @@ namespace MASIC.DataInput
             Comment = 6
         }
 
-        private readonly clsCustomSICList mCustomSICList;
+        private readonly CustomSICList mCustomSICList;
 
         /// <summary>
         /// Get the default header names for a custom SIC list file
@@ -83,7 +84,7 @@ namespace MASIC.DataInput
         /// <summary>
         /// Constructor
         /// </summary>
-        public clsCustomSICListReader(clsCustomSICList customSicList)
+        public CustomSICListReader(CustomSICList customSicList)
         {
             mCustomSICList = customSicList;
         }
@@ -169,7 +170,7 @@ namespace MASIC.DataInput
                             DataTableUtils.GetColumnIndex(columnMap, CustomSICFileColumns.TimeTolerance) >= 0)
                         {
                             forceAcquisitionTimeMode = true;
-                            mCustomSICList.ScanToleranceType = clsCustomSICList.CustomSICScanTypeConstants.AcquisitionTime;
+                            mCustomSICList.ScanToleranceType = CustomSICList.CustomSICScanTypeConstants.AcquisitionTime;
                         }
                         else
                         {
@@ -180,12 +181,12 @@ namespace MASIC.DataInput
                     }
 
                     // Parse this line's data if dataCols(0) is numeric
-                    if (!clsUtilities.IsNumber(dataCols[0]))
+                    if (!Utilities.IsNumber(dataCols[0]))
                     {
                         continue;
                     }
 
-                    var mzSearchSpec = new clsCustomMZSearchSpec(0)
+                    var mzSearchSpec = new CustomMZSearchSpec(0)
                     {
                         MZToleranceDa = 0,
                         ScanOrAcqTimeCenter = 0,
@@ -220,7 +221,7 @@ namespace MASIC.DataInput
                         // Do not use this value if both the ScanTime and the TimeTolerance columns were present
                         if (!forceAcquisitionTimeMode)
                         {
-                            if (mCustomSICList.ScanToleranceType == clsCustomSICList.CustomSICScanTypeConstants.Absolute)
+                            if (mCustomSICList.ScanToleranceType == CustomSICList.CustomSICScanTypeConstants.Absolute)
                             {
                                 mzSearchSpec.ScanOrAcqTimeTolerance = int.Parse(scanTolerance);
                             }

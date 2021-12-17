@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using MASIC.Data;
 using PRISM;
 
 namespace MASIC.Options
@@ -11,7 +12,7 @@ namespace MASIC.Options
     /// MASIC Options
     /// </summary>
     /// <remarks>Set options through the Property Functions or by passing parameterFilePath to ProcessFile()</remarks>
-    public class MASICOptions : clsMasicEventNotifier
+    public class MASICOptions : MasicEventNotifier
     {
         // Ignore Spelling: Butterworth, crosstab, Da, html, plex, SavitzkyGolay, Sql, Zeroes
 
@@ -73,7 +74,7 @@ namespace MASIC.Options
         /// <summary>
         /// Custom SIC list details
         /// </summary>
-        public clsCustomSICList CustomSICList { get; }
+        public CustomSICList CustomSICList { get; }
 
         /// <summary>
         /// Plotting options
@@ -197,7 +198,7 @@ namespace MASIC.Options
         /// <summary>
         /// Reporter ions to find
         /// </summary>
-        public clsReporterIons ReporterIons { get; }
+        public ReporterIons ReporterIons { get; }
 
         /// <summary>
         /// When true, assume the scan time in .cdf files is the number of seconds since the acquisition started
@@ -255,12 +256,12 @@ namespace MASIC.Options
 
             CacheOptions = new SpectrumCacheOptions();
 
-            CustomSICList = new clsCustomSICList();
+            CustomSICList = new CustomSICList();
             RegisterEvents(CustomSICList);
 
             RawDataExportOptions = new RawDataExportOptions();
 
-            ReporterIons = new clsReporterIons();
+            ReporterIons = new ReporterIons();
 
             BinningOptions = new BinningOptions();
 
@@ -275,24 +276,24 @@ namespace MASIC.Options
         /// Convert custom SIC scan tolerance type from text to an enum
         /// </summary>
         /// <param name="scanType"></param>
-        public clsCustomSICList.CustomSICScanTypeConstants GetScanToleranceTypeFromText(string scanType)
+        public CustomSICList.CustomSICScanTypeConstants GetScanToleranceTypeFromText(string scanType)
         {
             scanType ??= string.Empty;
 
             var scanTypeTrimmed = scanType.Trim();
 
-            if (string.Equals(scanTypeTrimmed, clsCustomSICList.CUSTOM_SIC_TYPE_RELATIVE, StringComparison.InvariantCultureIgnoreCase))
+            if (string.Equals(scanTypeTrimmed, CustomSICList.CUSTOM_SIC_TYPE_RELATIVE, StringComparison.InvariantCultureIgnoreCase))
             {
-                return clsCustomSICList.CustomSICScanTypeConstants.Relative;
+                return CustomSICList.CustomSICScanTypeConstants.Relative;
             }
 
-            if (string.Equals(scanTypeTrimmed, clsCustomSICList.CUSTOM_SIC_TYPE_ACQUISITION_TIME, StringComparison.InvariantCultureIgnoreCase))
+            if (string.Equals(scanTypeTrimmed, CustomSICList.CUSTOM_SIC_TYPE_ACQUISITION_TIME, StringComparison.InvariantCultureIgnoreCase))
             {
-                return clsCustomSICList.CustomSICScanTypeConstants.AcquisitionTime;
+                return CustomSICList.CustomSICScanTypeConstants.AcquisitionTime;
             }
 
             // Assume absolute
-            return clsCustomSICList.CustomSICScanTypeConstants.Absolute;
+            return CustomSICList.CustomSICScanTypeConstants.Absolute;
         }
 
         /// <summary>
@@ -514,7 +515,7 @@ namespace MASIC.Options
                     ReporterIons.ReporterIonStatsEnabled = reader.GetParam(
                         XML_SECTION_EXPORT_OPTIONS, "ReporterIonStatsEnabled", ReporterIons.ReporterIonStatsEnabled);
 
-                    var reporterIonMassMode = (clsReporterIons.ReporterIonMassModeConstants)reader.GetParam(
+                    var reporterIonMassMode = (ReporterIons.ReporterIonMassModeConstants)reader.GetParam(
                         XML_SECTION_EXPORT_OPTIONS, "ReporterIonMassMode", (int)ReporterIons.ReporterIonMassMode);
 
                     ReporterIons.ReporterIonToleranceDaDefault = reader.GetParam(
@@ -524,7 +525,7 @@ namespace MASIC.Options
                         XML_SECTION_EXPORT_OPTIONS, "ReporterIonApplyAbundanceCorrection", ReporterIons.ReporterIonApplyAbundanceCorrection);
 
                     ReporterIons.ReporterIonITraq4PlexCorrectionFactorType =
-                        (clsITraqIntensityCorrection.CorrectionFactorsiTRAQ4Plex)reader.GetParam(
+                        (ITraqIntensityCorrection.CorrectionFactorsiTRAQ4Plex)reader.GetParam(
                             XML_SECTION_EXPORT_OPTIONS,
                             "ReporterIonITraq4PlexCorrectionFactorType",
                             (int)ReporterIons.ReporterIonITraq4PlexCorrectionFactorType);
@@ -822,9 +823,9 @@ namespace MASIC.Options
 
                 CustomSICList.ScanToleranceType = GetScanToleranceTypeFromText(scanType);
 
-                if (scanTolerance.Length > 0 && clsUtilities.IsNumber(scanTolerance))
+                if (scanTolerance.Length > 0 && Utilities.IsNumber(scanTolerance))
                 {
-                    if (CustomSICList.ScanToleranceType == clsCustomSICList.CustomSICScanTypeConstants.Absolute)
+                    if (CustomSICList.ScanToleranceType == CustomSICList.CustomSICScanTypeConstants.Absolute)
                     {
                         CustomSICList.ScanOrAcqTimeTolerance = int.Parse(scanTolerance);
                     }
@@ -1113,15 +1114,15 @@ namespace MASIC.Options
 
                 switch (CustomSICList.ScanToleranceType)
                 {
-                    case clsCustomSICList.CustomSICScanTypeConstants.Relative:
-                        writer.SetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanType", clsCustomSICList.CUSTOM_SIC_TYPE_RELATIVE);
+                    case CustomSICList.CustomSICScanTypeConstants.Relative:
+                        writer.SetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanType", CustomSICList.CUSTOM_SIC_TYPE_RELATIVE);
                         break;
-                    case clsCustomSICList.CustomSICScanTypeConstants.AcquisitionTime:
-                        writer.SetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanType", clsCustomSICList.CUSTOM_SIC_TYPE_ACQUISITION_TIME);
+                    case CustomSICList.CustomSICScanTypeConstants.AcquisitionTime:
+                        writer.SetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanType", CustomSICList.CUSTOM_SIC_TYPE_ACQUISITION_TIME);
                         break;
                     default:
                         // Assume absolute
-                        writer.SetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanType", clsCustomSICList.CUSTOM_SIC_TYPE_ABSOLUTE);
+                        writer.SetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanType", CustomSICList.CUSTOM_SIC_TYPE_ABSOLUTE);
                         break;
                 }
 

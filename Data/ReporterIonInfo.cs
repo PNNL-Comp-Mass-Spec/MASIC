@@ -1,9 +1,9 @@
-﻿namespace MASIC
+﻿namespace MASIC.Data
 {
     /// <summary>
     /// Information for a single reporter ion
     /// </summary>
-    public class clsReporterIonInfo
+    public class ReporterIonInfo
     {
         // Ignore Spelling: Daltons, immonium
 
@@ -41,7 +41,7 @@
         /// <summary>
         /// Constructor
         /// </summary>
-        public clsReporterIonInfo(double ionMZ)
+        public ReporterIonInfo(double ionMZ)
         {
             MZ = ionMZ;
         }
@@ -51,7 +51,7 @@
         /// </summary>
         /// <param name="ionMZ"></param>
         /// <param name="isContaminantIon"></param>
-        public clsReporterIonInfo(double ionMZ, bool isContaminantIon)
+        public ReporterIonInfo(double ionMZ, bool isContaminantIon)
         {
             MZ = ionMZ;
             ContaminantIon = isContaminantIon;

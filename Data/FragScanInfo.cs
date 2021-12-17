@@ -1,9 +1,9 @@
-﻿namespace MASIC
+﻿namespace MASIC.Data
 {
     /// <summary>
     /// Information about a single fragmentation scan (spectrum)
     /// </summary>
-    public class clsFragScanInfo
+    public class FragScanInfo
     {
         /// <summary>
         /// Pointer to an entry in the ParentIons() array; -1 if undefined
@@ -41,7 +41,7 @@
         /// <summary>
         /// Constructor
         /// </summary>
-        public clsFragScanInfo(double parentIonMzValue)
+        public FragScanInfo(double parentIonMzValue)
         {
             // -1 means undefined; only used for fragmentation scans
             ParentIonInfoIndex = -1;

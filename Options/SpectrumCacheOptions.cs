@@ -50,7 +50,7 @@ namespace MASIC.Options
         /// </summary>
         public void Reset()
         {
-            var defaultOptions = clsSpectraCache.GetDefaultCacheOptions();
+            var defaultOptions = SpectraCache.GetDefaultCacheOptions();
 
             DiskCachingAlwaysDisabled = defaultOptions.DiskCachingAlwaysDisabled;
             DirectoryPath = defaultOptions.DirectoryPath;

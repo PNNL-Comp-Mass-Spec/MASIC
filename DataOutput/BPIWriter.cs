@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using MASIC.Data;
 using MASIC.Options;
 
 namespace MASIC.DataOutput
@@ -9,7 +10,7 @@ namespace MASIC.DataOutput
     /// <summary>
     /// BPI Writer
     /// </summary>
-    public class clsBPIWriter : clsMasicEventNotifier
+    public class BPIWriter : MasicEventNotifier
     {
         // ReSharper disable CommentTypo
 
@@ -43,8 +44,8 @@ namespace MASIC.DataOutput
         /// <remarks>SaveExtendedScanStatsFiles() creates a tab-delimited text file with the BPI and TIC information for each scan</remarks>
         /// <returns>True if success, false if an error</returns>
         public bool SaveBPIs(
-            clsScanList scanList,
-            clsSpectraCache spectraCache,
+            ScanList scanList,
+            SpectraCache spectraCache,
             string inputFilePathFull,
             string outputDirectoryPath)
         {
@@ -69,7 +70,7 @@ namespace MASIC.DataOutput
                 UpdateProgress((short)(stepsCompleted / (double)bpiStepCount * 100));
 
                 // Second, write an MS-based _scans.csv file (readable with Decon2LS)
-                var msScansFilePath = clsDataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, clsDataOutput.OutputFileTypeConstants.DeconToolsMSChromatogramFile);
+                var msScansFilePath = DataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, DataOutput.OutputFileTypeConstants.DeconToolsMSChromatogramFile);
                 currentFilePath = string.Copy(msScansFilePath);
 
                 ReportMessage("Saving Decon2LS MS Chromatogram File to " + Path.GetFileName(msScansFilePath));
@@ -80,7 +81,7 @@ namespace MASIC.DataOutput
                 UpdateProgress((short)(stepsCompleted / (double)bpiStepCount * 100));
 
                 // Third, write an MSMS-based _scans.csv file (readable with Decon2LS)
-                var msmsScansFilePath = clsDataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, clsDataOutput.OutputFileTypeConstants.DeconToolsMSMSChromatogramFile);
+                var msmsScansFilePath = DataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, DataOutput.OutputFileTypeConstants.DeconToolsMSMSChromatogramFile);
                 currentFilePath = string.Copy(msmsScansFilePath);
 
                 ReportMessage("Saving Decon2LS MSMS Chromatogram File to " + Path.GetFileName(msmsScansFilePath));
@@ -98,8 +99,8 @@ namespace MASIC.DataOutput
         }
 
         private void SaveDecon2LSChromatogram(
-            ICollection<clsScanInfo> scanList,
-            clsSpectraCache spectraCache,
+            ICollection<ScanInfo> scanList,
+            SpectraCache spectraCache,
             string outputFilePath)
         {
             var scansWritten = 0;
@@ -135,7 +136,7 @@ namespace MASIC.DataOutput
         [Obsolete("No longer used")]
         private void SaveICRToolsChromatogramByScan(
             MASICOptions masicOptions,
-            IList<clsScanInfo> scanList,
+            IList<ScanInfo> scanList,
             int scanCount,
             string outputFilePath,
             bool saveElutionTimeInsteadOfScan,
@@ -247,11 +248,11 @@ namespace MASIC.DataOutput
 
                     if (saveTICInsteadOfBPI)
                     {
-                        writer.Write(clsUtilities.CFloatSafe(scan.TotalIonIntensity));
+                        writer.Write(Utilities.CFloatSafe(scan.TotalIonIntensity));
                     }
                     else
                     {
-                        writer.Write(clsUtilities.CFloatSafe(scan.BasePeakIonIntensity));
+                        writer.Write(Utilities.CFloatSafe(scan.BasePeakIonIntensity));
                     }
                 }
             }
@@ -358,8 +359,8 @@ namespace MASIC.DataOutput
 
         private void WriteDecon2LSScanFileEntry(
             StreamWriter writer,
-            clsScanInfo currentScan,
-            clsSpectraCache spectraCache)
+            ScanInfo currentScan,
+            SpectraCache spectraCache)
         {
             int numPeaks;
 
@@ -400,7 +401,7 @@ namespace MASIC.DataOutput
         /// <param name="numIsotopicSignatures"></param>
         public void WriteDecon2LSScanFileEntry(
             StreamWriter writer,
-            clsScanInfo currentScan,
+            ScanInfo currentScan,
             int scanNumber,
             int msLevel,
             int numPeaks,

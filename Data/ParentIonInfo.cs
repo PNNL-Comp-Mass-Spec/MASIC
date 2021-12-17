@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 
-namespace MASIC
+namespace MASIC.Data
 {
     /// <summary>
     /// Container for a single parent ion
     /// </summary>
-    public class clsParentIonInfo
+    public class ParentIonInfo
     {
         /// <summary>
         /// Parent ion m/z value
@@ -36,7 +36,7 @@ namespace MASIC
         /// <summary>
         /// SIC Stats for this parent ion
         /// </summary>
-        public clsSICStats SICStats { get; set; }
+        public SICStats SICStats { get; set; }
 
         /// <summary>
         /// True if this is a custom SIC-based parent ion
@@ -72,11 +72,11 @@ namespace MASIC
         /// Constructor
         /// </summary>
         /// <param name="parentIonMz">Parent ion m/z value</param>
-        public clsParentIonInfo(double parentIonMz)
+        public ParentIonInfo(double parentIonMz)
         {
             FragScanIndices = new List<int>();
             MZ = parentIonMz;
-            SICStats = new clsSICStats();
+            SICStats = new SICStats();
         }
 
         /// <summary>

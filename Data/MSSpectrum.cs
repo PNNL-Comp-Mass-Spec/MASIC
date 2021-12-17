@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace MASIC
+namespace MASIC.Data
 {
     /// <summary>
     /// Used to track the m/z and intensity values of a given mass spectrum
     /// </summary>
-    public class clsMSSpectrum
+    public class MSSpectrum
     {
         /// <summary>
         /// Scan number
@@ -32,7 +32,7 @@ namespace MASIC
         /// <summary>
         /// Constructor that only sets the scan number
         /// </summary>
-        public clsMSSpectrum(int scanNumber)
+        public MSSpectrum(int scanNumber)
         {
             ScanNumber = scanNumber;
 
@@ -43,7 +43,7 @@ namespace MASIC
         /// <summary>
         /// Constructor that sets the scan number and stores m/z and intensity data (float intensities)
         /// </summary>
-        public clsMSSpectrum(int scanNumber, IList<double> mzList, IList<float> intensityList, int dataCount)
+        public MSSpectrum(int scanNumber, IList<double> mzList, IList<float> intensityList, int dataCount)
             : this(scanNumber)
         {
             IonsMZ.Capacity = dataCount;
@@ -58,7 +58,7 @@ namespace MASIC
         /// <summary>
         /// Constructor that sets the scan number and stores m/z and intensity data (double intensities)
         /// </summary>
-        public clsMSSpectrum(int scanNumber, IList<double> mzList, IList<double> intensityList, int dataCount)
+        public MSSpectrum(int scanNumber, IList<double> mzList, IList<double> intensityList, int dataCount)
             : this(scanNumber)
         {
             IonsMZ.Capacity = dataCount;
@@ -103,7 +103,7 @@ namespace MASIC
         /// Make a deep copy of this mass spectrum
         /// </summary>
         // ReSharper disable once UnusedMember.Global
-        public clsMSSpectrum Clone()
+        public MSSpectrum Clone()
         {
             return Copy(this);
         }
@@ -112,9 +112,9 @@ namespace MASIC
         /// Make a deep copy of the given mass spectrum
         /// </summary>
         /// <param name="sourceSpectrum"></param>
-        public clsMSSpectrum Copy(clsMSSpectrum sourceSpectrum)
+        public MSSpectrum Copy(MSSpectrum sourceSpectrum)
         {
-            return new clsMSSpectrum(sourceSpectrum.ScanNumber, sourceSpectrum.IonsMZ, sourceSpectrum.IonsIntensity, sourceSpectrum.IonsMZ.Count);
+            return new MSSpectrum(sourceSpectrum.ScanNumber, sourceSpectrum.IonsMZ, sourceSpectrum.IonsIntensity, sourceSpectrum.IonsMZ.Count);
         }
 
         /// <summary>
@@ -122,7 +122,7 @@ namespace MASIC
         /// </summary>
         /// <param name="spectrum"></param>
         /// <param name="scanNumberOverride"></param>
-        public void ReplaceData(clsMSSpectrum spectrum, int scanNumberOverride)
+        public void ReplaceData(MSSpectrum spectrum, int scanNumberOverride)
         {
             ScanNumber = spectrum.ScanNumber;
             if (ScanNumber != scanNumberOverride)

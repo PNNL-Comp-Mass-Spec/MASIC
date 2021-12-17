@@ -6,7 +6,7 @@ namespace MASIC
     /// <summary>
     /// Number utility methods
     /// </summary>
-    public static class clsUtilities
+    public static class Utilities
     {
         // CHARGE_CARRIER_MASS_AVG As Double = 1.00739
 

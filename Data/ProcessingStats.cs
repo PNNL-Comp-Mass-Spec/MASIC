@@ -1,11 +1,11 @@
 ﻿using System;
 
-namespace MASIC
+namespace MASIC.Data
 {
     /// <summary>
     /// Container for tracking processing stats
     /// </summary>
-    public class clsProcessingStats
+    public class ProcessingStats
     {
         // Ignore Spelling: uncache
 

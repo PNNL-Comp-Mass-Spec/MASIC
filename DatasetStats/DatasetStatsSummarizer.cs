@@ -28,7 +28,7 @@ namespace MASIC.DatasetStats
     /// <remarks>
     /// This class computes aggregate stats for a dataset
     /// </remarks>
-    public class clsDatasetStatsSummarizer : EventNotifier
+    public class DatasetStatsSummarizer : EventNotifier
     {
         // Ignore Spelling: AcqTime, yyyy-MM-dd, hh:mm:ss tt
 
@@ -92,7 +92,7 @@ namespace MASIC.DatasetStats
         /// <summary>
         /// Constructor
         /// </summary>
-        public clsDatasetStatsSummarizer()
+        public DatasetStatsSummarizer()
         {
             FileDate = "August 14, 2020";
 
@@ -194,11 +194,11 @@ namespace MASIC.DatasetStats
                     }
                 }
 
-                summaryStats.MSStats.TICMedian = clsUtilities.ComputeMedian(ticListMS);
-                summaryStats.MSStats.BPIMedian = clsUtilities.ComputeMedian(bpiListMS);
+                summaryStats.MSStats.TICMedian = Utilities.ComputeMedian(ticListMS);
+                summaryStats.MSStats.BPIMedian = Utilities.ComputeMedian(bpiListMS);
 
-                summaryStats.MSnStats.TICMedian = clsUtilities.ComputeMedian(ticListMSn);
-                summaryStats.MSnStats.BPIMedian = clsUtilities.ComputeMedian(bpiListMSn);
+                summaryStats.MSnStats.TICMedian = Utilities.ComputeMedian(ticListMSn);
+                summaryStats.MSnStats.BPIMedian = Utilities.ComputeMedian(bpiListMSn);
 
                 return true;
             }

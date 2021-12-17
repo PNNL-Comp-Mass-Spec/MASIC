@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using MASIC.Data;
 using MASIC.DatasetStats;
 using MASIC.Options;
 using PRISM;
@@ -11,7 +12,7 @@ namespace MASIC.DataInput
     /// <summary>
     /// Base class for reading spectra from mass spec data files
     /// </summary>
-    public abstract class clsDataImport : clsMasicEventNotifier
+    public abstract class DataImport : MasicEventNotifier
     {
         // Ignore Spelling: centroided
 
@@ -79,7 +80,7 @@ namespace MASIC.DataInput
         /// <summary>
         /// Parent ion processor
         /// </summary>
-        protected readonly clsParentIonProcessing mParentIonProcessor;
+        protected readonly ParentIonProcessing mParentIonProcessor;
 
         /// <summary>
         /// MASIC peak finder
@@ -89,7 +90,7 @@ namespace MASIC.DataInput
         /// <summary>
         /// Scan tracking
         /// </summary>
-        protected readonly clsScanTracking mScanTracking;
+        protected readonly ScanTracking mScanTracking;
 
         /// <summary>
         /// Dataset file info
@@ -170,11 +171,11 @@ namespace MASIC.DataInput
         /// <param name="peakFinder"></param>
         /// <param name="parentIonProcessor"></param>
         /// <param name="scanTracking"></param>
-        protected clsDataImport(
+        protected DataImport(
             MASICOptions masicOptions,
             MASICPeakFinder.clsMASICPeakFinder peakFinder,
-            clsParentIonProcessing parentIonProcessor,
-            clsScanTracking scanTracking)
+            ParentIonProcessing parentIonProcessor,
+            ScanTracking scanTracking)
         {
             mOptions = masicOptions;
             mPeakFinder = peakFinder;
@@ -237,7 +238,7 @@ namespace MASIC.DataInput
         /// <param name="mzIgnoreRangeEnd"></param>
         /// <param name="noiseThresholdOptions"></param>
         public void DiscardDataBelowNoiseThreshold(
-            clsMSSpectrum msSpectrum,
+            MSSpectrum msSpectrum,
             double noiseThresholdIntensity,
             double mzIgnoreRangeStart,
             double mzIgnoreRangeEnd,
@@ -257,7 +258,7 @@ namespace MASIC.DataInput
                             {
                                 // Always keep points in the m/z ignore range
                                 // If CheckPointInMZIgnoreRange returns true, set pointPassesFilter to true
-                                var pointPassesFilter = clsUtilities.CheckPointInMZIgnoreRange(msSpectrum.IonsMZ[ionIndex], mzIgnoreRangeStart, mzIgnoreRangeEnd);
+                                var pointPassesFilter = Utilities.CheckPointInMZIgnoreRange(msSpectrum.IonsMZ[ionIndex], mzIgnoreRangeStart, mzIgnoreRangeEnd);
 
                                 if (!pointPassesFilter)
                                 {
@@ -292,7 +293,7 @@ namespace MASIC.DataInput
                             {
                                 // Always keep points in the m/z ignore range
                                 // If CheckPointInMZIgnoreRange returns true, set pointPassesFilter to true
-                                var pointPassesFilter = clsUtilities.CheckPointInMZIgnoreRange(msSpectrum.IonsMZ[ionIndex], mzIgnoreRangeStart, mzIgnoreRangeEnd);
+                                var pointPassesFilter = Utilities.CheckPointInMZIgnoreRange(msSpectrum.IonsMZ[ionIndex], mzIgnoreRangeStart, mzIgnoreRangeEnd);
 
                                 if (!pointPassesFilter)
                                 {
@@ -342,7 +343,7 @@ namespace MASIC.DataInput
         /// <param name="mzIgnoreRangeEnd"></param>
         /// <param name="maxIonCountToRetain"></param>
         public void DiscardDataToLimitIonCount(
-            clsMSSpectrum msSpectrum,
+            MSSpectrum msSpectrum,
             double mzIgnoreRangeStart,
             double mzIgnoreRangeEnd,
             int maxIonCountToRetain)
@@ -357,7 +358,7 @@ namespace MASIC.DataInput
                 int ionCountNew;
                 if (msSpectrum.IonCount > maxIonCountToRetain)
                 {
-                    var filterDataArray = new clsFilterDataArrayMaxCount
+                    var filterDataArray = new FilterDataArrayMaxCount
                     {
                         MaximumDataCountToKeep = maxIonCountToRetain
                     };
@@ -395,7 +396,7 @@ namespace MASIC.DataInput
                     {
                         // Always keep points in the m/z ignore range
                         // If CheckPointInMZIgnoreRange returns true, set pointPassesFilter to true
-                        var pointPassesFilter = clsUtilities.CheckPointInMZIgnoreRange(msSpectrum.IonsMZ[ionIndex], mzIgnoreRangeStart, mzIgnoreRangeEnd);
+                        var pointPassesFilter = Utilities.CheckPointInMZIgnoreRange(msSpectrum.IonsMZ[ionIndex], mzIgnoreRangeStart, mzIgnoreRangeEnd);
 
                         if (!pointPassesFilter)
                         {
@@ -458,7 +459,7 @@ namespace MASIC.DataInput
         /// <param name="scanList"></param>
         /// <param name="dataFile"></param>
         /// <returns>True if it at least one scan was stored, otherwise false</returns>
-        protected bool FinalizeScanList(clsScanList scanList, FileSystemInfo dataFile)
+        protected bool FinalizeScanList(ScanList scanList, FileSystemInfo dataFile)
         {
             if (scanList.MasterScanOrderCount <= 0)
             {
@@ -519,7 +520,7 @@ namespace MASIC.DataInput
         /// <param name="scanList"></param>
         /// <param name="keepRawSpectra"></param>
         /// <param name="keepMSMSSpectra"></param>
-        protected void InitBaseOptions(clsScanList scanList, bool keepRawSpectra, bool keepMSMSSpectra)
+        protected void InitBaseOptions(ScanList scanList, bool keepRawSpectra, bool keepMSMSSpectra)
         {
             mLastNonZoomSurveyScanIndex = -1;
             mScansOutOfRange = 0;
@@ -542,8 +543,8 @@ namespace MASIC.DataInput
         /// <param name="datasetID"></param>
         protected void SaveScanStatEntry(
             StreamWriter writer,
-            clsScanList.ScanTypeConstants scanType,
-            clsScanInfo currentScan,
+            ScanList.ScanTypeConstants scanType,
+            ScanInfo currentScan,
             int datasetID)
         {
             const char TAB_DELIMITER = '\t';
@@ -553,7 +554,7 @@ namespace MASIC.DataInput
                 ScanNumber = currentScan.ScanNumber
             };
 
-            if (scanType == clsScanList.ScanTypeConstants.SurveyScan)
+            if (scanType == ScanList.ScanTypeConstants.SurveyScan)
             {
                 scanStatsEntry.ScanType = 1;
                 scanStatsEntry.ScanTypeName = string.Copy(currentScan.ScanTypeName);

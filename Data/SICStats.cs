@@ -1,9 +1,9 @@
-﻿namespace MASIC
+﻿namespace MASIC.Data
 {
     /// <summary>
     /// SIC Stats container
     /// </summary>
-    public class clsSICStats
+    public class SICStats
     {
         // Ignore Spelling: frag
 
@@ -15,7 +15,7 @@
         /// <summary>
         /// Scan type for peak indices (survey scan or frag scan)
         /// </summary>
-        public clsScanList.ScanTypeConstants ScanTypeForPeakIndices { get; set; }
+        public ScanList.ScanTypeConstants ScanTypeForPeakIndices { get; set; }
 
         /// <summary>
         /// Pointer to entry in .SurveyScans() or .FragScans() indicating the survey scan that contains the peak maximum
@@ -40,7 +40,7 @@
         /// <summary>
         /// Constructor
         /// </summary>
-        public clsSICStats()
+        public SICStats()
         {
             Peak = new MASICPeakFinder.clsSICStatsPeak();
         }

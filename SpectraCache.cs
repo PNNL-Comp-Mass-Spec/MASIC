@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using MASIC.Data;
 using MASIC.Options;
 
 namespace MASIC
@@ -8,7 +9,7 @@ namespace MASIC
     /// <summary>
     /// Utilizes a spectrum pool to store mass spectra
     /// </summary>
-    public class clsSpectraCache : clsMasicEventNotifier, IDisposable
+    public class SpectraCache : MasicEventNotifier, IDisposable
     {
         // Ignore Spelling: uncache, uncached
 
@@ -16,7 +17,7 @@ namespace MASIC
         /// Constructor
         /// </summary>
         /// <param name="cacheOptions"></param>
-        public clsSpectraCache(SpectrumCacheOptions cacheOptions)
+        public SpectraCache(SpectrumCacheOptions cacheOptions)
         {
             mCacheOptions = cacheOptions;
             InitializeVariables();
@@ -160,7 +161,7 @@ namespace MASIC
         /// <param name="scanNumber"></param>
         /// <returns>Index of the spectrum in the pool in targetPoolIndex</returns>
         public bool AddSpectrumToPool(
-            clsMSSpectrum spectrum,
+            MSSpectrum spectrum,
             int scanNumber)
         {
             try
@@ -197,7 +198,7 @@ namespace MASIC
             }
         }
 
-        private void CacheSpectrumWork(clsMSSpectrum spectrumToCache)
+        private void CacheSpectrumWork(MSSpectrum spectrumToCache)
         {
             const int MAX_RETRIES = 3;
 
@@ -490,10 +491,10 @@ namespace MASIC
         /// <param name="scanNumber">Scan number to load</param>
         /// <param name="msSpectrum">Output: spectrum for scan number</param>
         /// <returns>True if successfully uncached, false if an error</returns>
-        private bool UnCacheSpectrum(int scanNumber, out clsMSSpectrum msSpectrum)
+        private bool UnCacheSpectrum(int scanNumber, out MSSpectrum msSpectrum)
         {
             // Make sure we have a valid object
-            var cacheItem = new ScanMemoryCacheItem(new clsMSSpectrum(scanNumber), eCacheStateConstants.LoadedFromCache);
+            var cacheItem = new ScanMemoryCacheItem(new MSSpectrum(scanNumber), eCacheStateConstants.LoadedFromCache);
 
             msSpectrum = cacheItem.Scan;
 
@@ -515,9 +516,9 @@ namespace MASIC
         /// Load the spectrum from disk and cache in SpectraPool
         /// </summary>
         /// <param name="scanNumber">Scan number to load</param>
-        /// <param name="msSpectrum"><see cref="clsMSSpectrum"/> object to store data into; supplying 'null' is an exception.</param>
+        /// <param name="msSpectrum"><see cref="MSSpectrum"/> object to store data into; supplying 'null' is an exception.</param>
         /// <returns>True if successfully uncached, false if an error</returns>
-        private bool UnCacheSpectrumWork(int scanNumber, clsMSSpectrum msSpectrum)
+        private bool UnCacheSpectrumWork(int scanNumber, MSSpectrum msSpectrum)
         {
             var success = false;
             msSpectrum.Clear();
@@ -672,7 +673,7 @@ namespace MASIC
         /// <param name="canSkipPool">if true and the spectrum is not in the pool, it will be read from the disk cache without updating the pool.
         /// This should be true for any spectrum requests that are not likely to be repeated within the next <see cref="SpectrumCacheOptions.SpectraToRetainInMemory"/> requests.</param>
         /// <returns>True if the scan was found in the spectrum pool (or was successfully added to the pool)</returns>
-        public bool GetSpectrum(int scanNumber, out clsMSSpectrum spectrum, bool canSkipPool = true)
+        public bool GetSpectrum(int scanNumber, out MSSpectrum spectrum, bool canSkipPool = true)
         {
             try
             {
@@ -691,7 +692,7 @@ namespace MASIC
                     return success;
                 }
 
-                spectrum = new clsMSSpectrum(scanNumber);
+                spectrum = new MSSpectrum(scanNumber);
                 UnCacheSpectrumWork(scanNumber, spectrum);
 
                 // Maintain functionality: return true, even if the spectrum was not in the cache file.
@@ -718,14 +719,14 @@ namespace MASIC
             /// <summary>
             /// Mass Spectrum
             /// </summary>
-            public clsMSSpectrum Scan { get; }
+            public MSSpectrum Scan { get; }
 
             /// <summary>
             /// Constructor
             /// </summary>
             /// <param name="scan"></param>
             /// <param name="cacheState"></param>
-            public ScanMemoryCacheItem(clsMSSpectrum scan, eCacheStateConstants cacheState = eCacheStateConstants.NeverCached)
+            public ScanMemoryCacheItem(MSSpectrum scan, eCacheStateConstants cacheState = eCacheStateConstants.NeverCached)
             {
                 Scan = scan;
                 CacheState = cacheState;

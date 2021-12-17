@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using MASIC.Data;
 using MASIC.Options;
 using MASICPeakFinder;
 using PRISM;
@@ -11,7 +12,7 @@ namespace MASIC.DataOutput
     /// <summary>
     /// SIC Stats Writer
     /// </summary>
-    public class clsSICStatsWriter : clsMasicEventNotifier
+    public class SICStatsWriter : MasicEventNotifier
     {
         // Ignore Spelling: Frag
 
@@ -20,11 +21,11 @@ namespace MASIC.DataOutput
         /// </summary>
         public string SICStatsFilePath { get; private set; } = string.Empty;
 
-        private clsParentIonInfo GetFakeParentIonForFragScan(clsScanList scanList, int fragScanIndex)
+        private ParentIonInfo GetFakeParentIonForFragScan(ScanList scanList, int fragScanIndex)
         {
             var currentFragScan = scanList.FragScans[fragScanIndex];
 
-            var newParentIon = new clsParentIonInfo(currentFragScan.BasePeakIonMZ)
+            var newParentIon = new ParentIonInfo(currentFragScan.BasePeakIonMZ)
             {
                 SurveyScanIndex = 0
             };
@@ -41,7 +42,7 @@ namespace MASIC.DataOutput
                     surveyScanNumberAbsolute,
                     clsBinarySearch.eMissingDataModeConstants.ReturnClosestPoint);
 
-                while (surveyScanIndexMatch >= 0 && scanList.MasterScanOrder[surveyScanIndexMatch].ScanType == clsScanList.ScanTypeConstants.FragScan)
+                while (surveyScanIndexMatch >= 0 && scanList.MasterScanOrder[surveyScanIndexMatch].ScanType == ScanList.ScanTypeConstants.FragScan)
                 {
                     surveyScanIndexMatch--;
                 }
@@ -50,7 +51,7 @@ namespace MASIC.DataOutput
                 {
                     // Did not find the previous survey scan; find the next survey scan
                     surveyScanIndexMatch++;
-                    while (surveyScanIndexMatch < scanList.MasterScanOrderCount && scanList.MasterScanOrder[surveyScanIndexMatch].ScanType == clsScanList.ScanTypeConstants.FragScan)
+                    while (surveyScanIndexMatch < scanList.MasterScanOrderCount && scanList.MasterScanOrder[surveyScanIndexMatch].ScanType == ScanList.ScanTypeConstants.FragScan)
                     {
                         surveyScanIndexMatch++;
                     }
@@ -75,7 +76,7 @@ namespace MASIC.DataOutput
 
             newParentIon.PeakApexOverrideParentIonIndex = -1;
 
-            newParentIon.SICStats.ScanTypeForPeakIndices = clsScanList.ScanTypeConstants.FragScan;
+            newParentIon.SICStats.ScanTypeForPeakIndices = ScanList.ScanTypeConstants.FragScan;
             newParentIon.SICStats.PeakScanIndexStart = fragScanIndex;
             newParentIon.SICStats.PeakScanIndexEnd = fragScanIndex;
             newParentIon.SICStats.PeakScanIndexMax = fragScanIndex;
@@ -94,7 +95,7 @@ namespace MASIC.DataOutput
 
         [Obsolete("Unused")]
         private void PopulateScanListPointerArray(
-            IList<clsScanInfo> surveyScans,
+            IList<ScanInfo> surveyScans,
             int surveyScanCount,
             out int[] scanListArray)
         {
@@ -122,11 +123,11 @@ namespace MASIC.DataOutput
         /// <param name="masicOptions"></param>
         /// <param name="dataOutputHandler"></param>
         public bool SaveSICStatsFlatFile(
-            clsScanList scanList,
+            ScanList scanList,
             string inputFileName,
             string outputDirectoryPath,
             MASICOptions masicOptions,
-            clsDataOutput dataOutputHandler)
+            DataOutput dataOutputHandler)
         {
             SICStatsFilePath = string.Empty;
 
@@ -136,7 +137,7 @@ namespace MASIC.DataOutput
             {
                 UpdateProgress(0, "Saving SIC data to flat file");
 
-                SICStatsFilePath = clsDataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, clsDataOutput.OutputFileTypeConstants.SICStatsFlatFile);
+                SICStatsFilePath = DataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, DataOutput.OutputFileTypeConstants.SICStatsFlatFile);
                 ReportMessage("Saving SIC flat file to disk: " + Path.GetFileName(SICStatsFilePath));
 
                 using var writer = new StreamWriter(SICStatsFilePath, false);
@@ -148,7 +149,7 @@ namespace MASIC.DataOutput
 
                 if (masicOptions.IncludeHeadersInExportFile)
                 {
-                    writer.WriteLine(dataOutputHandler.GetHeadersForOutputFile(scanList, clsDataOutput.OutputFileTypeConstants.SICStatsFlatFile, TAB_DELIMITER));
+                    writer.WriteLine(dataOutputHandler.GetHeadersForOutputFile(scanList, DataOutput.OutputFileTypeConstants.SICStatsFlatFile, TAB_DELIMITER));
                 }
 
                 if (scanList.SurveyScans.Count == 0 && scanList.ParentIons.Count == 0)
@@ -238,7 +239,7 @@ namespace MASIC.DataOutput
         }
 
         private float ScanNumberToScanTime(
-            clsScanList scanList,
+            ScanList scanList,
             int scanNumber)
         {
             var surveyScanMatches = (from item in scanList.SurveyScans where item.ScanNumber == scanNumber select item).ToList();
@@ -261,8 +262,8 @@ namespace MASIC.DataOutput
             TextWriter sicStatsWriter,
             char delimiter,
             SICOptions sicOptions,
-            clsScanList scanList,
-            clsParentIonInfo parentIon,
+            ScanList scanList,
+            ParentIonInfo parentIon,
             int parentIonIndex,
             int surveyScanNumber,
             float surveyScanTime,
@@ -323,7 +324,7 @@ namespace MASIC.DataOutput
 
             var currentSIC = parentIon.SICStats;
 
-            if (currentSIC.ScanTypeForPeakIndices == clsScanList.ScanTypeConstants.FragScan)
+            if (currentSIC.ScanTypeForPeakIndices == ScanList.ScanTypeConstants.FragScan)
             {
                 dataValues.Add(scanList.FragScans[currentSIC.PeakScanIndexStart].ScanNumber.ToString());    // Peak Scan Start
                 dataValues.Add(scanList.FragScans[currentSIC.PeakScanIndexEnd].ScanNumber.ToString());      // Peak Scan End

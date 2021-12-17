@@ -24,6 +24,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using MASIC.Data;
 using MASIC.DataInput;
 using MASIC.DataOutput;
 using MASIC.DatasetStats;
@@ -50,7 +51,7 @@ namespace MASIC
             LocalErrorCode = MasicErrorCodes.NoError;
             StatusMessage = string.Empty;
 
-            mProcessingStats = new clsProcessingStats();
+            mProcessingStats = new ProcessingStats();
             InitializeMemoryManagementOptions(mProcessingStats);
 
             mMASICPeakFinder = new MASICPeakFinder.clsMASICPeakFinder();
@@ -250,7 +251,7 @@ namespace MASIC
 
         private readonly MASICPeakFinder.clsMASICPeakFinder mMASICPeakFinder;
 
-        private readonly clsProcessingStats mProcessingStats;
+        private readonly ProcessingStats mProcessingStats;
 
         /// <summary>
         /// Use RaiseEvent MyBase.ProgressChanged when updating the overall progress
@@ -352,23 +353,23 @@ namespace MASIC
             bool success;
             var inputFile = new FileInfo(inputFilePath);
 
-            if (inputFile.Name.EndsWith(clsDataOutput.SIC_STATS_FILE_SUFFIX, StringComparison.OrdinalIgnoreCase))
+            if (inputFile.Name.EndsWith(DataOutput.DataOutput.SIC_STATS_FILE_SUFFIX, StringComparison.OrdinalIgnoreCase))
             {
                 success = CreatePlots(inputFile, outputDirectoryPath);
             }
-            else if (inputFilePath.EndsWith(clsDataOutput.SCAN_STATS_FILE_SUFFIX, StringComparison.OrdinalIgnoreCase))
+            else if (inputFilePath.EndsWith(DataOutput.DataOutput.SCAN_STATS_FILE_SUFFIX, StringComparison.OrdinalIgnoreCase))
             {
                 // The user specified the Scan Stats file
                 // Auto-switch to the SIC stats file
-                var sicStatsFilePath = clsUtilities.ReplaceSuffix(inputFilePath, clsDataOutput.SCAN_STATS_FILE_SUFFIX, clsDataOutput.SIC_STATS_FILE_SUFFIX);
+                var sicStatsFilePath = Utilities.ReplaceSuffix(inputFilePath, DataOutput.DataOutput.SCAN_STATS_FILE_SUFFIX, DataOutput.DataOutput.SIC_STATS_FILE_SUFFIX);
                 success = CreatePlots(new FileInfo(sicStatsFilePath), outputDirectoryPath);
             }
-            else if (inputFilePath.EndsWith(clsDataOutput.REPORTER_IONS_FILE_SUFFIX, StringComparison.OrdinalIgnoreCase))
+            else if (inputFilePath.EndsWith(DataOutput.DataOutput.REPORTER_IONS_FILE_SUFFIX, StringComparison.OrdinalIgnoreCase))
             {
                 // The user specified the Reporter Ion data file
                 // Auto-switch to the SIC stats file
 
-                var sicStatsFilePath = clsUtilities.ReplaceSuffix(inputFilePath, clsDataOutput.REPORTER_IONS_FILE_SUFFIX, clsDataOutput.SIC_STATS_FILE_SUFFIX);
+                var sicStatsFilePath = Utilities.ReplaceSuffix(inputFilePath, DataOutput.DataOutput.REPORTER_IONS_FILE_SUFFIX, DataOutput.DataOutput.SIC_STATS_FILE_SUFFIX);
                 success = CreatePlots(new FileInfo(sicStatsFilePath), outputDirectoryPath);
             }
             else
@@ -406,22 +407,22 @@ namespace MASIC
         private bool FindSICsAndWriteOutput(
             string inputFilePathFull,
             string outputDirectoryPath,
-            clsScanList scanList,
-            clsSpectraCache spectraCache,
-            clsDataOutput dataOutputHandler,
-            clsScanTracking scanTracking,
+            ScanList scanList,
+            SpectraCache spectraCache,
+            DataOutput.DataOutput dataOutputHandler,
+            ScanTracking scanTracking,
             DatasetFileInfo datasetFileInfo,
-            clsParentIonProcessing parentIonProcessor,
-            clsDataImport dataImporterBase)
+            ParentIonProcessing parentIonProcessor,
+            DataImport dataImporterBase)
         {
             var inputFileName = Path.GetFileName(inputFilePathFull);
 
             try
             {
-                var bpiWriter = new clsBPIWriter();
+                var bpiWriter = new BPIWriter();
                 RegisterEvents(bpiWriter);
 
-                var xmlResultsWriter = new clsXMLResultsWriter(Options);
+                var xmlResultsWriter = new XMLResultsWriter(Options);
                 RegisterEvents(xmlResultsWriter);
 
                 // ---------------------------------------------------------
@@ -518,7 +519,7 @@ namespace MASIC
                 string sicStatsFilePath;
                 if (!Options.ExportRawDataOnly)
                 {
-                    var sicStatsWriter = new clsSICStatsWriter();
+                    var sicStatsWriter = new SICStatsWriter();
                     RegisterEvents(sicStatsWriter);
 
                     LogMessage("FindSICsAndWriteOutput: Call SaveSICStatsFlatFile", MessageTypeConstants.Debug);
@@ -604,13 +605,13 @@ namespace MASIC
         private bool FindSICsWork(
             string inputFilePathFull,
             string outputDirectoryPath,
-            clsScanList scanList,
-            clsSpectraCache spectraCache,
-            clsDataOutput dataOutputHandler,
-            clsParentIonProcessing parentIonProcessor,
-            clsDataImport dataImporterBase,
-            clsBPIWriter bpiWriter,
-            clsXMLResultsWriter xmlResultsWriter,
+            ScanList scanList,
+            SpectraCache spectraCache,
+            DataOutput.DataOutput dataOutputHandler,
+            ParentIonProcessing parentIonProcessor,
+            DataImport dataImporterBase,
+            BPIWriter bpiWriter,
+            XMLResultsWriter xmlResultsWriter,
             out int similarParentIonUpdateCount)
         {
             var inputFileName = Path.GetFileName(inputFilePathFull);
@@ -622,7 +623,7 @@ namespace MASIC
 
             if (Options.RawDataExportOptions.ExportEnabled)
             {
-                var rawDataExporter = new clsSpectrumDataWriter(bpiWriter, Options);
+                var rawDataExporter = new SpectrumDataWriter(bpiWriter, Options);
                 RegisterEvents(rawDataExporter);
 
                 rawDataExporter.ExportRawDataToDisk(scanList, spectraCache, inputFileName, outputDirectoryPath);
@@ -632,12 +633,12 @@ namespace MASIC
             {
                 // Look for Reporter Ions in the Fragmentation spectra
 
-                var reporterIonProcessor = new clsReporterIonProcessor(Options);
+                var reporterIonProcessor = new ReporterIonProcessor(Options);
                 RegisterEvents(reporterIonProcessor);
                 reporterIonProcessor.FindReporterIons(scanList, spectraCache, inputFilePathFull, outputDirectoryPath);
             }
 
-            var mrmProcessor = new clsMRMProcessing(Options, dataOutputHandler);
+            var mrmProcessor = new MRMProcessing(Options, dataOutputHandler);
             RegisterEvents(mrmProcessor);
 
             // ---------------------------------------------------------
@@ -690,7 +691,7 @@ namespace MASIC
                 UpdatePeakMemoryUsage();
 
                 LogMessage("FindSICsWork: Call CreateParentIonSICs", MessageTypeConstants.Debug);
-                var sicProcessor = new clsSICProcessing(mMASICPeakFinder, mrmProcessor);
+                var sicProcessor = new SICProcessing(mMASICPeakFinder, mrmProcessor);
                 RegisterEvents(sicProcessor);
 
                 var parentIonSICsCreated = sicProcessor.CreateParentIonSICs(
@@ -732,7 +733,7 @@ namespace MASIC
         /// </summary>
         public override IList<string> GetDefaultExtensionsToParse()
         {
-            return clsDataImport.GetDefaultExtensionsToParse();
+            return DataImport.GetDefaultExtensionsToParse();
         }
 
         /// <summary>
@@ -801,7 +802,7 @@ namespace MASIC
             return (float)(currentProcess.TotalProcessorTime.TotalSeconds);
         }
 
-        private void InitializeMemoryManagementOptions(clsProcessingStats processingStats)
+        private void InitializeMemoryManagementOptions(ProcessingStats processingStats)
         {
             processingStats.PeakMemoryUsageMB = GetProcessMemoryUsageMB();
             processingStats.TotalProcessingTimeAtStart = GetTotalProcessingTimeSec();
@@ -822,12 +823,12 @@ namespace MASIC
         private bool LoadData(
             string inputFilePath,
             string outputDirectoryPath,
-            clsDataOutput dataOutputHandler,
-            clsParentIonProcessing parentIonProcessor,
-            clsScanTracking scanTracking,
-            clsScanList scanList,
-            clsSpectraCache spectraCache,
-            out clsDataImport dataImporterBase,
+            DataOutput.DataOutput dataOutputHandler,
+            ParentIonProcessing parentIonProcessor,
+            ScanTracking scanTracking,
+            ScanList scanList,
+            SpectraCache spectraCache,
+            out DataImport dataImporterBase,
             out DatasetFileInfo datasetFileInfo)
         {
             bool success;
@@ -865,10 +866,10 @@ namespace MASIC
 
                 switch (Path.GetExtension(inputFileName).ToUpper())
                 {
-                    case clsDataImport.THERMO_RAW_FILE_EXTENSION:
+                    case DataImport.THERMO_RAW_FILE_EXTENSION:
                         // Open the .Raw file and obtain the scan information
 
-                        var dataImporter = new clsDataImportThermoRaw(Options, mMASICPeakFinder, parentIonProcessor, scanTracking);
+                        var dataImporter = new DataImportThermoRaw(Options, mMASICPeakFinder, parentIonProcessor, scanTracking);
                         RegisterDataImportEvents(dataImporter);
                         dataImporterBase = dataImporter;
 
@@ -881,10 +882,10 @@ namespace MASIC
                         datasetFileInfo = dataImporter.DatasetFileInfo;
                         break;
 
-                    case clsDataImport.MZ_ML_FILE_EXTENSION:
+                    case DataImport.MZ_ML_FILE_EXTENSION:
                         // Open the .mzML file and obtain the scan information
 
-                        var dataImporterMzML = new clsDataImportMSXml(Options, mMASICPeakFinder, parentIonProcessor, scanTracking);
+                        var dataImporterMzML = new DataImportMSXml(Options, mMASICPeakFinder, parentIonProcessor, scanTracking);
                         RegisterDataImportEvents(dataImporterMzML);
                         dataImporterBase = dataImporterMzML;
 
@@ -897,11 +898,11 @@ namespace MASIC
                         datasetFileInfo = dataImporterMzML.DatasetFileInfo;
                         break;
 
-                    case clsDataImport.MZ_XML_FILE_EXTENSION1:
-                    case clsDataImport.MZ_XML_FILE_EXTENSION2:
+                    case DataImport.MZ_XML_FILE_EXTENSION1:
+                    case DataImport.MZ_XML_FILE_EXTENSION2:
                         // Open the .mzXML file and obtain the scan information
 
-                        var dataImporterMzXML = new clsDataImportMSXml(Options, mMASICPeakFinder, parentIonProcessor, scanTracking);
+                        var dataImporterMzXML = new DataImportMSXml(Options, mMASICPeakFinder, parentIonProcessor, scanTracking);
                         RegisterDataImportEvents(dataImporterMzXML);
                         dataImporterBase = dataImporterMzXML;
 
@@ -914,11 +915,11 @@ namespace MASIC
                         datasetFileInfo = dataImporterMzXML.DatasetFileInfo;
                         break;
 
-                    case clsDataImport.MZ_DATA_FILE_EXTENSION1:
-                    case clsDataImport.MZ_DATA_FILE_EXTENSION2:
+                    case DataImport.MZ_DATA_FILE_EXTENSION1:
+                    case DataImport.MZ_DATA_FILE_EXTENSION2:
                         // Open the .mzData file and obtain the scan information
 
-                        var dataImporterMzData = new clsDataImportMSXml(Options, mMASICPeakFinder, parentIonProcessor, scanTracking);
+                        var dataImporterMzData = new DataImportMSXml(Options, mMASICPeakFinder, parentIonProcessor, scanTracking);
                         RegisterDataImportEvents(dataImporterMzData);
                         dataImporterBase = dataImporterMzData;
 
@@ -930,11 +931,11 @@ namespace MASIC
                         datasetFileInfo = dataImporterMzData.DatasetFileInfo;
                         break;
 
-                    case clsDataImport.AGILENT_MSMS_FILE_EXTENSION:
-                    case clsDataImport.AGILENT_MS_FILE_EXTENSION:
+                    case DataImport.AGILENT_MSMS_FILE_EXTENSION:
+                    case DataImport.AGILENT_MS_FILE_EXTENSION:
                         // Open the .MGF and .CDF files to obtain the scan information
 
-                        var dataImporterMGF = new clsDataImportMGFandCDF(Options, mMASICPeakFinder, parentIonProcessor, scanTracking);
+                        var dataImporterMGF = new DataImportMGFandCDF(Options, mMASICPeakFinder, parentIonProcessor, scanTracking);
                         RegisterDataImportEvents(dataImporterMGF);
                         dataImporterBase = dataImporterMGF;
 
@@ -1090,7 +1091,7 @@ namespace MASIC
                                "you should set PlotWithPython=True in the parameter file");
             }
 
-            var dataOutputHandler = new clsDataOutput(Options);
+            var dataOutputHandler = new DataOutput.DataOutput(Options);
             var existingResultsFound = false;
 
             RegisterEvents(dataOutputHandler);
@@ -1100,7 +1101,7 @@ namespace MASIC
                 // If a Custom SICList file is defined, load the custom SIC values now
                 if (Options.CustomSICList.CustomSICListFileName.Length > 0)
                 {
-                    var sicListReader = new clsCustomSICListReader(Options.CustomSICList);
+                    var sicListReader = new CustomSICListReader(Options.CustomSICList);
                     RegisterEvents(sicListReader);
 
                     LogMessage("ProcessFile: Reading custom SIC values file: " + Options.CustomSICList.CustomSICListFileName);
@@ -1133,9 +1134,9 @@ namespace MASIC
                     success = CleanupFilePaths(ref inputFilePath, ref outputDirectoryPath);
                     Options.OutputDirectoryPath = outputDirectoryPath;
 
-                    if (success && !inputFilePath.EndsWith(clsDataImport.TEXT_FILE_EXTENSION, StringComparison.OrdinalIgnoreCase))
+                    if (success && !inputFilePath.EndsWith(DataImport.TEXT_FILE_EXTENSION, StringComparison.OrdinalIgnoreCase))
                     {
-                        var dbAccessor = new clsDatabaseAccess(Options);
+                        var dbAccessor = new DatabaseAccess(Options);
                         RegisterEvents(dbAccessor);
 
                         Options.SICOptions.DatasetID = dbAccessor.LookupDatasetID(inputFilePath, Options.DatasetLookupFilePath, Options.SICOptions.DatasetID);
@@ -1211,7 +1212,7 @@ namespace MASIC
 
                         InitializeMemoryManagementOptions(mProcessingStats);
 
-                        if (inputFilePath.EndsWith(clsDataImport.TEXT_FILE_EXTENSION, StringComparison.OrdinalIgnoreCase))
+                        if (inputFilePath.EndsWith(DataImport.TEXT_FILE_EXTENSION, StringComparison.OrdinalIgnoreCase))
                         {
                             success = CreatePlots(inputFilePath, outputDirectoryPath);
                         }
@@ -1319,7 +1320,7 @@ namespace MASIC
         private bool ProcessInstrumentDataFile(
             string inputFilePath,
             string outputDirectoryPath,
-            clsDataOutput dataOutputHandler,
+            DataOutput.DataOutput dataOutputHandler,
             out bool existingResultsFound)
         {
             try
@@ -1357,7 +1358,7 @@ namespace MASIC
                 // Instantiate the SpectraCache
                 // ---------------------------------------------------------
 
-                using var spectraCache = new clsSpectraCache(Options.CacheOptions)
+                using var spectraCache = new SpectraCache(Options.CacheOptions)
                 {
                     DiskCachingAlwaysDisabled = Options.CacheOptions.DiskCachingAlwaysDisabled,
                     CacheDirectoryPath = Options.CacheOptions.DirectoryPath,
@@ -1367,13 +1368,13 @@ namespace MASIC
 
                 spectraCache.InitializeSpectraPool();
 
-                var scanList = new clsScanList();
+                var scanList = new ScanList();
                 RegisterEvents(scanList);
 
-                var parentIonProcessor = new clsParentIonProcessing(Options.ReporterIons);
+                var parentIonProcessor = new ParentIonProcessing(Options.ReporterIons);
                 RegisterEvents(parentIonProcessor);
 
-                var scanTracking = new clsScanTracking(Options.ReporterIons, mMASICPeakFinder);
+                var scanTracking = new ScanTracking(Options.ReporterIons, mMASICPeakFinder);
                 RegisterEvents(scanTracking);
 
                 // ---------------------------------------------------------
@@ -1423,7 +1424,7 @@ namespace MASIC
             }
         }
 
-        private void RegisterDataImportEvents(clsDataImport dataImporter)
+        private void RegisterDataImportEvents(DataImport dataImporter)
         {
             RegisterEvents(dataImporter);
             dataImporter.UpdateMemoryUsageEvent += UpdateMemoryUsageEventHandler;
@@ -1437,7 +1438,7 @@ namespace MASIC
             sourceClass.ProgressUpdate += ProgressUpdateHandler;
         }
 
-        private void RegisterEvents(clsMasicEventNotifier sourceClass)
+        private void RegisterEvents(MasicEventNotifier sourceClass)
         {
             RegisterEventsBase(sourceClass);
 
@@ -1448,7 +1449,7 @@ namespace MASIC
 
         // ReSharper restore UnusedMember.Global
 
-        private void SetDefaultPeakLocValues(clsScanList scanList)
+        private void SetDefaultPeakLocValues(ScanList scanList)
         {
             try
             {
@@ -1457,7 +1458,7 @@ namespace MASIC
                     var scanIndexObserved = parentIon.SurveyScanIndex;
 
                     var sicStats = parentIon.SICStats;
-                    sicStats.ScanTypeForPeakIndices = clsScanList.ScanTypeConstants.SurveyScan;
+                    sicStats.ScanTypeForPeakIndices = ScanList.ScanTypeConstants.SurveyScan;
                     sicStats.PeakScanIndexStart = scanIndexObserved;
                     sicStats.PeakScanIndexEnd = scanIndexObserved;
                     sicStats.PeakScanIndexMax = scanIndexObserved;
@@ -1640,7 +1641,7 @@ namespace MASIC
                         writer.WriteStartElement("Root");
 
                         writer.WriteStartElement("General");
-                        writer.WriteElementString("LastUpdate", DateTime.Now.ToString(clsDatasetStatsSummarizer.DATE_TIME_FORMAT_STRING));
+                        writer.WriteElementString("LastUpdate", DateTime.Now.ToString(DatasetStatsSummarizer.DATE_TIME_FORMAT_STRING));
                         writer.WriteElementString("ProcessingStep", ProcessStep.ToString());
                         writer.WriteElementString("Progress", StringUtilities.DblToString(mProgressPercentComplete, 2));
                         writer.WriteElementString("Error", GetErrorMessage());

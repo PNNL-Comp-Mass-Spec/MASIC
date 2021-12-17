@@ -43,7 +43,7 @@
                 if (SICToleranceIsPPM)
                 {
                     // Return the Da tolerance value that will result for the given ppm tolerance at 1000 m/z
-                    return clsParentIonProcessing.GetParentIonToleranceDa(this, 1000);
+                    return ParentIonProcessing.GetParentIonToleranceDa(this, 1000);
                 }
 
                 return SICTolerance;

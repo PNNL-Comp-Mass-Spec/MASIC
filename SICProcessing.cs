@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using MASIC.Data;
 using MASIC.DataOutput;
 using MASIC.Options;
 using MASICPeakFinder;
@@ -10,17 +11,17 @@ namespace MASIC
     /// <summary>
     /// This class creates selected ion chromatograms for parent ions
     /// </summary>
-    public class clsSICProcessing : clsMasicEventNotifier
+    public class SICProcessing : MasicEventNotifier
     {
         private const string CREATING_SICS = "Creating SIC's for parent ions";
 
         private readonly clsMASICPeakFinder mMASICPeakFinder;
-        private readonly clsMRMProcessing mMRMProcessor;
+        private readonly MRMProcessing mMRMProcessor;
 
         /// <summary>
         /// Constructor
         /// </summary>
-        public clsSICProcessing(clsMASICPeakFinder peakFinder, clsMRMProcessing mrmProcessor)
+        public SICProcessing(clsMASICPeakFinder peakFinder, MRMProcessing mrmProcessor)
         {
             mMASICPeakFinder = peakFinder;
             mMRMProcessor = mrmProcessor;
@@ -41,13 +42,13 @@ namespace MASIC
             return (short)Math.Round(percentComplete, 0);
         }
 
-        private static List<clsMzBinInfo> CreateMZLookupList(
+        private static List<MzBinInfo> CreateMZLookupList(
             MASICOptions masicOptions,
-            clsScanList scanList,
+            ScanList scanList,
             bool processSIMScans,
             int simIndex)
         {
-            var mzBinList = new List<clsMzBinInfo>(scanList.ParentIons.Count);
+            var mzBinList = new List<MzBinInfo>(scanList.ParentIons.Count);
 
             var sicOptions = masicOptions.SICOptions;
 
@@ -89,7 +90,7 @@ namespace MASIC
                     continue;
                 }
 
-                var newMzBin = new clsMzBinInfo
+                var newMzBin = new MzBinInfo
                 {
                     MZ = scanList.ParentIons[parentIonIndex].MZ,
                     ParentIonIndex = parentIonIndex
@@ -124,12 +125,12 @@ namespace MASIC
         /// <param name="sicProcessor"></param>
         /// <param name="xmlResultsWriter"></param>
         public bool CreateParentIonSICs(
-            clsScanList scanList,
-            clsSpectraCache spectraCache,
+            ScanList scanList,
+            SpectraCache spectraCache,
             MASICOptions masicOptions,
-            clsDataOutput dataOutputHandler,
-            clsSICProcessing sicProcessor,
-            clsXMLResultsWriter xmlResultsWriter)
+            DataOutput.DataOutput dataOutputHandler,
+            SICProcessing sicProcessor,
+            XMLResultsWriter xmlResultsWriter)
         {
             var success = false;
 
@@ -232,11 +233,11 @@ namespace MASIC
             int[,] fullSICScanIndices,
             double[,] fullSICIntensities,
             double[,] fullSICMasses,
-            clsScanList scanList,
+            ScanList scanList,
             int scanIndexObservedInFullSIC,
-            clsSICDetails sicDetails,
+            SICDetails sicDetails,
             MASICOptions masicOptions,
-            clsScanNumScanTimeConversion scanNumScanConverter,
+            ScanNumScanTimeConversion scanNumScanConverter,
             bool customSICPeak,
             float customSICPeakScanOrAcqTimeTolerance)
         {
@@ -288,7 +289,7 @@ namespace MASIC
                 }
                 else
                 {
-                    if (masicOptions.CustomSICList.ScanToleranceType == clsCustomSICList.CustomSICScanTypeConstants.Relative && customSICPeakScanOrAcqTimeTolerance > 10)
+                    if (masicOptions.CustomSICList.ScanToleranceType == CustomSICList.CustomSICScanTypeConstants.Relative && customSICPeakScanOrAcqTimeTolerance > 10)
                     {
                         // Relative scan time should only range from 0 to 1; we'll allow values up to 10
                         customSICPeakScanOrAcqTimeTolerance = 10;
@@ -543,7 +544,7 @@ namespace MASIC
                 // Copy the intensity values from fullSICIntensities() to .SICData()
                 // Copy the mz values from fullSICMasses() to .SICMasses()
 
-                sicDetails.SICScanType = clsScanList.ScanTypeConstants.SurveyScan;
+                sicDetails.SICScanType = ScanList.ScanTypeConstants.SurveyScan;
                 sicDetails.SICData.Clear();
 
                 sicPeak.IndexObserved = 0;
@@ -576,12 +577,12 @@ namespace MASIC
         }
 
         private bool ProcessMZList(
-            clsScanList scanList,
-            clsSpectraCache spectraCache,
+            ScanList scanList,
+            SpectraCache spectraCache,
             MASICOptions masicOptions,
-            clsDataOutput dataOutputHandler,
-            clsXMLResultsWriter xmlResultsWriter,
-            IReadOnlyList<clsMzBinInfo> mzBinList,
+            DataOutput.DataOutput dataOutputHandler,
+            XMLResultsWriter xmlResultsWriter,
+            IReadOnlyList<MzBinInfo> mzBinList,
             bool processSIMScans,
             int simIndex,
             ref int parentIonsProcessed)
@@ -592,7 +593,7 @@ namespace MASIC
 
             int maxMZCountInChunk;
 
-            var mzSearchChunks = new List<clsMzSearchInfo>(mzBinList.Count);
+            var mzSearchChunks = new List<MzSearchInfo>(mzBinList.Count);
 
             bool[] parentIonUpdated;
 
@@ -630,10 +631,10 @@ namespace MASIC
 
             try
             {
-                var dataAggregation = new clsDataAggregation();
+                var dataAggregation = new DataAggregation();
                 RegisterEvents(dataAggregation);
 
-                var scanNumScanConverter = new clsScanNumScanTimeConversion();
+                var scanNumScanConverter = new ScanNumScanTimeConversion();
                 RegisterEvents(scanNumScanConverter);
 
                 var parentIonIndices = (from item in mzBinList select item.ParentIonIndex).ToList();
@@ -650,7 +651,7 @@ namespace MASIC
                     // of the m/z value that starts this group
                     // Only group m/z values with the same udtMZBinList().MZTolerance and udtMZBinList().MZToleranceIsPPM values
 
-                    var mzSearchChunk = new clsMzSearchInfo
+                    var mzSearchChunk = new MzSearchInfo
                     {
                         MZIndexStart = mzIndex,
                         MZTolerance = mzBinList[mzIndex].MZTolerance,
@@ -660,7 +661,7 @@ namespace MASIC
                     double mzToleranceDa;
                     if (mzSearchChunk.MZToleranceIsPPM)
                     {
-                        mzToleranceDa = clsUtilities.PPMToMass(mzSearchChunk.MZTolerance, mzBinList[mzSearchChunk.MZIndexStart].MZ);
+                        mzToleranceDa = Utilities.PPMToMass(mzSearchChunk.MZTolerance, mzBinList[mzSearchChunk.MZIndexStart].MZ);
                     }
                     else
                     {
@@ -747,13 +748,13 @@ namespace MASIC
 
         private bool ProcessMzSearchChunk(
             MASICOptions masicOptions,
-            clsScanList scanList,
-            clsDataAggregation dataAggregation,
-            clsDataOutput dataOutputHandler,
-            clsXMLResultsWriter xmlResultsWriter,
-            clsSpectraCache spectraCache,
-            clsScanNumScanTimeConversion scanNumScanConverter,
-            IReadOnlyList<clsMzSearchInfo> mzSearchChunk,
+            ScanList scanList,
+            DataAggregation dataAggregation,
+            DataOutput.DataOutput dataOutputHandler,
+            XMLResultsWriter xmlResultsWriter,
+            SpectraCache spectraCache,
+            ScanNumScanTimeConversion scanNumScanConverter,
+            IReadOnlyList<MzSearchInfo> mzSearchChunk,
             double mzSearchChunkProgressFraction,
             IList<int> parentIonIndices,
             bool processSIMScans,
@@ -831,7 +832,7 @@ namespace MASIC
 
                     if (current.MZToleranceIsPPM)
                     {
-                        mzToleranceDa = clsUtilities.PPMToMass(current.MZTolerance, current.SearchMZ);
+                        mzToleranceDa = Utilities.PPMToMass(current.MZTolerance, current.SearchMZ);
                     }
                     else
                     {
@@ -933,9 +934,9 @@ namespace MASIC
                 var scanIndexObservedInFullSIC = mzSearchChunk[mzIndexWork].ScanIndexMax;
 
                 // Initialize sicDetails
-                var sicDetails = new clsSICDetails
+                var sicDetails = new SICDetails
                 {
-                    SICScanType = clsScanList.ScanTypeConstants.SurveyScan
+                    SICScanType = ScanList.ScanTypeConstants.SurveyScan
                 };
 
                 // Populate sicDetails using the data centered around the highest intensity in fullSICIntensities
@@ -1085,17 +1086,17 @@ namespace MASIC
         }
 
         private void UpdateSICStatsUsingLargestPeak(
-            clsSICDetails sicDetails,
+            SICDetails sicDetails,
             clsSICStatsPeak sicPeak,
             MASICOptions masicOptions,
             clsSICPotentialAreaStats potentialAreaStatsInFullSIC,
-            clsScanList scanList,
-            IReadOnlyList<clsMzSearchInfo> mzSearchChunk,
+            ScanList scanList,
+            IReadOnlyList<MzSearchInfo> mzSearchChunk,
             int mzIndexWork,
             IList<int> parentIonIndices,
             int debugParentIonIndexToFind,
-            clsDataOutput dataOutputHandler,
-            clsXMLResultsWriter xmlResultsWriter,
+            DataOutput.DataOutput dataOutputHandler,
+            XMLResultsWriter xmlResultsWriter,
             IList<bool> parentIonUpdated,
             ref int parentIonsProcessed)
         {
@@ -1170,9 +1171,9 @@ namespace MASIC
         /// <param name="sicPeak"></param>
         /// <param name="peakIsValid"></param>
         public bool StorePeakInParentIon(
-            clsScanList scanList,
+            ScanList scanList,
             int parentIonIndex,
-            clsSICDetails sicDetails,
+            SICDetails sicDetails,
             clsSICPotentialAreaStats potentialAreaStatsForPeak,
             clsSICStatsPeak sicPeak,
             bool peakIsValid)
@@ -1213,11 +1214,11 @@ namespace MASIC
                 sicStats.ScanTypeForPeakIndices = sicDetails.SICScanType;
                 if (processingMRMPeak)
                 {
-                    if (sicStats.ScanTypeForPeakIndices != clsScanList.ScanTypeConstants.FragScan)
+                    if (sicStats.ScanTypeForPeakIndices != ScanList.ScanTypeConstants.FragScan)
                     {
                         // ScanType is not FragScan; this is unexpected
                         ReportError("Programming error: udtSICDetails.SICScanType is not FragScan even though we're processing an MRM peak", clsMASIC.MasicErrorCodes.FindSICPeaksError);
-                        sicStats.ScanTypeForPeakIndices = clsScanList.ScanTypeConstants.FragScan;
+                        sicStats.ScanTypeForPeakIndices = ScanList.ScanTypeConstants.FragScan;
                     }
                 }
 

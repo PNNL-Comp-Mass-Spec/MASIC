@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using MASIC.Data;
 using MASIC.DataOutput;
 using MASIC.Options;
 using MASICPeakFinder;
@@ -13,7 +14,7 @@ namespace MASIC.DataInput
     /// <summary>
     /// Class for reading spectra from a Thermo .raw file
     /// </summary>
-    public class clsDataImportThermoRaw : clsDataImport
+    public class DataImportThermoRaw : DataImport
     {
         private const string SCAN_EVENT_CHARGE_STATE = "Charge State";
         private const string SCAN_EVENT_MONOISOTOPIC_MZ = "Monoisotopic M/Z";
@@ -30,11 +31,11 @@ namespace MASIC.DataInput
         /// <param name="peakFinder"></param>
         /// <param name="parentIonProcessor"></param>
         /// <param name="scanTracking"></param>
-        public clsDataImportThermoRaw(
+        public DataImportThermoRaw(
             MASICOptions masicOptions,
             clsMASICPeakFinder peakFinder,
-            clsParentIonProcessing parentIonProcessor,
-            clsScanTracking scanTracking)
+            ParentIonProcessing parentIonProcessor,
+            ScanTracking scanTracking)
             : base(masicOptions, peakFinder, parentIonProcessor, scanTracking)
         {
         }
@@ -135,9 +136,9 @@ namespace MASIC.DataInput
         /// <remarks>Assumes filePath exists</remarks>
         public bool ExtractScanInfoFromThermoDataFile(
             string filePath,
-            clsScanList scanList,
-            clsSpectraCache spectraCache,
-            clsDataOutput dataOutputHandler,
+            ScanList scanList,
+            SpectraCache spectraCache,
+            DataOutput.DataOutput dataOutputHandler,
             bool keepRawSpectra,
             bool keepMSMSSpectra)
         {
@@ -191,7 +192,7 @@ namespace MASIC.DataInput
 
                 success = UpdateDatasetFileStats(rawFileInfo, datasetID, rawFileReader);
 
-                var metadataWriter = new clsThermoMetadataWriter();
+                var metadataWriter = new ThermoMetadataWriter();
                 RegisterEvents(metadataWriter);
 
                 if (mOptions.WriteMSMethodFile)
@@ -279,9 +280,9 @@ namespace MASIC.DataInput
         private bool ExtractScanInfoCheckRange(
             XRawFileIO rawFileReader,
             ThermoRawFileReader.clsScanInfo thermoScanInfo,
-            clsScanList scanList,
-            clsSpectraCache spectraCache,
-            clsDataOutput dataOutputHandler,
+            ScanList scanList,
+            SpectraCache spectraCache,
+            DataOutput.DataOutput dataOutputHandler,
             double percentComplete)
         {
             bool success;
@@ -322,9 +323,9 @@ namespace MASIC.DataInput
 
         private bool ExtractScanInfoWork(
             XRawFileIO rawFileReader,
-            clsScanList scanList,
-            clsSpectraCache spectraCache,
-            clsDataOutput dataOutputHandler,
+            ScanList scanList,
+            SpectraCache spectraCache,
+            DataOutput.DataOutput dataOutputHandler,
             SICOptions sicOptions,
             ThermoRawFileReader.clsScanInfo thermoScanInfo)
         {
@@ -349,13 +350,13 @@ namespace MASIC.DataInput
 
         private bool ExtractThermoSurveyScan(
             XRawFileIO rawFileReader,
-            clsScanList scanList,
-            clsSpectraCache spectraCache,
-            clsDataOutput dataOutputHandler,
+            ScanList scanList,
+            SpectraCache spectraCache,
+            DataOutput.DataOutput dataOutputHandler,
             SICOptions sicOptions,
             ThermoRawFileReader.clsScanInfo thermoScanInfo)
         {
-            var scanInfo = new clsScanInfo
+            var scanInfo = new ScanInfo
             {
                 ScanNumber = thermoScanInfo.ScanNumber,
                 ScanTime = (float)thermoScanInfo.RetentionTime,
@@ -405,10 +406,10 @@ namespace MASIC.DataInput
 
             // Store the collision mode and possibly the scan filter text
             scanInfo.FragScanInfo.CollisionMode = thermoScanInfo.CollisionMode;
-            StoreExtendedHeaderInfo(dataOutputHandler, scanInfo, clsExtendedStatsWriter.EXTENDED_STATS_HEADER_COLLISION_MODE, thermoScanInfo.CollisionMode);
+            StoreExtendedHeaderInfo(dataOutputHandler, scanInfo, ExtendedStatsWriter.EXTENDED_STATS_HEADER_COLLISION_MODE, thermoScanInfo.CollisionMode);
             if (mOptions.WriteExtendedStatsIncludeScanFilterText)
             {
-                StoreExtendedHeaderInfo(dataOutputHandler, scanInfo, clsExtendedStatsWriter.EXTENDED_STATS_HEADER_SCAN_FILTER_TEXT, thermoScanInfo.FilterText);
+                StoreExtendedHeaderInfo(dataOutputHandler, scanInfo, ExtendedStatsWriter.EXTENDED_STATS_HEADER_SCAN_FILTER_TEXT, thermoScanInfo.FilterText);
             }
 
             if (mOptions.WriteExtendedStatsStatusLog)
@@ -424,7 +425,7 @@ namespace MASIC.DataInput
                 mLastNonZoomSurveyScanIndex = scanList.SurveyScans.Count - 1;
             }
 
-            scanList.AddMasterScanEntry(clsScanList.ScanTypeConstants.SurveyScan, scanList.SurveyScans.Count - 1);
+            scanList.AddMasterScanEntry(ScanList.ScanTypeConstants.SurveyScan, scanList.SurveyScans.Count - 1);
 
             double msDataResolution;
 
@@ -434,12 +435,12 @@ namespace MASIC.DataInput
                 // However, if the lowest m/z value is < 100, use 100 m/z
                 if (thermoScanInfo.LowMass < 100)
                 {
-                    msDataResolution = clsParentIonProcessing.GetParentIonToleranceDa(sicOptions, 100) /
+                    msDataResolution = ParentIonProcessing.GetParentIonToleranceDa(sicOptions, 100) /
                         sicOptions.CompressToleranceDivisorForPPM;
                 }
                 else
                 {
-                    msDataResolution = clsParentIonProcessing.GetParentIonToleranceDa(sicOptions, thermoScanInfo.LowMass) /
+                    msDataResolution = ParentIonProcessing.GetParentIonToleranceDa(sicOptions, thermoScanInfo.LowMass) /
                         sicOptions.CompressToleranceDivisorForPPM;
                 }
             }
@@ -462,23 +463,23 @@ namespace MASIC.DataInput
             if (!success)
                 return false;
 
-            SaveScanStatEntry(dataOutputHandler.OutputFileHandles.ScanStats, clsScanList.ScanTypeConstants.SurveyScan, scanInfo, sicOptions.DatasetID);
+            SaveScanStatEntry(dataOutputHandler.OutputFileHandles.ScanStats, ScanList.ScanTypeConstants.SurveyScan, scanInfo, sicOptions.DatasetID);
 
             return true;
         }
 
         private bool ExtractThermoFragmentationScan(
             XRawFileIO rawFileReader,
-            clsScanList scanList,
-            clsSpectraCache spectraCache,
-            clsDataOutput dataOutputHandler,
+            ScanList scanList,
+            SpectraCache spectraCache,
+            DataOutput.DataOutput dataOutputHandler,
             SICOptions sicOptions,
             BinningOptions binningOptions,
             ThermoRawFileReader.clsScanInfo thermoScanInfo)
         {
             // Note that MinimumPositiveIntensity will be determined in LoadSpectraForThermoRawFile
 
-            var scanInfo = new clsScanInfo(thermoScanInfo.ParentIonMZ)
+            var scanInfo = new ScanInfo(thermoScanInfo.ParentIonMZ)
             {
                 ScanNumber = thermoScanInfo.ScanNumber,
                 ScanTime = (float)thermoScanInfo.RetentionTime,
@@ -520,7 +521,7 @@ namespace MASIC.DataInput
                 // This is an MRM scan
                 scanList.MRMDataPresent = true;
 
-                scanInfo.MRMScanInfo = clsMRMProcessing.DuplicateMRMInfo(thermoScanInfo.MRMInfo, thermoScanInfo.ParentIonMZ);
+                scanInfo.MRMScanInfo = MRMProcessing.DuplicateMRMInfo(thermoScanInfo.MRMInfo, thermoScanInfo.ParentIonMZ);
 
                 if (scanList.SurveyScans.Count == 0)
                 {
@@ -542,10 +543,10 @@ namespace MASIC.DataInput
 
             // Store the collision mode and possibly the scan filter text
             scanInfo.FragScanInfo.CollisionMode = thermoScanInfo.CollisionMode;
-            StoreExtendedHeaderInfo(dataOutputHandler, scanInfo, clsExtendedStatsWriter.EXTENDED_STATS_HEADER_COLLISION_MODE, thermoScanInfo.CollisionMode);
+            StoreExtendedHeaderInfo(dataOutputHandler, scanInfo, ExtendedStatsWriter.EXTENDED_STATS_HEADER_COLLISION_MODE, thermoScanInfo.CollisionMode);
             if (mOptions.WriteExtendedStatsIncludeScanFilterText)
             {
-                StoreExtendedHeaderInfo(dataOutputHandler, scanInfo, clsExtendedStatsWriter.EXTENDED_STATS_HEADER_SCAN_FILTER_TEXT, thermoScanInfo.FilterText);
+                StoreExtendedHeaderInfo(dataOutputHandler, scanInfo, ExtendedStatsWriter.EXTENDED_STATS_HEADER_SCAN_FILTER_TEXT, thermoScanInfo.FilterText);
             }
 
             if (mOptions.WriteExtendedStatsStatusLog)
@@ -557,7 +558,7 @@ namespace MASIC.DataInput
             scanList.FragScans.Add(scanInfo);
             var fragScanIndex = scanList.FragScans.Count - 1;
 
-            scanList.AddMasterScanEntry(clsScanList.ScanTypeConstants.FragScan, fragScanIndex);
+            scanList.AddMasterScanEntry(ScanList.ScanTypeConstants.FragScan, fragScanIndex);
 
             // Note: Even if keepRawSpectra = False, we still need to load the raw data so that we can compute the noise level for the spectrum
             var msDataResolution = binningOptions.BinSize / sicOptions.CompressToleranceDivisorForDa;
@@ -575,7 +576,7 @@ namespace MASIC.DataInput
             if (!success)
                 return false;
 
-            SaveScanStatEntry(dataOutputHandler.OutputFileHandles.ScanStats, clsScanList.ScanTypeConstants.FragScan, scanInfo, sicOptions.DatasetID);
+            SaveScanStatEntry(dataOutputHandler.OutputFileHandles.ScanStats, ScanList.ScanTypeConstants.FragScan, scanInfo, sicOptions.DatasetID);
 
             if (thermoScanInfo.MRMScanType == MRMScanTypeConstants.NotMRM)
             {
@@ -601,7 +602,7 @@ namespace MASIC.DataInput
             return true;
         }
 
-        private void InitOptions(clsScanList scanList,
+        private void InitOptions(ScanList scanList,
                                  bool keepRawSpectra,
                                  bool keepMSMSSpectra)
         {
@@ -619,8 +620,8 @@ namespace MASIC.DataInput
 
         private bool LoadSpectraForThermoRawFile(
             XRawFileIO rawFileReader,
-            clsSpectraCache spectraCache,
-            clsScanInfo scanInfo,
+            SpectraCache spectraCache,
+            ScanInfo scanInfo,
             clsBaselineNoiseOptions noiseThresholdOptions,
             bool discardLowIntensityData,
             bool compressSpectraData,
@@ -652,7 +653,7 @@ namespace MASIC.DataInput
 
                 lastKnownLocation = "Instantiate new clsMSSpectrum";
 
-                var msSpectrum = new clsMSSpectrum(scanInfo.ScanNumber, mzList, intensityList, scanInfo.IonCountRaw);
+                var msSpectrum = new MSSpectrum(scanInfo.ScanNumber, mzList, intensityList, scanInfo.IonCountRaw);
 
                 lastKnownLocation = "Manually determine the base peak m/z and base peak intensity";
 
@@ -788,8 +789,8 @@ namespace MASIC.DataInput
         }
 
         private void StoreExtendedHeaderInfo(
-            clsDataOutput dataOutputHandler,
-            clsScanInfo scanInfo,
+            DataOutput.DataOutput dataOutputHandler,
+            ScanInfo scanInfo,
             string entryName,
             string entryValue)
         {
@@ -807,8 +808,8 @@ namespace MASIC.DataInput
         }
 
         private void StoreExtendedHeaderInfo(
-            clsDataOutput dataOutputHandler,
-            clsScanInfo scanInfo,
+            DataOutput.DataOutput dataOutputHandler,
+            ScanInfo scanInfo,
             IReadOnlyCollection<KeyValuePair<string, string>> statusEntries)
         {
             StoreExtendedHeaderInfo(dataOutputHandler, scanInfo, statusEntries, new SortedSet<string>());
@@ -822,8 +823,8 @@ namespace MASIC.DataInput
         /// <param name="statusEntries"></param>
         /// <param name="keyNameFilterList">List of header names to store; store all headers if this is an entry list</param>
         private void StoreExtendedHeaderInfo(
-            clsDataOutput dataOutputHandler,
-            clsScanInfo scanInfo,
+            DataOutput.DataOutput dataOutputHandler,
+            ScanInfo scanInfo,
             IReadOnlyCollection<KeyValuePair<string, string>> statusEntries,
             IReadOnlyCollection<string> keyNameFilterList)
         {
