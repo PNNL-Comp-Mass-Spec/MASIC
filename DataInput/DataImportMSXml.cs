@@ -548,297 +548,14 @@ namespace MASIC.DataInput
                 }
                 else if (mzMLReader.NumSpectra == 0 && mzMLReader.NumChromatograms > 0)
                 {
-                    // ReSharper disable CommentTypo
-
-                    // m/z and intensity data in the .mzML file are stored as chromatograms, instead of as spectra
-                    // An example is TSQ dataset QC18PepsR1_4Apr18_legolas1, converted from .raw to .mzML using:
-                    // msconvert.exe --32 --mzML QC18PepsR1_4Apr18_legolas1.raw
-                    //
-                    // The .mzML file for this dataset has 69 chromatograms
-                    // The first has CV Param MS_total_ion_current_chromatogram and is thus TIC vs. time
-                    // The remaining ones have CV Param MS_selected_reaction_monitoring_chromatogram, and that is the data we need to load
-
-                    // ReSharper restore CommentTypo
-
-                    // Construct a list of the difference in time (in minutes) between adjacent data points in each chromatogram
-                    var scanTimeDiffMedians = new List<double>(200);
-
-                    // Also keep track of elution times
-                    // Keys in this dictionary are chromatogram number
-                    // Values are a dictionary where keys are elution times and values are the pseudo scan number mapped to each time (initially 0)
-                    var elutionTimeToScanMapByChromatogram = new Dictionary<int, SortedDictionary<double, int>>();
-                    var chromatogramNumber = 0;
-                    var scanTimeDiffs = new List<double>(200);
-
-                    foreach (var chromatogramItem in xmlReader.ReadAllChromatograms(true))
-                    {
-                        if (chromatogramItem == null)
-                            continue;
-
-                        var isSRM = IsSrmChromatogram(chromatogramItem);
-                        if (!isSRM)
-                            continue;
-
-                        chromatogramNumber++;
-
-                        // Keys in this dictionary are elution time, values are the pseudo scan number (assigned later in this method)
-                        var elutionTimeToScanMap = new SortedDictionary<double, int>();
-                        elutionTimeToScanMapByChromatogram.Add(chromatogramNumber, elutionTimeToScanMap);
-
-                        // Construct a list of the difference in time (in minutes) between adjacent data points in each chromatogram
-                        scanTimeDiffs.Clear();
-
-                        var scanTimes = chromatogramItem.Times.ToList();
-
-                        for (var i = 0; i < scanTimes.Count; i++)
-                        {
-                            if (!elutionTimeToScanMap.ContainsKey(scanTimes[i]))
-                            {
-                                elutionTimeToScanMap.Add(scanTimes[i], 0);
-                            }
-
-                            if (i > 0)
-                            {
-                                var adjacentTimeDiff = scanTimes[i] - scanTimes[i - 1];
-                                if (adjacentTimeDiff > 0)
-                                {
-                                    scanTimeDiffs.Add(adjacentTimeDiff);
-                                }
-                            }
-                        }
-
-                        // Compute the median time difference in scanTimeDiffs
-                        var medianScanTimeDiffThisChromatogram = Utilities.ComputeMedian(scanTimeDiffs);
-
-                        // Store in scanTimeDiffMedians, which tracks the median scan time difference for each chromatogram
-                        scanTimeDiffMedians.Add(medianScanTimeDiffThisChromatogram);
-                    }
-
-                    // Construct a mapping between elution time and scan number
-                    // This is a bit of a challenge since chromatogram data only tracks elution time, and not scan number
-
-                    // First, compute the overall median time difference, e.g. 0.0216
-                    var medianScanTimeDiff = Utilities.ComputeMedian(scanTimeDiffMedians);
-                    if (Math.Abs(medianScanTimeDiff) < 0.000001)
-                    {
-                        medianScanTimeDiff = 0.000001;
-                    }
-
-                    Console.WriteLine("Populating dictionary mapping SRM ion elution times to pseudo scan number");
-
-                    var lastProgress = DateTime.UtcNow;
-                    var chromatogramsProcessed = 0;
-
-                    // Keys in this dictionary are scan times, values are the pseudo scan number mapped to each time
-                    var elutionTimeToScanMapMaster = new Dictionary<double, int>();
-
-                    // Define the mapped scan number of each elution time in elutionTimeToScanMapByChromatogram
-                    foreach (var chromatogramTimeEntry in elutionTimeToScanMapByChromatogram)
-                    {
-                        if (DateTime.UtcNow.Subtract(lastProgress).TotalSeconds >= 2.5)
-                        {
-                            lastProgress = DateTime.UtcNow;
-                            var percentComplete = chromatogramsProcessed / (double)elutionTimeToScanMapByChromatogram.Count * 100;
-                            Console.Write("{0:N0}% ", percentComplete);
-                        }
-
-                        // Assign the pseudo scan number for each time in the chromatogram
-                        // For example, if elutionTime is 0.00461 and medianScanTimeDiff is 0.0216 minutes,
-                        // nearestPseudoScan will be 0.00461 / 0.0216 * 100 + 1 = 22
-
-                        var elutionTimeToScanMap = chromatogramTimeEntry.Value;
-                        foreach (var elutionTime in elutionTimeToScanMap.Keys.ToList())
-                        {
-                            var nearestPseudoScan = (int)Math.Round(elutionTime / medianScanTimeDiff * 100) + 1;
-                            elutionTimeToScanMap[elutionTime] = nearestPseudoScan;
-                        }
-
-                        // Fix duplicate scans (values) in elutionTimeToScanMap, if possible
-                        // (elutionTimeToScanMap is a SortedDictionary where keys are elution times and values are the pseudo scan number mapped to each time)
-
-                        // Cache the keys in elutionTimeToScanMap in a list that we can iterate over
-                        var elutionTimes = (from item in elutionTimeToScanMap.Keys orderby item select item).ToList();
-
-                        for (var i = 1; i < elutionTimeToScanMap.Count; i++)
-                        {
-                            var previousElutionTime = elutionTimes[i - 1];
-                            var currentElutionTime = elutionTimes[i];
-
-                            var previousScan = elutionTimeToScanMap[previousElutionTime];
-                            var currentScan = elutionTimeToScanMap[currentElutionTime];
-
-                            if (currentScan != previousScan)
-                                continue;
-
-                            // Adjacent time points have an identical scan number
-                            if (i == elutionTimeToScanMap.Count - 1)
-                            {
-                                // We're at the final scan
-                                elutionTimeToScanMap[currentElutionTime] = currentScan + 1;
-                                continue;
-                            }
-
-                            // We're somewhere in the middle; increment the scan only if it's not a collision
-                            var nextElutionTime = elutionTimes[i + 1];
-                            var nextScan = elutionTimeToScanMap[nextElutionTime];
-
-                            if (nextScan - currentScan > 1)
-                            {
-                                // The next scan is more than 1 scan away from this one; it is safe to use currentScan + 1 for the current elution time
-                                elutionTimeToScanMap[currentElutionTime] = currentScan + 1;
-                            }
-                        }
-
-                        // Populate the master dictionary mapping elution time to scan number (using chromatogram 1)
-                        // On subsequent chromatograms, add new elution times,
-                        // or validate that existing elution times have the same computed pseudo scan number (which should always be true)
-
-                        foreach (var item in elutionTimeToScanMap)
-                        {
-                            if (elutionTimeToScanMapMaster.TryGetValue(item.Key, out var existingScan))
-                            {
-                                if (existingScan != item.Value)
-                                {
-                                    ConsoleMsgUtils.ShowWarning("Elution times resulted in different pseudo scans in ExtractScanInfoFromMzMLDataFile; this is unexpected");
-                                }
-                            }
-                            else
-                            {
-                                elutionTimeToScanMapMaster.Add(item.Key, item.Value);
-                            }
-                        }
-
-                        chromatogramsProcessed++;
-                    }
-
-                    Console.WriteLine();
-
-                    // Keys in this dictionary are scan numbers
-                    // Values are a dictionary tracking m/z values and intensities
-                    var simulatedSpectraByScan = new Dictionary<int, Dictionary<double, double>>();
-
-                    // Keys in this dictionary are scan numbers
-                    // Values are the elution time for the scan
-                    var simulatedSpectraTimes = new Dictionary<int, double>();
-
-                    // Open the file with a new reader
-                    var xmlReader2 = new SimpleMzMLReader(mzMLFile.FullName, false);
-
-                    var scanTimeLookupErrors = 0;
-                    var nextWarningThreshold = 10;
-                    scanList.ReserveListCapacity(elutionTimeToScanMapMaster.Count);
-                    mScanTracking.ReserveListCapacity(elutionTimeToScanMapMaster.Count);
-                    spectraCache.SpectrumCount = Math.Max(spectraCache.SpectrumCount, elutionTimeToScanMapMaster.Count);
-
-                    foreach (var chromatogramItem in xmlReader2.ReadAllChromatograms(true))
-                    {
-                        var isSRM = IsSrmChromatogram(chromatogramItem);
-                        if (!isSRM)
-                            continue;
-
-                        var scanTimes = chromatogramItem.Times.ToList();
-                        var intensities = chromatogramItem.Intensities.ToList();
-                        var currentMz = chromatogramItem.Product.TargetMz;
-
-                        for (var i = 0; i < scanTimes.Count; i++)
-                        {
-                            if (elutionTimeToScanMapMaster.TryGetValue(scanTimes[i], out var scanToStore))
-                            {
-                                var success = StoreSimulatedDataPoint(simulatedSpectraByScan, simulatedSpectraTimes, scanToStore, scanTimes[i], currentMz, intensities[i]);
-
-                                if (!success && scanToStore > 1)
-                                {
-                                    // The current scan already has a value for this m/z
-                                    // Try storing in the previous scan
-                                    success = StoreSimulatedDataPoint(simulatedSpectraByScan, simulatedSpectraTimes, scanToStore - 1, scanTimes[i], currentMz, intensities[i]);
-                                }
-
-                                if (!success)
-                                {
-                                    // The current scan and the previous scan already have a value for this m/z
-                                    // Store in the next scan
-                                    StoreSimulatedDataPoint(simulatedSpectraByScan, simulatedSpectraTimes, scanToStore + 1, scanTimes[i], currentMz, intensities[i]);
-                                }
-
-                                if (!success)
-                                {
-                                    ConsoleMsgUtils.ShowDebug("Skipping duplicate m/z value {0} for scan {1}", currentMz, scanToStore);
-                                }
-                            }
-                            else
-                            {
-                                scanTimeLookupErrors++;
-                                if (scanTimeLookupErrors <= 5 || scanTimeLookupErrors >= nextWarningThreshold)
-                                {
-                                    ConsoleMsgUtils.ShowWarning("The elutionTimeToScanMap dictionary did not have scan time {0:N1} for {1}; this is unexpected",
-                                                                scanTimes[i], chromatogramItem.Id);
-
-                                    if (scanTimeLookupErrors > 5)
-                                    {
-                                        nextWarningThreshold *= 2;
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    // Call ExtractFragmentationScan for each scan in simulatedSpectraByScan
-
-                    var mzList = new List<double>(200);
-                    var intensityList = new List<double>(200);
-
-                    foreach (var simulatedSpectrum in simulatedSpectraByScan)
-                    {
-                        var scanNumber = simulatedSpectrum.Key;
-
-                        mDatasetFileInfo.ScanCount++;
-
-                        if (scanNumber > 0 && !mScanTracking.CheckScanInRange(scanNumber, mOptions.SICOptions))
-                        {
-                            mScansOutOfRange++;
-                            continue;
-                        }
-
-                        var nativeId = string.Format("controllerType=0 controllerNumber=1 scan={0}", scanNumber);
-                        var scanStartTime = simulatedSpectraTimes[scanNumber];
-
-                        // ReSharper disable CollectionNeverUpdated.Local
-                        var cvParams = new List<SimpleMzMLReader.CVParamData>();
-                        var userParams = new List<SimpleMzMLReader.UserParamData>();
-                        var precursors = new List<SimpleMzMLReader.Precursor>();
-                        var scanWindows = new List<SimpleMzMLReader.ScanWindowData>();
-                        // ReSharper restore CollectionNeverUpdated.Local
-
-                        mzList.Clear();
-                        intensityList.Clear();
-
-                        foreach (var dataPoint in simulatedSpectrum.Value)
-                        {
-                            mzList.Add(dataPoint.Key);
-                            intensityList.Add(dataPoint.Value);
-                        }
-
-                        var mzMLSpectrum = new SimpleMzMLReader.SimpleSpectrum(
-                            mzList, intensityList, scanNumber, nativeId, scanStartTime, cvParams, userParams, precursors, scanWindows);
-
-                        var mzXmlSourceSpectrum = GetSpectrumInfoFromMzMLSpectrum(mzMLSpectrum, mzList, intensityList, thermoRawFile);
-                        scanTimeMax = mzXmlSourceSpectrum.RetentionTimeMin;
-
-                        var msSpectrum = new MSSpectrum(mzXmlSourceSpectrum.ScanNumber, mzList, intensityList, mzList.Count);
-
-                        var percentComplete = scanList.MasterScanOrderCount / (double)simulatedSpectraByScan.Count * 100;
-
-                        var extractSuccess = ExtractScanInfoCheckRange(msSpectrum, mzXmlSourceSpectrum, mzMLSpectrum,
-                                                                       scanList, spectraCache, dataOutputHandler,
-                                                                       percentComplete, mDatasetFileInfo.ScanCount);
-
-                        if (!extractSuccess)
-                        {
-                            break;
-                        }
-                    }
-
-                    mDatasetFileInfo.AcqTimeEnd = mDatasetFileInfo.AcqTimeStart.AddMinutes(scanTimeMax);
+                    ExtractSRMChromatogramsFromMzML(
+                        mzMLFile,
+                        scanList,
+                        spectraCache,
+                        dataOutputHandler,
+                        mzMLReader,
+                        isThermoRawFile,
+                        ref scanTimeMax);
                 }
 
                 // Shrink the memory usage of the scanList arrays
@@ -949,6 +666,308 @@ namespace MASIC.DataInput
                 scanList, spectraCache, dataOutputHandler,
                 spectrumInfo, msSpectrum, sicOptions,
                 isMzXML, mzXmlSourceSpectrum, mzMLSpectrum);
+        }
+
+        private void ExtractSRMChromatogramsFromMzML(
+            FileSystemInfo mzMLFile,
+            ScanList scanList,
+            SpectraCache spectraCache,
+            DataOutput.DataOutput dataOutputHandler,
+            SimpleMzMLReader mzMLReader,
+            bool isThermoRawFile,
+            ref double scanTimeMax)
+        {
+            // ReSharper disable CommentTypo
+
+            // m/z and intensity data in the .mzML file are stored as chromatograms, instead of as spectra
+            // An example is TSQ dataset QC18PepsR1_4Apr18_legolas1, converted from .raw to .mzML using:
+            // msconvert.exe --32 --mzML QC18PepsR1_4Apr18_legolas1.raw
+            //
+            // The .mzML file for this dataset has 69 chromatograms
+            // The first has CV Param MS_total_ion_current_chromatogram and is thus TIC vs. time
+            // The remaining ones have CV Param MS_selected_reaction_monitoring_chromatogram, and that is the data we need to load
+
+            // ReSharper restore CommentTypo
+
+            // Construct a list of the difference in time (in minutes) between adjacent data points in each chromatogram
+            var scanTimeDiffMedians = new List<double>(200);
+
+            // Also keep track of elution times
+            // Keys in this dictionary are chromatogram number
+            // Values are a dictionary where keys are elution times and values are the pseudo scan number mapped to each time (initially 0)
+            var elutionTimeToScanMapByChromatogram = new Dictionary<int, SortedDictionary<double, int>>();
+            var chromatogramNumber = 0;
+            var scanTimeDiffs = new List<double>(200);
+
+            foreach (var chromatogramItem in mzMLReader.ReadAllChromatograms(true))
+            {
+                if (chromatogramItem == null)
+                    continue;
+
+                var isSRM = IsSrmChromatogram(chromatogramItem);
+                if (!isSRM)
+                    continue;
+
+                chromatogramNumber++;
+
+                // Keys in this dictionary are elution time, values are the pseudo scan number (assigned later in this method)
+                var elutionTimeToScanMap = new SortedDictionary<double, int>();
+                elutionTimeToScanMapByChromatogram.Add(chromatogramNumber, elutionTimeToScanMap);
+
+                // Construct a list of the difference in time (in minutes) between adjacent data points in each chromatogram
+                scanTimeDiffs.Clear();
+
+                var scanTimes = chromatogramItem.Times.ToList();
+
+                for (var i = 0; i < scanTimes.Count; i++)
+                {
+                    if (!elutionTimeToScanMap.ContainsKey(scanTimes[i]))
+                    {
+                        elutionTimeToScanMap.Add(scanTimes[i], 0);
+                    }
+
+                    if (i > 0)
+                    {
+                        var adjacentTimeDiff = scanTimes[i] - scanTimes[i - 1];
+                        if (adjacentTimeDiff > 0)
+                        {
+                            scanTimeDiffs.Add(adjacentTimeDiff);
+                        }
+                    }
+                }
+
+                // Compute the median time difference in scanTimeDiffs
+                var medianScanTimeDiffThisChromatogram = Utilities.ComputeMedian(scanTimeDiffs);
+
+                // Store in scanTimeDiffMedians, which tracks the median scan time difference for each chromatogram
+                scanTimeDiffMedians.Add(medianScanTimeDiffThisChromatogram);
+            }
+
+            // Construct a mapping between elution time and scan number
+            // This is a bit of a challenge since chromatogram data only tracks elution time, and not scan number
+
+            // First, compute the overall median time difference, e.g. 0.0216
+            var medianScanTimeDiff = Utilities.ComputeMedian(scanTimeDiffMedians);
+            if (Math.Abs(medianScanTimeDiff) < 0.000001)
+            {
+                medianScanTimeDiff = 0.000001;
+            }
+
+            Console.WriteLine("Populating dictionary mapping SRM ion elution times to pseudo scan number");
+
+            var lastProgress = DateTime.UtcNow;
+            var chromatogramsProcessed = 0;
+
+            // Keys in this dictionary are scan times, values are the pseudo scan number mapped to each time
+            var elutionTimeToScanMapMaster = new Dictionary<double, int>();
+
+            // Define the mapped scan number of each elution time in elutionTimeToScanMapByChromatogram
+            foreach (var chromatogramTimeEntry in elutionTimeToScanMapByChromatogram)
+            {
+                if (DateTime.UtcNow.Subtract(lastProgress).TotalSeconds >= 2.5)
+                {
+                    lastProgress = DateTime.UtcNow;
+                    var percentComplete = chromatogramsProcessed / (double)elutionTimeToScanMapByChromatogram.Count * 100;
+                    Console.Write("{0:N0}% ", percentComplete);
+                }
+
+                // Assign the pseudo scan number for each time in the chromatogram
+                // For example, if elutionTime is 0.00461 and medianScanTimeDiff is 0.0216 minutes,
+                // nearestPseudoScan will be 0.00461 / 0.0216 * 100 + 1 = 22
+
+                var elutionTimeToScanMap = chromatogramTimeEntry.Value;
+                foreach (var elutionTime in elutionTimeToScanMap.Keys.ToList())
+                {
+                    var nearestPseudoScan = (int)Math.Round(elutionTime / medianScanTimeDiff * 100) + 1;
+                    elutionTimeToScanMap[elutionTime] = nearestPseudoScan;
+                }
+
+                // Fix duplicate scans (values) in elutionTimeToScanMap, if possible
+                // (elutionTimeToScanMap is a SortedDictionary where keys are elution times and values are the pseudo scan number mapped to each time)
+
+                // Cache the keys in elutionTimeToScanMap in a list that we can iterate over
+                var elutionTimes = (from item in elutionTimeToScanMap.Keys orderby item select item).ToList();
+
+                for (var i = 1; i < elutionTimeToScanMap.Count; i++)
+                {
+                    var previousElutionTime = elutionTimes[i - 1];
+                    var currentElutionTime = elutionTimes[i];
+
+                    var previousScan = elutionTimeToScanMap[previousElutionTime];
+                    var currentScan = elutionTimeToScanMap[currentElutionTime];
+
+                    if (currentScan != previousScan)
+                        continue;
+
+                    // Adjacent time points have an identical scan number
+                    if (i == elutionTimeToScanMap.Count - 1)
+                    {
+                        // We're at the final scan
+                        elutionTimeToScanMap[currentElutionTime] = currentScan + 1;
+                        continue;
+                    }
+
+                    // We're somewhere in the middle; increment the scan only if it's not a collision
+                    var nextElutionTime = elutionTimes[i + 1];
+                    var nextScan = elutionTimeToScanMap[nextElutionTime];
+
+                    if (nextScan - currentScan > 1)
+                    {
+                        // The next scan is more than 1 scan away from this one; it is safe to use currentScan + 1 for the current elution time
+                        elutionTimeToScanMap[currentElutionTime] = currentScan + 1;
+                    }
+                }
+
+                // Populate the master dictionary mapping elution time to scan number (using chromatogram 1)
+                // On subsequent chromatograms, add new elution times,
+                // or validate that existing elution times have the same computed pseudo scan number (which should always be true)
+
+                foreach (var item in elutionTimeToScanMap)
+                {
+                    if (elutionTimeToScanMapMaster.TryGetValue(item.Key, out var existingScan))
+                    {
+                        if (existingScan != item.Value)
+                        {
+                            ConsoleMsgUtils.ShowWarning("Elution times resulted in different pseudo scans in ExtractScanInfoFromMzMLDataFile; this is unexpected");
+                        }
+                    }
+                    else
+                    {
+                        elutionTimeToScanMapMaster.Add(item.Key, item.Value);
+                    }
+                }
+
+                chromatogramsProcessed++;
+            }
+
+            Console.WriteLine();
+
+            // Keys in this dictionary are scan numbers
+            // Values are a dictionary tracking m/z values and intensities
+            var simulatedSpectraByScan = new Dictionary<int, Dictionary<double, double>>();
+
+            // Keys in this dictionary are scan numbers
+            // Values are the elution time for the scan
+            var simulatedSpectraTimes = new Dictionary<int, double>();
+
+            // Open the file with a new reader
+            var mzMLReader2 = new SimpleMzMLReader(mzMLFile.FullName, false);
+
+            var scanTimeLookupErrors = 0;
+            var nextWarningThreshold = 10;
+            scanList.ReserveListCapacity(elutionTimeToScanMapMaster.Count);
+            mScanTracking.ReserveListCapacity(elutionTimeToScanMapMaster.Count);
+            spectraCache.SpectrumCount = Math.Max(spectraCache.SpectrumCount, elutionTimeToScanMapMaster.Count);
+
+            foreach (var chromatogramItem in mzMLReader2.ReadAllChromatograms(true))
+            {
+                var isSRM = IsSrmChromatogram(chromatogramItem);
+                if (!isSRM)
+                    continue;
+
+                var scanTimes = chromatogramItem.Times.ToList();
+                var intensities = chromatogramItem.Intensities.ToList();
+                var currentMz = chromatogramItem.Product.TargetMz;
+
+                for (var i = 0; i < scanTimes.Count; i++)
+                {
+                    if (elutionTimeToScanMapMaster.TryGetValue(scanTimes[i], out var scanToStore))
+                    {
+                        var success = StoreSimulatedDataPoint(simulatedSpectraByScan, simulatedSpectraTimes, scanToStore, scanTimes[i], currentMz, intensities[i]);
+
+                        if (!success && scanToStore > 1)
+                        {
+                            // The current scan already has a value for this m/z
+                            // Try storing in the previous scan
+                            success = StoreSimulatedDataPoint(simulatedSpectraByScan, simulatedSpectraTimes, scanToStore - 1, scanTimes[i], currentMz, intensities[i]);
+                        }
+
+                        if (!success)
+                        {
+                            // The current scan and the previous scan already have a value for this m/z
+                            // Store in the next scan
+                            StoreSimulatedDataPoint(simulatedSpectraByScan, simulatedSpectraTimes, scanToStore + 1, scanTimes[i], currentMz, intensities[i]);
+                        }
+
+                        if (!success)
+                        {
+                            ConsoleMsgUtils.ShowDebug("Skipping duplicate m/z value {0} for scan {1}", currentMz, scanToStore);
+                        }
+                    }
+                    else
+                    {
+                        scanTimeLookupErrors++;
+                        if (scanTimeLookupErrors <= 5 || scanTimeLookupErrors >= nextWarningThreshold)
+                        {
+                            ConsoleMsgUtils.ShowWarning("The elutionTimeToScanMap dictionary did not have scan time {0:N1} for {1}; this is unexpected",
+                                                        scanTimes[i], chromatogramItem.Id);
+
+                            if (scanTimeLookupErrors > 5)
+                            {
+                                nextWarningThreshold *= 2;
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Call ExtractFragmentationScan for each scan in simulatedSpectraByScan
+
+            var mzList = new List<double>(200);
+            var intensityList = new List<double>(200);
+
+            foreach (var simulatedSpectrum in simulatedSpectraByScan)
+            {
+                var scanNumber = simulatedSpectrum.Key;
+
+                mDatasetFileInfo.ScanCount++;
+
+                if (scanNumber > 0 && !mScanTracking.CheckScanInRange(scanNumber, mOptions.SICOptions))
+                {
+                    mScansOutOfRange++;
+                    continue;
+                }
+
+                var nativeId = string.Format("controllerType=0 controllerNumber=1 scan={0}", scanNumber);
+                var scanStartTime = simulatedSpectraTimes[scanNumber];
+
+                // ReSharper disable CollectionNeverUpdated.Local
+                var cvParams = new List<SimpleMzMLReader.CVParamData>();
+                var userParams = new List<SimpleMzMLReader.UserParamData>();
+                var precursors = new List<SimpleMzMLReader.Precursor>();
+                var scanWindows = new List<SimpleMzMLReader.ScanWindowData>();
+                // ReSharper restore CollectionNeverUpdated.Local
+
+                mzList.Clear();
+                intensityList.Clear();
+
+                foreach (var dataPoint in simulatedSpectrum.Value)
+                {
+                    mzList.Add(dataPoint.Key);
+                    intensityList.Add(dataPoint.Value);
+                }
+
+                var mzMLSpectrum = new SimpleMzMLReader.SimpleSpectrum(
+                    mzList, intensityList, scanNumber, nativeId, scanStartTime, cvParams, userParams, precursors, scanWindows);
+
+                var mzXmlSourceSpectrum = GetSpectrumInfoFromMzMLSpectrum(mzMLSpectrum, mzList, intensityList, isThermoRawFile);
+                scanTimeMax = mzXmlSourceSpectrum.RetentionTimeMin;
+
+                var msSpectrum = new MSSpectrum(mzXmlSourceSpectrum.ScanNumber, mzList, intensityList);
+
+                var percentComplete = scanList.MasterScanOrderCount / (double)simulatedSpectraByScan.Count * 100;
+
+                var extractSuccess = ExtractScanInfoCheckRange(msSpectrum, mzXmlSourceSpectrum, mzMLSpectrum,
+                                                               scanList, spectraCache, dataOutputHandler,
+                                                               percentComplete, mDatasetFileInfo.ScanCount);
+
+                if (!extractSuccess)
+                {
+                    break;
+                }
+            }
+
+            mDatasetFileInfo.AcqTimeEnd = mDatasetFileInfo.AcqTimeStart.AddMinutes(scanTimeMax);
         }
 
         /// <summary>
