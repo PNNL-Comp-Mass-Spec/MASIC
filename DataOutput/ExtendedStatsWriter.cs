@@ -333,33 +333,34 @@ namespace MASIC.DataOutput
         private ScanInfo GetScanByMasterScanIndex(ScanList scanList, int masterScanIndex)
         {
             var currentScan = new ScanInfo();
-            if (scanList.MasterScanOrder != null)
+
+            if (scanList.MasterScanOrder == null)
+                return currentScan;
+
+            if (masterScanIndex < 0)
             {
-                if (masterScanIndex < 0)
-                {
-                    masterScanIndex = 0;
-                }
-                else if (masterScanIndex >= scanList.MasterScanOrderCount)
-                {
-                    masterScanIndex = scanList.MasterScanOrderCount - 1;
-                }
+                masterScanIndex = 0;
+            }
+            else if (masterScanIndex >= scanList.MasterScanOrderCount)
+            {
+                masterScanIndex = scanList.MasterScanOrderCount - 1;
+            }
 
-                switch (scanList.MasterScanOrder[masterScanIndex].ScanType)
-                {
-                    case ScanList.ScanTypeConstants.SurveyScan:
-                        // Survey scan
-                        currentScan = scanList.SurveyScans[scanList.MasterScanOrder[masterScanIndex].ScanIndexPointer];
-                        break;
+            switch (scanList.MasterScanOrder[masterScanIndex].ScanType)
+            {
+                case ScanList.ScanTypeConstants.SurveyScan:
+                    // Survey scan
+                    currentScan = scanList.SurveyScans[scanList.MasterScanOrder[masterScanIndex].ScanIndexPointer];
+                    break;
 
-                    case ScanList.ScanTypeConstants.FragScan:
-                        // Fragmentation Scan
-                        currentScan = scanList.FragScans[scanList.MasterScanOrder[masterScanIndex].ScanIndexPointer];
-                        break;
+                case ScanList.ScanTypeConstants.FragScan:
+                    // Fragmentation Scan
+                    currentScan = scanList.FragScans[scanList.MasterScanOrder[masterScanIndex].ScanIndexPointer];
+                    break;
 
-                    default:
-                        // Unknown scan type
-                        break;
-                }
+                default:
+                    // Unknown scan type
+                    break;
             }
 
             return currentScan;
