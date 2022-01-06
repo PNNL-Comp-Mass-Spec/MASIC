@@ -111,7 +111,7 @@ namespace MASICTest
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error in clsBinarySearch->TestSearchFunctions: " + ex.Message);
+                Console.WriteLine("Error in BinarySearch->TestSearchFunctions: " + ex.Message);
             }
         }
 
@@ -219,7 +219,7 @@ namespace MASICTest
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error in clsBinarySearch->TestSearchFunctions: " + ex.Message);
+                Console.WriteLine("Error in BinarySearch->TestSearchFunctions: " + ex.Message);
             }
         }
 

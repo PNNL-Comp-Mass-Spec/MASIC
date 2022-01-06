@@ -80,7 +80,7 @@ namespace MASICBrowser
         /// <summary>
         /// Selected ion chromatogram data points
         /// </summary>
-        public List<clsSICDataPoint> SICData { get; set; }
+        public List<SICDataPoint> SICData { get; set; }
 
         /// <summary>
         /// Maximum intensity in SICData
@@ -98,16 +98,16 @@ namespace MASICBrowser
         /// <remarks>
         /// The range of scans checked will be from SICScans[0] to SICScans[DataCount]
         /// </remarks>
-        public List<clsSICDataPoint> SimilarFragScans { get; set; }
+        public List<SICDataPoint> SimilarFragScans { get; set; }
 
         /// <summary>
         /// Constructor
         /// </summary>
         public clsParentIonStats()
         {
-            SICData = new List<clsSICDataPoint>();
+            SICData = new List<SICDataPoint>();
             SICStats = new clsSICStats();
-            SimilarFragScans = new List<clsSICDataPoint>();
+            SimilarFragScans = new List<SICDataPoint>();
         }
     }
 }

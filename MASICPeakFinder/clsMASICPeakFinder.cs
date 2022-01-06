@@ -992,7 +992,7 @@ namespace MASICPeakFinder
         /// <param name="sicIntensities"></param>
         /// <param name="sicPeak"></param>
         /// <param name="baselineNoiseOptions"></param>
-        [Obsolete("Use the version that takes a List(Of clsSICDataPoint")]
+        [Obsolete("Use the version that takes a List(Of SICDataPoint")]
         public bool ComputeNoiseLevelInPeakVicinity(
             int dataCount, int[] sicScanNumbers, double[] sicIntensities,
             SICStatsPeak sicPeak,
@@ -1162,7 +1162,7 @@ namespace MASICPeakFinder
         /// <param name="sicIntensities">List of intensities</param>
         /// <param name="sicPeak"></param>
         /// <param name="fragScanNumber"></param>
-        [Obsolete("Use the version that takes a List(Of clsSICDataPoint")]
+        [Obsolete("Use the version that takes a List(Of SICDataPoint")]
         public bool ComputeParentIonIntensity(
             int dataCount,
             int[] sicScanNumbers,
@@ -3241,7 +3241,7 @@ namespace MASICPeakFinder
         /// <param name="returnClosestPeak"></param>
         /// <param name="simDataPresent">True if Select Ion Monitoring data is present</param>
         /// <param name="recomputeNoiseLevel"></param>
-        [Obsolete("Use the version that takes List<clsSICDataPoint>")]
+        [Obsolete("Use the version that takes List<SICDataPoint>")]
         public bool FindSICPeakAndArea(
             int dataCount,
             int[] sicScanNumbers,

@@ -161,7 +161,7 @@ namespace MASICBrowser
 
         private DataSet mMsMsResults;
 
-        private clsSICPeakFinderOptions mSICPeakFinderOptions;
+        private SICPeakFinderOptions mSICPeakFinderOptions;
 
         /// <summary>
         /// Number of data point in mParentIonPointerArray
@@ -427,7 +427,7 @@ namespace MASICBrowser
         /// The summed intensity is not used if the number of points greater than or equal to
         /// .SICNoiseThresholdIntensity is less than Minimum_Peak_Width
         /// </remarks>
-        private void FindMinimumPotentialPeakAreaInRegion(int parentIonIndexStart, int parentIonIndexEnd, clsSICPotentialAreaStats potentialAreaStatsForRegion)
+        private void FindMinimumPotentialPeakAreaInRegion(int parentIonIndexStart, int parentIonIndexEnd, SICPotentialAreaStats potentialAreaStatsForRegion)
         {
             potentialAreaStatsForRegion.MinimumPotentialPeakArea = double.MaxValue;
             potentialAreaStatsForRegion.PeakCountBasisForMinimumPotentialArea = 0;
@@ -464,7 +464,7 @@ namespace MASICBrowser
 
         private bool FindSICPeakAndAreaForParentIon(int parentIonIndex, clsSICStats sicStats)
         {
-            var sicPotentialAreaStatsForRegion = new clsSICPotentialAreaStats();
+            var sicPotentialAreaStatsForRegion = new SICPotentialAreaStats ();
 
             try
             {
@@ -688,10 +688,10 @@ namespace MASICBrowser
                         // Look for similarFragScan in .SICScans() then use the corresponding
                         // intensity value in .SICData()
 
-                        var matchIndex = clsBinarySearch.BinarySearchFindNearest(
+                        var matchIndex = BinarySearch.BinarySearchFindNearest(
                             scanNumbers,
                             similarFragScan,
-                            clsBinarySearch.eMissingDataModeConstants.ReturnPreviousPoint);
+                            BinarySearch.MissingDataModeConstants.ReturnPreviousPoint);
 
                         if (matchIndex < 0)
                         {
@@ -744,7 +744,7 @@ namespace MASICBrowser
                             }
                         }
 
-                        var newDataPoint = new clsSICDataPoint(similarFragScan, interpolatedYValue, 0);
+                        var newDataPoint = new SICDataPoint(similarFragScan, interpolatedYValue, 0);
                         currentParentIon.SimilarFragScans.Add(newDataPoint);
                     }
                 }
@@ -1903,7 +1903,7 @@ namespace MASICBrowser
                                                 massValue = sicMasses[index];
                                             }
 
-                                            var newDataPoint = new clsSICDataPoint(sicScans[index], sicIntensities[index], massValue);
+                                            var newDataPoint = new SICDataPoint(sicScans[index], sicIntensities[index], massValue);
                                             currentParentIon.SICData.Add(newDataPoint);
                                         }
 

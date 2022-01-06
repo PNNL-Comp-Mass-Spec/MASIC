@@ -11,7 +11,7 @@ namespace MASICBrowser
         /// <summary>
         /// Largest peak in the selected ion chromatogram
         /// </summary>
-        public MASICPeakFinder.clsSICStatsPeak Peak { get; set; }
+        public MASICPeakFinder.SICStatsPeak Peak { get; set; }
 
         /// <summary>
         /// Peak width, in scans
@@ -26,7 +26,7 @@ namespace MASICBrowser
         /// <summary>
         /// Area stats for the SIC peak
         /// </summary>
-        public MASICPeakFinder.clsSICPotentialAreaStats SICPotentialAreaStatsForPeak { get; set; }
+        public MASICPeakFinder.SICPotentialAreaStats  SICPotentialAreaStatsForPeak { get; set; }
 
         /// <summary>
         /// Smoothed intensity values
@@ -43,8 +43,8 @@ namespace MASICBrowser
         /// </summary>
         public clsSICStats()
         {
-            Peak = new MASICPeakFinder.clsSICStatsPeak();
-            SICPotentialAreaStatsForPeak = new MASICPeakFinder.clsSICPotentialAreaStats();
+            Peak = new MASICPeakFinder.SICStatsPeak();
+            SICPotentialAreaStatsForPeak = new MASICPeakFinder.SICPotentialAreaStats ();
             SICSmoothedYData = new List<double>();
         }
 
@@ -58,7 +58,7 @@ namespace MASICBrowser
                 Peak = Peak.Clone(),
                 SICPeakWidthFullScans = SICPeakWidthFullScans,
                 ScanNumberMaxIntensity = ScanNumberMaxIntensity,
-                SICPotentialAreaStatsForPeak = new MASICPeakFinder.clsSICPotentialAreaStats
+                SICPotentialAreaStatsForPeak = new MASICPeakFinder.SICPotentialAreaStats
                 {
                     MinimumPotentialPeakArea = SICPotentialAreaStatsForPeak.MinimumPotentialPeakArea,
                     PeakCountBasisForMinimumPotentialArea = SICPotentialAreaStatsForPeak.PeakCountBasisForMinimumPotentialArea,
