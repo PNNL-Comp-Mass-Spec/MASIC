@@ -653,7 +653,7 @@ namespace MASIC.DataInput
 
                 lastKnownLocation = "Instantiate new clsMSSpectrum";
 
-                var msSpectrum = new MSSpectrum(scanInfo.ScanNumber, mzList, intensityList, scanInfo.IonCountRaw);
+                var msSpectrum = new MSSpectrum(scanInfo.ScanNumber, mzList, intensityList);
 
                 lastKnownLocation = "Manually determine the base peak m/z and base peak intensity";
 

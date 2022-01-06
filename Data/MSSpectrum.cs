@@ -43,12 +43,13 @@ namespace MASIC.Data
         /// <summary>
         /// Constructor that sets the scan number and stores m/z and intensity data (float intensities)
         /// </summary>
-        public MSSpectrum(int scanNumber, IList<double> mzList, IList<float> intensityList, int dataCount)
+        public MSSpectrum(int scanNumber, IList<double> mzList, IList<float> intensityList)
             : this(scanNumber)
         {
-            IonsMZ.Capacity = dataCount;
-            IonsIntensity.Capacity = dataCount;
-            for (var i = 0; i < dataCount; i++)
+            IonsMZ.Capacity = mzList.Count;
+            IonsIntensity.Capacity = IonsMZ.Capacity;
+
+            for (var i = 0; i < mzList.Count; i++)
             {
                 IonsMZ.Add(mzList[i]);
                 IonsIntensity.Add(intensityList[i]);
@@ -58,12 +59,13 @@ namespace MASIC.Data
         /// <summary>
         /// Constructor that sets the scan number and stores m/z and intensity data (double intensities)
         /// </summary>
-        public MSSpectrum(int scanNumber, IList<double> mzList, IList<double> intensityList, int dataCount)
+        public MSSpectrum(int scanNumber, IList<double> mzList, IList<double> intensityList)
             : this(scanNumber)
         {
-            IonsMZ.Capacity = dataCount;
-            IonsIntensity.Capacity = dataCount;
-            for (var i = 0; i < dataCount; i++)
+            IonsMZ.Capacity = mzList.Count;
+            IonsIntensity.Capacity = IonsMZ.Capacity;
+
+            for (var i = 0; i < mzList.Count; i++)
             {
                 IonsMZ.Add(mzList[i]);
                 IonsIntensity.Add(intensityList[i]);
@@ -114,7 +116,7 @@ namespace MASIC.Data
         /// <param name="sourceSpectrum"></param>
         public MSSpectrum Copy(MSSpectrum sourceSpectrum)
         {
-            return new MSSpectrum(sourceSpectrum.ScanNumber, sourceSpectrum.IonsMZ, sourceSpectrum.IonsIntensity, sourceSpectrum.IonsMZ.Count);
+            return new MSSpectrum(sourceSpectrum.ScanNumber, sourceSpectrum.IonsMZ, sourceSpectrum.IonsIntensity);
         }
 
         /// <summary>

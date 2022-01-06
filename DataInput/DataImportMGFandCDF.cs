@@ -179,7 +179,7 @@ namespace MASIC.DataInput
 
                         if (success && intIonCount > 0)
                         {
-                            var msSpectrum = new MSSpectrum(scanNumber, mzData, intensityData, intIonCount);
+                            var msSpectrum = new MSSpectrum(scanNumber, mzData, intensityData);
 
                             double msDataResolution;
 
@@ -397,7 +397,7 @@ namespace MASIC.DataInput
 
                     scanList.FragScans.Add(newFragScan);
 
-                    var msSpectrum = new MSSpectrum(newFragScan.ScanNumber, spectrumInfo.MZList, spectrumInfo.IntensityList, spectrumInfo.DataCount);
+                    var msSpectrum = new MSSpectrum(newFragScan.ScanNumber, spectrumInfo.MzList, spectrumInfo.IntensityList);
 
                     if (spectrumInfo.DataCount > 0)
                     {
