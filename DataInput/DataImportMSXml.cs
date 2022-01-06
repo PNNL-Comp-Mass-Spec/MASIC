@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using MASIC.Data;
-using MASIC.DataOutput;
 using MASIC.Options;
 using MASICPeakFinder;
 using MSDataFileReader;
 using PRISM;
+using PSI_Interface;
 using PSI_Interface.CV;
 using PSI_Interface.MSData;
 using ThermoRawFileReader;
@@ -263,8 +263,8 @@ namespace MASIC.DataInput
         {
             try
             {
-                clsMSDataFileReaderBaseClass xmlReader = new clsMzXMLFileReader();
-                return ExtractScanInfoFromMSXMLDataFile(filePath, xmlReader, scanList, spectraCache,
+                MsDataFileReaderBaseClass mzXmlReader = new MzXMLFileReader();
+                return ExtractScanInfoFromMSXMLDataFile(filePath, mzXmlReader, scanList, spectraCache,
                                                         dataOutputHandler, keepRawSpectra, keepMSMSSpectra);
             }
             catch (Exception ex)
@@ -294,8 +294,8 @@ namespace MASIC.DataInput
         {
             try
             {
-                clsMSDataFileReaderBaseClass xmlReader = new clsMzDataFileReader();
-                return ExtractScanInfoFromMSXMLDataFile(filePath, xmlReader, scanList, spectraCache,
+                MsDataFileReaderBaseClass mzDataReader = new MzDataFileReader();
+                return ExtractScanInfoFromMSXMLDataFile(filePath, mzDataReader, scanList, spectraCache,
                                                         dataOutputHandler,
                                                         keepRawSpectra, keepMSMSSpectra);
             }
@@ -320,7 +320,7 @@ namespace MASIC.DataInput
         /// <remarks>Assumes filePath exists</remarks>
         private bool ExtractScanInfoFromMSXMLDataFile(
             string filePath,
-            clsMSDataFileReaderBaseClass xmlReader,
+            MsDataFileReaderBaseClass xmlReader,
             ScanList scanList,
             SpectraCache spectraCache,
             DataOutput.DataOutput dataOutputHandler,
@@ -399,7 +399,7 @@ namespace MASIC.DataInput
                         continue;
                     }
 
-                    var msSpectrum = new MSSpectrum(spectrumInfo.ScanNumber, spectrumInfo.MZList, spectrumInfo.IntensityList, spectrumInfo.DataCount);
+                    var msSpectrum = new MSSpectrum(spectrumInfo.ScanNumber, spectrumInfo.MzList, spectrumInfo.IntensityList);
 
                     var percentComplete = xmlReader.ProgressPercentComplete;
                     SimpleMzMLReader.SimpleSpectrum nullMzMLSpectrum = null;
@@ -472,10 +472,10 @@ namespace MASIC.DataInput
                 mDatasetFileInfo.ScanCount = 0;
 
                 // Open a handle to the data file
-                var xmlReader = new SimpleMzMLReader(mzMLFile.FullName, false);
+                var mzMLReader = new SimpleMzMLReader(mzMLFile.FullName, false);
                 fileOpened = true;
 
-                var fileStatsSuccess = UpdateDatasetFileStats(mzMLFile, datasetID, xmlReader);
+                var fileStatsSuccess = UpdateDatasetFileStats(mzMLFile, datasetID, mzMLReader);
                 if (!fileStatsSuccess)
                 {
                     return false;
@@ -483,16 +483,16 @@ namespace MASIC.DataInput
 
                 InitOptions(scanList, keepRawSpectra, keepMSMSSpectra);
 
-                var thermoRawFile = false;
+                var isThermoRawFile = false;
 
-                foreach (var cvParam in xmlReader.SourceFileParams.CVParams)
+                foreach (var cvParam in mzMLReader.SourceFileParams.CVParams)
                 {
                     switch (cvParam.TermInfo.Cvid)
                     {
                         case CV.CVID.MS_Thermo_nativeID_format:
                         case CV.CVID.MS_Thermo_nativeID_format__combined_spectra:
                         case CV.CVID.MS_Thermo_RAW_format:
-                            thermoRawFile = true;
+                            isThermoRawFile = true;
                             break;
                     }
                 }
@@ -502,17 +502,18 @@ namespace MASIC.DataInput
 
                 double scanTimeMax = 0;
 
-                if (xmlReader.NumSpectra > 0)
+                if (mzMLReader.NumSpectra > 0)
                 {
                     var scansEst = mOptions.SICOptions.ScanRangeCount;
                     if (scansEst <= 0)
                     {
-                        scansEst = xmlReader.NumSpectra;
+                        scansEst = mzMLReader.NumSpectra;
                     }
                     scanList.ReserveListCapacity(scansEst);
                     mScanTracking.ReserveListCapacity(scansEst);
                     spectraCache.SpectrumCount = Math.Max(spectraCache.SpectrumCount, scansEst);
-                    foreach (var mzMLSpectrum in xmlReader.ReadAllSpectra(true))
+
+                    foreach (var mzMLSpectrum in mzMLReader.ReadAllSpectra(true))
                     {
                         if (mzMLSpectrum == null)
                             continue;
@@ -528,12 +529,12 @@ namespace MASIC.DataInput
                         var mzList = mzMLSpectrum.Mzs.ToList();
                         var intensityList = mzMLSpectrum.Intensities.ToList();
 
-                        var mzXmlSourceSpectrum = GetSpectrumInfoFromMzMLSpectrum(mzMLSpectrum, mzList, intensityList, thermoRawFile);
+                        var mzXmlSourceSpectrum = GetSpectrumInfoFromMzMLSpectrum(mzMLSpectrum, mzList, intensityList, isThermoRawFile);
                         scanTimeMax = mzXmlSourceSpectrum.RetentionTimeMin;
 
-                        var msSpectrum = new MSSpectrum(mzXmlSourceSpectrum.ScanNumber, mzList, intensityList, mzList.Count);
+                        var msSpectrum = new MSSpectrum(mzXmlSourceSpectrum.ScanNumber, mzList, intensityList);
 
-                        var percentComplete = scanList.MasterScanOrderCount / (double)xmlReader.NumSpectra * 100;
+                        var percentComplete = scanList.MasterScanOrderCount / (double)mzMLReader.NumSpectra * 100;
 
                         var extractSuccess = ExtractScanInfoCheckRange(msSpectrum, mzXmlSourceSpectrum, mzMLSpectrum,
                                                                        scanList, spectraCache, dataOutputHandler,
@@ -546,7 +547,7 @@ namespace MASIC.DataInput
 
                     mDatasetFileInfo.AcqTimeEnd = mDatasetFileInfo.AcqTimeStart.AddMinutes(scanTimeMax);
                 }
-                else if (xmlReader.NumSpectra == 0 && xmlReader.NumChromatograms > 0)
+                else if (mzMLReader.NumSpectra == 0 && mzMLReader.NumChromatograms > 0)
                 {
                     // ReSharper disable CommentTypo
 
@@ -865,7 +866,7 @@ namespace MASIC.DataInput
 
         private bool ExtractScanInfoCheckRange(
             MSSpectrum msSpectrum,
-            clsSpectrumInfo spectrumInfo,
+            SpectrumInfo spectrumInfo,
             SimpleMzMLReader.SimpleSpectrum mzMLSpectrum,
             ScanList scanList,
             SpectraCache spectraCache,
@@ -915,15 +916,15 @@ namespace MASIC.DataInput
             DataOutput.DataOutput dataOutputHandler,
             SICOptions sicOptions,
             MSSpectrum msSpectrum,
-            clsSpectrumInfo spectrumInfo,
+            SpectrumInfo spectrumInfo,
             SimpleMzMLReader.SimpleSpectrum mzMLSpectrum)
         {
             bool isMzXML;
 
-            clsSpectrumInfoMzXML mzXmlSourceSpectrum = null;
+            SpectrumInfoMzXML mzXmlSourceSpectrum = null;
 
             // Note that both mzXML and mzML data is stored in spectrumInfo
-            if (spectrumInfo is clsSpectrumInfoMzXML xml)
+            if (spectrumInfo is SpectrumInfoMzXML xml)
             {
                 mzXmlSourceSpectrum = xml;
                 isMzXML = true;
@@ -938,13 +939,15 @@ namespace MASIC.DataInput
             if (spectrumInfo.MSLevel <= 1)
             {
                 // Survey Scan
-                return ExtractSurveyScan(scanList, spectraCache, dataOutputHandler,
-                                            spectrumInfo, msSpectrum, sicOptions,
-                                            isMzXML, mzXmlSourceSpectrum);
+                return ExtractSurveyScan(
+                    scanList, spectraCache, dataOutputHandler,
+                    spectrumInfo, msSpectrum, sicOptions,
+                    isMzXML, mzXmlSourceSpectrum);
             }
 
             // Fragmentation Scan
-            return ExtractFragmentationScan(scanList, spectraCache, dataOutputHandler,
+            return ExtractFragmentationScan(
+                scanList, spectraCache, dataOutputHandler,
                 spectrumInfo, msSpectrum, sicOptions,
                 isMzXML, mzXmlSourceSpectrum, mzMLSpectrum);
         }
@@ -964,11 +967,11 @@ namespace MASIC.DataInput
             ScanList scanList,
             SpectraCache spectraCache,
             DataOutput.DataOutput dataOutputHandler,
-            clsSpectrumInfo spectrumInfo,
+            SpectrumInfo spectrumInfo,
             MSSpectrum msSpectrum,
             SICOptions sicOptions,
             bool isMzXML,
-            clsSpectrumInfoMzXML mzXmlSourceSpectrum)
+            SpectrumInfoMzXML mzXmlSourceSpectrum)
         {
             var scanInfo = new ScanInfo
             {
@@ -983,8 +986,8 @@ namespace MASIC.DataInput
                 ZoomScan = false,
                 SIMScan = false,
                 MRMScanType = MRMScanTypeConstants.NotMRM,
-                LowMass = spectrumInfo.mzRangeStart,
-                HighMass = spectrumInfo.mzRangeEnd
+                LowMass = spectrumInfo.MzRangeStart,
+                HighMass = spectrumInfo.MzRangeEnd
             };
 
             if (mzXmlSourceSpectrum != null && !string.IsNullOrWhiteSpace(mzXmlSourceSpectrum.FilterLine))
@@ -1016,13 +1019,13 @@ namespace MASIC.DataInput
             {
                 // Define MSDataResolution based on the tolerance value that will be used at the lowest m/z in this spectrum, divided by sicOptions.CompressToleranceDivisorForPPM
                 // However, if the lowest m/z value is < 100, use 100 m/z
-                if (spectrumInfo.mzRangeStart < 100)
+                if (spectrumInfo.MzRangeStart < 100)
                 {
                     msDataResolution = ParentIonProcessing.GetParentIonToleranceDa(sicOptions, 100) / sicOptions.CompressToleranceDivisorForPPM;
                 }
                 else
                 {
-                    msDataResolution = ParentIonProcessing.GetParentIonToleranceDa(sicOptions, spectrumInfo.mzRangeStart) / sicOptions.CompressToleranceDivisorForPPM;
+                    msDataResolution = ParentIonProcessing.GetParentIonToleranceDa(sicOptions, spectrumInfo.MzRangeStart) / sicOptions.CompressToleranceDivisorForPPM;
                 }
             }
             else
@@ -1092,14 +1095,16 @@ namespace MASIC.DataInput
             ScanList scanList,
             SpectraCache spectraCache,
             DataOutput.DataOutput dataOutputHandler,
-            clsSpectrumInfo spectrumInfo,
+            SpectrumInfo spectrumInfo,
             MSSpectrum msSpectrum,
             SICOptions sicOptions,
             bool isMzXML,
-            clsSpectrumInfoMzXML mzXmlSourceSpectrum,
+            SpectrumInfoMzXML mzXmlSourceSpectrum,
             SimpleMzMLReader.SimpleSpectrum mzMLSpectrum)
         {
-            var scanInfo = new ScanInfo(spectrumInfo.ParentIonMZ)
+            var parentScan = GetParentScan(mzMLSpectrum);
+
+            var scanInfo = new ScanInfo(parentScan, spectrumInfo.ParentIonMZ)
             {
                 ScanNumber = spectrumInfo.ScanNumber,
                 ScanTime = spectrumInfo.RetentionTimeMin,
@@ -1140,7 +1145,7 @@ namespace MASIC.DataInput
                 // This is an MRM scan
                 scanList.MRMDataPresent = true;
 
-                var mrmScan = new ThermoRawFileReader.clsScanInfo(spectrumInfo.SpectrumID)
+                var mrmScan = new clsScanInfo(spectrumInfo.SpectrumID)
                 {
                     MRMScanType = mrmScanType,
                     MRMInfo = new MRMInfo()
@@ -1169,7 +1174,7 @@ namespace MASIC.DataInput
                 {
                     // .MZRangeStart and .MZRangeEnd should be equivalent, and they should define the m/z of the MRM transition
 
-                    if (spectrumInfo.mzRangeEnd - spectrumInfo.mzRangeStart >= 0.5)
+                    if (spectrumInfo.MzRangeEnd - spectrumInfo.MzRangeStart >= 0.5)
                     {
                         // The data is likely MRM and not SRM
                         // We cannot currently handle data like this
@@ -1178,7 +1183,7 @@ namespace MASIC.DataInput
                         if (mWarnCount <= 5)
                         {
                             ReportError("Warning: m/z range for SRM scan " + spectrumInfo.ScanNumber + " is " +
-                                            (spectrumInfo.mzRangeEnd - spectrumInfo.mzRangeStart).ToString("0.0") +
+                                            (spectrumInfo.MzRangeEnd - spectrumInfo.MzRangeStart).ToString("0.0") +
                                             " m/z; this is likely a MRM scan, but MASIC doesn't support inferring the " +
                                             "MRM transition masses from the observed m/z values.  Results will likely not be meaningful");
                             if (mWarnCount == 5)
@@ -1190,8 +1195,8 @@ namespace MASIC.DataInput
 
                     var mrmMassRange = new MRMMassRangeType
                     {
-                        StartMass = spectrumInfo.mzRangeStart,
-                        EndMass = spectrumInfo.mzRangeEnd
+                        StartMass = spectrumInfo.MzRangeStart,
+                        EndMass = spectrumInfo.MzRangeEnd
                     };
 
                     mrmMassRange.CentralMass = Math.Round(mrmMassRange.StartMass + (mrmMassRange.EndMass - mrmMassRange.StartMass) / 2, 6);
@@ -1211,8 +1216,8 @@ namespace MASIC.DataInput
                 scanInfo.MRMScanInfo.MRMMassCount = 0;
             }
 
-            scanInfo.LowMass = spectrumInfo.mzRangeStart;
-            scanInfo.HighMass = spectrumInfo.mzRangeEnd;
+            scanInfo.LowMass = spectrumInfo.MzRangeStart;
+            scanInfo.HighMass = spectrumInfo.MzRangeEnd;
             scanInfo.IsFTMS = IsHighResolutionSpectrum(mzXmlSourceSpectrum.FilterLine);
 
             scanList.FragScans.Add(scanInfo);
@@ -1278,30 +1283,30 @@ namespace MASIC.DataInput
             return filterStrings.First().Value;
         }
 
-        private clsSpectrumInfoMzXML GetSpectrumInfoFromMzMLSpectrum(
+        private SpectrumInfoMzXML GetSpectrumInfoFromMzMLSpectrum(
             SimpleMzMLReader.SimpleSpectrum mzMLSpectrum,
             IReadOnlyList<double> mzList,
             IReadOnlyList<double> intensityList,
-            bool thermoRawFile)
+            bool isThermoRawFile)
         {
-            var mzXmlSourceSpectrum = new clsSpectrumInfoMzXML
+            var mzXmlSourceSpectrum = new SpectrumInfoMzXML
             {
                 SpectrumID = mzMLSpectrum.ScanNumber,
                 ScanNumber = mzMLSpectrum.ScanNumber,
                 RetentionTimeMin = Utilities.CFloatSafe(mzMLSpectrum.ScanStartTime),
                 MSLevel = mzMLSpectrum.MsLevel,
                 TotalIonCurrent = mzMLSpectrum.TotalIonCurrent,
-                DataCount = mzList.Count
+                PeaksCount = mzList.Count
             };
 
-            if (mzXmlSourceSpectrum.DataCount > 0)
+            if (mzList.Count > 0)
             {
                 var basePeakMz = mzList[0];
                 var bpi = intensityList[0];
                 var mzMin = basePeakMz;
                 var mzMax = basePeakMz;
 
-                for (var i = 1; i < mzXmlSourceSpectrum.DataCount; i++)
+                for (var i = 1; i < mzList.Count; i++)
                 {
                     if (intensityList[i] > bpi)
                     {
@@ -1322,8 +1327,8 @@ namespace MASIC.DataInput
                 mzXmlSourceSpectrum.BasePeakMZ = basePeakMz;
                 mzXmlSourceSpectrum.BasePeakIntensity = Utilities.CFloatSafe(bpi);
 
-                mzXmlSourceSpectrum.mzRangeStart = Utilities.CFloatSafe(mzMin);
-                mzXmlSourceSpectrum.mzRangeEnd = Utilities.CFloatSafe(mzMax);
+                mzXmlSourceSpectrum.MzRangeStart = Utilities.CFloatSafe(mzMin);
+                mzXmlSourceSpectrum.MzRangeEnd = Utilities.CFloatSafe(mzMax);
             }
 
             if (mzXmlSourceSpectrum.MSLevel > 1)
@@ -1388,7 +1393,7 @@ namespace MASIC.DataInput
                         case CV.CVID.MS_LIFT:
                             activationMethods.Add("LIFT");
                             break;
-                        case CV.CVID.MS_Electron_Transfer_Higher_Energy_Collision_Dissociation__EThcD_:
+                        case CV.CVID.MS_electron_transfer_higher_energy_collision_dissociation:
                             activationMethods.Add("EThcD");
                             break;
                         case CV.CVID.MS_supplemental_beam_type_collision_induced_dissociation:
@@ -1423,7 +1428,7 @@ namespace MASIC.DataInput
 
             if (!string.IsNullOrWhiteSpace(filterString))
             {
-                if (thermoRawFile)
+                if (isThermoRawFile)
                 {
                     mzXmlSourceSpectrum.FilterLine = XRawFileIO.MakeGenericThermoScanFilter(filterString);
                     mzXmlSourceSpectrum.ScanType = XRawFileIO.GetScanTypeNameFromThermoScanFilterText(filterString);
@@ -1434,7 +1439,7 @@ namespace MASIC.DataInput
                 }
             }
 
-            if (string.IsNullOrWhiteSpace(filterString) || !thermoRawFile)
+            if (string.IsNullOrWhiteSpace(filterString) || !isThermoRawFile)
             {
                 var matchingParams = mzMLSpectrum.GetCVParamsChildOf(CV.CVID.MS_spectrum_type);
                 if (matchingParams.Count > 0)
@@ -1605,13 +1610,13 @@ namespace MASIC.DataInput
         /// </summary>
         /// <param name="rawFileInfo"></param>
         /// <param name="datasetID"></param>
-        /// <param name="xmlReader"></param>
+        /// <param name="mzMLReader"></param>
         /// <returns>True if success, false if an error</returns>
         [CLSCompliant(false)]
         protected bool UpdateDatasetFileStats(
             FileInfo rawFileInfo,
             int datasetID,
-            SimpleMzMLReader xmlReader)
+            SimpleMzMLReader mzMLReader)
         {
             // Read the file info from the file system
             var success = UpdateDatasetFileStats(rawFileInfo, datasetID);
@@ -1619,9 +1624,9 @@ namespace MASIC.DataInput
             if (!success)
                 return false;
 
-            if (xmlReader.StartTimeStamp > DateTime.MinValue)
+            if (mzMLReader.StartTimeStamp > DateTime.MinValue)
             {
-                mDatasetFileInfo.AcqTimeStart = xmlReader.StartTimeStamp;
+                mDatasetFileInfo.AcqTimeStart = mzMLReader.StartTimeStamp;
                 mDatasetFileInfo.AcqTimeEnd = mDatasetFileInfo.AcqTimeStart;
             }
 
@@ -1635,7 +1640,7 @@ namespace MASIC.DataInput
             int msLevel,
             string defaultScanType,
             bool isMzXML,
-            clsSpectrumInfoMzXML mzXmlSourceSpectrum)
+            SpectrumInfoMzXML mzXmlSourceSpectrum)
         {
             if (!isMzXML)
             {
@@ -1687,7 +1692,7 @@ namespace MASIC.DataInput
             else
             {
                 // Possibly update .ScanTypeName to match the values returned by XRawFileIO.GetScanTypeNameFromThermoScanFilterText()
-                if (scanInfo.ScanTypeName.Equals(clsSpectrumInfoMzXML.ScanTypeNames.Full, StringComparison.OrdinalIgnoreCase))
+                if (scanInfo.ScanTypeName.Equals(SpectrumInfoMzXML.ScanTypeNames.Full, StringComparison.OrdinalIgnoreCase))
                 {
                     if (msLevel <= 1)
                     {
@@ -1698,16 +1703,16 @@ namespace MASIC.DataInput
                         scanInfo.ScanTypeName = "MSn";
                     }
                 }
-                else if (scanInfo.ScanTypeName.Equals(clsSpectrumInfoMzXML.ScanTypeNames.zoom, StringComparison.OrdinalIgnoreCase))
+                else if (scanInfo.ScanTypeName.Equals(SpectrumInfoMzXML.ScanTypeNames.Zoom, StringComparison.OrdinalIgnoreCase))
                 {
                     scanInfo.ScanTypeName = "Zoom-MS";
                 }
-                else if (scanInfo.ScanTypeName.Equals(clsSpectrumInfoMzXML.ScanTypeNames.MRM, StringComparison.OrdinalIgnoreCase))
+                else if (scanInfo.ScanTypeName.Equals(SpectrumInfoMzXML.ScanTypeNames.MRM, StringComparison.OrdinalIgnoreCase))
                 {
                     scanInfo.ScanTypeName = "MRM";
                     scanInfo.MRMScanType = MRMScanTypeConstants.SRM;
                 }
-                else if (scanInfo.ScanTypeName.Equals(clsSpectrumInfoMzXML.ScanTypeNames.SRM, StringComparison.OrdinalIgnoreCase))
+                else if (scanInfo.ScanTypeName.Equals(SpectrumInfoMzXML.ScanTypeNames.SRM, StringComparison.OrdinalIgnoreCase))
                 {
                     scanInfo.ScanTypeName = "CID-SRM";
                     scanInfo.MRMScanType = MRMScanTypeConstants.SRM;

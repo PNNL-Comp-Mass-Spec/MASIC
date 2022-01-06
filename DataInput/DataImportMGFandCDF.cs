@@ -61,7 +61,7 @@ namespace MASIC.DataInput
             var scanTime = 0.0;
 
             var cdfReader = new NetCDFReader.clsMSNetCdf();
-            var mgfReader = new MSDataFileReader.clsMGFFileReader();
+            var mgfReader = new MSDataFileReader.MgfFileReader();
 
             try
             {

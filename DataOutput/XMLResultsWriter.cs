@@ -413,7 +413,7 @@ namespace MASIC.DataOutput
             string elementName,
             byte[] dataArray)
         {
-            var encodedValues = MSDataFileReader.clsBase64EncodeDecode.EncodeNumericArray(dataArray, out var precisionBits, out var dataTypeName);
+            var encodedValues = MSDataFileReader.Base64EncodeDecode.EncodeNumericArray(dataArray, out var precisionBits, out var dataTypeName);
 
             writer.WriteStartElement(elementName);
             writer.WriteAttributeString("precision", precisionBits.ToString());        // Store the precision, in bits
@@ -427,7 +427,7 @@ namespace MASIC.DataOutput
             string elementName,
             float[] dataArray)
         {
-            var encodedValues = MSDataFileReader.clsBase64EncodeDecode.EncodeNumericArray(dataArray, out var precisionBits, out var dataTypeName);
+            var encodedValues = MSDataFileReader.Base64EncodeDecode.EncodeNumericArray(dataArray, out var precisionBits, out var dataTypeName);
 
             writer.WriteStartElement(elementName);
             writer.WriteAttributeString("precision", precisionBits.ToString());        // Store the precision, in bits
