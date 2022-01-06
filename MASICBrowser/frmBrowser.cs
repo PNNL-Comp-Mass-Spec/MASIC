@@ -43,7 +43,7 @@ namespace MASICBrowser
     {
         // Ignore Spelling: cancelled, const, Ctrl, frag, fragscan, Golay, Loc, resmooth, Savitzky, similarFragScan
 
-        private const string PROGRAM_DATE = "October 4, 2021";
+        private const string PROGRAM_DATE = "January 5, 2022";
 
         /// <summary>
         /// Constructor

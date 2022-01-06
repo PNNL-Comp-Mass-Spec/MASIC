@@ -303,10 +303,12 @@ namespace MASIC
                 {
                     headerColumns.AddRange(ftmsSignalToNoise);
                     headerColumns.AddRange(ftmsResolution);
+
                     // Uncomment to include the label data m/z value in the _ReporterIons.txt file
-                    // If mOptions.ReporterIons.ReporterIonSaveObservedMasses Then
-                    // headerColumns.AddRange(ftmsLabelDataMz)
-                    // End If
+                    // if (mOptions.ReporterIons.ReporterIonSaveObservedMasses)
+                    // {
+                    //     headerColumns.AddRange(ftmsLabelDataMz);
+                    // }
                 }
 
                 // Write the headers to the output file, separated by tabs

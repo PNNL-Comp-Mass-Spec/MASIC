@@ -28,7 +28,7 @@ namespace MASICPeakFinder
         /// <summary>
         /// Program date
         /// </summary>
-        public string PROGRAM_DATE = "October 4, 2021";
+        public string PROGRAM_DATE = "January 5, 2022";
 
         /// <summary>
         /// Minimum peak width, in points
@@ -1298,8 +1298,10 @@ namespace MASICPeakFinder
                     var indexPointer = dataIndex - sicPeak.IndexBaseLeft + areaDataBaseIndex;
                     scanNumbers[indexPointer] = sicData[dataIndex].ScanNumber;
                     intensities[indexPointer] = sicData[dataIndex].Intensity;
-                    // intensitiesSmoothed(indexPointer) = smoothedYDataSubset.Data(dataIndex - smoothedYDataSubset.DataStartIndex)
-                    // If intensitiesSmoothed(indexPointer) < 0 Then intensitiesSmoothed(indexPointer) = 0
+
+                    // intensitiesSmoothed[indexPointer] = smoothedYDataSubset.Data[dataIndex - smoothedYDataSubset.DataStartIndex];
+                    // if (intensitiesSmoothed[indexPointer] < 0)
+                    //     intensitiesSmoothed[indexPointer] = 0;
                 }
 
                 var areaDataCount = sicPeak.IndexBaseRight - sicPeak.IndexBaseLeft + 1 + areaDataBaseIndex;
@@ -2355,8 +2357,9 @@ namespace MASICPeakFinder
                 // Determine the initial value for .PeakWidthPointsMinimum
                 // We will use maximumIntensity and minimumPeakIntensity to compute a S/N value to help pick .PeakWidthPointsMinimum
 
-                // Old: If sicPeakFinderOptions.SICNoiseThresholdIntensity < 1 Then sicPeakFinderOptions.SICNoiseThresholdIntensity = 1
-                // Old: peakAreaSignalToNoise = maximumIntensity / sicPeakFinderOptions.SICNoiseThresholdIntensity
+                // Old: if (sicPeakFinderOptions.SICNoiseThresholdIntensity < 1)
+                //          sicPeakFinderOptions.SICNoiseThresholdIntensity = 1;
+                // Old: peakAreaSignalToNoise = maximumIntensity / sicPeakFinderOptions.SICNoiseThresholdIntensity;
 
                 if (minimumPotentialPeakArea < 1)
                     minimumPotentialPeakArea = 1;
