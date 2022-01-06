@@ -534,13 +534,23 @@ namespace MASIC.Data
         /// <param name="reporterIonMassMode"></param>
         public void SetReporterIonMassMode(ReporterIonMassModeConstants reporterIonMassMode)
         {
-            if (reporterIonMassMode == ReporterIonMassModeConstants.ITraqEightMZHighRes)
+            switch (reporterIonMassMode)
             {
-                SetReporterIonMassMode(reporterIonMassMode, REPORTER_ION_TOLERANCE_DA_DEFAULT_ITRAQ8_HIGH_RES);
-            }
-            else
-            {
-                SetReporterIonMassMode(reporterIonMassMode, REPORTER_ION_TOLERANCE_DA_DEFAULT);
+                case ReporterIonMassModeConstants.ITraqEightMZHighRes:
+                    SetReporterIonMassMode(reporterIonMassMode, REPORTER_ION_TOLERANCE_DA_DEFAULT_ITRAQ8_HIGH_RES);
+                    break;
+
+                case ReporterIonMassModeConstants.TMTSixMZ:
+                    SetReporterIonMassMode(reporterIonMassMode, REPORTER_ION_TOLERANCE_DA_DEFAULT_TMT6);
+                    break;
+
+                case ReporterIonMassModeConstants.TMTTenMZ or ReporterIonMassModeConstants.TMTElevenMZ or ReporterIonMassModeConstants.TMTSixteenMZ:
+                    SetReporterIonMassMode(reporterIonMassMode, REPORTER_ION_TOLERANCE_DA_DEFAULT_TMT10);
+                    break;
+
+                default:
+                    SetReporterIonMassMode(reporterIonMassMode, REPORTER_ION_TOLERANCE_DA_DEFAULT);
+                    break;
             }
         }
 
