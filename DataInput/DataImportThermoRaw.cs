@@ -42,7 +42,7 @@ namespace MASIC.DataInput
 
         private double ComputeInterference(
             XRawFileIO rawFileReader,
-            ThermoRawFileReader.clsScanInfo scanInfo,
+            clsScanInfo scanInfo,
             int precursorScanNumber)
         {
             if (precursorScanNumber != mCachedPrecursorScan)
@@ -278,7 +278,7 @@ namespace MASIC.DataInput
 
         private bool ExtractScanInfoCheckRange(
             XRawFileIO rawFileReader,
-            ThermoRawFileReader.clsScanInfo thermoScanInfo,
+            clsScanInfo thermoScanInfo,
             ScanList scanList,
             SpectraCache spectraCache,
             DataOutput.DataOutput dataOutputHandler,
@@ -326,7 +326,7 @@ namespace MASIC.DataInput
             SpectraCache spectraCache,
             DataOutput.DataOutput dataOutputHandler,
             SICOptions sicOptions,
-            ThermoRawFileReader.clsScanInfo thermoScanInfo)
+            clsScanInfo thermoScanInfo)
         {
             if (thermoScanInfo.ParentIonMZ > 0 && Math.Abs(mOptions.ParentIonDecoyMassDa) > 0)
             {
@@ -353,7 +353,7 @@ namespace MASIC.DataInput
             SpectraCache spectraCache,
             DataOutput.DataOutput dataOutputHandler,
             SICOptions sicOptions,
-            ThermoRawFileReader.clsScanInfo thermoScanInfo)
+            clsScanInfo thermoScanInfo)
         {
             var scanInfo = new ScanInfo
             {
@@ -474,7 +474,7 @@ namespace MASIC.DataInput
             DataOutput.DataOutput dataOutputHandler,
             SICOptions sicOptions,
             BinningOptions binningOptions,
-            ThermoRawFileReader.clsScanInfo thermoScanInfo)
+            clsScanInfo thermoScanInfo)
         {
             // Note that MinimumPositiveIntensity will be determined in LoadSpectraForThermoRawFile
 
