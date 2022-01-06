@@ -192,8 +192,7 @@ namespace MASIC.DataInput
 
                 if (!double.TryParse(monoMzText, out var mz))
                 {
-                    OnWarningEvent(string.Format("Skipping scan {0} since 'selected ion m/z' was not a number:  {1}",
-                                                 scanInfo.ScanNumber, monoMzText));
+                    OnWarningEvent("Skipping scan {0} since 'selected ion m/z' was not a number:  {1}", scanInfo.ScanNumber, monoMzText);
                     return 0;
                 }
 

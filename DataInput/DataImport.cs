@@ -486,10 +486,8 @@ namespace MASIC.DataInput
                     precursorMissingPct = mPrecursorNotFoundCount / (double)scanList.FragScans.Count * 100;
                 }
 
-                OnWarningEvent(
-                    string.Format("Could not find the precursor ion for {0:F1}% of the MS2 spectra ({1} / {2} scans). " +
-                                  "These scans will have an Interference Score of 1 (to avoid accidentally filtering out low intensity results).",
-                                  precursorMissingPct, mPrecursorNotFoundCount, scanList.FragScans.Count));
+                OnWarningEvent("Could not find the precursor ion for {0:F1}% of the MS2 spectra ({1} / {2} scans). " +
+                               "These scans will have an Interference Score of 1 (to avoid accidentally filtering out low intensity results).", precursorMissingPct, mPrecursorNotFoundCount, scanList.FragScans.Count);
             }
 
             // Record the current memory usage

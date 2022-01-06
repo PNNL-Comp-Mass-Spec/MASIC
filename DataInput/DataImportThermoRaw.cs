@@ -104,8 +104,7 @@ namespace MASIC.DataInput
 
                 if (!double.TryParse(monoMzText, out var mz))
                 {
-                    OnWarningEvent(string.Format("Skipping scan {0} since scan event {1} was not a number: {2}",
-                                                 scanInfo.ScanNumber, SCAN_EVENT_MONOISOTOPIC_MZ, monoMzText));
+                    OnWarningEvent("Skipping scan {0} since scan event {1} was not a number: {2}", scanInfo.ScanNumber, SCAN_EVENT_MONOISOTOPIC_MZ, monoMzText);
                     return 0;
                 }
 

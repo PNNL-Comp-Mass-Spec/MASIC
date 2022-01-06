@@ -251,8 +251,7 @@ namespace MASIC.DataOutput
                 {
                     if (parentIon.Value.FragScanIndices.Count == 0)
                     {
-                        OnWarningEvent(string.Format(
-                            "Parent ion {0} does not have a fragmentation scan defined", parentIon.Key));
+                        OnWarningEvent("Parent ion {0} does not have a fragmentation scan defined", parentIon.Key);
                         continue;
                     }
 
@@ -488,18 +487,14 @@ namespace MASIC.DataOutput
 
                         if (!mScanList.ContainsKey(startScan))
                         {
-                            OnWarningEvent(string.Format(
-                                "StartScan {0} not found in the _ScanStats file; cannot use parent ion index {1} for the peak width histogram",
-                                startScan, parentIon.Key));
+                            OnWarningEvent("StartScan {0} not found in the _ScanStats file; cannot use parent ion index {1} for the peak width histogram", startScan, parentIon.Key);
 
                             continue;
                         }
 
                         if (!mScanList.ContainsKey(endScan))
                         {
-                            OnWarningEvent(string.Format(
-                                "EndScan {0} not found in the _ScanStats file; cannot use parent ion index {1} for the peak width histogram",
-                                endScan, parentIon.Key));
+                            OnWarningEvent("EndScan {0} not found in the _ScanStats file; cannot use parent ion index {1} for the peak width histogram", endScan, parentIon.Key);
 
                             continue;
                         }
@@ -662,7 +657,7 @@ namespace MASIC.DataOutput
                         {
                             if (DbUtils.GetColumnIndex(columnMap, columnId) < 0)
                             {
-                                OnWarningEvent(string.Format("File {0} is missing required column {1}", reporterIonsFile.FullName, columnId));
+                                OnWarningEvent("File {0} is missing required column {1}", reporterIonsFile.FullName, columnId);
                                 return false;
                             }
                         }
@@ -802,7 +797,7 @@ namespace MASIC.DataOutput
                         {
                             if (DbUtils.GetColumnIndex(columnMap, columnId) < 0)
                             {
-                                OnWarningEvent(string.Format("File {0} is missing required column {1}", scanStatsFile.FullName, columnId));
+                                OnWarningEvent("File {0} is missing required column {1}", scanStatsFile.FullName, columnId);
                                 return false;
                             }
                         }
@@ -834,7 +829,7 @@ namespace MASIC.DataOutput
 
                     if (mScanList.ContainsKey(scanNumber))
                     {
-                        OnWarningEvent(string.Format("Ignoring duplicate scan {0} found in {1}", scanNumber, scanStatsFile.Name));
+                        OnWarningEvent("Ignoring duplicate scan {0} found in {1}", scanNumber, scanStatsFile.Name);
                         continue;
                     }
 
@@ -917,7 +912,7 @@ namespace MASIC.DataOutput
                         {
                             if (DbUtils.GetColumnIndex(columnMap, columnId) < 0)
                             {
-                                OnWarningEvent(string.Format("File {0} is missing required column {1}", sicStatsFile.FullName, columnId));
+                                OnWarningEvent("File {0} is missing required column {1}", sicStatsFile.FullName, columnId);
                                 return false;
                             }
                         }
@@ -966,17 +961,15 @@ namespace MASIC.DataOutput
                     if (duplicateParentIonIndices.Count > 5)
                         continue;
 
-                    OnWarningEvent(string.Format(
-                        "Ignoring duplicate parent ion index {0} found in {1}", parentIonIndex, sicStatsFile.Name));
+                    OnWarningEvent("Ignoring duplicate parent ion index {0} found in {1}", parentIonIndex, sicStatsFile.Name);
                 }
 
                 if (duplicateParentIonIndices.Count > 5)
                 {
-                    OnWarningEvent(string.Format(
-                        // ReSharper disable once StringLiteralTypo
-                        "Ignored {0} lines in the _SICstats.txt file due to a duplicate parent ion index\n" +
-                        "This typically indicates that the same parent ion was fragmented " +
-                        "using multiple fragmentation modes, and is thus not an error", duplicateParentIonIndices.Count));
+                    // ReSharper disable once StringLiteralTypo
+                    OnWarningEvent("Ignored {0} lines in the _SICstats.txt file due to a duplicate parent ion index\n" +
+                                   "This typically indicates that the same parent ion was fragmented " +
+                                   "using multiple fragmentation modes, and is thus not an error", duplicateParentIonIndices.Count);
                 }
 
                 return true;
