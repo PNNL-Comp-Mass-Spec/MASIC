@@ -79,6 +79,7 @@
     <Compile Include="Correlation.cs" />
     <Compile Include="DataAggregation.cs" />
     <Compile Include="DatabaseAccess.cs" />
+    <Compile Include="Data\ReporterIonStats.cs" />
     <Compile Include="FilterDataArrayMaxCount.cs" />
     <Compile Include="ITraqIntensityCorrection.cs" />
     <Compile Include="MasicEventNotifier.cs" />

@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using MASIC.Data;
-using MASIC.DataOutput;
 using MASIC.Options;
+using MathNet.Numerics.Statistics;
 using PRISM;
 using ThermoRawFileReader;
 
@@ -30,6 +30,96 @@ namespace MASIC
         public ReporterIonProcessor(MASICOptions masicOptions)
         {
             mOptions = masicOptions;
+        }
+
+        /// <summary>
+        /// Look for MS3 spectra
+        /// If found, possibly copy the reporter ion data to parent MS2 spectra
+        /// </summary>
+        /// <remarks>
+        /// If mOptions.ReporterIons.AlwaysUseMS3ReporterIonsForParents is true, always copy
+        /// If false (the default), examine reporter ions in the parent MS2 spectra and copy if the median intensity is less than the MS3 scan's median intensity
+        /// </remarks>
+        /// <param name="cachedDataToWrite"></param>
+        private void CopyReporterIonsToParentIfRequired(SortedDictionary<int, ReporterIonStats> cachedDataToWrite)
+        {
+            foreach (var item in cachedDataToWrite)
+            {
+                if (item.Value.MSLevel <= 2 || item.Value.ParentScan == 0)
+                    continue;
+
+                var targetScan = 0;
+
+                if (mOptions.ReporterIons.AlwaysUseMS3ReporterIonsForParents)
+                {
+                    targetScan = item.Value.ParentScan;
+                }
+                else
+                {
+                    // Compute the median reporter ion intensity for this MS3 scan (both using all values and ignoring missing values and zeros)
+
+                    var reporterIonCount = item.Value.ReporterIonIntensityEndIndex - item.Value.ReporterIonIntensityStartIndex + 1;
+
+                    var medianMS3Intensity = GetMedianReporterIonIntensity(
+                        string.Format("MS3 scan {0}", item.Key),
+                        item.Value.DataColumns.GetRange(item.Value.ReporterIonIntensityStartIndex, reporterIonCount),
+                        out var medianMS3IntensityIgnoringZeros);
+
+                    // Examine the parent ion intensities of the parent MS2 scan
+
+                    // If the median value is less than medianMS3Intensity,
+                    // copy the reporter ion intensities from the MS3 scan to the MS2 scan
+
+                    // ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
+                    foreach (var candidateScan in cachedDataToWrite)
+                    {
+                        if (candidateScan.Key != item.Value.ParentScan)
+                            continue;
+
+                        var medianMS2Intensity = GetMedianReporterIonIntensity(
+                            string.Format("MS2 scan {0}", candidateScan.Value.ScanNumber),
+                            candidateScan.Value.DataColumns.GetRange(item.Value.ReporterIonIntensityStartIndex, reporterIonCount),
+                            out var medianMS2IntensityIgnoringZeros);
+
+                        // First compare the median based on all values, since scans with numerous reporter ion intensities that are small (or 0) will have a smaller median
+                        if (medianMS2Intensity < medianMS3Intensity)
+                        {
+                            targetScan = item.Value.ParentScan;
+                        }
+                        else if (medianMS2IntensityIgnoringZeros < medianMS3IntensityIgnoringZeros)
+                        {
+                            // If both the MS2 scan and the MS3 scan have several reporter ions with an intensity of 0, the median for each will be 0
+                            // Compare the median of the non-zero values
+                            targetScan = item.Value.ParentScan;
+                        }
+
+                        break;
+                    }
+                }
+
+                if (targetScan == 0)
+                {
+                    continue;
+                }
+
+                foreach (var candidateScan in cachedDataToWrite)
+                {
+                    if (candidateScan.Key != targetScan)
+                        continue;
+
+                    var targetScanStats = candidateScan.Value;
+
+                    // Copy the ReporterIonIntensityMax value
+                    targetScanStats.DataColumns[item.Value.ReporterIonIntensityStartIndex - 1] =
+                        item.Value.DataColumns[item.Value.ReporterIonIntensityStartIndex - 1];
+
+                    // Copy the reporter ion data (starting at column index ReporterIonIntensityStartIndex)
+                    for (var i = item.Value.ReporterIonIntensityStartIndex; i < item.Value.DataColumns.Count; i++)
+                    {
+                        targetScanStats.DataColumns[i] = item.Value.DataColumns[i];
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -140,7 +230,7 @@ namespace MASIC
                 var dataAggregation = new DataAggregation();
                 RegisterEvents(dataAggregation);
 
-                for (var reporterIonIndex= 0; reporterIonIndex < reporterIons.Length; reporterIonIndex++)
+                for (var reporterIonIndex = 0; reporterIonIndex < reporterIons.Length; reporterIonIndex++)
                 {
                     var reporterIon = reporterIons[reporterIonIndex];
 
@@ -225,7 +315,7 @@ namespace MASIC
                 UpdateProgress(0, "Searching for reporter ions");
 
                 // Keys in this dictionary are scan number, values are the data columns for each scan
-                var cachedDataToWrite = new SortedDictionary<int, List<string>>();
+                var cachedDataToWrite = new SortedDictionary<int, ReporterIonStats>();
 
                 for (var masterOrderIndex = 0; masterOrderIndex < scanList.MasterScanOrderCount; masterOrderIndex++)
                 {
@@ -271,6 +361,12 @@ namespace MASIC
                     }
                 }
 
+                if (cachedDataToWrite.Count > 0)
+                {
+                    WriteCachedReporterIons(writer, cachedDataToWrite, TAB_DELIMITER);
+                    cachedDataToWrite.Clear();
+                }
+
                 if (includeFtmsColumns)
                 {
                     // Close the handle to the data file
@@ -288,33 +384,17 @@ namespace MASIC
 
         private void WriteCachedReporterIons(
             TextWriter writer,
-            SortedDictionary<int, List<string>> cachedDataToWrite,
+            SortedDictionary<int, ReporterIonStats> cachedDataToWrite,
             char delimiter)
         {
             if (mOptions.ReporterIons.UseMS3ReporterIonsForParentMS2Spectra)
             {
-                // Look for MS3 spectra
-                // If found, possibly copy the reporter ion data to parent MS2 spectra
-                // If mOptions.ReporterIons.AlwaysUseMS3ReporterIonsForParents is true, always copy
-                // If false, examine reporter ions in the parent MS2 spectra and copy if missing / sparse
-
-                bool copyReporterIonData;
-
-                if (mOptions.ReporterIons.AlwaysUseMS3ReporterIonsForParents)
-                {
-                    copyReporterIonData = true;
-                }
-                else
-                {
-                }
-
-                // ToDo: Copy values from MS3 spectra to MS2 spectra
-
+                CopyReporterIonsToParentIfRequired(cachedDataToWrite);
             }
 
             foreach (var cachedLine in cachedDataToWrite)
             {
-                writer.WriteLine(string.Join(delimiter.ToString(), cachedLine.Value));
+                writer.WriteLine(string.Join(delimiter.ToString(), cachedLine.Value.DataColumns));
             }
         }
 
@@ -345,15 +425,13 @@ namespace MASIC
             ScanList scanList,
             SpectraCache spectraCache,
             ScanInfo currentScan,
-            IDictionary<int, List<string>> cachedDataToWrite,
+            IDictionary<int, ReporterIonStats> cachedDataToWrite,
             IList<ReporterIonInfo> reporterIons,
             bool saveUncorrectedIntensities,
             bool saveObservedMasses)
         {
             const bool USE_MAX_ABUNDANCE_IN_WINDOW = true;
 
-            // The following will be a value between 0 and 100
-            // Using Absolute Value of percent change to avoid averaging both negative and positive values
             double parentIonMZ;
 
             if (currentScan.FragScanInfo.ParentIonInfoIndex >= 0 && currentScan.FragScanInfo.ParentIonInfoIndex < scanList.ParentIons.Count)
@@ -376,17 +454,31 @@ namespace MASIC
             var reporterIntensitiesCorrected = new double[reporterIons.Count];
             var closestMZ = new double[reporterIons.Count];
 
-            // Initialize the output variables
-            var dataColumns = new List<string>
+            var reporterIonStats = new ReporterIonStats(currentScan.ScanNumber);
+
+            // Initialize the output data
+            reporterIonStats.DataColumns.Add(sicOptions.DatasetID.ToString());
+            reporterIonStats.DataColumns.Add(currentScan.ScanNumber.ToString());
+            reporterIonStats.DataColumns.Add(currentScan.FragScanInfo.CollisionMode);
+            reporterIonStats.DataColumns.Add(StringUtilities.DblToString(parentIonMZ, 2));
+            reporterIonStats.DataColumns.Add(StringUtilities.DblToString(currentScan.BasePeakIonIntensity, 2));
+            reporterIonStats.DataColumns.Add(StringUtilities.DblToString(currentScan.BasePeakIonMZ, 4));
+
+            reporterIonStats.MSLevel = currentScan.FragScanInfo.MSLevel;
+            reporterIonStats.ParentIonMz = currentScan.FragScanInfo.ParentIonMz;
+
+            if (reporterIonStats.MSLevel <= 2)
             {
-                sicOptions.DatasetID.ToString(),
-                currentScan.ScanNumber.ToString(),
-                currentScan.FragScanInfo.CollisionMode,
-                StringUtilities.DblToString(parentIonMZ, 2),
-                StringUtilities.DblToString(currentScan.BasePeakIonIntensity, 2),
-                StringUtilities.DblToString(currentScan.BasePeakIonMZ, 4),
-                parentScan.ToString()
-            };
+                reporterIonStats.ParentScan = currentScan.FragScanInfo.ParentScan;
+
+                // Note that the parent scan is not necessarily the most recent survey scan (i.e., most recent MS1 scan)
+            }
+            else
+            {
+                reporterIonStats.ParentScan = currentScan.FragScanInfo.ParentScan;
+            }
+
+            reporterIonStats.DataColumns.Add(reporterIonStats.ParentScan.ToString());
 
             var reporterIntensityList = new List<string>(reporterIons.Count);
             var obsMZList = new List<string>(reporterIons.Count);
@@ -404,6 +496,7 @@ namespace MASIC
             for (var reporterIonIndex = 0; reporterIonIndex < reporterIons.Count; reporterIonIndex++)
             {
                 var ion = reporterIons[reporterIonIndex];
+
                 // Search for the reporter ion MZ in this mass spectrum
                 reporterIntensities[reporterIonIndex] = dataAggregation.AggregateIonsInRange(
                     spectrum,
@@ -504,6 +597,7 @@ namespace MASIC
             // Will also compute the percent change in intensities
 
             // Initialize the variables used to compute the weighted average percent change
+
             double pctChangeSum = 0;
             double originalIntensitySum = 0;
 
@@ -573,6 +667,8 @@ namespace MASIC
             }
 
             // Compute the weighted average percent intensity correction value
+            // This will be a value between 0 and 100
+
             float weightedAvgPctIntensityCorrection;
             if (originalIntensitySum > 0)
             {
@@ -584,44 +680,110 @@ namespace MASIC
             }
 
             // Resize the target list capacity to large enough to hold all data.
-            dataColumns.Capacity = reporterIntensityList.Count + 3 + obsMZList.Count + uncorrectedIntensityList.Count +
-                                   ftmsSignalToNoise.Count + ftmsResolution.Count;
+            reporterIonStats.DataColumns.Capacity = reporterIntensityList.Count + 3 + obsMZList.Count + uncorrectedIntensityList.Count +
+                                                    ftmsSignalToNoise.Count + ftmsResolution.Count;
 
             // Append the maximum reporter ion intensity, then the individual reporter ion intensities
-            dataColumns.Add(StringUtilities.DblToString(reporterIntensityMax, 2));
-            dataColumns.AddRange(reporterIntensityList);
+            reporterIonStats.DataColumns.Add(StringUtilities.DblToString(reporterIntensityMax, 2));
+
+            reporterIonStats.ReporterIonIntensityStartIndex = reporterIonStats.DataColumns.Count;
+            reporterIonStats.ReporterIonIntensityEndIndex = reporterIonStats.ReporterIonIntensityStartIndex + reporterIntensityList.Count - 1;
+
+            reporterIonStats.DataColumns.AddRange(reporterIntensityList);
 
             // Append the weighted average percent intensity correction
             if (weightedAvgPctIntensityCorrection < float.Epsilon)
             {
-                dataColumns.Add("0");
+                reporterIonStats.DataColumns.Add("0");
             }
             else
             {
-                dataColumns.Add(StringUtilities.DblToString(weightedAvgPctIntensityCorrection, 1));
+                reporterIonStats.DataColumns.Add(StringUtilities.DblToString(weightedAvgPctIntensityCorrection, 1));
             }
 
             if (saveObservedMasses)
             {
-                dataColumns.AddRange(obsMZList);
+                reporterIonStats.DataColumns.AddRange(obsMZList);
             }
 
             if (saveUncorrectedIntensities)
             {
-                dataColumns.AddRange(uncorrectedIntensityList);
+                reporterIonStats.DataColumns.AddRange(uncorrectedIntensityList);
             }
 
             if (includeFtmsColumns)
             {
-                dataColumns.AddRange(ftmsSignalToNoise);
-                dataColumns.AddRange(ftmsResolution);
+                reporterIonStats.DataColumns.AddRange(ftmsSignalToNoise);
+                reporterIonStats.DataColumns.AddRange(ftmsResolution);
 
                 // Uncomment to include the label data m/z value in the _ReporterIons.txt file
                 //if (saveObservedMasses)
-                //    dataColumns.AddRange(ftmsLabelDataMz)
+                //    reporterIonStats.DataColumns.AddRange(ftmsLabelDataMz)
             }
 
-            cachedDataToWrite.Add(currentScan.ScanNumber, dataColumns);
+            cachedDataToWrite.Add(currentScan.ScanNumber, reporterIonStats);
+        }
+
+        /// <summary>
+        /// Compute the median reporter ion value
+        /// </summary>
+        /// <param name="scanDescription"></param>
+        /// <param name="reporterIonIntensities"></param>
+        /// <param name="medianIgnoringZeros">Median value, ignoring zeros</param>
+        /// <returns>Median value, including zeros</returns>
+        private double GetMedianReporterIonIntensity(string scanDescription, List<string> reporterIonIntensities, out double medianIgnoringZeros)
+        {
+            var reporterIonIntensityValues = new List<double>();
+            var nonZeroIntensities = new List<double>();
+
+            var validNumbers = 0;
+
+            foreach (var item in reporterIonIntensities)
+            {
+                if (!double.TryParse(item, out var reporterIonIntensity))
+                {
+                    reporterIonIntensityValues.Add(0);
+                    continue;
+                }
+
+                validNumbers++;
+
+                reporterIonIntensityValues.Add(reporterIonIntensity);
+
+                if (reporterIonIntensity > 0)
+                    nonZeroIntensities.Add(reporterIonIntensity);
+            }
+
+            if (validNumbers == 0)
+            {
+                OnWarningEvent("No valid reporter ions were found in {0}", scanDescription);
+                medianIgnoringZeros = 0;
+                return 0;
+            }
+
+            medianIgnoringZeros = GetMedianValue(scanDescription + " (non-zero values)", nonZeroIntensities);
+
+            return GetMedianValue(scanDescription + " (all values)", reporterIonIntensityValues);
+        }
+
+        /// <summary>
+        /// Compute the median value for a list of doubles
+        /// </summary>
+        /// <param name="scanDescription"></param>
+        /// <param name="values"></param>
+        /// <returns>Median value, or 0 if an empty list or the computed median is NaN</returns>
+        private double GetMedianValue(string scanDescription, IReadOnlyCollection<double> values)
+        {
+            if (values.Count == 0)
+                return 0;
+
+            var medianValue = values.Median();
+
+            if (!double.IsNaN(medianValue))
+                return medianValue;
+
+            OnWarningEvent("Median reporter ion intensity is NaN for {0}", scanDescription);
+            return 0;
         }
 
         /// <summary>

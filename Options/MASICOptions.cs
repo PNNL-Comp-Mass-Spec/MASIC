@@ -536,6 +536,12 @@ namespace MASIC.Options
                     ReporterIons.ReporterIonSaveUncorrectedIntensities = reader.GetParam(
                         XML_SECTION_EXPORT_OPTIONS, "ReporterIonSaveUncorrectedIntensities", ReporterIons.ReporterIonSaveUncorrectedIntensities);
 
+                    ReporterIons.UseMS3ReporterIonsForParentMS2Spectra = reader.GetParam(
+                        XML_SECTION_EXPORT_OPTIONS, "UseMS3ReporterIonsForParentMS2Spectra", ReporterIons.UseMS3ReporterIonsForParentMS2Spectra);
+
+                    ReporterIons.AlwaysUseMS3ReporterIonsForParents = reader.GetParam(
+                        XML_SECTION_EXPORT_OPTIONS, "AlwaysUseMS3ReporterIonsForParents", ReporterIons.AlwaysUseMS3ReporterIonsForParents);
+
                     ReporterIons.SetReporterIonMassMode(reporterIonMassMode,
                                                         ReporterIons.ReporterIonToleranceDaDefault);
 
@@ -942,6 +948,9 @@ namespace MASIC.Options
 
                 writer.SetParam(XML_SECTION_EXPORT_OPTIONS, "ReporterIonSaveObservedMasses", ReporterIons.ReporterIonSaveObservedMasses);
                 writer.SetParam(XML_SECTION_EXPORT_OPTIONS, "ReporterIonSaveUncorrectedIntensities", ReporterIons.ReporterIonSaveUncorrectedIntensities);
+
+                writer.SetParam(XML_SECTION_EXPORT_OPTIONS, "UseMS3ReporterIonsForParentMS2Spectra", ReporterIons.UseMS3ReporterIonsForParentMS2Spectra);
+                writer.SetParam(XML_SECTION_EXPORT_OPTIONS, "AlwaysUseMS3ReporterIonsForParents", ReporterIons.AlwaysUseMS3ReporterIonsForParents);
 
                 writer.SetParam(XML_SECTION_EXPORT_OPTIONS, "ExportRawSpectraData", RawDataExportOptions.ExportEnabled);
                 writer.SetParam(XML_SECTION_EXPORT_OPTIONS, "ExportRawDataFileFormat", (int)RawDataExportOptions.FileFormat);

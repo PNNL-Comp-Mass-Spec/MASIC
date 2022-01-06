@@ -166,6 +166,13 @@ namespace MASIC.Data
         private ReporterIonMassModeConstants mReporterIonMassMode;
 
         /// <summary>
+        /// When true, always copy reporter ion data from MS3 spectra to MS2 spectra
+        /// When false (the default), only copy if the MS2 data is sparse
+        /// </summary>
+        /// <remarks>Ignored if UseMS3ReporterIonsForParentMS2Spectra is false</remarks>
+        public bool AlwaysUseMS3ReporterIonsForParents { get; set; }
+
+        /// <summary>
         /// When ReporterIonStatsEnabled = True, MZIntensityFilterIgnoreRangeStart and MZIntensityFilterIgnoreRangeEnd
         /// will be populated with the m/z range of the reporter ions being processed
         /// </summary>
@@ -234,6 +241,12 @@ namespace MASIC.Data
                 mReporterIonToleranceDaDefault = value;
             }
         }
+
+        /// <summary>
+        /// When true (the default), copy reporter ion data from MS3 spectra to parent MS2 spectra,
+        /// always copying if AlwaysUseMS3ReporterIonsForParents is true, otherwise only copying if sparse
+        /// </summary>
+        public bool UseMS3ReporterIonsForParentMS2Spectra { get; set; }
 
         /// <summary>
         /// Constructor
@@ -526,6 +539,9 @@ namespace MASIC.Data
 
             ReporterIonSaveObservedMasses = false;
             ReporterIonSaveUncorrectedIntensities = false;
+
+            UseMS3ReporterIonsForParentMS2Spectra = true;
+            AlwaysUseMS3ReporterIonsForParents = false;
         }
 
         /// <summary>
