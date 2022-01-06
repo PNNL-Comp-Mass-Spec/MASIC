@@ -793,10 +793,7 @@ namespace MASIC.DataInput
             string entryName,
             string entryValue)
         {
-            if (entryValue == null)
-            {
-                entryValue = string.Empty;
-            }
+            entryValue ??= string.Empty;
 
             var statusEntries = new List<KeyValuePair<string, string>>
             {

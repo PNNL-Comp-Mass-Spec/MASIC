@@ -2624,7 +2624,7 @@ namespace MASICBrowser
             {
                 try
                 {
-                    dlgOpenFile.InitialDirectory = Directory.GetParent(txtDataFilePath.Text).ToString();
+                    dlgOpenFile.InitialDirectory = Directory.GetParent(txtDataFilePath.Text)?.ToString();
                 }
                 catch
                 {
@@ -2662,7 +2662,7 @@ namespace MASICBrowser
             {
                 try
                 {
-                    dlgOpenFile.InitialDirectory = Directory.GetParent(txtDataFilePath.Text).ToString();
+                    dlgOpenFile.InitialDirectory = Directory.GetParent(txtDataFilePath.Text)?.ToString();
                 }
                 catch
                 {
