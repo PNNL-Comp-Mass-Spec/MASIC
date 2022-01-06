@@ -160,6 +160,8 @@ namespace MASICTest
                 {
                     // Add a survey scan
                     // If this is a mzXML file that was processed with ReadW, .ScanHeaderText and .ScanTypeName will get updated by UpdateMSXMLScanType
+
+                    // ReSharper disable once UseObjectOrCollectionInitializer
                     var newSurveyScan = new ScanInfo
                     {
                         ScanNumber = scanNumber,
@@ -196,6 +198,8 @@ namespace MASICTest
                 else
                 {
                     // If this is a mzXML file that was processed with ReadW, .ScanHeaderText and .ScanTypeName will get updated by UpdateMSXMLScanType
+
+                    // ReSharper disable once UseObjectOrCollectionInitializer
                     var newFragScan = new ScanInfo
                     {
                         ScanNumber = scanNumber,

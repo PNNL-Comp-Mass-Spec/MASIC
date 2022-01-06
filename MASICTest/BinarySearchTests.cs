@@ -232,6 +232,7 @@ namespace MASICTest
                 if (defaultOutputFolder.Exists)
                     return defaultOutputFolder.FullName;
 
+                // ReSharper disable once MergeIntoPattern
                 if (defaultOutputFolder.Parent != null && defaultOutputFolder.Parent.Exists)
                 {
                     defaultOutputFolder.Create();

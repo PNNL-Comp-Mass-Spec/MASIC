@@ -31,14 +31,11 @@ namespace MASIC.Plots
         /// </summary>
         public bool AddColorAxis { get; set; }
 
-#pragma warning disable CS3003 // Type is not CLS-compliant
-
         /// <summary>
         /// Color palette
         /// </summary>
+        [CLSCompliant(false)]
         public OxyPalette ColorPalette { get; set; }
-
-#pragma warning restore CS3003 // Type is not CLS-compliant
 
         /// <summary>
         /// Minimum intensity for the color scale
