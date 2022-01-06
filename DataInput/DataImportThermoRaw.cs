@@ -478,7 +478,7 @@ namespace MASIC.DataInput
         {
             // Note that MinimumPositiveIntensity will be determined in LoadSpectraForThermoRawFile
 
-            var scanInfo = new ScanInfo(thermoScanInfo.ParentIonMZ)
+            var scanInfo = new ScanInfo(thermoScanInfo.ParentScan, thermoScanInfo.ParentIonMZ)
             {
                 ScanNumber = thermoScanInfo.ScanNumber,
                 ScanTime = (float)thermoScanInfo.RetentionTime,

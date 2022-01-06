@@ -123,18 +123,31 @@ namespace MASIC.Data
         /// Constructor for a MS1 scan
         /// </summary>
         public ScanInfo()
-            : this(0)
+            : this(0, 0)
         {
         }
 
         /// <summary>
         /// Constructor for a MS2 scan
         /// </summary>
-        public ScanInfo(double fragScanParentIonMz)
+        public ScanInfo(int parentScan, double fragScanParentIonMz)
         {
             MRMScanType = MRMScanTypeConstants.NotMRM;
 
-            FragScanInfo = new FragScanInfo(fragScanParentIonMz);
+            FragScanInfo = new FragScanInfo(parentScan, fragScanParentIonMz);
+            MRMScanInfo = new MRMScanInfo();
+
+            ExtendedHeaderInfo = new Dictionary<int, string>();
+        }
+
+        /// <summary>
+        /// Constructor for MS3 scans
+        /// </summary>
+        public ScanInfo(int parentScan, IReadOnlyList<double> parentIons)
+        {
+            MRMScanType = MRMScanTypeConstants.NotMRM;
+
+            FragScanInfo = new FragScanInfo(parentScan, parentIons);
             MRMScanInfo = new MRMScanInfo();
 
             ExtendedHeaderInfo = new Dictionary<int, string>();

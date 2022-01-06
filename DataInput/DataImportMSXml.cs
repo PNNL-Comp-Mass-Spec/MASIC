@@ -1301,6 +1301,24 @@ namespace MASIC.DataInput
             return filterStrings.First().Value;
         }
 
+        private int GetParentScan(SimpleMzMLReader.SimpleSpectrum mzMLSpectrum)
+        {
+            if (mzMLSpectrum.Precursors.Count == 0)
+            {
+                return 0;
+            }
+
+            var precursorSpectrumReference = mzMLSpectrum.Precursors[0].PrecursorSpectrumRef;
+
+            // Parse out scan number from the precursor spectrum reference
+            // "controllerType=0 controllerNumber=1 scan=1"
+            if (NativeIdConversion.TryGetScanNumberInt(precursorSpectrumReference, out var precursorScan))
+                return precursorScan;
+
+            OnWarningEvent("Invalid spectrum reference: " + precursorSpectrumReference);
+            return 0;
+        }
+
         private SpectrumInfoMzXML GetSpectrumInfoFromMzMLSpectrum(
             SimpleMzMLReader.SimpleSpectrum mzMLSpectrum,
             IReadOnlyList<double> mzList,
@@ -1354,6 +1372,8 @@ namespace MASIC.DataInput
                 var firstPrecursor = mzMLSpectrum.Precursors[0];
 
                 mzXmlSourceSpectrum.ParentIonMZ = firstPrecursor.IsolationWindow.TargetMz;
+
+                mzXmlSourceSpectrum.PrecursorScanNum = GetParentScan(mzMLSpectrum);
 
                 // Verbose activation method description:
                 // Dim activationMethod = firstPrecursor.ActivationMethod
