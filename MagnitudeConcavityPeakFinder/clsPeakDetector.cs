@@ -399,17 +399,16 @@ namespace MagnitudeConcavityPeakFinder
         /// <param name="peakFinderOptions"></param>
         public void TestPeakFinder(string dataFilePath, SICPeakFinderOptionsType peakFinderOptions)
         {
-            var fiDataFile = new FileInfo(dataFilePath);
-            if (!fiDataFile.Exists)
+            var dataFile = new FileInfo(dataFilePath);
+            if (!dataFile.Exists)
             {
-                Console.WriteLine("File not found: " + fiDataFile.FullName);
+                Console.WriteLine("File not found: " + dataFile.FullName);
                 return;
             }
 
             var xyData = new List<KeyValuePair<int, double>>(30);
 
-            using (
-                var reader = new StreamReader(new FileStream(fiDataFile.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)))
+            using (var reader = new StreamReader(new FileStream(dataFile.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)))
             {
                 while (!reader.EndOfStream)
                 {
@@ -455,16 +454,16 @@ namespace MagnitudeConcavityPeakFinder
 
             // Write the original data, the smoothed data, and the points within each peak to a tab-delimited text file
 
-            TestPeakFinderSaveResults(fiDataFile, detectedPeaks, xyData, smoothedYData);
+            TestPeakFinderSaveResults(dataFile, detectedPeaks, xyData, smoothedYData);
         }
 
-        private void TestPeakFinderSaveResults(FileInfo fiDataFile, ICollection<clsPeakInfo> detectedPeaks, IList<KeyValuePair<int, double>> xyData, IList<double> smoothedYData)
+        private void TestPeakFinderSaveResults(FileInfo dataFile, ICollection<clsPeakInfo> detectedPeaks, IList<KeyValuePair<int, double>> xyData, IList<double> smoothedYData)
         {
-            if (fiDataFile.Directory == null) return;
+            if (dataFile.Directory == null) return;
 
-            var resultsFilePath = Path.Combine(fiDataFile.Directory.FullName,
-                                               Path.GetFileNameWithoutExtension(fiDataFile.Name) + "_Peaks" +
-                                               fiDataFile.Extension);
+            var resultsFilePath = Path.Combine(dataFile.Directory.FullName,
+                                               Path.GetFileNameWithoutExtension(dataFile.Name) + "_Peaks" +
+                                               dataFile.Extension);
 
             using var writer = new StreamWriter(new FileStream(resultsFilePath, FileMode.Create, FileAccess.Write, FileShare.Read));
 
@@ -575,7 +574,7 @@ namespace MagnitudeConcavityPeakFinder
                 // No peaks were found; create a new peak list using the original peak location index as the peak center
                 peakData.Peaks = new List<clsPeakInfo>
                 {
-                    new clsPeakInfo(peakData.OriginalPeakLocationIndex)
+                    new(peakData.OriginalPeakLocationIndex)
                 };
 
                 return;

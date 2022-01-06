@@ -800,7 +800,7 @@ namespace MASIC.DataInput
 
             var statusEntries = new List<KeyValuePair<string, string>>
             {
-                new KeyValuePair<string, string>(entryName, entryValue)
+                new(entryName, entryValue)
             };
 
             StoreExtendedHeaderInfo(dataOutputHandler, scanInfo, statusEntries);
