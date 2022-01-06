@@ -190,7 +190,8 @@ namespace MASIC.DataInput
                             newSurveyScan.BasePeakIonMZ = FindBasePeakIon(msSpectrum.IonsMZ,
                                 msSpectrum.IonsIntensity,
                                 out var basePeakIonIntensity,
-                                out var mzMin, out _);
+                                out var mzMin);
+
                             newSurveyScan.BasePeakIonIntensity = basePeakIonIntensity;
 
                             // Determine the minimum positive intensity in this scan
@@ -406,8 +407,7 @@ namespace MASIC.DataInput
 
                         // Find the base peak ion mass and intensity
                         newFragScan.BasePeakIonMZ = FindBasePeakIon(msSpectrum.IonsMZ, msSpectrum.IonsIntensity,
-                                                                    out var basePeakIonIntensity,
-                                                                    out _, out _);
+                                                                    out var basePeakIonIntensity, out _);
 
                         newFragScan.BasePeakIonIntensity = basePeakIonIntensity;
 
@@ -535,19 +535,16 @@ namespace MASIC.DataInput
             IReadOnlyList<double> mzList,
             IReadOnlyList<double> ionIntensity,
             out double basePeakIonIntensity,
-            out double mzMin,
-            out double mzMax)
+            out double mzMin)
         {
             // Finds the base peak ion
             // Also determines the minimum and maximum m/z values in mzList
 
             mzMin = 0;
-            mzMax = 0;
 
             try
             {
                 mzMin = mzList[0];
-                mzMax = mzList[0];
 
                 var basePeakIndex = 0;
                 for (var dataIndex = 0; dataIndex < mzList.Count; dataIndex++)
@@ -560,11 +557,6 @@ namespace MASIC.DataInput
                     if (mzList[dataIndex] < mzMin)
                     {
                         mzMin = mzList[dataIndex];
-                    }
-
-                    if (mzList[dataIndex] > mzMax)
-                    {
-                        mzMax = mzList[dataIndex];
                     }
                 }
 
