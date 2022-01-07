@@ -53,11 +53,11 @@ call ProcessData.bat
 cd ..
 
 cd QEHFX01_PreMix_QC
-call ProcessData.bat
+call ProcessData_use_SICstats.bat
 cd ..
 
 cd QExactHF03_PreMix_QC
-call ProcessData.bat
+call ProcessData_use_SICstats.bat
 cd ..
 
 cd Orbitrap_Example
@@ -86,7 +86,7 @@ cd ..
 
 
 cd TMT_Example_Bad_Labeling
-call ProcessData.bat
+call ProcessData_use_SICstats.bat
 cd ..
 
 
