@@ -1165,7 +1165,10 @@ namespace MASIC.DataInput
 
             scanInfo.FragScanInfo.MSLevel = spectrumInfo.MSLevel;
 
-            scanInfo.FragScanInfo.CollisionMode = mzXmlSourceSpectrum.ActivationMethod;
+            if (mzXmlSourceSpectrum != null)
+            {
+                scanInfo.FragScanInfo.CollisionMode = mzXmlSourceSpectrum.ActivationMethod;
+            }
 
             // Determine the minimum positive intensity in this scan
             scanInfo.MinimumPositiveIntensity = mPeakFinder.FindMinimumPositiveValue(msSpectrum.IonsIntensity, 0);
@@ -1251,7 +1254,11 @@ namespace MASIC.DataInput
 
             scanInfo.LowMass = spectrumInfo.MzRangeStart;
             scanInfo.HighMass = spectrumInfo.MzRangeEnd;
-            scanInfo.IsFTMS = IsHighResolutionSpectrum(mzXmlSourceSpectrum.FilterLine);
+
+            if (mzXmlSourceSpectrum != null)
+            {
+                scanInfo.IsFTMS = IsHighResolutionSpectrum(mzXmlSourceSpectrum.FilterLine);
+            }
 
             scanList.FragScans.Add(scanInfo);
             var fragScanIndex = scanList.FragScans.Count - 1;
@@ -1389,7 +1396,7 @@ namespace MASIC.DataInput
                 mzXmlSourceSpectrum.MzRangeEnd = Utilities.CFloatSafe(mzMax);
             }
 
-            if (mzXmlSourceSpectrum.MSLevel > 1)
+            if (mzXmlSourceSpectrum.MSLevel > 1 && mzMLSpectrum.Precursors.Count > 0)
             {
                 var firstPrecursor = mzMLSpectrum.Precursors[0];
 
