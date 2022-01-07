@@ -632,19 +632,13 @@ namespace MASIC.DataInput
             SpectrumInfo spectrumInfo,
             SimpleMzMLReader.SimpleSpectrum mzMLSpectrum)
         {
-            bool isMzXML;
-
             SpectrumInfoMzXML mzXmlSourceSpectrum = null;
 
-            // Note that both mzXML and mzML data is stored in spectrumInfo
-            if (spectrumInfo is SpectrumInfoMzXML xml)
+            // Note that both mzXML and mzML data are stored in an instance of SpectrumInfoMzXML
+            // mzData files will have SpectrumInfoMzData here
+            if (spectrumInfo is SpectrumInfoMzXML mzXmlSpectrumInfo)
             {
-                mzXmlSourceSpectrum = xml;
-                isMzXML = true;
-            }
-            else
-            {
-                isMzXML = false;
+                mzXmlSourceSpectrum = mzXmlSpectrumInfo;
             }
 
             // Determine if this was an MS/MS scan
@@ -978,7 +972,6 @@ namespace MASIC.DataInput
         /// <param name="spectrumInfo"></param>
         /// <param name="msSpectrum">Tracks scan number, m/z values, and intensity values; msSpectrum.IonCount is the number of data points</param>
         /// <param name="sicOptions"></param>
-        /// <param name="isMzXML"></param>
         /// <param name="mzXmlSourceSpectrum"></param>
         private void ExtractSurveyScan(
             ScanList scanList,
@@ -987,7 +980,6 @@ namespace MASIC.DataInput
             SpectrumInfo spectrumInfo,
             MSSpectrum msSpectrum,
             SICOptions sicOptions,
-            bool isMzXML,
             SpectrumInfoMzXML mzXmlSourceSpectrum)
         {
             var scanInfo = new ScanInfo
@@ -1020,7 +1012,7 @@ namespace MASIC.DataInput
 
             scanList.SurveyScans.Add(scanInfo);
 
-            UpdateMSXmlScanType(scanInfo, spectrumInfo.MSLevel, "MS", isMzXML, mzXmlSourceSpectrum);
+            UpdateMSXmlScanType(scanInfo, spectrumInfo.MSLevel, "MS", mzXmlSourceSpectrum);
 
             if (!scanInfo.ZoomScan)
             {
@@ -1113,7 +1105,6 @@ namespace MASIC.DataInput
             SpectrumInfo spectrumInfo,
             MSSpectrum msSpectrum,
             SICOptions sicOptions,
-            bool isMzXML,
             SpectrumInfoMzXML mzXmlSourceSpectrum,
             SimpleMzMLReader.SimpleSpectrum mzMLSpectrum)
         {
@@ -1152,7 +1143,7 @@ namespace MASIC.DataInput
             // Determine the minimum positive intensity in this scan
             scanInfo.MinimumPositiveIntensity = mPeakFinder.FindMinimumPositiveValue(msSpectrum.IonsIntensity, 0);
 
-            UpdateMSXmlScanType(scanInfo, spectrumInfo.MSLevel, "MSn", isMzXML, mzXmlSourceSpectrum);
+            UpdateMSXmlScanType(scanInfo, spectrumInfo.MSLevel, "MSn", mzXmlSourceSpectrum);
 
             var mrmScanType = scanInfo.MRMScanType;
             if (mrmScanType != MRMScanTypeConstants.NotMRM)
@@ -1674,23 +1665,15 @@ namespace MASIC.DataInput
             ScanInfo scanInfo,
             int msLevel,
             string defaultScanType,
-            bool isMzXML,
             SpectrumInfoMzXML mzXmlSourceSpectrum)
         {
-            if (!isMzXML)
+            if (mzXmlSourceSpectrum == null)
             {
-                // Not a .mzXML file
+                // Not a .mzXML or .mzML file
                 // Use the defaults
                 if (string.IsNullOrWhiteSpace(scanInfo.ScanHeaderText))
                 {
-                    if (mzXmlSourceSpectrum == null || string.IsNullOrWhiteSpace(mzXmlSourceSpectrum.FilterLine))
-                    {
-                        scanInfo.ScanHeaderText = string.Empty;
-                    }
-                    else
-                    {
-                        scanInfo.ScanHeaderText = mzXmlSourceSpectrum.FilterLine;
-                    }
+                    scanInfo.ScanHeaderText = string.Empty;
                 }
 
                 scanInfo.ScanTypeName = defaultScanType;
