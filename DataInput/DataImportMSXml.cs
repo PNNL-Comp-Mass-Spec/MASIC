@@ -590,17 +590,14 @@ namespace MASIC.DataInput
             double percentComplete,
             int scansRead)
         {
-            bool success;
-
             if (mScanTracking.CheckScanInRange(spectrumInfo.ScanNumber, spectrumInfo.RetentionTimeMin, mOptions.SICOptions))
             {
-                success = ExtractScanInfoWork(scanList, spectraCache, dataOutputHandler,
-                                              mOptions.SICOptions, msSpectrum, spectrumInfo, mzMLSpectrum);
+                ExtractScanInfoWork(scanList, spectraCache, dataOutputHandler,
+                                    mOptions.SICOptions, msSpectrum, spectrumInfo, mzMLSpectrum);
             }
             else
             {
                 mScansOutOfRange++;
-                success = true;
             }
 
             if (!double.IsNaN(percentComplete))
@@ -623,10 +620,10 @@ namespace MASIC.DataInput
                 mLastLogTime = DateTime.UtcNow;
             }
 
-            return success;
+            return true;
         }
 
-        private bool ExtractScanInfoWork(
+        private void ExtractScanInfoWork(
             ScanList scanList,
             SpectraCache spectraCache,
             DataOutput.DataOutput dataOutputHandler,
@@ -655,17 +652,19 @@ namespace MASIC.DataInput
             if (spectrumInfo.MSLevel <= 1)
             {
                 // Survey Scan
-                return ExtractSurveyScan(
+                ExtractSurveyScan(
                     scanList, spectraCache, dataOutputHandler,
                     spectrumInfo, msSpectrum, sicOptions,
-                    isMzXML, mzXmlSourceSpectrum);
+                    mzXmlSourceSpectrum);
+
+                return;
             }
 
             // Fragmentation Scan
-            return ExtractFragmentationScan(
+            ExtractFragmentationScan(
                 scanList, spectraCache, dataOutputHandler,
                 spectrumInfo, msSpectrum, sicOptions,
-                isMzXML, mzXmlSourceSpectrum, mzMLSpectrum);
+                mzXmlSourceSpectrum, mzMLSpectrum);
         }
 
         private void ExtractSRMChromatogramsFromMzML(
@@ -981,7 +980,7 @@ namespace MASIC.DataInput
         /// <param name="sicOptions"></param>
         /// <param name="isMzXML"></param>
         /// <param name="mzXmlSourceSpectrum"></param>
-        private bool ExtractSurveyScan(
+        private void ExtractSurveyScan(
             ScanList scanList,
             SpectraCache spectraCache,
             DataOutput.DataOutput dataOutputHandler,
@@ -1105,11 +1104,9 @@ namespace MASIC.DataInput
             }
 
             SaveScanStatEntry(dataOutputHandler.OutputFileHandles.ScanStats, ScanList.ScanTypeConstants.SurveyScan, scanInfo, sicOptions.DatasetID);
-
-            return true;
         }
 
-        private bool ExtractFragmentationScan(
+        private void ExtractFragmentationScan(
             ScanList scanList,
             SpectraCache spectraCache,
             DataOutput.DataOutput dataOutputHandler,
@@ -1278,8 +1275,8 @@ namespace MASIC.DataInput
                 // Compute the interference of the parent ion in the MS1 spectrum for this fragmentation scan
                 scanInfo.FragScanInfo.InterferenceScore = ComputeInterference(mzMLSpectrum, scanInfo, precursorScanNumber);
             }
+        }
 
-            return true;
         }
 
         /// <summary>
