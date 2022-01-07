@@ -380,6 +380,7 @@ namespace MASIC.DataInput
                         {
                             scanCount = xmlReader.ScanCount;
                         }
+
                         if (scanCount > 0)
                         {
                             scanList.ReserveListCapacity(scanCount);
@@ -1135,7 +1136,29 @@ namespace MASIC.DataInput
             SpectrumInfoMzXML mzXmlSourceSpectrum,
             SimpleMzMLReader.SimpleSpectrum mzMLSpectrum)
         {
-            var parentScan = GetParentScan(mzMLSpectrum);
+            int parentScan;
+
+            if (mzMLSpectrum != null)
+            {
+                parentScan = GetParentScan(mzMLSpectrum);
+            }
+            else if (mzXmlSourceSpectrum != null)
+            {
+                parentScan = mzXmlSourceSpectrum.PrecursorScanNum;
+            }
+            else if (spectrumInfo is SpectrumInfoMzData mzDataSpectrum)
+            {
+                parentScan = mzDataSpectrum.ParentIonSpectrumID;
+            }
+            else if (scanList.SurveyScans.Count > 0)
+            {
+                // Use the scan number of the most recent MS1 scan
+                parentScan = scanList.SurveyScans.Last().ScanNumber;
+            }
+            else
+            {
+                parentScan = 0;
+            }
 
             var scanInfo = new ScanInfo(parentScan, spectrumInfo.ParentIonMZ)
             {
