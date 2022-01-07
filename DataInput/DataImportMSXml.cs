@@ -1794,7 +1794,7 @@ namespace MASIC.DataInput
                 // For example, to be CID-MSn instead of simply MSn
                 scanInfo.ScanTypeName = mzXmlSourceSpectrum.ActivationMethod + "-" + scanInfo.ScanTypeName;
 
-                if ((scanInfo.ScanTypeName ?? "") == "HCD-MSn")
+                if (scanInfo.ScanTypeName == "HCD-MSn")
                 {
                     // HCD spectra are always high res; auto-update things
                     scanInfo.ScanTypeName = "HCD-HMSn";
