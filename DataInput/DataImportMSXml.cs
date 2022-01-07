@@ -1178,7 +1178,7 @@ namespace MASIC.DataInput
                 // This is an MRM scan
                 scanList.MRMDataPresent = true;
 
-                var mrmScan = new clsScanInfo(spectrumInfo.SpectrumID)
+                var mrmScan = new clsScanInfo(spectrumInfo.ScanNumber > 0 ? spectrumInfo.ScanNumber : spectrumInfo.SpectrumID)
                 {
                     MRMScanType = mrmScanType,
                     MRMInfo = new MRMInfo()
