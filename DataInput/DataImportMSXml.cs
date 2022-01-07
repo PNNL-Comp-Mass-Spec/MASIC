@@ -519,7 +519,12 @@ namespace MASIC.DataInput
 
                         mDatasetFileInfo.ScanCount++;
 
-                        if (mzMLSpectrum.ScanNumber > 0 && !mScanTracking.CheckScanInRange(mzMLSpectrum.ScanNumber, mOptions.SICOptions))
+                        // The first scan will always have .ScanNumber = 1, even if the actual data does not start at scan 1 (due to the .mzML file having a subset of spectra from the original dataset)
+                        // NativeIdScanNumber will either have the actual scan number, or 0
+
+                        var actualScanNumber = GetActualScanNumber(mzMLSpectrum);
+
+                        if (actualScanNumber > 0 && !mScanTracking.CheckScanInRange(actualScanNumber, mOptions.SICOptions))
                         {
                             mScansOutOfRange++;
                             continue;
@@ -1290,6 +1295,11 @@ namespace MASIC.DataInput
             }
         }
 
+        private int GetActualScanNumber(SimpleMzMLReader.SimpleSpectrum mzMLSpectrum)
+        {
+            return mzMLSpectrum.NativeIdScanNumber > 0
+                ? mzMLSpectrum.NativeIdScanNumber
+                : mzMLSpectrum.ScanNumber;
         }
 
         /// <summary>
@@ -1335,10 +1345,12 @@ namespace MASIC.DataInput
             IReadOnlyList<double> intensityList,
             bool isThermoRawFile)
         {
+            var actualScanNumber = GetActualScanNumber(mzMLSpectrum);
+
             var mzXmlSourceSpectrum = new SpectrumInfoMzXML
             {
-                SpectrumID = mzMLSpectrum.ScanNumber,
-                ScanNumber = mzMLSpectrum.ScanNumber,
+                SpectrumID = actualScanNumber,
+                ScanNumber = actualScanNumber,
                 RetentionTimeMin = Utilities.CFloatSafe(mzMLSpectrum.ScanStartTime),
                 MSLevel = mzMLSpectrum.MsLevel,
                 TotalIonCurrent = mzMLSpectrum.TotalIonCurrent,
