@@ -580,6 +580,18 @@ namespace MASIC.DataInput
             }
         }
 
+        /// <summary>
+        /// Extract scan info, skipping spectra that are not in the range of scans to process
+        /// </summary>
+        /// <param name="msSpectrum"></param>
+        /// <param name="spectrumInfo"></param>
+        /// <param name="mzMLSpectrum">Null if reading a .mzXML file</param>
+        /// <param name="scanList"></param>
+        /// <param name="spectraCache"></param>
+        /// <param name="dataOutputHandler"></param>
+        /// <param name="percentComplete"></param>
+        /// <param name="scansRead"></param>
+        /// <returns>True if no error, false if mOptions.AbortProcessing is true</returns>
         private bool ExtractScanInfoCheckRange(
             MSSpectrum msSpectrum,
             SpectrumInfo spectrumInfo,
@@ -623,6 +635,16 @@ namespace MASIC.DataInput
             return true;
         }
 
+        /// <summary>
+        /// Extract scan info
+        /// </summary>
+        /// <param name="scanList"></param>
+        /// <param name="spectraCache"></param>
+        /// <param name="dataOutputHandler"></param>
+        /// <param name="sicOptions"></param>
+        /// <param name="msSpectrum"></param>
+        /// <param name="spectrumInfo"></param>
+        /// <param name="mzMLSpectrum">Null if reading a .mzXML or .mzData file</param>
         private void ExtractScanInfoWork(
             ScanList scanList,
             SpectraCache spectraCache,
@@ -1363,9 +1385,6 @@ namespace MASIC.DataInput
 
                 mzXmlSourceSpectrum.PrecursorScanNum = GetParentScan(mzMLSpectrum);
 
-                // Verbose activation method description:
-                // Dim activationMethod = firstPrecursor.ActivationMethod
-
                 var precursorParams = firstPrecursor.CVParams;
 
                 var activationMethods = new SortedSet<string>();
@@ -1661,6 +1680,13 @@ namespace MASIC.DataInput
             return true;
         }
 
+        /// <summary>
+        /// Update .ScanTypeName in scanInfo
+        /// </summary>
+        /// <param name="scanInfo"></param>
+        /// <param name="msLevel"></param>
+        /// <param name="defaultScanType"></param>
+        /// <param name="mzXmlSourceSpectrum"></param>
         private void UpdateMSXmlScanType(
             ScanInfo scanInfo,
             int msLevel,
@@ -1681,7 +1707,8 @@ namespace MASIC.DataInput
             }
 
             // Store the filter line text in .ScanHeaderText
-            // Only Thermo files processed with ReadW will have a FilterLine
+            // For .mzXML files, only Thermo files processed with ReadW will have a FilterLine
+            // In contrast, .mzML files should have a filter line
             scanInfo.ScanHeaderText = mzXmlSourceSpectrum.FilterLine;
 
             if (!string.IsNullOrEmpty(scanInfo.ScanHeaderText))
