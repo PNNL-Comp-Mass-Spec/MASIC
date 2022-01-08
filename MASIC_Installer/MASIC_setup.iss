@@ -96,6 +96,26 @@ Source: ..\ExampleData\Parameter_Files\TMT11_LTQ-FT_10ppm_ReporterTol0.003Da_Sav
 Source: ..\ExampleData\Parameter_Files\TMT16_10ppm_ReporterTol0.003Da_2019-10-07.xml            ; DestDir: {app}\Parameter_Files
 Source: ..\ExampleData\Parameter_Files\TMT6_LTQ-FT_10ppm_ReporterTol0.015Da_2014-08-06.xml      ; DestDir: {app}\Parameter_Files
 
+Source: ..\ExampleData\TMT_Example\index.html                                                   ; DestDir: {app}\TMT_Example
+Source: ..\ExampleData\TMT_Example\ProcessData.bat                                              ; DestDir: {app}\TMT_Example
+Source: ..\ExampleData\TMT_Example\TMT_QCPool_23Jun14.mzML                                      ; DestDir: {app}\TMT_Example
+Source: ..\ExampleData\TMT_Example\TMT_QCPool_23Jun14_DatasetInfo.xml                           ; DestDir: {app}\TMT_Example
+Source: ..\ExampleData\TMT_Example\TMT_QCPool_23Jun14_MS_scans.csv                              ; DestDir: {app}\TMT_Example
+Source: ..\ExampleData\TMT_Example\TMT_QCPool_23Jun14_MSMS_scans.csv                            ; DestDir: {app}\TMT_Example
+Source: ..\ExampleData\TMT_Example\TMT_QCPool_23Jun14_PeakAreaHistogram.png                     ; DestDir: {app}\TMT_Example
+Source: ..\ExampleData\TMT_Example\TMT_QCPool_23Jun14_PeakWidthHistogram.png                    ; DestDir: {app}\TMT_Example
+Source: ..\ExampleData\TMT_Example\TMT_QCPool_23Jun14_RepIonObsRate.png                         ; DestDir: {app}\TMT_Example
+Source: ..\ExampleData\TMT_Example\TMT_QCPool_23Jun14_RepIonObsRate.txt                         ; DestDir: {app}\TMT_Example
+Source: ..\ExampleData\TMT_Example\TMT_QCPool_23Jun14_RepIonObsRateHighAbundance.png            ; DestDir: {app}\TMT_Example
+Source: ..\ExampleData\TMT_Example\TMT_QCPool_23Jun14_RepIonStats.png                           ; DestDir: {app}\TMT_Example
+Source: ..\ExampleData\TMT_Example\TMT_QCPool_23Jun14_RepIonStats.txt                           ; DestDir: {app}\TMT_Example
+Source: ..\ExampleData\TMT_Example\TMT_QCPool_23Jun14_RepIonStatsHighAbundance.png              ; DestDir: {app}\TMT_Example
+Source: ..\ExampleData\TMT_Example\TMT_QCPool_23Jun14_ReporterIons.txt                          ; DestDir: {app}\TMT_Example
+Source: ..\ExampleData\TMT_Example\TMT_QCPool_23Jun14_ScanStats.txt                             ; DestDir: {app}\TMT_Example
+Source: ..\ExampleData\TMT_Example\TMT_QCPool_23Jun14_SICs.xml                                  ; DestDir: {app}\TMT_Example
+Source: ..\ExampleData\TMT_Example\TMT_QCPool_23Jun14_SICstats.txt                              ; DestDir: {app}\TMT_Example
+Source: ..\ExampleData\TMT_Example\TMT10_LTQ-FT_10ppm_ReporterTol0.003Da_2014-08-06.xml         ; DestDir: {app}\TMT_Example
+
 Source: ..\ExampleData\CustomMZList_AcqTime.txt                                 ; DestDir: {app}
 Source: ..\ExampleData\CustomMZList.txt                                         ; DestDir: {app}
 
