@@ -26,6 +26,7 @@
     <item key="WriteMRMDataList" value="False" />
     <item key="WriteMRMIntensityCrosstab" value="True" />
     <item key="FastExistingXMLFileTest" value="False" />
+
     <item key="ReporterIonStatsEnabled" value="True" />
     <item key="ReporterIonMassMode" value="4" />
     <item key="ReporterIonToleranceDa" value="0.015" />
@@ -35,6 +36,7 @@
     <item key="ReporterIonSaveUncorrectedIntensities" value="False" />
     <item key="UseMS3ReporterIonsForParentMS2Spectra" value="True" />
     <item key="AlwaysUseMS3ReporterIonsForParents" value="False" />
+
     <item key="ExportRawSpectraData" value="False" />
     <item key="ExportRawDataFileFormat" value="1" />
     <item key="ExportRawDataIncludeMSMS" value="False" />
