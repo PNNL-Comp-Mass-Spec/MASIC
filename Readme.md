@@ -177,6 +177,20 @@ The integer value corresponds to the number that appears in the MASIC settings f
 | 17            | Acetylation             | Peptides with acetylated lysine residues    | 126.09134 and 143.11789                                                                                                                 |
 | 19            | NativeOGlcNAc           | Native O-GlcNAc                             | 126.055, 138.055, 144.065, 168.066, 186.076, 204.087, and 366.14                                                                        |
 
+For datasets with low resolution MS2 spectra but high resolution MS3 spectra, 
+MASIC will copy the reporter ion abundances from the MS3 spectra to the MS2 spectra
+if the median of the reporter ion abundances for a given scan is larger in the MS3 spectrum vs. the parent MS2 spectrum.
+This behavior can be adjusted using options `UseMS3ReporterIonsForParentMS2Spectra` and 
+`AlwaysUseMS3ReporterIonsForParents` in a MASIC parameter file:
+
+* When UseMS3ReporterIonsForParentMS2Spectra is True and AlwaysUseMS3ReporterIonsForParents is False
+  * Only copy from MS3 to MS2 if the median intensity is larger for the MS3 reporter ions
+  * This is the default behavior
+* When UseMS3ReporterIonsForParentMS2Spectra is True and AlwaysUseMS3ReporterIonsForParents is True
+  * Always copy reporter ion intensities from MS3 spectra to the parent MS2 spectra
+* When UseMS3ReporterIonsForParentMS2Spectra is False
+  * Never copy reporter ion intensities from MS3 spectra to the parent MS2 spectra
+
 ## MRM Data
 
 When processing Thermo-Finnigan MRM data files, a file named _MRMSettings.txt 
