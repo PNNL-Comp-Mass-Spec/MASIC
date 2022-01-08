@@ -158,7 +158,8 @@ namespace MASIC.DataInput
                 LoadMSTuneInfo = mOptions.WriteMSTuneFile
             };
 
-            var rawFileReader = new XRawFileIO(readerOptions) {
+            var rawFileReader = new XRawFileIO(readerOptions)
+            {
                 ScanInfoCacheMaxSize = 0    // Don't cache scanInfo objects
             };
             RegisterEvents(rawFileReader);

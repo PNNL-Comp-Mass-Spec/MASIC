@@ -464,7 +464,7 @@ namespace MASICBrowser
 
         private bool FindSICPeakAndAreaForParentIon(int parentIonIndex, clsSICStats sicStats)
         {
-            var sicPotentialAreaStatsForRegion = new SICPotentialAreaStats ();
+            var sicPotentialAreaStatsForRegion = new SICPotentialAreaStats();
 
             try
             {

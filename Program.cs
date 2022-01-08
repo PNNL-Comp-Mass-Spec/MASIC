@@ -216,13 +216,13 @@ namespace MASIC
             if (!mQuietMode)
             {
 #if GUI
-                    mProgressForm = new frmProgress();
+                mProgressForm = new frmProgress();
 
-                    mProgressForm.InitializeProgressForm("Parsing " + Path.GetFileName(mInputFilePath), 0, 100, false, true);
-                    mProgressForm.InitializeSubtask(string.Empty, 0, 100, false);
-                    mProgressForm.ResetKeyPressAbortProcess();
-                    mProgressForm.Show();
-                    Application.DoEvents();
+                mProgressForm.InitializeProgressForm("Parsing " + Path.GetFileName(mInputFilePath), 0, 100, false, true);
+                mProgressForm.InitializeSubtask(string.Empty, 0, 100, false);
+                mProgressForm.ResetKeyPressAbortProcess();
+                mProgressForm.Show();
+                Application.DoEvents();
 #else
                 Console.WriteLine("Parsing " + Path.GetFileName(mInputFilePath));
 #endif

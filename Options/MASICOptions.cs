@@ -542,8 +542,7 @@ namespace MASIC.Options
                     ReporterIons.AlwaysUseMS3ReporterIonsForParents = reader.GetParam(
                         XML_SECTION_EXPORT_OPTIONS, "AlwaysUseMS3ReporterIonsForParents", ReporterIons.AlwaysUseMS3ReporterIonsForParents);
 
-                    ReporterIons.SetReporterIonMassMode(reporterIonMassMode,
-                                                        ReporterIons.ReporterIonToleranceDaDefault);
+                    ReporterIons.SetReporterIonMassMode(reporterIonMassMode, ReporterIons.ReporterIonToleranceDaDefault);
 
                     // Raw data export options
                     RawDataExportOptions.ExportEnabled = reader.GetParam(

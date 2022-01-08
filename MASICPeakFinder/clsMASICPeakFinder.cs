@@ -2829,7 +2829,7 @@ namespace MASICPeakFinder
                 while (peakIndexStart < peakLocationIndex - 1)
                 {
                     if (peaksContainer.YData[peakIndexStart] > peaksContainer.YData[peakIndexStart + 1])
-                        // || (usedSmoothedDataForPeakDetection && peaksContainer.SmoothedYData[peakIndexStart] < 0))
+                    // || (usedSmoothedDataForPeakDetection && peaksContainer.SmoothedYData[peakIndexStart] < 0))
                     {
                         peakIndexStart++;
                     }
@@ -2842,7 +2842,7 @@ namespace MASICPeakFinder
                 while (peakIndexEnd > peakLocationIndex + 1)
                 {
                     if (peaksContainer.YData[peakIndexEnd - 1] < peaksContainer.YData[peakIndexEnd])
-                        // || (usedSmoothedDataForPeakDetection && peaksContainer.SmoothedYData[peakIndexEnd] < 0))
+                    // || (usedSmoothedDataForPeakDetection && peaksContainer.SmoothedYData[peakIndexEnd] < 0))
                     {
                         peakIndexEnd--;
                     }

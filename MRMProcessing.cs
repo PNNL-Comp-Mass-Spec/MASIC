@@ -157,7 +157,7 @@ namespace MASIC
                 MRMMassCount = sourceInfo.MRMMassList.Count,
                 ScanCount = 0,
                 ParentIonInfoIndex = -1,
-        };
+            };
 
             if (sourceInfo.MRMMassList == null)
             {
