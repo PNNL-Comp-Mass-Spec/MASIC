@@ -1,5 +1,10 @@
 MASIC Change Log
 
+Version 3.2.8042; January 7, 2022
+	- New version of MSDataFileReader.dll that tracks the scan number of the parent scan of MS2 spectra
+	- Add option (enabled by default) to copy reporter ion intensities from MS3 spectra to MS2 spectra if the intensities in the MS3 spectra have a larger median value
+	- Add column ParentScan to the _RepoterIons.txt file 
+
 Version 3.2.8006; December 2, 2021
 	- Replace DLL references with ThermoRawFileReader NuGet package
 		- Uses ThermoFisher.CommonCore.RawFileReader.dll v5.0.0.71
