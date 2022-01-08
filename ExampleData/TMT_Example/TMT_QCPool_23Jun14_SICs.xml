@@ -5,9 +5,9 @@
   <SourceFilePath>TMT_QCPool_23Jun14.mzML</SourceFilePath>
   <SourceFileDateTime>4/26/2019 6:49 PM</SourceFileDateTime>
   <SourceFileSizeBytes>6478568</SourceFileSizeBytes>
-  <MASICProcessingDate>2020-08-11 04:16:10 PM</MASICProcessingDate>
-  <MASICVersion>3.2.7528.29165</MASICVersion>
-  <MASICPeakFinderDllVersion>2.2.7528.29165</MASICPeakFinderDllVersion>
+  <MASICProcessingDate>2022-01-07 03:39:09 PM</MASICProcessingDate>
+  <MASICVersion>3.2.8042.28045</MASICVersion>
+  <MASICPeakFinderDllVersion>2.2.8040.30394</MASICPeakFinderDllVersion>
   <ScanCountTotal>501</ScanCountTotal>
   <SurveyScanCount>76</SurveyScanCount>
   <FragScanCount>425</FragScanCount>
@@ -15807,8 +15807,8 @@
   <CacheEventCount>0</CacheEventCount>
   <UnCacheEventCount>0</UnCacheEventCount>
   <SpectraPoolHitEventCount>1442</SpectraPoolHitEventCount>
-  <PeakMemoryUsageMB>56.6</PeakMemoryUsageMB>
-  <TotalProcessingTimeSeconds>1.8</TotalProcessingTimeSeconds>
+  <PeakMemoryUsageMB>60.1</PeakMemoryUsageMB>
+  <TotalProcessingTimeSeconds>1.6</TotalProcessingTimeSeconds>
  </ProcessingStats>
  <ProcessingComplete>True</ProcessingComplete>
 </SICData>
