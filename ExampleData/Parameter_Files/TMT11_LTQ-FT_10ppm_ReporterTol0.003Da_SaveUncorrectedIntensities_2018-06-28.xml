@@ -33,6 +33,8 @@
     <item key="ReporterIonITraq4PlexCorrectionFactorType" value="0" />
     <item key="ReporterIonSaveObservedMasses" value="False" />
     <item key="ReporterIonSaveUncorrectedIntensities" value="True" />
+    <item key="UseMS3ReporterIonsForParentMS2Spectra" value="True" />
+    <item key="AlwaysUseMS3ReporterIonsForParents" value="False" />
     <item key="ExportRawSpectraData" value="False" />
     <item key="ExportRawDataFileFormat" value="1" />
     <item key="ExportRawDataIncludeMSMS" value="False" />
