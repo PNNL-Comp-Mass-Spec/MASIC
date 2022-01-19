@@ -28,7 +28,7 @@ namespace MASICPeakFinder
         /// <summary>
         /// Program date
         /// </summary>
-        public string PROGRAM_DATE = "January 5, 2022";
+        public string PROGRAM_DATE = "January 18, 2022";
 
         /// <summary>
         /// Minimum peak width, in points
@@ -3379,6 +3379,7 @@ namespace MASICPeakFinder
                     var previousPeakFWHMPointRight = sicPeak.PreviousPeakFWHMPointRight;
                     var nextPeakFWHMPointLeft = sicPeak.NextPeakFWHMPointLeft;
                     var shoulderCount = sicPeak.ShoulderCount;
+
                     var success = FindPeaks(
                         sicData, ref peakIndexStart, ref peakIndexEnd, ref peakLocationIndex,
                         ref previousPeakFWHMPointRight, ref nextPeakFWHMPointLeft, ref shoulderCount,

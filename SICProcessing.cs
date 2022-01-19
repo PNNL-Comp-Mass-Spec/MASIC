@@ -264,7 +264,7 @@ namespace MASIC
             var maxSICPeakWidthMinutesBackward = sicOptions.MaxSICPeakWidthMinutesBackward;
             var maxSICPeakWidthMinutesForward = sicOptions.MaxSICPeakWidthMinutesForward;
 
-            // Limit the data examined to a portion of fullSICScanIndices() and fullSICIntensities, populating udtSICDetails
+            // Limit the data examined to a portion of fullSICScanIndices() and fullSICIntensities, populating sicDetails
             try
             {
                 // Initialize customSICScanToleranceHalfWidth
@@ -525,7 +525,7 @@ namespace MASIC
                 }    // While Not LeftDone and Not RightDone
             }
 
-            // Populate udtSICDetails with the data between scanIndexStart and scanIndexEnd
+            // Populate sicDetails with the data between scanIndexStart and scanIndexEnd
             if (scanIndexStart < 0)
                 scanIndexStart = 0;
             if (scanIndexEnd >= fullSICDataCount)
@@ -1001,7 +1001,7 @@ namespace MASIC
                         scanIndexObservedInFullSIC = 0;
                     }
 
-                    // Populate udtSICDetails using the data centered around scanIndexObservedInFullSIC
+                    // Populate sicDetails using the data centered around scanIndexObservedInFullSIC
                     // Note that this function will update sicStatsPeak.IndexObserved
                     var sicStatsPeak = ExtractSICDetailsFromFullSIC(
                         mzIndexWork, mzSearchChunk[mzIndexWork].BaselineNoiseStatSegments,
@@ -1025,6 +1025,7 @@ namespace MASIC
                         returnClosestPeak,
                         scanList.SIMDataPresent,
                         false);
+
                     currentParentIon.SICStats.SICPotentialAreaStatsForPeak = potentialAreaStatsForPeakOut;
 
                     StorePeakInParentIon(scanList,
@@ -1113,7 +1114,7 @@ namespace MASIC
             }
 
             // --------------------------------------------------------
-            // Step through the parent ions and see if .SurveyScanIndex is contained in udtSICPeak
+            // Step through the parent ions and see if .SurveyScanIndex is contained in sicPeak
             // If it is, assign the stats of the largest peak to the given parent ion
             // --------------------------------------------------------
 
@@ -1216,7 +1217,7 @@ namespace MASIC
                     if (sicStats.ScanTypeForPeakIndices != ScanList.ScanTypeConstants.FragScan)
                     {
                         // ScanType is not FragScan; this is unexpected
-                        ReportError("Programming error: udtSICDetails.SICScanType is not FragScan even though we're processing an MRM peak", clsMASIC.MasicErrorCodes.FindSICPeaksError);
+                        ReportError("Programming error: sicStats.SICScanType is not FragScan even though we're processing an MRM peak", clsMASIC.MasicErrorCodes.FindSICPeaksError);
                         sicStats.ScanTypeForPeakIndices = ScanList.ScanTypeConstants.FragScan;
                     }
                 }
@@ -1228,7 +1229,7 @@ namespace MASIC
                 else
                 {
                     // Record the index (of data in .SICData) that the parent ion mass was first observed
-                    // This is not necessarily the same as udtSICPeak.IndexObserved, so we need to search for it here
+                    // This is not necessarily the same as sicPeak.IndexObserved, so we need to search for it here
 
                     // Search for scanIndexObserved in sicScanIndices()
                     sicStats.Peak.IndexObserved = -1;

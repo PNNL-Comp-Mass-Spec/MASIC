@@ -66,7 +66,10 @@
         /// <summary>
         /// Multiplied by scaled S/N for the given spectrum to determine the initial minimum peak width (in scans) to try.  Scaled "S/N" = Math.Log10(Math.Floor("S/N")) * 10
         /// </summary>
-        /// <remarks>Default: 0.5</remarks>
+        /// <remarks>
+        /// Default is 0.5 in this class
+        /// Default is 1.0 in method GetDefaultSICPeakFinderOptions() in clsMASICPeakFinder
+        /// </remarks>
         public double InitialPeakWidthScansScaler
         {
             get => mInitialPeakWidthScansScaler;
