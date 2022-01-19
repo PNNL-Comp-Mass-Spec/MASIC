@@ -296,9 +296,22 @@ namespace MASIC.Data
             CustomMZSearchValues.Add(mzSearchSpec);
         }
 
+        private char[] DetermineDelimiter(string values)
+        {
+            if (!values.Contains('\t') && values.Contains(','))
+                return new[] { ',' };
+
+            return new[] { '\t' };
+        }
+
         /// <summary>
         /// Parse parallel lists of custom m/z info
         /// </summary>
+        /// <remarks>
+        /// Parameter files created by MASIC will be tab-separated, which allows for commas in the comments
+        /// User-created parameter files might be comma separated
+        /// This method will auto-determine the delimiter in each list by looking for a tab character, and using that if found, otherwise using a comma
+        /// </remarks>
         /// <param name="mzList">Comma or tab separated list of m/z values</param>
         /// <param name="mzToleranceDaList">Comma or tab separated list of tolerances (in Da)</param>
         /// <param name="scanCenterList">Comma or tab separated list of scan centers</param>
@@ -311,24 +324,29 @@ namespace MASIC.Data
             string scanToleranceList,
             string scanCommentList)
         {
-            var delimiters = new[] { ',', '\t' };
-
             // Trim any trailing tab characters
             mzList = mzList.TrimEnd('\t');
             mzToleranceDaList = mzToleranceDaList.TrimEnd('\t');
             scanCenterList = scanCenterList.TrimEnd('\t');
             scanToleranceList = scanToleranceList.TrimEnd('\t');
-            scanCommentList = scanCommentList.TrimEnd(delimiters);
+            scanCommentList = scanCommentList.TrimEnd(',', '\t');
 
-            var mzValues = mzList.Split(delimiters).ToList();
-            var mzToleranceDa = mzToleranceDaList.Split(delimiters).ToList();
-            var scanCenters = scanCenterList.Split(delimiters).ToList();
-            var scanTolerances = scanToleranceList.Split(delimiters).ToList();
+            // Determine the delimiter for each list (should be tab characters, but use a comma if no tabs)
+            var mzDelimiter = DetermineDelimiter(mzList);
+            var mzToleranceDelimiter = DetermineDelimiter(mzToleranceDaList);
+            var scanCenterDelimiter = DetermineDelimiter(scanCenterList);
+            var scanToleranceDelimiter = DetermineDelimiter(scanToleranceList);
+            var scanCommentDelimiter = DetermineDelimiter(scanCommentList);
+
+            var mzValues = mzList.Split(mzDelimiter).ToList();
+            var mzToleranceDa = mzToleranceDaList.Split(mzToleranceDelimiter).ToList();
+            var scanCenters = scanCenterList.Split(scanCenterDelimiter).ToList();
+            var scanTolerances = scanToleranceList.Split(scanToleranceDelimiter).ToList();
             List<string> lstScanComments;
 
             if (scanCommentList.Length > 0)
             {
-                lstScanComments = scanCommentList.Split(delimiters).ToList();
+                lstScanComments = scanCommentList.Split(scanCommentDelimiter).ToList();
             }
             else
             {
