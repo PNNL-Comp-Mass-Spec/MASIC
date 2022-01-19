@@ -61,6 +61,7 @@ namespace MASIC
             mLogMessages = new List<string>();
             mReporterIonIndexToModeMap = new Dictionary<int, ReporterIons.ReporterIonMassModeConstants>();
             InitializeControls();
+
             mMasic = new clsMASIC();
             RegisterEvents(mMasic);
         }
@@ -103,7 +104,11 @@ namespace MASIC
         private int mHeightAdjustForce;
         private DateTime mHeightAdjustTime;
 
+        /// <summary>
+        /// Default instance of MASIC
+        /// </summary>
         private readonly clsMASIC mMasic;
+
         private frmProgress mProgressForm;
 
         /// <summary>
@@ -700,7 +705,8 @@ namespace MASIC
             try
             {
                 // Utilize MASIC's built-in LoadParameters function, then call ResetToDefaults
-                var masicInstance = new clsMASIC();
+
+                var masicInstance = mMasic ?? new clsMASIC();
 
                 var success = masicInstance.LoadParameterFileSettings(filePath);
                 if (!success)
@@ -708,7 +714,7 @@ namespace MASIC
                     MessageBox.Show("LoadParameterFileSettings returned false for: " + Path.GetFileName(filePath), "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 }
 
-                ResetToDefaults(false, masicInstance);
+                ResetToDefaults(false);
 
                 // Sleep for 100 msec, just to be safe
                 Thread.Sleep(100);
@@ -846,11 +852,9 @@ namespace MASIC
             {
                 if (!saveWindowDimensionsOnly)
                 {
-                    var masicInstance = new clsMASIC();
+                    UpdateMasicSettings(mMasic);
 
-                    UpdateMasicSettings(masicInstance);
-
-                    masicInstance.Options.SaveParameterFileSettings(filePath);
+                    mMasic.Options.SaveParameterFileSettings(filePath);
 
                     // Sleep for 100 msec, just to be safe
                     Thread.Sleep(100);
@@ -1249,7 +1253,7 @@ namespace MASIC
             masicInstance.ProgressSubtaskChanged += MASIC_ProgressSubtaskChanged;
         }
 
-        private void ResetToDefaults(bool confirmReset, clsMASIC masicReferenceClass = null)
+        private void ResetToDefaults(bool confirmReset)
         {
             if (confirmReset)
             {
@@ -1258,7 +1262,7 @@ namespace MASIC
                     return;
             }
 
-            var masicInstance = masicReferenceClass ?? new clsMASIC();
+            var masicInstance = mMasic ?? new clsMASIC();
 
             Width = 710;
             Height = 560;
