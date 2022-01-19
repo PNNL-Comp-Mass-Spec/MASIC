@@ -7,27 +7,31 @@
   <section name="MasicImportOptions">
     <item key="CDFTimeInSeconds" value="True" />
     <item key="ParentIonDecoyMassDa" value="0" />
+    <item key="InputFilePath" value="C:\DMS_WorkDir\Dataset.raw" />
+    <item key="LastDirectory" value="C:\DMS_WorkDir" />
+    <item key="PreferredInputFileExtension" value=".raw" />
+    <item key="WindowWidth" value="961" />
+    <item key="WindowHeight" value="655" />
   </section>
   <section name="MasicExportOptions">
     <item key="IncludeHeaders" value="True" />
-    <item key="IncludeCustomSICCommentsInSICStatsFile" value="False" />
-    <item key="IncludeScanTimesInSICStatsFile" value="False" />
+    <item key="IncludeCustomSICCommentsInSICStatsFile" value="True" />
+    <item key="IncludeScanTimesInSICStatsFile" value="True" />
     <item key="SkipMSMSProcessing" value="False" />
     <item key="SkipSICAndRawDataProcessing" value="False" />
     <item key="ExportRawDataOnly" value="False" />
     <item key="SuppressNoParentIonsError" value="True" />
-    <item key="WriteExtendedStats" value="True" />
+    <item key="WriteExtendedStats" value="False" />
     <item key="WriteExtendedStatsIncludeScanFilterText" value="True" />
     <item key="WriteExtendedStatsStatusLog" value="True" />
     <item key="StatusLogKeyNameFilterList" value="Source" />
     <item key="ConsolidateConstantExtendedHeaderValues" value="True" />
     <item key="WriteDetailedSICDataFile" value="False" />
-    <item key="WriteMSMethodFile" value="True" />
+    <item key="WriteMSMethodFile" value="False" />
     <item key="WriteMSTuneFile" value="False" />
     <item key="WriteMRMDataList" value="False" />
     <item key="WriteMRMIntensityCrosstab" value="True" />
     <item key="FastExistingXMLFileTest" value="False" />
-
     <item key="ReporterIonStatsEnabled" value="False" />
     <item key="ReporterIonMassMode" value="0" />
     <item key="ReporterIonToleranceDa" value="0.5" />
@@ -37,7 +41,6 @@
     <item key="ReporterIonSaveUncorrectedIntensities" value="False" />
     <item key="UseMS3ReporterIonsForParentMS2Spectra" value="True" />
     <item key="AlwaysUseMS3ReporterIonsForParents" value="False" />
-
     <item key="ExportRawSpectraData" value="False" />
     <item key="ExportRawDataFileFormat" value="1" />
     <item key="ExportRawDataIncludeMSMS" value="False" />
@@ -45,9 +48,9 @@
     <item key="ExportRawDataMinimumSignalToNoiseRatio" value="1" />
     <item key="ExportRawDataMaxIonCountPerScan" value="200" />
     <item key="ExportRawDataIntensityMinimum" value="0" />
+    <item key="MASICStatusFilename" value="MasicStatus.xml" />
   </section>
   <section name="SICOptions">
-    <!-- When using narrow SIC tolerances, be sure to also use a narrow value for SimilarIonMZToleranceHalfWidth -->
     <item key="SICToleranceDa" value="0.0100" />
     <item key="SICTolerance" value="10.0000" />
     <item key="SICToleranceIsPPM" value="True" />
@@ -60,8 +63,9 @@
     <item key="CompressMSMSSpectraData" value="True" />
     <item key="CompressToleranceDivisorForDa" value="5" />
     <item key="CompressToleranceDivisorForPPM" value="3" />
-    <item key="MaxSICPeakWidthMinutesBackward" value="5" />
-    <item key="MaxSICPeakWidthMinutesForward" value="5" />
+    <!-- Use 0.75 instead the default of 5 since several of the metabolites have the same m/z but a different expected elution time, separated by 1 to 2 minutes -->
+    <item key="MaxSICPeakWidthMinutesBackward" value="0.75" />
+    <item key="MaxSICPeakWidthMinutesForward" value="0.75" />
     <item key="IntensityThresholdFractionMax" value="0.01" />
     <item key="IntensityThresholdAbsoluteMinimum" value="0" />
     <item key="SICNoiseThresholdMode" value="3" />
@@ -70,12 +74,14 @@
     <item key="SICNoiseMinimumSignalToNoiseRatio" value="0" />
     <item key="MaxDistanceScansNoOverlap" value="0" />
     <item key="MaxAllowedUpwardSpikeFractionMax" value="0.2" />
-    <item key="InitialPeakWidthScansScaler" value="1" />
+    <!-- Use 0.25 instead of the default of 1.0 due to narrow LC peaks (most of the metabolites elute over just a few scans) -->
+    <item key="InitialPeakWidthScansScaler" value="0.25" />
     <item key="InitialPeakWidthScansMaximum" value="30" />
     <item key="FindPeaksOnSmoothedData" value="True" />
     <item key="SmoothDataRegardlessOfMinimumPeakWidth" value="True" />
     <item key="UseButterworthSmooth" value="True" />
-    <item key="ButterworthSamplingFrequency" value="0.25" />
+    <!-- Use 0.35 instead of the default of 0.25 due to narrow LC peaks -->
+    <item key="ButterworthSamplingFrequency" value="0.35" />
     <item key="ButterworthSamplingFrequencyDoubledForSIMData" value="True" />
     <item key="UseSavitzkyGolaySmooth" value="False" />
     <item key="SavitzkyGolayFilterOrder" value="0" />
@@ -85,7 +91,6 @@
     <item key="MassSpectraNoiseFractionLowIntensityDataToAverage" value="0.5" />
     <item key="MassSpectraNoiseMinimumSignalToNoiseRatio" value="2" />
     <item key="ReplaceSICZeroesWithMinimumPositiveValueFromMSData" value="True" />
-    <!-- When using narrow SIC tolerances, be sure to also use a narrow value for SimilarIonMZToleranceHalfWidth -->
     <item key="SimilarIonMZToleranceHalfWidth" value="0.05" />
     <item key="SimilarIonToleranceHalfWidthMinutes" value="5" />
     <item key="SpectrumSimilarityMinimum" value="0.8" />
@@ -105,8 +110,8 @@
     <item key="CacheSpectraToRetainInMemory" value="5000" />
   </section>
   <section name="PlotOptions">
-    <item key="CreatePlots" value="True" />
-    <item key="PlotWithPython" value="True" />
+    <item key="CreatePlots" value="False" />
+    <item key="PlotWithPython" value="False" />
     <item key="SaveHistogramData" value="False" />
     <item key="SaveHtmlFile" value="True" />
     <item key="SaveReporterIonObservationRateData" value="True" />
@@ -116,14 +121,14 @@
     <item key="ReporterIonTopNPctObsRateYAxisMinimum" value="0" />
   </section>
   <section name="CustomSICValues">
-    <item key="MZList" value="" />
-    <item key="MZToleranceDaList" value="" />
-    <item key="ScanCenterList" value="" />
-    <item key="ScanToleranceList" value="" />
-    <item key="ScanCommentList" value="" />
-    <item key="ScanTolerance" value="1000" />
-    <item key="ScanType" value="Absolute" />
+    <item key="MZList" value="90.055	105.0182	111.0441	117.0182	119.0339	119.0339	124.0393	132.1019	132.1019	133.0608	134.0448	135.0288	147.0764	148.0605	150.0583	151.0237	151.0601	157.0244	157.0244	163.039	169.0356	169.0495	181.0495	181.0707	183.0652	193.0343	193.0343	193.0707	193.0707	195.0877	205.0972	213.1022	221.0492	243.2319	244.0928	245.0768	255.0652	257.2475	269.0808	271.0601	271.0601	271.0601	285.0758	285.0758	303.0863	305.0656	319.0448	328.1212	345.1391	355.1024	355.1024	395.1489	400.1755	423.0922	442.147	442.147	451.1235	581.1865	611.1607" />
+    <item key="MZToleranceDaList" value="0.0018	0.0021	0.0022	0.0023	0.0024	0.0024	0.0025	0.0026	0.0026	0.0027	0.0027	0.0027	0.0029	0.003	0.003	0.003	0.003	0.0031	0.0031	0.0033	0.0034	0.0034	0.0036	0.0036	0.0037	0.0039	0.0039	0.0039	0.0039	0.0039	0.0041	0.0043	0.0044	0.0049	0.0049	0.0049	0.0051	0.0051	0.0054	0.0054	0.0054	0.0054	0.0057	0.0057	0.0061	0.0061	0.0064	0.0066	0.0069	0.0071	0.0071	0.0079	0.008	0.0085	0.0088	0.0088	0.009	0.0116	0.0122" />
+    <item key="ScanCenterList" value="0.93	0.99	1.59	1.01	1.34	1.06	1.04	1.03	1.33	0.98	1	1.08	0.97	1	1.03	1.1	1.01	1	1.34	5.19	0.99	3.7	2.58	0.99	5.17	1.34	1.02	0.97	1.09	2.89	2.1	8.11	6.91	11.28	0.94	1.04	6.39	12.95	7.81	9.46	8.62	7.13	8.67	8.62	6.34	5.44	5.91	9.19	1.35	1.04	2.72	9.7	6.27	3.54	1.03	1.97	5.44	5.72	5.43" />
+    <item key="ScanToleranceList" value="0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5" />
+    <item key="ScanCommentList" value="L-Alanine	Malonic acid	Hydroquinone	Fumaric acid	Succinate (1.3 min.)	Succinate (1.0 min.)	Nicotinic acid/Niacin	Leucine (1.0 min.)	Leucine (1.3 min.)	L-Asparagine	Aspartate	(R)-Malate	L-Glutamine	Glutamic acid	L-Methionine	(S,S)-Tartaric acid	Sugars-Monosaccharides-Pentoses (Arabinose)	Orotic acid (1 min.)	Orotic acid (1.3 min.)	Umbelliferone	Uric acid	Vanillic acid	Acetylsalicylic acid	Sugars-Monosaccharides-Hexoses (Glucose)	Syringaldehyde	Citrate (1.3 min.)	Citrate (1.0 min.)	L-Cysteine	Quinate	Caffeine	D-Tryptophan	1,3-Diphenylurea	Thidiazuron	Pentadecanoic acid	Cytidine	Uridine	Daidzein	Palmitic acid	Formononetin	Emodin	Galangin	Genistein	Biochanin A	Prunetin	Hesperetin	Taxifolin	Myricetin	Brassinazole	Maltitol	Chlorogenic acid (1.0 min.)	Chlorogenic acid (2.7 min.)	Rotenone	Cochicine	Mangiferin	Folic acid (1.0 min.)	Folic acid (2.0 min.)	Astilbin	Naringin	Rutin" />
+    <item key="ScanTolerance" value="0.5" />
+    <item key="ScanType" value="AcquisitionTime" />
     <item key="CustomMZFile" value="" />
-    <item key="LimitSearchToCustomMZList" value="False" />
+    <item key="LimitSearchToCustomMZList" value="True" />
   </section>
 </sections>
