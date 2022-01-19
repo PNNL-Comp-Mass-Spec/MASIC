@@ -1056,6 +1056,8 @@ namespace MASIC
             }
 
             var columnDelimiters = columnDelimiterList.ToArray();
+            var rowNumber = 0;
+
             foreach (var dataLine in dataLines)
             {
                 if (string.IsNullOrWhiteSpace(dataLine))
@@ -1063,11 +1065,24 @@ namespace MASIC
                     continue;
                 }
 
+                rowNumber++;
+
                 var columns = dataLine.Split(columnDelimiters, 5);
                 if (columns.Length < 2)
                 {
                     rowsSkipped++;
                     continue;
+                }
+
+                if (rowNumber == 1)
+                {
+                    var numericColumns = columns.Count(column => double.TryParse(column, out _));
+
+                    if (numericColumns == 0)
+                    {
+                        // This is a header row; skip it (and do not increment rowsSkipped)
+                        continue;
+                    }
                 }
 
                 try
