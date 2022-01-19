@@ -2390,7 +2390,7 @@ namespace MASIC
 
         private void txtInitialPeakWidthScansScaler_KeyPress(object sender, KeyPressEventArgs e)
         {
-            TextBoxUtils.TextBoxKeyPressHandler(txtInitialPeakWidthScansScaler, e);
+            TextBoxUtils.TextBoxKeyPressHandler(txtInitialPeakWidthScansScaler, e, true, true);
         }
 
         private void txtIntensityThresholdAbsoluteMinimum_KeyPress(object sender, KeyPressEventArgs e)
