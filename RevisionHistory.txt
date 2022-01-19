@@ -1,5 +1,12 @@
 MASIC Change Log
 
+Version 3.2.8053; January 18, 2022
+	- Improvements when pasting a list of custom m/z values into the GUI
+	  - Auto-determine the column delimiter
+	  - Allow for 4-column format: m/z, m/z tolerance, scan or time, and comment
+	- Allow for entering decimal values for the initial peak width scaler
+	- Fix bug in the GUI that failed to track hidden settings loaded from a parameter file
+
 Version 3.2.8042; January 7, 2022
 	- New version of MSDataFileReader.dll that tracks the scan number of the parent scan of MS2 spectra
 	- Add option (enabled by default) to copy reporter ion intensities from MS3 spectra to MS2 spectra if the intensities in the MS3 spectra have a larger median value
