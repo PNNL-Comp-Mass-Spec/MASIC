@@ -102,12 +102,17 @@ namespace MASIC.Options
         public string DatasetLookupFilePath { get; set; } = string.Empty;
 
         /// <summary>
+        /// When true, add a Custom SIC Comments column to the _SICStats.txt file
+        /// </summary>
+        public bool IncludeCustomSICCommentsInSICStatsFile { get; set; }
+
+        /// <summary>
         /// When true, include headers in export files
         /// </summary>
         public bool IncludeHeadersInExportFile { get; set; }
 
         /// <summary>
-        /// When true, include scan times in the _SICStats.txt file
+        /// When true, add scan time columns to the _SICStats.txt file
         /// </summary>
         public bool IncludeScanTimesInSICStatsFile { get; set; }
 
@@ -325,7 +330,9 @@ namespace MASIC.Options
             DatasetInfoQuerySql = string.Empty;
 
             IncludeHeadersInExportFile = true;
+            IncludeCustomSICCommentsInSICStatsFile = false;
             IncludeScanTimesInSICStatsFile = false;
+
             FastExistingXMLFileTest = false;
 
             SkipMSMSProcessing = false;
@@ -453,6 +460,9 @@ namespace MASIC.Options
                 {
                     IncludeHeadersInExportFile = reader.GetParam(
                         XML_SECTION_EXPORT_OPTIONS, "IncludeHeaders", IncludeHeadersInExportFile);
+
+                    IncludeCustomSICCommentsInSICStatsFile = reader.GetParam(
+                        XML_SECTION_EXPORT_OPTIONS, "IncludeCustomSICCommentsInSICStatsFile", IncludeCustomSICCommentsInSICStatsFile);
 
                     IncludeScanTimesInSICStatsFile = reader.GetParam(
                         XML_SECTION_EXPORT_OPTIONS, "IncludeScanTimesInSICStatsFile", IncludeScanTimesInSICStatsFile);
@@ -872,7 +882,8 @@ namespace MASIC.Options
                 var scanCommentList = reader.GetParam(
                     XML_SECTION_CUSTOM_SIC_VALUES, "ScanCommentList", string.Empty);
 
-                return CustomSICList.ParseCustomSICList(mzList, mzToleranceDaList,
+                return CustomSICList.ParseCustomSICList(
+                    mzList, mzToleranceDaList,
                     scanCenterList, scanToleranceList,
                     scanCommentList);
             }
@@ -917,7 +928,9 @@ namespace MASIC.Options
 
                 // MASIC Export Options
                 writer.SetParam(XML_SECTION_EXPORT_OPTIONS, "IncludeHeaders", IncludeHeadersInExportFile);
+                writer.SetParam(XML_SECTION_EXPORT_OPTIONS, "IncludeCustomSICCommentsInSICStatsFile", IncludeCustomSICCommentsInSICStatsFile);
                 writer.SetParam(XML_SECTION_EXPORT_OPTIONS, "IncludeScanTimesInSICStatsFile", IncludeScanTimesInSICStatsFile);
+
                 writer.SetParam(XML_SECTION_EXPORT_OPTIONS, "SkipMSMSProcessing", SkipMSMSProcessing);
                 writer.SetParam(XML_SECTION_EXPORT_OPTIONS, "SkipSICAndRawDataProcessing", SkipSICAndRawDataProcessing);
                 writer.SetParam(XML_SECTION_EXPORT_OPTIONS, "ExportRawDataOnly", ExportRawDataOnly);

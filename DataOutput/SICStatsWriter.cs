@@ -145,8 +145,6 @@ namespace MASIC.DataOutput
                 // Write the SIC stats to the output file
                 // The file is tab delimited
 
-                var includeScanTimesInSICStatsFile = masicOptions.IncludeScanTimesInSICStatsFile;
-
                 if (masicOptions.IncludeHeadersInExportFile)
                 {
                     writer.WriteLine(dataOutputHandler.GetHeadersForOutputFile(scanList, DataOutput.OutputFileTypeConstants.SICStatsFlatFile, TAB_DELIMITER));
@@ -165,7 +163,7 @@ namespace MASIC.DataOutput
 
                         WriteSICStatsFlatFileEntry(writer, TAB_DELIMITER, masicOptions.SICOptions, scanList,
                             fakeParentIon, parentIonIndex, surveyScanNumber, surveyScanTime,
-                            0, includeScanTimesInSICStatsFile);
+                            0, masicOptions);
                     }
                 }
                 else
@@ -204,7 +202,7 @@ namespace MASIC.DataOutput
 
                                 WriteSICStatsFlatFileEntry(writer, TAB_DELIMITER, masicOptions.SICOptions, scanList,
                                     parentIon, parentIonIndex, surveyScanNumber, surveyScanTime,
-                                    fragScanIndex, includeScanTimesInSICStatsFile);
+                                    fragScanIndex, masicOptions);
                             }
                         }
 
@@ -268,7 +266,7 @@ namespace MASIC.DataOutput
             int surveyScanNumber,
             float surveyScanTime,
             int fragScanIndex,
-            bool includeScanTimesInSICStatsFile)
+            MASICOptions masicOptions)
         {
             var dataValues = new List<string>(40);
 
@@ -298,7 +296,7 @@ namespace MASIC.DataOutput
 
             dataValues.Add(parentIon.OptimalPeakApexScanNumber.ToString());                // Optimal peak apex scan number
 
-            if (includeScanTimesInSICStatsFile)
+            if (masicOptions.IncludeScanTimesInSICStatsFile)
             {
                 if (fragScanIndex < scanList.FragScans.Count)
                 {
@@ -340,7 +338,7 @@ namespace MASIC.DataOutput
             var currentPeak = currentSIC.Peak;
             dataValues.Add(StringUtilities.ValueToString(currentPeak.MaxIntensityValue, 5));          // Peak Intensity
             dataValues.Add(StringUtilities.ValueToString(currentPeak.SignalToNoiseRatio, 4));         // Peak signal to noise ratio
-            dataValues.Add(currentPeak.FWHMScanWidth.ToString());                                     // Full width at half max (in scans)
+            dataValues.Add(currentPeak.FWHMScanWidth.ToString());                                                   // Full width at half max (in scans)
             dataValues.Add(StringUtilities.ValueToString(currentPeak.Area, 5));                       // Peak area
 
             dataValues.Add(StringUtilities.ValueToString(currentPeak.ParentIonIntensity, 5));         // Intensity of the parent ion (just before the fragmentation scan)
@@ -359,11 +357,16 @@ namespace MASIC.DataOutput
 
             dataValues.Add(StringUtilities.ValueToString(interferenceScore, 4));     // Interference Score
 
-            if (includeScanTimesInSICStatsFile)
+            if (masicOptions.IncludeScanTimesInSICStatsFile)
             {
-                dataValues.Add(StringUtilities.DblToString(surveyScanTime, 5));         // SurveyScanTime
+                dataValues.Add(StringUtilities.DblToString(surveyScanTime, 5));            // SurveyScanTime
                 dataValues.Add(StringUtilities.DblToString(fragScanTime, 5));              // FragScanTime
                 dataValues.Add(StringUtilities.DblToString(optimalPeakApexScanTime, 5));   // OptimalPeakApexScanTime
+            }
+
+            if (masicOptions.IncludeCustomSICCommentsInSICStatsFile)
+            {
+                dataValues.Add(parentIon.CustomSICPeakComment);
             }
 
             sicStatsWriter.WriteLine(string.Join(delimiter.ToString(), dataValues));

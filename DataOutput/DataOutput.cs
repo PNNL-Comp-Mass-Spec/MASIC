@@ -816,6 +816,7 @@ namespace MASIC.DataOutput
                         "ScanTypeName"
                     };
                     break;
+
                 case OutputFileTypeConstants.ScanStatsExtendedFlatFile:
                     if (ExtendedStatsWriter.ExtendedHeaderNameCount <= 0)
                     {
@@ -870,6 +871,10 @@ namespace MASIC.DataOutput
                         headerNames.Add("OptimalPeakApexScanTime");
                     }
 
+                    if (mOptions.IncludeCustomSICCommentsInSICStatsFile)
+                    {
+                        headerNames.Add("Comment");
+                    }
                     break;
 
                 case OutputFileTypeConstants.MRMSettingsFile:
@@ -883,6 +888,7 @@ namespace MASIC.DataOutput
                         "Scan_Count"
                     };
                     break;
+
                 case OutputFileTypeConstants.MRMDatafile:
                     headerNames = new List<string>
                     {
@@ -892,6 +898,7 @@ namespace MASIC.DataOutput
                         "MRM_Daughter_Intensity"
                     };
                     break;
+
                 default:
                     headerNames = new List<string>
                     {
