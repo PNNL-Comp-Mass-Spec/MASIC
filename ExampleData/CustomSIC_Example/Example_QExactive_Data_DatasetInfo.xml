@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<DatasetInfo>
+  <Dataset>Example_QExactive_Data</Dataset>
+  <ScanTypes>
+    <ScanType ScanCount="240" ScanFilterText="FTMS + p ESI Full ms">HMS</ScanType>
+    <ScanType ScanCount="1261" ScanFilterText="FTMS + c ESI d Full ms2 0@hcd30.00">HCD-HMSn</ScanType>
+  </ScanTypes>
+  <AcquisitionInfo>
+    <ScanCount>1501</ScanCount>
+    <ScanCountMS>240</ScanCountMS>
+    <ScanCountMSn>1261</ScanCountMSn>
+    <Elution_Time_Max>5.0335</Elution_Time_Max>
+    <AcqTimeMinutes>5.03</AcqTimeMinutes>
+    <StartTime>2021-10-27 03:09:10 PM</StartTime>
+    <EndTime>2021-10-27 03:14:12 PM</EndTime>
+    <FileSizeBytes>10190299</FileSizeBytes>
+  </AcquisitionInfo>
+  <TICInfo>
+    <TIC_Max_MS>4.2126E+09</TIC_Max_MS>
+    <TIC_Max_MSn>1.0254E+09</TIC_Max_MSn>
+    <BPI_Max_MS>2.0862E+09</BPI_Max_MS>
+    <BPI_Max_MSn>4.9725E+08</BPI_Max_MSn>
+    <TIC_Median_MS>8.7141E+07</TIC_Median_MS>
+    <TIC_Median_MSn>196357</TIC_Median_MSn>
+    <BPI_Median_MS>1.4363E+07</BPI_Median_MS>
+    <BPI_Median_MSn>76335</BPI_Median_MSn>
+  </TICInfo>
+</DatasetInfo>
