@@ -1109,7 +1109,11 @@ namespace MASIC
                     }
                     else if (columns.Length > 2)
                     {
-                        // Assume pasted data is m/z, m/z tolerance, scan, scan tolerance, and comment
+                        // Assume pasted data is either
+                        // m/z, m/z tolerance, scanOrTime, scanOrTime tolerance, and comment
+                        //   or
+                        // m/z, m/z tolerance, scanOrTime, and comment
+
                         mz = double.Parse(columns[0]);
                         mzToleranceDa = double.Parse(columns[1]);
                         if (Math.Abs(mzToleranceDa) < float.Epsilon)
@@ -1119,22 +1123,19 @@ namespace MASIC
 
                         scanOrAcqTime = float.Parse(columns[2]);
 
-                        if (columns.Length >= 4)
+                        switch (columns.Length)
                         {
-                            scanOrAcqTimeTolerance = float.Parse(columns[3]);
-                        }
-                        else
-                        {
-                            scanOrAcqTimeTolerance = defaultScanOrAcqTimeTolerance;
-                        }
+                            case >= 4 when float.TryParse(columns[3], out var timeTolerance):
+                                scanOrAcqTimeTolerance = timeTolerance;
+                                break;
 
-                        if (columns.Length >= 5)
-                        {
-                            comment = columns[4];
-                        }
-                        else
-                        {
-                            comment = string.Empty;
+                            case 4:
+                                comment = columns[3];
+                                break;
+
+                            case >= 5:
+                                comment = columns[4];
+                                break;
                         }
                     }
 
