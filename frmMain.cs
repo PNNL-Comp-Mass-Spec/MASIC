@@ -19,6 +19,7 @@ using System.Data;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
@@ -964,7 +965,6 @@ namespace MASIC
         private void PasteCustomSICValues(bool clearList)
         {
             var lineDelimiters = new[] { '\r', '\n' };
-            var columnDelimiters = new[] { '\t', ',' };
 
             // Examine the clipboard contents
             var clipboardData = Clipboard.GetDataObject();
@@ -992,15 +992,70 @@ namespace MASIC
 
             GetCurrentCustomSICTolerances(out var defaultMZTolerance, out var defaultScanOrAcqTimeTolerance);
 
-            if (clearList)
+            if (clearList && !ClearCustomSICList(true))
             {
-                if (!ClearCustomSICList(true))
-                    return;
+                return;
             }
 
             var rowsAlreadyPresent = 0;
             var rowsSkipped = 0;
 
+            var tabDelimiter = new[] { '\t' };
+            var commaDelimiter = new[] { ',' };
+
+            // Auto-determine the column delimiter by counting the number of lines that are tab-delimited and counting the number that are comma delimited
+
+            // Keys in these dictionaries are the number of columns in a line, values are the number of lines with the given column count
+            var tabStats = new Dictionary<int, int>();
+            var commaStats = new Dictionary<int, int>();
+
+            foreach (var dataLine in dataLines)
+            {
+                var tabSeparatedColumns = dataLine.Split(tabDelimiter, 5);
+                var commaSeparatedColumns = dataLine.Split(commaDelimiter, 5);
+
+                if (tabSeparatedColumns.Length > 1)
+                {
+                    if (tabStats.TryGetValue(tabSeparatedColumns.Length, out var columnCount))
+                        tabStats[tabSeparatedColumns.Length] = columnCount + 1;
+                    else
+                        tabStats.Add(tabSeparatedColumns.Length, 1);
+                }
+
+                // ReSharper disable once InvertIf
+                if (commaSeparatedColumns.Length > 1)
+                {
+                    if (commaStats.TryGetValue(commaSeparatedColumns.Length, out var columnCount))
+                        commaStats[commaSeparatedColumns.Length] = columnCount + 1;
+                    else
+                        commaStats.Add(commaSeparatedColumns.Length, 1);
+                }
+            }
+
+            // Find the largest value in the two dictionaries
+            var maxTabCount = tabStats.Values.Max();
+            var maxCommaCount = commaStats.Values.Max();
+
+            var columnDelimiterList = new List<char>();
+
+            if (maxTabCount > maxCommaCount)
+            {
+                columnDelimiterList.Add('\t');
+            }
+            else if (maxCommaCount > maxTabCount)
+            {
+                columnDelimiterList.Add(',');
+            }
+            else
+            {
+                if (maxCommaCount > 0)
+                    columnDelimiterList.Add(',');
+
+                if (maxTabCount > 0 || columnDelimiterList.Count == 0)
+                    columnDelimiterList.Add('\t');
+            }
+
+            var columnDelimiters = columnDelimiterList.ToArray();
             foreach (var dataLine in dataLines)
             {
                 if (string.IsNullOrWhiteSpace(dataLine))
