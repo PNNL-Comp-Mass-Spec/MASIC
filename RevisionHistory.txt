@@ -1,5 +1,11 @@
 MASIC Change Log
 
+Version 3.2.8054; January 19, 2022
+	- Preferentially use a tab when parsing custom SIC detail lists loaded from a parameter file
+	  - Only use a comma if no tabs
+	  - Allows for a comma custom SIC comments
+	- Add option to include custom SIC comments as an additional column in the _SICStats.txt file
+
 Version 3.2.8053; January 18, 2022
 	- Improvements when pasting a list of custom m/z values into the GUI
 	  - Auto-determine the column delimiter
