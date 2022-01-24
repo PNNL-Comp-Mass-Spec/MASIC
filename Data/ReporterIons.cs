@@ -158,7 +158,15 @@ namespace MASIC.Data
             /// <summary>
             /// Native O-GlcNAc fragments
             /// </summary>
-            NativeOGlcNAc = 19
+            NativeOGlcNAc = 19,
+
+            /// <summary>
+            /// 18-plex TMT (aka TMT18)
+            /// </summary>
+            /// <remarks>
+            /// Several of the reporter ion masses are just 49 ppm apart, thus you must use a very tight tolerance of +/-0.003 Da
+            /// </remarks>
+            TMTEighteenMZ = 20
         }
 
         private double mReporterIonToleranceDaDefault;
@@ -264,17 +272,23 @@ namespace MASIC.Data
         // ReSharper disable once UnusedMember.Global
         public static List<ReporterIonInfo> GetDefaultReporterIons(ReporterIonMassModeConstants reporterIonMassMode)
         {
-            return reporterIonMassMode switch
+            // ReSharper disable once ConvertSwitchStatementToSwitchExpression
+
+            switch (reporterIonMassMode)
             {
-                ReporterIonMassModeConstants.TMTSixMZ =>
-                    GetDefaultReporterIons(reporterIonMassMode, REPORTER_ION_TOLERANCE_DA_DEFAULT_TMT6),
-                ReporterIonMassModeConstants.TMTTenMZ or ReporterIonMassModeConstants.TMTElevenMZ or ReporterIonMassModeConstants.TMTSixteenMZ =>
-                    GetDefaultReporterIons(reporterIonMassMode, REPORTER_ION_TOLERANCE_DA_DEFAULT_TMT10),
-                ReporterIonMassModeConstants.ITraqEightMZHighRes =>
-                    GetDefaultReporterIons(reporterIonMassMode, REPORTER_ION_TOLERANCE_DA_DEFAULT_ITRAQ8_HIGH_RES),
-                _ =>
-                    GetDefaultReporterIons(reporterIonMassMode, REPORTER_ION_TOLERANCE_DA_DEFAULT)
-            };
+                case ReporterIonMassModeConstants.TMTSixMZ:
+                    return GetDefaultReporterIons(reporterIonMassMode, REPORTER_ION_TOLERANCE_DA_DEFAULT_TMT6);
+
+                case ReporterIonMassModeConstants.TMTTenMZ or ReporterIonMassModeConstants.TMTElevenMZ or
+                     ReporterIonMassModeConstants.TMTSixteenMZ or ReporterIonMassModeConstants.TMTEighteenMZ:
+                    return GetDefaultReporterIons(reporterIonMassMode, REPORTER_ION_TOLERANCE_DA_DEFAULT_TMT10);
+
+                case ReporterIonMassModeConstants.ITraqEightMZHighRes:
+                    return GetDefaultReporterIons(reporterIonMassMode, REPORTER_ION_TOLERANCE_DA_DEFAULT_ITRAQ8_HIGH_RES);
+
+                default:
+                    return GetDefaultReporterIons(reporterIonMassMode, REPORTER_ION_TOLERANCE_DA_DEFAULT);
+            }
         }
 
         /// <summary>
@@ -376,6 +390,30 @@ namespace MASIC.Data
                     reporterIons.Add(new ReporterIonInfo(133.14489));         // 133N
                     reporterIons.Add(new ReporterIonInfo(133.15121));         // 133C
                     reporterIons.Add(new ReporterIonInfo(134.148245));        // 134N
+                    break;
+
+                case ReporterIonMassModeConstants.TMTEighteenMZ:
+                    // ReSharper disable once CommentTypo
+                    // TMT 18-plex Isobaric tags (from Thermo), aka TMT18
+                    // Several of the reporter ion masses are just 49 ppm apart, thus you must use a very tight tolerance of +/-0.003 Da (which is +/-23 ppm)
+                    reporterIons.Add(new ReporterIonInfo(126.127726)); //
+                    reporterIons.Add(new ReporterIonInfo(127.124761)); // 127N
+                    reporterIons.Add(new ReporterIonInfo(127.131081)); // 127C
+                    reporterIons.Add(new ReporterIonInfo(128.128116)); // 128N
+                    reporterIons.Add(new ReporterIonInfo(128.134436)); // 128C
+                    reporterIons.Add(new ReporterIonInfo(129.131471)); // 129N
+                    reporterIons.Add(new ReporterIonInfo(129.13779));  // 129C
+                    reporterIons.Add(new ReporterIonInfo(130.134825)); // 130N
+                    reporterIons.Add(new ReporterIonInfo(130.141145)); // 130C
+                    reporterIons.Add(new ReporterIonInfo(131.13818));  // 131N
+                    reporterIons.Add(new ReporterIonInfo(131.144499)); // 131C
+                    reporterIons.Add(new ReporterIonInfo(132.141535)); // 132N
+                    reporterIons.Add(new ReporterIonInfo(132.147855)); // 132C
+                    reporterIons.Add(new ReporterIonInfo(133.14489));  // 133N
+                    reporterIons.Add(new ReporterIonInfo(133.15121));  // 133C
+                    reporterIons.Add(new ReporterIonInfo(134.148245)); // 134N
+                    reporterIons.Add(new ReporterIonInfo(134.154565)); // 134C
+                    reporterIons.Add(new ReporterIonInfo(135.1516));   // 135N
                     break;
 
                 case ReporterIonMassModeConstants.ITraqEightMZHighRes:
@@ -511,6 +549,7 @@ namespace MASIC.Data
                 ReporterIonMassModeConstants.TMTElevenMZ => "11-plex TMT",
                 // ReSharper disable once StringLiteralTypo
                 ReporterIonMassModeConstants.TMTSixteenMZ => "16-plex TMT (aka TMTpro)",
+                ReporterIonMassModeConstants.TMTEighteenMZ => "18-plex TMT",
                 ReporterIonMassModeConstants.ITraqEightMZHighRes => "8-plex iTraq (High Res MS/MS)",
                 ReporterIonMassModeConstants.ITraqEightMZLowRes => "8-plex iTraq (Low Res MS/MS)",
                 ReporterIonMassModeConstants.PCGalnaz => "PCGalnaz (300.13 m/z and 503.21 m/z)",
@@ -560,7 +599,8 @@ namespace MASIC.Data
                     SetReporterIonMassMode(reporterIonMassMode, REPORTER_ION_TOLERANCE_DA_DEFAULT_TMT6);
                     break;
 
-                case ReporterIonMassModeConstants.TMTTenMZ or ReporterIonMassModeConstants.TMTElevenMZ or ReporterIonMassModeConstants.TMTSixteenMZ:
+                case ReporterIonMassModeConstants.TMTTenMZ or ReporterIonMassModeConstants.TMTElevenMZ or
+                     ReporterIonMassModeConstants.TMTSixteenMZ or ReporterIonMassModeConstants.TMTEighteenMZ:
                     SetReporterIonMassMode(reporterIonMassMode, REPORTER_ION_TOLERANCE_DA_DEFAULT_TMT10);
                     break;
 

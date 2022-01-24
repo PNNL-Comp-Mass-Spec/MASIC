@@ -8,7 +8,7 @@ namespace MASIC
     /// <para>
     /// This class corrects the intensities of iTraq or TMT data, based on the expected overlapping isotopic distributions
     /// It supports 4-plex and 8-plex iTraq
-    /// It also supports TMT10, TMT11, and TMT16 (aka TMTpro)
+    /// It also supports TMT10, TMT11, TMT16 (aka TMTpro), and TMT18
     /// </para>
     /// <para>
     /// The isotopic distribution weights are provided by the iTraq or TMT manufacturer
@@ -32,6 +32,7 @@ namespace MASIC
         private const int TEN_PLEX_TMT_MATRIX_LENGTH = 10;
         private const int ELEVEN_PLEX_TMT_MATRIX_LENGTH = 11;
         private const int SIXTEEN_PLEX_TMT_MATRIX_LENGTH = 16;
+        private const int EIGHTEEN_PLEX_TMT_MATRIX_LENGTH = 18;
 
         // ReSharper disable IdentifierTypo
 

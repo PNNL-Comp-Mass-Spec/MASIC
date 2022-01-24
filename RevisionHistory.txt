@@ -1,5 +1,8 @@
 MASIC Change Log
 
+Version 3.2.8059; January 24, 2022
+	- Add 18-plex TMT (aka TMT18)
+
 Version 3.2.8054; January 19, 2022
 	- Preferentially use a tab when parsing custom SIC detail lists loaded from a parameter file
 	  - Only use a comma if no tabs

@@ -244,7 +244,8 @@ namespace MASIC
                     if (mOptions.ReporterIons.ReporterIonMassMode is
                         ReporterIons.ReporterIonMassModeConstants.TMTTenMZ or
                         ReporterIons.ReporterIonMassModeConstants.TMTElevenMZ or
-                        ReporterIons.ReporterIonMassModeConstants.TMTSixteenMZ)
+                        ReporterIons.ReporterIonMassModeConstants.TMTSixteenMZ or
+                        ReporterIons.ReporterIonMassModeConstants.TMTEighteenMZ)
                     {
                         mzValue = reporterIon.MZ.ToString("#0.000");
                     }
@@ -565,7 +566,8 @@ namespace MASIC
                     ReporterIons.ReporterIonMassModeConstants.ITraqEightMZLowRes or
                     ReporterIons.ReporterIonMassModeConstants.TMTTenMZ or
                     ReporterIons.ReporterIonMassModeConstants.TMTElevenMZ or
-                    ReporterIons.ReporterIonMassModeConstants.TMTSixteenMZ)
+                    ReporterIons.ReporterIonMassModeConstants.TMTSixteenMZ or
+                    ReporterIons.ReporterIonMassModeConstants.TMTEighteenMZ)
                 {
                     // Correct the reporter ion intensities using the Reporter Ion Intensity Corrector class
 

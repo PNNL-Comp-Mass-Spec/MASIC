@@ -1231,9 +1231,10 @@ namespace MASIC
             AppendReporterIonMassMode(ReporterIons.ReporterIonMassModeConstants.PCGalnaz, "PCGalnaz: 300.13 and 503.21");
             AppendReporterIonMassMode(ReporterIons.ReporterIonMassModeConstants.TMTTwoMZ, "TMT 2: 126, 127");
             AppendReporterIonMassMode(ReporterIons.ReporterIonMassModeConstants.TMTSixMZ, "TMT 6: 126, 127, 128, 129, 130, 131");
-            AppendReporterIonMassMode(ReporterIons.ReporterIonMassModeConstants.TMTTenMZ, "TMT 10: 126, 127N, 127C, 128N, 128C, 129N, 129C, 130N, 130C, 131");
-            AppendReporterIonMassMode(ReporterIons.ReporterIonMassModeConstants.TMTElevenMZ, "TMT 11: 126, 127N, 127C, 128N, 128C, 129N, 129C, 130N, 130C, 131N, 131C");
-            AppendReporterIonMassMode(ReporterIons.ReporterIonMassModeConstants.TMTSixteenMZ, "TMT 16: 126, 127N, 127C, ... 132N, 132C, 133N, 133C, 134N");
+            AppendReporterIonMassMode(ReporterIons.ReporterIonMassModeConstants.TMTTenMZ, "TMT 10: 126, 127N, 127C, ... 130C, 131");
+            AppendReporterIonMassMode(ReporterIons.ReporterIonMassModeConstants.TMTElevenMZ, "TMT 11: 126, 127N, 127C, ... 130C, 131N, 131C");
+            AppendReporterIonMassMode(ReporterIons.ReporterIonMassModeConstants.TMTSixteenMZ, "TMT 16: 126, 127N, 127C, ... 133N, 133C, 134N");
+            AppendReporterIonMassMode(ReporterIons.ReporterIonMassModeConstants.TMTEighteenMZ, "TMT 18: 126, 127N, 127C, ... 133N, 133C, 134N, 134C, 135N");
 
             SelectedReporterIonMode = ReporterIons.ReporterIonMassModeConstants.CustomOrNone;
         }
