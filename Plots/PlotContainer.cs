@@ -339,4 +339,3 @@ namespace MASIC.Plots
         }
     }
 }
-

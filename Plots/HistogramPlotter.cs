@@ -518,4 +518,3 @@ namespace MASIC.Plots
         }
     }
 }
-
