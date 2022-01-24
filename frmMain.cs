@@ -705,7 +705,7 @@ namespace MASIC
 
             try
             {
-                // Utilize MASIC's built-in LoadParameters function, then call ResetToDefaults
+                // Utilize the built-in LoadParameterFileSettings function, then call ResetToDefaults
 
                 var masicInstance = mMasic ?? new clsMASIC();
 

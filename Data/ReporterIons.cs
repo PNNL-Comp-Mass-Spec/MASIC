@@ -51,7 +51,7 @@ namespace MASIC.Data
             CustomOrNone = 0,
 
             /// <summary>
-            /// 4-plex iTRAQ
+            /// 4-plex iTRAQ (aka iTRAQ4)
             /// </summary>
             ITraqFourMZ = 1,
 
@@ -61,17 +61,17 @@ namespace MASIC.Data
             ITraqETDThreeMZ = 2,
 
             /// <summary>
-            /// 2-plex TMT
+            /// 2-plex TMT (aka TMT2)
             /// </summary>
             TMTTwoMZ = 3,
 
             /// <summary>
-            /// 6-plex TMT
+            /// 6-plex TMT (aka TMT6)
             /// </summary>
             TMTSixMZ = 4,
 
             /// <summary>
-            /// 8-plex iTRAQ
+            /// 8-plex iTRAQ (aka iTRAQ8)
             /// </summary>
             /// <remarks>
             /// This version of 8-plex iTraq should be used when the reporter ion search tolerance is +/-0.03 Da or smaller
@@ -102,7 +102,7 @@ namespace MASIC.Data
             LycAcetFragment = 9,
 
             /// <summary>
-            /// 10-plex TMT
+            /// 10-plex TMT (aka TMT10)
             /// </summary>
             /// <remarks>
             /// Several of the reporter ion masses are just 49 ppm apart, thus you must use a very tight tolerance of +/-0.003 Da
@@ -135,7 +135,7 @@ namespace MASIC.Data
             FSFACustomHydroxyl = 15,
 
             /// <summary>
-            /// 11-plex TMT
+            /// 11-plex TMT (aka TMT11)
             /// </summary>
             /// <remarks>
             /// Several of the reporter ion masses are just 49 ppm apart, thus you must use a very tight tolerance of +/-0.003 Da
@@ -147,8 +147,10 @@ namespace MASIC.Data
             /// </summary>
             Acetylation = 17,
 
+            // ReSharper disable once CommentTypo
+
             /// <summary>
-            /// 16-plex TMT
+            /// 16-plex TMT (aka TMT16 or TMTpro)
             /// </summary>
             /// <remarks>
             /// Several of the reporter ion masses are just 49 ppm apart, thus you must use a very tight tolerance of +/-0.003 Da
