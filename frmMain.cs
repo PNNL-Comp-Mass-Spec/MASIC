@@ -50,7 +50,7 @@ namespace MASIC
         /// <summary>
         /// Constructor
         /// </summary>
-        public frmMain() : base()
+        public frmMain()
         {
             // This call is required by the Windows Form Designer.
             InitializeComponent();
@@ -122,10 +122,7 @@ namespace MASIC
 
         private ReporterIons.ReporterIonMassModeConstants SelectedReporterIonMode
         {
-            get
-            {
-                return GetSelectedReporterIonMode();
-            }
+            get => GetSelectedReporterIonMode();
             set
             {
                 try
