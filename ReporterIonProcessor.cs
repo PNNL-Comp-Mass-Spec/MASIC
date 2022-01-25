@@ -655,23 +655,23 @@ namespace MASIC
                                 : StringUtilities.DblToString(reporterIntensities[reporterIonIndex], 2));
                     }
 
-                    if (includeFtmsColumns)
+                    if (!includeFtmsColumns)
+                        continue;
+
+                    if (Math.Abs(reporterIons[reporterIonIndex].SignalToNoise) < float.Epsilon &&
+                        Math.Abs(reporterIons[reporterIonIndex].Resolution) < float.Epsilon &&
+                        Math.Abs(reporterIons[reporterIonIndex].LabelDataMZ) < float.Epsilon)
                     {
-                        if (Math.Abs(reporterIons[reporterIonIndex].SignalToNoise) < float.Epsilon &&
-                            Math.Abs(reporterIons[reporterIonIndex].Resolution) < float.Epsilon &&
-                            Math.Abs(reporterIons[reporterIonIndex].LabelDataMZ) < float.Epsilon)
-                        {
-                            // A match was not found in the label data; display blanks (not zeros)
-                            ftmsSignalToNoise.Add(string.Empty);
-                            ftmsResolution.Add(string.Empty);
-                            //ftmsLabelDataMz.Add(string.Empty);
-                        }
-                        else
-                        {
-                            ftmsSignalToNoise.Add(StringUtilities.DblToString(reporterIons[reporterIonIndex].SignalToNoise, 2));
-                            ftmsResolution.Add(StringUtilities.DblToString(reporterIons[reporterIonIndex].Resolution, 2));
-                            //ftmsLabelDataMz.Add(StringUtilities.DblToString(reporterIons(reporterIonIndex).LabelDataMZ, 4));
-                        }
+                        // A match was not found in the label data; display blanks (not zeros)
+                        ftmsSignalToNoise.Add(string.Empty);
+                        ftmsResolution.Add(string.Empty);
+                        //ftmsLabelDataMz.Add(string.Empty);
+                    }
+                    else
+                    {
+                        ftmsSignalToNoise.Add(StringUtilities.DblToString(reporterIons[reporterIonIndex].SignalToNoise, 2));
+                        ftmsResolution.Add(StringUtilities.DblToString(reporterIons[reporterIonIndex].Resolution, 2));
+                        //ftmsLabelDataMz.Add(StringUtilities.DblToString(reporterIons(reporterIonIndex).LabelDataMZ, 4));
                     }
                 }
             }
@@ -702,14 +702,10 @@ namespace MASIC
             reporterIonStats.DataColumns.AddRange(reporterIntensityList);
 
             // Append the weighted average percent intensity correction
-            if (weightedAvgPctIntensityCorrection < float.Epsilon)
-            {
-                reporterIonStats.DataColumns.Add("0");
-            }
-            else
-            {
-                reporterIonStats.DataColumns.Add(StringUtilities.DblToString(weightedAvgPctIntensityCorrection, 1));
-            }
+            reporterIonStats.DataColumns.Add(
+                weightedAvgPctIntensityCorrection < float.Epsilon
+                    ? "0"
+                    : StringUtilities.DblToString(weightedAvgPctIntensityCorrection, 1));
 
             if (saveObservedMasses)
             {
