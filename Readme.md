@@ -268,13 +268,13 @@ msconvert.exe --32 --mzML --filter "peakPicking true 1" DatasetName.raw
 
 The `PlotOptions` section in the MASIC parameter file has options for instructing MASIC to create various plots. When enabled, the following plots are created:
 
-| Plot Title                            | Filename                               | Description                                                                                                                                                                    |
-|---------------------------------------|----------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Peak area histogram                   | Dataset_PeakAreaHistogram.png          | Histogram of selected ion chromatogram (SIC) peak areas. Areas are log-10 transformed.                                                                                         |
-| Peak width histogram                  | Dataset_PeakWidthHistogram.png         | Histogram of peak widths (FWHM) of selected ion chromatogram peaks (in seconds)                                                                                                |
-| Reporter ion observation rate, top N% | Dataset_RepIonObsRateHighAbundance.png | Bar chart showing the percentage of MS/MS spectra for which a reporter ion was observed. Uses data from the top 80% of spectra, as sorted by SIC peak area (% is adjustable)   |
-| Reporter ion observation rate         | Dataset_RepIonObsRate.png              | Bar chart showing the percentage of MS/MS spectra for which a reporter ion was observed, showing a separate bar for each channel.                                              |
-| Reporter ion intensity stats, top N%  | Dataset_RepIonStatsHighAbundance.png   | Box and whiskers plot showing the distribution of reporter ion intensities, by channel. Uses data from the top 80% of spectra, as sorted by SIC peak area (% is adjustable).   |
+| Plot Title                             | Filename                               | Description                                                                                                                                                                   |
+|----------------------------------------|----------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Peak area histogram                    | Dataset_PeakAreaHistogram.png          | Histogram of selected ion chromatogram (SIC) peak areas. Areas are log-10 transformed.                                                                                        |
+| Peak width histogram                   | Dataset_PeakWidthHistogram.png         | Histogram of peak widths (FWHM) of selected ion chromatogram peaks (in seconds).                                                                                              |
+| Reporter ion observation rate          | Dataset_RepIonObsRate.png              | Bar chart showing the percentage of MS/MS spectra for which a reporter ion was observed, showing a separate bar for each channel.                                             |
+| Reporter ion observation rate, top 80% | Dataset_RepIonObsRateHighAbundance.png | Bar chart showing the percentage of MS/MS spectra for which a reporter ion was observed. Uses data from the top 80% of spectra, as sorted by SIC peak area (% is adjustable). |
+| Reporter ion intensity stats, top 80%  | Dataset_RepIonStatsHighAbundance.png   | Box and whiskers plot showing the distribution of reporter ion intensities, by channel. Uses data from the top 80% of spectra, as sorted by SIC peak area (% is adjustable).  |
 
 The reporter ion based plots are only created if reporter ions were searched for.
 
