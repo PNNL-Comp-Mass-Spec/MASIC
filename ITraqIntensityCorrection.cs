@@ -699,6 +699,16 @@ namespace MASIC
 
                     // ReSharper disable once CommentTypo
                     // TMTpro lot UH290428
+
+                    // Column map
+                    // PDF file column   Contribution field
+                    // ---------------   ------------------
+                    // -2x 13C           minus2
+                    //    -13C           minus1
+                    //      M+           zero
+                    //    +13C           plus1
+                    // +2x 13C           plus2
+
                     udtIsoPct126 = DefineIsotopeContribution(0, 0, 100, 7.73F, 0.22F);
                     udtIsoPct127N = DefineIsotopeContribution(0, 0, 100, 7.46F, 0.22F);
                     udtIsoPct127C = DefineIsotopeContribution(0, 0.71F, 100, 6.62F, 0.16F);
@@ -882,48 +892,57 @@ namespace MASIC
                     // Source percentages provided by Thermo
 
                     // ReSharper disable once CommentTypo
-                    // TMTpro lot N/A
+                    // TMTpro lot UH290428
 
-                    udtIsoPct126 = DefineIsotopeContribution(0, 0, 100, 0, 0);
-                    udtIsoPct127N = DefineIsotopeContribution(0, 0, 100, 0, 0);
-                    udtIsoPct127C = DefineIsotopeContribution(0, 0, 100, 0, 0);
-                    udtIsoPct128N = DefineIsotopeContribution(0, 0, 100, 0, 0);
-                    udtIsoPct128C = DefineIsotopeContribution(0, 0, 100, 0, 0);
-                    udtIsoPct129N = DefineIsotopeContribution(0, 0, 100, 0, 0);
-                    udtIsoPct129C = DefineIsotopeContribution(0, 0, 100, 0, 0);
-                    udtIsoPct130N = DefineIsotopeContribution(0, 0, 100, 0, 0);
-                    udtIsoPct130C = DefineIsotopeContribution(0, 0, 100, 0, 0);
-                    udtIsoPct131N = DefineIsotopeContribution(0, 0, 100, 0, 0);
-                    udtIsoPct131C = DefineIsotopeContribution(0, 0, 100, 0, 0);
-                    udtIsoPct132N = DefineIsotopeContribution(0, 0, 100, 0, 0);
-                    udtIsoPct132C = DefineIsotopeContribution(0, 0, 100, 0, 0);
-                    udtIsoPct133N = DefineIsotopeContribution(0, 0, 100, 0, 0);
-                    udtIsoPct133C = DefineIsotopeContribution(0, 0, 100, 0, 0);
-                    udtIsoPct134N = DefineIsotopeContribution(0, 0, 100, 0, 0);
-                    udtIsoPct134C = DefineIsotopeContribution(0, 0, 100, 0, 0);
-                    udtIsoPct135N = DefineIsotopeContribution(0, 0, 100, 0, 0);
+                    // Column map
+                    // PDF file column   Contribution field
+                    // ---------------   ------------------
+                    // -2x 13C           minus2
+                    //    -13C           minus1
+                    //      M+           zero
+                    //    +13C           plus1
+                    // +2x 13C           plus2
+
+                    udtIsoPct126 = DefineIsotopeContribution(0, 0, 100, 7.73F, 0.22F);
+                    udtIsoPct127N = DefineIsotopeContribution(0, 0, 100, 7.46F, 0.22F);
+                    udtIsoPct127C = DefineIsotopeContribution(0, 0.71F, 100, 6.62F, 0.16F);
+                    udtIsoPct128N = DefineIsotopeContribution(0, 0.75F, 100, 6.67F, 0.16F);
+                    udtIsoPct128C = DefineIsotopeContribution(0.06F, 1.34F, 100, 5.31F, 0.11F);
+                    udtIsoPct129N = DefineIsotopeContribution(0.01F, 1.29F, 100, 5.48F, 0.1F);
+                    udtIsoPct129C = DefineIsotopeContribution(0.26F, 2.34F, 100, 4.87F, 0.08F);
+                    udtIsoPct130N = DefineIsotopeContribution(0.39F, 2.36F, 100, 4.57F, 0.07F);
+                    udtIsoPct130C = DefineIsotopeContribution(0.05F, 2.67F, 100, 3.85F, 0.15F);
+                    udtIsoPct131N = DefineIsotopeContribution(0.05F, 2.71F, 100, 3.73F, 0.04F);
+                    udtIsoPct131C = DefineIsotopeContribution(0.09F, 3.69F, 100, 2.77F, 0.01F);
+                    udtIsoPct132N = DefineIsotopeContribution(0.09F, 2.51F, 100, 2.76F, 0.01F);
+                    udtIsoPct132C = DefineIsotopeContribution(0.1F, 4.11F, 100, 1.63F, 0);
+                    udtIsoPct133N = DefineIsotopeContribution(0.09F, 3.09F, 100, 1.58F, 0);
+                    udtIsoPct133C = DefineIsotopeContribution(0.36F, 4.63F, 100, 0.88F, 0);
+                    udtIsoPct134N = DefineIsotopeContribution(0.38F, 4.82F, 100, 0.86F, 0);
+                    udtIsoPct134C = DefineIsotopeContribution(0.14F, 5.81F, 100, 0, 0);
+                    udtIsoPct135N = DefineIsotopeContribution(0.19F, 5.42F, 100, 0, 0);
 
                     // Goal is to generate an 18x18 matrix
                     //       0       1       2       3       4       5       6       7       8       9       10      11      12      13      14      15      16      17
                     // --  ------  ------  ------  ------  ------  ------  ------  ------  ------  ------  ------  ------  ------  ------  ------  ------  ------  ------
-                    // 0   0.9205    0     0.0071    0     0.0006    0       0       0       0       0       0       0       0       0       0       0
-                    // 1     0     0.9232    0     0.0075    0     0.0001    0       0       0       0       0       0       0       0       0       0
-                    // 2   0.0773    0     0.9251    0     0.0134    0     0.0026    0       0       0       0       0       0       0       0       0
-                    // 3     0     0.0746    0     0.9242    0     0.0129    0     0.0039    0       0       0       0       0       0       0       0
-                    // 4   0.0022    0     0.0662    0     0.9318    0     0.0234    0     0.0005    0       0       0       0       0       0       0
-                    // 5     0     0.0022    0     0.0667    0     0.9312    0     0.0236    0     0.0005    0       0       0       0       0       0
-                    // 6     0       0     0.0016    0     0.0531    0     0.9245    0     0.0267    0     0.0009    0       0       0       0       0
-                    // 7     0       0       0     0.0016    0     0.0548    0     0.9261    0     0.0271    0     0.0009    0       0       0       0
-                    // 8     0       0       0       0     0.0011    0     0.0487    0     0.9328    0     0.0369    0     0.0010    0       0       0
-                    // 9     0       0       0       0       0     0.0010    0     0.0457    0     0.9347    0     0.0251    0     0.0009    0       0
-                    // 10    0       0       0       0       0       0     0.0008    0     0.0385    0     0.9344    0     0.0411    0     0.0036    0
-                    // 11    0       0       0       0       0       0       0     0.0007    0     0.0373    0     0.9463    0     0.0309    0     0.0038
-                    // 12    0       0       0       0       0       0       0       0     0.0015    0     0.0277    0     0.9416    0     0.0463    0
-                    // 13    0       0       0       0       0       0       0       0       0     0.0004    0     0.0276    0     0.9524    0     0.0482
-                    // 14    0       0       0       0       0       0       0       0       0       0     0.0001    0     0.0163    0     0.9413    0
-                    // 15    0       0       0       0       0       0       0       0       0       0       0     0.0001    0     0.0158    0     0.9394
-                    // 16    0       0       0       0       0       0       0       0       0       0       0       0     0.0001    0     0.0158    0     0.9394
-                    // 17    0       0       0       0       0       0       0       0       0       0       0       0       0     0.0001    0     0.0158    0     0.9394
+                    // 0   0.9205    0     0.0071    0     0.0006    0       0       0       0       0       0       0       0       0       0       0       0       0
+                    // 1     0     0.9232    0     0.0075    0     0.0001    0       0       0       0       0       0       0       0       0       0       0       0
+                    // 2   0.0773    0     0.9251    0     0.0134    0     0.0026    0       0       0       0       0       0       0       0       0       0       0
+                    // 3     0     0.0746    0     0.9242    0     0.0129    0     0.0039    0       0       0       0       0       0       0       0       0       0
+                    // 4   0.0022    0     0.0662    0     0.9318    0     0.0234    0     0.0005    0       0       0       0       0       0       0       0       0
+                    // 5     0     0.0022    0     0.0667    0     0.9312    0     0.0236    0     0.0005    0       0       0       0       0       0       0       0
+                    // 6     0       0     0.0016    0     0.0531    0     0.9245    0     0.0267    0     0.0009    0       0       0       0       0       0       0
+                    // 7     0       0       0     0.0016    0     0.0548    0     0.9261    0     0.0271    0     0.0009    0       0       0       0       0       0
+                    // 8     0       0       0       0     0.0011    0     0.0487    0     0.9328    0     0.0369    0     0.0010    0       0       0       0       0
+                    // 9     0       0       0       0       0     0.0010    0     0.0457    0     0.9347    0     0.0251    0     0.0009    0       0       0       0
+                    // 10    0       0       0       0       0       0     0.0008    0     0.0385    0     0.9344    0     0.0411    0     0.0036    0       0       0
+                    // 11    0       0       0       0       0       0       0     0.0007    0     0.0373    0     0.9463    0     0.0309    0     0.0038    0       0
+                    // 12    0       0       0       0       0       0       0       0     0.0015    0     0.0277    0     0.9416    0     0.0463    0     0.0014    0
+                    // 13    0       0       0       0       0       0       0       0       0     0.0004    0     0.0276    0     0.9524    0     0.0482    0     0.0019
+                    // 14    0       0       0       0       0       0       0       0       0       0     0.0001    0     0.0163    0     0.9413    0     0.0581    0
+                    // 15    0       0       0       0       0       0       0       0       0       0       0     0.0001    0     0.0158    0     0.9394    0     0.0542
+                    // 16    0       0       0       0       0       0       0       0       0       0       0       0       0       0     0.0088    0     0.9405    0
+                    // 17    0       0       0       0       0       0       0       0       0       0       0       0       0       0       0     0.0086    0     0.9439
 
                     mCoeffs = new double[maxIndex + 1, maxIndex + 1];
 
@@ -1073,17 +1092,17 @@ namespace MASIC
                     mCoeffs[15, 16] = 0;
                     mCoeffs[15, 17] = udtIsoPct135N.Minus1;
 
-                    mCoeffs[16, 10] = udtIsoPct132C.Plus2;
-                    mCoeffs[16, 11] = 0;
-                    mCoeffs[16, 12] = udtIsoPct133C.Plus1;
+                    mCoeffs[16, 12] = udtIsoPct132C.Plus2;
                     mCoeffs[16, 13] = 0;
-                    mCoeffs[16, 14] = udtIsoPct134C.Zero;
+                    mCoeffs[16, 14] = udtIsoPct133C.Plus1;
+                    mCoeffs[16, 15] = 0;
+                    mCoeffs[16, 16] = udtIsoPct134C.Zero;
 
-                    mCoeffs[17, 11] = udtIsoPct133N.Plus2;
-                    mCoeffs[17, 12] = 0;
-                    mCoeffs[17, 13] = udtIsoPct134N.Plus1;
+                    mCoeffs[17, 13] = udtIsoPct133N.Plus2;
                     mCoeffs[17, 14] = 0;
-                    mCoeffs[17, 15] = udtIsoPct135N.Zero;
+                    mCoeffs[17, 15] = udtIsoPct134N.Plus1;
+                    mCoeffs[17, 16] = 0;
+                    mCoeffs[17, 17] = udtIsoPct135N.Zero;
 
                     break;
 
