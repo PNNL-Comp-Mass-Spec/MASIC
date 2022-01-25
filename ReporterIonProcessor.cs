@@ -635,7 +635,10 @@ namespace MASIC
                     // Append the reporter ion intensity to reporterIntensityList
                     // We skip contaminant ions, unless saveUncorrectedIntensities is True, in which case we include them
 
-                    reporterIntensityList.Add(StringUtilities.DblToString(reporterIntensitiesCorrected[reporterIonIndex], 2));
+                    reporterIntensityList.Add(
+                        reporterIntensitiesCorrected[reporterIonIndex] < float.Epsilon
+                            ? "0"
+                            : StringUtilities.DblToString(reporterIntensitiesCorrected[reporterIonIndex], 2));
 
                     if (saveObservedMasses)
                     {
@@ -646,7 +649,10 @@ namespace MASIC
                     if (saveUncorrectedIntensities)
                     {
                         // Append the original, uncorrected intensity value
-                        uncorrectedIntensityList.Add(StringUtilities.DblToString(reporterIntensities[reporterIonIndex], 2));
+                        uncorrectedIntensityList.Add(
+                            reporterIntensities[reporterIonIndex] < float.Epsilon
+                                ? "0"
+                                : StringUtilities.DblToString(reporterIntensities[reporterIonIndex], 2));
                     }
 
                     if (includeFtmsColumns)
