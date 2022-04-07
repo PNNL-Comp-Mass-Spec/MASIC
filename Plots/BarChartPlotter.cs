@@ -6,7 +6,6 @@ using MASIC.Options;
 using OxyPlot;
 using OxyPlot.Series;
 using PRISM;
-using ColumnSeries = OxyPlot.Series.ColumnSeries;
 
 namespace MASIC.Plots
 {
@@ -82,10 +81,10 @@ namespace MASIC.Plots
             mBarChart.AddPoint(label, value);
         }
 
-        private void AddOxyPlotSeries(PlotModel myPlot, IReadOnlyCollection<ColumnItem> points)
+        private void AddOxyPlotSeries(PlotModel myPlot, IReadOnlyCollection<BarItem> points)
         {
             // A column series represents a bar chart with vertical bars
-            var series = new ColumnSeries();
+            var series = new BarSeries();
 
             if (points.Count == 0)
             {
@@ -206,11 +205,11 @@ namespace MASIC.Plots
                 return emptyContainer;
             }
 
-            var points = new List<ColumnItem>();
+            var points = new List<BarItem>();
 
             foreach (var dataPoint in dataPoints)
             {
-                var columnItem = new ColumnItem(dataPoint.Key) {
+                var columnItem = new BarItem(dataPoint.Key) {
                     Color = dataPoint.Value
                 };
 
