@@ -448,10 +448,7 @@ namespace MASIC.DataOutput
                 PeakWidthHistogram.Clear();
 
                 var scanNumbers = new List<int>();
-                foreach (var scanNumber in (from item in mScanList.Keys orderby item select item))
-                {
-                    scanNumbers.Add(scanNumber);
-                }
+                scanNumbers.AddRange(from item in mScanList.Keys orderby item select item);
 
                 var peakWidths = new List<double>();
 

@@ -3300,10 +3300,7 @@ namespace MASICBrowser
                 // Copy the smoothed data into udtSICStats.SICSmoothedYData
                 sicStats.SICSmoothedYData.Clear();
 
-                foreach (var dataPoint in intensities)
-                {
-                    sicStats.SICSmoothedYData.Add(dataPoint);
-                }
+                sicStats.SICSmoothedYData.AddRange(intensities);
             }
 
             if (repeatPeakFinding)

@@ -62,10 +62,7 @@ namespace MASIC.Plots
             var xAxisInfo = new AxisInfo(string.Empty);
             var xAxis = MakeCategoryAxis(AxisPosition.Bottom, xAxisInfo, PlotContainer.DEFAULT_BASE_FONT_SIZE);
 
-            foreach (var label in xAxisLabels)
-            {
-                xAxis.Labels.Add(label);
-            }
+            xAxis.Labels.AddRange(xAxisLabels);
 
             var yAxis = MakeYAxis(yAxisInfo, PlotContainer.DEFAULT_BASE_FONT_SIZE);
 
@@ -121,10 +118,7 @@ namespace MASIC.Plots
 
             var xAxis = MakeCategoryAxis(AxisPosition.Bottom, yAxisInfo, PlotContainer.DEFAULT_BASE_FONT_SIZE);
 
-            foreach (var label in xAxisLabels)
-            {
-                xAxis.Labels.Add(label);
-            }
+            xAxis.Labels.AddRange(xAxisLabels);
 
             var yAxis = MakeYAxis(yAxisInfo, PlotContainer.DEFAULT_BASE_FONT_SIZE);
 
