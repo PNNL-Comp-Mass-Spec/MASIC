@@ -9,3 +9,4 @@ using System.Diagnostics.CodeAnalysis;
 [assembly: SuppressMessage("Readability", "RCS1123:Add parentheses when necessary.", Justification = "Parentheses aren't needed", Scope = "module")]
 [assembly: SuppressMessage("Usage", "RCS1246:Use element access.", Justification = "Prefer to use .First()", Scope = "module")]
 [assembly: SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "Allowed legacy name", Scope = "type", Target = "~T:MASICPeakFinder.clsMASICPeakFinder")]
+[assembly: SuppressMessage("Style", "IDE0180:Use tuple to swap values", Justification = "Leave as-is for readability", Scope = "member", Target = "~M:MASICPeakFinder.PeakDetection.GaussJordan(System.Double[,]@,System.Int32,System.Double[]@)~System.Boolean")]

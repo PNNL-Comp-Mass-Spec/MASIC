@@ -804,6 +804,7 @@ namespace MagnitudeConcavityPeakFinder
                     {
                         for (var k = 0; k < termCount; k++)
                         {
+                            // ReSharper disable once SwapViaDeconstruction
                             var swapValue = A[k, indexR[L]];
                             A[k, indexR[L]] = A[k, indexC[L]];
                             A[k, indexC[L]] = swapValue;
