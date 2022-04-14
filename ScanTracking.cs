@@ -315,11 +315,12 @@ namespace MASIC
                     // Discard data below the noise level or below the minimum S/N level
                     // If we are searching for Reporter ions, it is important to not discard any of the ions in the region of the reporter ion m/z values
                     lastKnownLocation = "Call DiscardDataBelowNoiseThreshold";
-                    dataImportUtilities.DiscardDataBelowNoiseThreshold(msSpectrum,
-                                                                       scanInfo.BaselineNoiseStats.NoiseLevel,
-                                                                       mReporterIons.MZIntensityFilterIgnoreRangeStart,
-                                                                       mReporterIons.MZIntensityFilterIgnoreRangeEnd,
-                                                                       noiseThresholdOptions);
+                    dataImportUtilities.DiscardDataBelowNoiseThreshold(
+                        msSpectrum,
+                        scanInfo.BaselineNoiseStats.NoiseLevel,
+                        mReporterIons.MZIntensityFilterIgnoreRangeStart,
+                        mReporterIons.MZIntensityFilterIgnoreRangeEnd,
+                        noiseThresholdOptions);
 
                     scanInfo.IonCount = msSpectrum.IonCount;
                 }
@@ -352,10 +353,11 @@ namespace MASIC
                         mMaxIonCountReported = msSpectrum.IonCount;
                     }
 
-                    dataImportUtilities.DiscardDataToLimitIonCount(msSpectrum,
-                                                                   mReporterIons.MZIntensityFilterIgnoreRangeStart,
-                                                                   mReporterIons.MZIntensityFilterIgnoreRangeEnd,
-                                                                   MAX_ALLOWABLE_ION_COUNT);
+                    dataImportUtilities.DiscardDataToLimitIonCount(
+                        msSpectrum,
+                        mReporterIons.MZIntensityFilterIgnoreRangeStart,
+                        mReporterIons.MZIntensityFilterIgnoreRangeEnd,
+                        MAX_ALLOWABLE_ION_COUNT);
 
                     scanInfo.IonCount = msSpectrum.IonCount;
                 }

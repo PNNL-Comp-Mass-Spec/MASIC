@@ -175,9 +175,10 @@ namespace MagnitudeConcavityPeakFinder
                 intensityData[index] = xyData[index].Value;
             }
 
-            noiseAnalyzer.ComputeTrimmedNoiseLevel(intensityData, 0, intensityData.Length - 1,
-                                                   peakFinderOptions.SICBaselineNoiseOptions, ignoreNonPositiveData,
-                                                   out var baselineNoiseStats);
+            noiseAnalyzer.ComputeTrimmedNoiseLevel(
+                intensityData, 0, intensityData.Length - 1,
+                peakFinderOptions.SICBaselineNoiseOptions, ignoreNonPositiveData,
+                out var baselineNoiseStats);
 
             // Find maximumPotentialPeakArea and dataPointCountAboveThreshold
             var maximumPotentialPeakArea = FindMaximumPotentialPeakArea(intensityData, peakFinderOptions, baselineNoiseStats, out var dataPointCountAboveThreshold);
@@ -461,9 +462,10 @@ namespace MagnitudeConcavityPeakFinder
         {
             if (dataFile.Directory == null) return;
 
-            var resultsFilePath = Path.Combine(dataFile.Directory.FullName,
-                                               Path.GetFileNameWithoutExtension(dataFile.Name) + "_Peaks" +
-                                               dataFile.Extension);
+            var resultsFilePath = Path.Combine(
+                dataFile.Directory.FullName,
+                Path.GetFileNameWithoutExtension(dataFile.Name) + "_Peaks" +
+                dataFile.Extension);
 
             using var writer = new StreamWriter(new FileStream(resultsFilePath, FileMode.Create, FileAccess.Write, FileShare.Read));
 
@@ -1057,11 +1059,12 @@ namespace MagnitudeConcavityPeakFinder
 
             // Note that the SavitzkyGolayFilter doesn't work right for PolynomialDegree values greater than 0
             // Also note that a PolynomialDegree value of 0 results in the equivalent of a moving average filter
-            var success = dataFilter.SavitzkyGolayFilter(smoothedYData, startIndex,
-                                                       endIndex, filterThirdWidth,
-                                                       filterThirdWidth,
-                                                       peakFinderOptions.SavitzkyGolayFilterOrder,
-                                                       out errorMessage, true);
+            var success = dataFilter.SavitzkyGolayFilter(
+                smoothedYData, startIndex,
+                endIndex, filterThirdWidth,
+                filterThirdWidth,
+                peakFinderOptions.SavitzkyGolayFilterOrder,
+                out errorMessage, true);
 
             if (!success)
             {

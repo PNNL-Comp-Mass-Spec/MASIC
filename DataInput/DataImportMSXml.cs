@@ -232,8 +232,9 @@ namespace MASIC.DataInput
             {
                 var msXmlFileInfo = new FileInfo(filePath);
 
-                return ExtractScanInfoFromMzMLDataFile(msXmlFileInfo, scanList, spectraCache,
-                                                       dataOutputHandler, keepRawSpectra, keepMSMSSpectra);
+                return ExtractScanInfoFromMzMLDataFile(
+                    msXmlFileInfo, scanList, spectraCache,
+                    dataOutputHandler, keepRawSpectra, keepMSMSSpectra);
             }
             catch (Exception ex)
             {
@@ -263,8 +264,10 @@ namespace MASIC.DataInput
             try
             {
                 MsDataFileReaderBaseClass mzXmlReader = new MzXMLFileReader();
-                return ExtractScanInfoFromMSXMLDataFile(filePath, mzXmlReader, scanList, spectraCache,
-                                                        dataOutputHandler, keepRawSpectra, keepMSMSSpectra);
+
+                return ExtractScanInfoFromMSXMLDataFile(
+                    filePath, mzXmlReader, scanList, spectraCache,
+                    dataOutputHandler, keepRawSpectra, keepMSMSSpectra);
             }
             catch (Exception ex)
             {
@@ -294,9 +297,10 @@ namespace MASIC.DataInput
             try
             {
                 MsDataFileReaderBaseClass mzDataReader = new MzDataFileReader();
-                return ExtractScanInfoFromMSXMLDataFile(filePath, mzDataReader, scanList, spectraCache,
-                                                        dataOutputHandler,
-                                                        keepRawSpectra, keepMSMSSpectra);
+                return ExtractScanInfoFromMSXMLDataFile(
+                    filePath, mzDataReader, scanList, spectraCache,
+                    dataOutputHandler,
+                    keepRawSpectra, keepMSMSSpectra);
             }
             catch (Exception ex)
             {
@@ -405,9 +409,10 @@ namespace MASIC.DataInput
                     SimpleMzMLReader.SimpleSpectrum nullMzMLSpectrum = null;
 
                     // ReSharper disable once ExpressionIsAlwaysNull
-                    var extractSuccess = ExtractScanInfoCheckRange(msSpectrum, spectrumInfo, nullMzMLSpectrum,
-                                                                   scanList, spectraCache, dataOutputHandler,
-                                                                   percentComplete, mDatasetFileInfo.ScanCount);
+                    var extractSuccess = ExtractScanInfoCheckRange(
+                        msSpectrum, spectrumInfo, nullMzMLSpectrum,
+                        scanList, spectraCache, dataOutputHandler,
+                        percentComplete, mDatasetFileInfo.ScanCount);
 
                     if (!extractSuccess)
                     {
@@ -541,9 +546,11 @@ namespace MASIC.DataInput
 
                         var percentComplete = scanList.MasterScanOrderCount / (double)mzMLReader.NumSpectra * 100;
 
-                        var extractSuccess = ExtractScanInfoCheckRange(msSpectrum, mzXmlSourceSpectrum, mzMLSpectrum,
-                                                                       scanList, spectraCache, dataOutputHandler,
-                                                                       percentComplete, mDatasetFileInfo.ScanCount);
+                        var extractSuccess = ExtractScanInfoCheckRange(
+                            msSpectrum, mzXmlSourceSpectrum, mzMLSpectrum,
+                            scanList, spectraCache, dataOutputHandler,
+                            percentComplete, mDatasetFileInfo.ScanCount);
+
                         if (!extractSuccess)
                         {
                             break;
@@ -920,8 +927,9 @@ namespace MASIC.DataInput
                         scanTimeLookupErrors++;
                         if (scanTimeLookupErrors <= 5 || scanTimeLookupErrors >= nextWarningThreshold)
                         {
-                            ConsoleMsgUtils.ShowWarning("The elutionTimeToScanMap dictionary did not have scan time {0:N1} for {1}; this is unexpected",
-                                                        scanTimes[i], chromatogramItem.Id);
+                            ConsoleMsgUtils.ShowWarning(
+                                "The elutionTimeToScanMap dictionary did not have scan time {0:N1} for {1}; this is unexpected",
+                                scanTimes[i], chromatogramItem.Id);
 
                             if (scanTimeLookupErrors > 5)
                             {
@@ -978,9 +986,10 @@ namespace MASIC.DataInput
 
                 var percentComplete = scanList.MasterScanOrderCount / (double)simulatedSpectraByScan.Count * 100;
 
-                var extractSuccess = ExtractScanInfoCheckRange(msSpectrum, mzXmlSourceSpectrum, mzMLSpectrum,
-                                                               scanList, spectraCache, dataOutputHandler,
-                                                               percentComplete, mDatasetFileInfo.ScanCount);
+                var extractSuccess = ExtractScanInfoCheckRange(
+                    msSpectrum, mzXmlSourceSpectrum, mzMLSpectrum,
+                    scanList, spectraCache, dataOutputHandler,
+                    percentComplete, mDatasetFileInfo.ScanCount);
 
                 if (!extractSuccess)
                 {
@@ -1102,8 +1111,9 @@ namespace MASIC.DataInput
 
                     var massResolution = mCentroider.EstimateResolution(1000, 0.5, scanInfo.IsFTMS);
 
-                    var centroidSuccess = mCentroider.CentroidData(scanInfo, sourceMzs, sourceIntensities,
-                                                                   massResolution, out var centroidedPrecursorIonsMz, out var centroidedPrecursorIonsIntensity);
+                    var centroidSuccess = mCentroider.CentroidData(
+                        scanInfo, sourceMzs, sourceIntensities,
+                        massResolution, out var centroidedPrecursorIonsMz, out var centroidedPrecursorIonsIntensity);
 
                     if (centroidSuccess)
                     {
@@ -1241,10 +1251,12 @@ namespace MASIC.DataInput
                         mWarnCount++;
                         if (mWarnCount <= 5)
                         {
-                            ReportError("Warning: m/z range for SRM scan " + spectrumInfo.ScanNumber + " is " +
-                                            (spectrumInfo.MzRangeEnd - spectrumInfo.MzRangeStart).ToString("0.0") +
-                                            " m/z; this is likely a MRM scan, but MASIC doesn't support inferring the " +
-                                            "MRM transition masses from the observed m/z values.  Results will likely not be meaningful");
+                            ReportError(
+                                "Warning: m/z range for SRM scan " + spectrumInfo.ScanNumber + " is " +
+                                (spectrumInfo.MzRangeEnd - spectrumInfo.MzRangeStart).ToString("0.0") +
+                                " m/z; this is likely a MRM scan, but MASIC doesn't support inferring the " +
+                                "MRM transition masses from the observed m/z values.  Results will likely not be meaningful");
+
                             if (mWarnCount == 5)
                             {
                                 ReportMessage("Additional m/z range warnings will not be shown");
@@ -1306,14 +1318,16 @@ namespace MASIC.DataInput
             if (mrmScanType == MRMScanTypeConstants.NotMRM)
             {
                 // This is not an MRM scan
-                mParentIonProcessor.AddUpdateParentIons(scanList, mLastNonZoomSurveyScanIndex, spectrumInfo.ParentIonMZ,
-                                                        fragScanIndex, spectraCache, sicOptions);
+                mParentIonProcessor.AddUpdateParentIons(
+                    scanList, mLastNonZoomSurveyScanIndex, spectrumInfo.ParentIonMZ,
+                    fragScanIndex, spectraCache, sicOptions);
             }
             else
             {
                 // This is an MRM scan
-                mParentIonProcessor.AddUpdateParentIons(scanList, mLastNonZoomSurveyScanIndex, spectrumInfo.ParentIonMZ,
-                                                        scanInfo.MRMScanInfo, spectraCache, sicOptions);
+                mParentIonProcessor.AddUpdateParentIons(
+                    scanList, mLastNonZoomSurveyScanIndex, spectrumInfo.ParentIonMZ,
+                    scanInfo.MRMScanInfo, spectraCache, sicOptions);
             }
 
             if (mLastNonZoomSurveyScanIndex >= 0)

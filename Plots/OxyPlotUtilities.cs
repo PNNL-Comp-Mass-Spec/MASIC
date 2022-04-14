@@ -63,11 +63,13 @@ namespace MASIC.Plots
             {
                 AxisKey = "Category"
             };
+
             var xAxis = MakeCategoryAxis(AxisPosition.Bottom, xAxisInfo, PlotContainer.DEFAULT_BASE_FONT_SIZE);
 
             xAxis.Labels.AddRange(xAxisLabels);
 
             yAxisInfo.AxisKey = "Value";
+
             var yAxis = MakeYAxis(yAxisInfo, PlotContainer.DEFAULT_BASE_FONT_SIZE);
 
             var yAxisFormatString = AddAxes(myPlot, xAxis, yAxis, yAxisInfo);
@@ -216,6 +218,7 @@ namespace MASIC.Plots
             {
                 Angle = 30
             };
+
             InitializeAxis(categoryAxis, position, axisInfo, baseFontSize, true);
 
             return categoryAxis;

@@ -595,9 +595,10 @@ namespace MASIC
                         var useScan = false;
                         for (var mrmMassIndex = 0; mrmMassIndex < fragScan.MRMScanInfo.MRMMassCount; mrmMassIndex++)
                         {
-                            if (MRMParentDaughterMatch(fragScan.MRMScanInfo.ParentIonMZ,
-                                                       fragScan.MRMScanInfo.MRMMassList[mrmMassIndex].CentralMass,
-                                                       parentIonMZ, mrmDaughterMZ))
+                            if (MRMParentDaughterMatch(
+                                fragScan.MRMScanInfo.ParentIonMZ,
+                                fragScan.MRMScanInfo.MRMMassList[mrmMassIndex].CentralMass,
+                                parentIonMZ, mrmDaughterMZ))
                             {
                                 useScan = true;
                                 break;
@@ -609,11 +610,13 @@ namespace MASIC
 
                         // Include this scan in the SIC for this parent ion
 
-                        mDataAggregation.FindMaxValueInMZRange(spectraCache,
-                                                               scanList.FragScans[scanIndex],
-                                                               mrmDaughterMZ - searchToleranceHalfWidth,
-                                                               mrmDaughterMZ + searchToleranceHalfWidth,
-                                                               out var closestMZ, out var matchIntensity);
+                        mDataAggregation.FindMaxValueInMZRange(
+                            spectraCache,
+                            scanList.FragScans[scanIndex],
+                            mrmDaughterMZ - searchToleranceHalfWidth,
+                            mrmDaughterMZ + searchToleranceHalfWidth,
+                            out var closestMZ,
+                            out var matchIntensity);
 
                         sicDetails.AddData(fragScan.ScanNumber, matchIntensity, closestMZ, scanIndex);
                     }
@@ -621,11 +624,12 @@ namespace MASIC
                     // Step 2: Find the largest peak in the SIC
 
                     // Compute the noise level; the noise level may change with increasing index number if the background is increasing for a given m/z
-                    var success = peakFinder.ComputeDualTrimmedNoiseLevelTTest(sicDetails.SICIntensities, 0,
-                                                                               sicDetails.SICDataCount - 1,
-                                                                               mOptions.SICOptions.SICPeakFinderOptions.
-                                                                               SICBaselineNoiseOptions,
-                                                                               out var noiseStatsSegments);
+                    var success = peakFinder.ComputeDualTrimmedNoiseLevelTTest(
+                        sicDetails.SICIntensities, 0,
+                        sicDetails.SICDataCount - 1,
+                        mOptions.SICOptions.SICPeakFinderOptions.
+                        SICBaselineNoiseOptions,
+                        out var noiseStatsSegments);
 
                     if (!success)
                     {
@@ -650,9 +654,10 @@ namespace MASIC
                     }
 
                     // Compute the minimum potential peak area in the entire SIC, populating potentialAreaStatsInFullSIC
-                    peakFinder.FindPotentialPeakArea(sicDetails.SICData,
-                                                     out var potentialAreaStatsInFullSIC,
-                                                     mOptions.SICOptions.SICPeakFinderOptions);
+                    peakFinder.FindPotentialPeakArea(
+                        sicDetails.SICData,
+                        out var potentialAreaStatsInFullSIC,
+                        mOptions.SICOptions.SICPeakFinderOptions);
 
                     // Update .BaselineNoiseStats in scanList.ParentIons(parentIonIndex).SICStats.Peak
                     scanList.ParentIons[parentIonIndex].SICStats.Peak.BaselineNoiseStats = peakFinder.LookupNoiseStatsUsingSegments(
@@ -664,18 +669,20 @@ namespace MASIC
                     // Clear potentialAreaStatsForPeak
                     parentIon.SICStats.SICPotentialAreaStatsForPeak = new SICPotentialAreaStats();
 
-                    var peakIsValid = peakFinder.FindSICPeakAndArea(sicDetails.SICData,
-                                                                    out var potentialAreaStatsForPeakOut,
-                                                                    parentIon.SICStats.Peak, out var smoothedYDataSubset,
-                                                                    mOptions.SICOptions.SICPeakFinderOptions,
-                                                                    potentialAreaStatsInFullSIC, false,
-                                                                    scanList.SIMDataPresent, false);
+                    var peakIsValid = peakFinder.FindSICPeakAndArea(
+                        sicDetails.SICData,
+                        out var potentialAreaStatsForPeakOut,
+                        parentIon.SICStats.Peak, out var smoothedYDataSubset,
+                        mOptions.SICOptions.SICPeakFinderOptions,
+                        potentialAreaStatsInFullSIC, false,
+                        scanList.SIMDataPresent, false);
 
                     parentIon.SICStats.SICPotentialAreaStatsForPeak = potentialAreaStatsForPeakOut;
 
-                    sicProcessor.StorePeakInParentIon(scanList, parentIonIndex, sicDetails,
-                                                      parentIon.SICStats.SICPotentialAreaStatsForPeak,
-                                                      parentIon.SICStats.Peak, peakIsValid);
+                    sicProcessor.StorePeakInParentIon(
+                        scanList, parentIonIndex, sicDetails,
+                        parentIon.SICStats.SICPotentialAreaStatsForPeak,
+                        parentIon.SICStats.Peak, peakIsValid);
 
                     // Step 3: store the results
 
@@ -683,8 +690,9 @@ namespace MASIC
                     mDataOutputHandler.SaveSICDataToText(mOptions.SICOptions, scanList, parentIonIndex, sicDetails);
 
                     // Save the stats for this SIC to the XML file
-                    xmlResultsWriter.SaveDataToXML(scanList, parentIonIndex, sicDetails, smoothedYDataSubset,
-                                                   mDataOutputHandler);
+                    xmlResultsWriter.SaveDataToXML(
+                        scanList, parentIonIndex, sicDetails,
+                        smoothedYDataSubset, mDataOutputHandler);
 
                     parentIonsProcessed++;
 

@@ -690,8 +690,10 @@ namespace MASIC
             }
 
             // Resize the target list capacity to large enough to hold all data.
-            reporterIonStats.DataColumns.Capacity = reporterIntensityList.Count + 3 + obsMZList.Count + uncorrectedIntensityList.Count +
-                                                    ftmsSignalToNoise.Count + ftmsResolution.Count;
+            reporterIonStats.DataColumns.Capacity =
+                reporterIntensityList.Count + 3 +
+                obsMZList.Count + uncorrectedIntensityList.Count +
+                ftmsSignalToNoise.Count + ftmsResolution.Count;
 
             // Append the maximum reporter ion intensity, then the individual reporter ion intensities
             reporterIonStats.DataColumns.Add(StringUtilities.DblToString(reporterIntensityMax, 2));

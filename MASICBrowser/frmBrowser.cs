@@ -509,10 +509,12 @@ namespace MASICBrowser
                     }
                 }
 
-                mMASICPeakFinder.FindSICPeakAndArea(parentIon.SICData, out var potentialAreaStatsForPeak, sicStats.Peak,
-                                                    out var smoothedYDataSubset, mSICPeakFinderOptions,
-                                                    sicPotentialAreaStatsForRegion,
-                                                    returnClosestPeak, false, recomputeNoiseLevel);
+                mMASICPeakFinder.FindSICPeakAndArea(
+                    parentIon.SICData, out var potentialAreaStatsForPeak, sicStats.Peak,
+                    out var smoothedYDataSubset, mSICPeakFinderOptions,
+                    sicPotentialAreaStatsForRegion,
+                    returnClosestPeak, false, recomputeNoiseLevel);
+
                 sicStats.SICPotentialAreaStatsForPeak = potentialAreaStatsForPeak;
 
                 // Copy the data out of smoothedYDataSubset and into sicStats.SICSmoothedYData
@@ -528,8 +530,9 @@ namespace MASICBrowser
                 try
                 {
                     // Update the two computed values
-                    sicStats.SICPeakWidthFullScans = mParentIonStats[parentIonIndex].SICData[sicStats.Peak.IndexBaseRight].ScanNumber -
-                                                     mParentIonStats[parentIonIndex].SICData[sicStats.Peak.IndexBaseLeft].ScanNumber + 1;
+                    sicStats.SICPeakWidthFullScans =
+                        mParentIonStats[parentIonIndex].SICData[sicStats.Peak.IndexBaseRight].ScanNumber -
+                        mParentIonStats[parentIonIndex].SICData[sicStats.Peak.IndexBaseLeft].ScanNumber + 1;
 
                     sicStats.ScanNumberMaxIntensity = mParentIonStats[parentIonIndex].SICData[sicStats.Peak.IndexMax].ScanNumber;
                 }
@@ -1458,8 +1461,9 @@ namespace MASICBrowser
                 var fragScanObserved = currentParentIon.FragScanObserved;
 
                 const int seriesToUse = 0;
-                mSpectrum.SetAnnotationForDataPoint(fragScanObserved, scanObservedIntensity, "MS2",
-                                                    seriesToUse, captionOffsetDirection, arrowLengthPixels);
+                mSpectrum.SetAnnotationForDataPoint(
+                    fragScanObserved, scanObservedIntensity, "MS2",
+                    seriesToUse, captionOffsetDirection, arrowLengthPixels);
 
                 if (mnuEditShowOptimalPeakApexCursor.Checked)
                 {
@@ -2801,8 +2805,9 @@ namespace MASICBrowser
                     for (var index = 0; index < mParentIonStats.Count; index++)
                     {
                         var ionStats = mParentIonStats[index];
-                        if (SortDataFilterCheck(ionStats.SICStats.Peak.MaxIntensityValue, ionStats.SICStats.Peak.SignalToNoiseRatio, ionStats.MZ,
-                                                minimumIntensity, minimumSN, mzFilter, mzFilterTol, ionStats.CustomSICPeak))
+                        if (SortDataFilterCheck(
+                                ionStats.SICStats.Peak.MaxIntensityValue, ionStats.SICStats.Peak.SignalToNoiseRatio, ionStats.MZ,
+                                minimumIntensity, minimumSN, mzFilter, mzFilterTol, ionStats.CustomSICPeak))
                         {
                             mParentIonPointerArray[mParentIonPointerArrayCount] = index;
                             sortKeys[mParentIonPointerArrayCount] = mParentIonStats[index].Index;
@@ -2815,8 +2820,9 @@ namespace MASICBrowser
                     for (var index = 0; index < mParentIonStats.Count; index++)
                     {
                         var ionStats = mParentIonStats[index];
-                        if (SortDataFilterCheck(ionStats.SICStats.Peak.MaxIntensityValue, ionStats.SICStats.Peak.SignalToNoiseRatio, ionStats.MZ,
-                                                minimumIntensity, minimumSN, mzFilter, mzFilterTol, ionStats.CustomSICPeak))
+                        if (SortDataFilterCheck(
+                                ionStats.SICStats.Peak.MaxIntensityValue, ionStats.SICStats.Peak.SignalToNoiseRatio, ionStats.MZ,
+                                minimumIntensity, minimumSN, mzFilter, mzFilterTol, ionStats.CustomSICPeak))
                         {
                             mParentIonPointerArray[mParentIonPointerArrayCount] = index;
                             sortKeys[mParentIonPointerArrayCount] = mParentIonStats[index].SICStats.ScanNumberMaxIntensity;
@@ -2829,8 +2835,9 @@ namespace MASICBrowser
                     for (var index = 0; index < mParentIonStats.Count; index++)
                     {
                         var ionStats = mParentIonStats[index];
-                        if (SortDataFilterCheck(ionStats.SICStats.Peak.MaxIntensityValue, ionStats.SICStats.Peak.SignalToNoiseRatio, ionStats.MZ,
-                                                minimumIntensity, minimumSN, mzFilter, mzFilterTol, ionStats.CustomSICPeak))
+                        if (SortDataFilterCheck(
+                                ionStats.SICStats.Peak.MaxIntensityValue, ionStats.SICStats.Peak.SignalToNoiseRatio, ionStats.MZ,
+                                minimumIntensity, minimumSN, mzFilter, mzFilterTol, ionStats.CustomSICPeak))
                         {
                             mParentIonPointerArray[mParentIonPointerArrayCount] = index;
                             sortKeys[mParentIonPointerArrayCount] = double.Parse(mParentIonStats[index].OptimalPeakApexScanNumber + "." + Math.Round(mParentIonStats[index].MZ, 0).ToString("0000") + mParentIonStats[index].Index.ToString("00000"));
@@ -2843,8 +2850,9 @@ namespace MASICBrowser
                     for (var index = 0; index < mParentIonStats.Count; index++)
                     {
                         var ionStats = mParentIonStats[index];
-                        if (SortDataFilterCheck(ionStats.SICStats.Peak.MaxIntensityValue, ionStats.SICStats.Peak.SignalToNoiseRatio, ionStats.MZ,
-                                                minimumIntensity, minimumSN, mzFilter, mzFilterTol, ionStats.CustomSICPeak))
+                        if (SortDataFilterCheck(
+                                ionStats.SICStats.Peak.MaxIntensityValue, ionStats.SICStats.Peak.SignalToNoiseRatio, ionStats.MZ,
+                                minimumIntensity, minimumSN, mzFilter, mzFilterTol, ionStats.CustomSICPeak))
                         {
                             mParentIonPointerArray[mParentIonPointerArrayCount] = index;
                             sortKeys[mParentIonPointerArrayCount] = double.Parse(Math.Round(mParentIonStats[index].MZ, 2) + mParentIonStats[index].SICStats.ScanNumberMaxIntensity.ToString("000000"));
@@ -2857,8 +2865,9 @@ namespace MASICBrowser
                     for (var index = 0; index < mParentIonStats.Count; index++)
                     {
                         var ionStats = mParentIonStats[index];
-                        if (SortDataFilterCheck(ionStats.SICStats.Peak.MaxIntensityValue, ionStats.SICStats.Peak.SignalToNoiseRatio, ionStats.MZ,
-                                                minimumIntensity, minimumSN, mzFilter, mzFilterTol, ionStats.CustomSICPeak))
+                        if (SortDataFilterCheck(
+                                ionStats.SICStats.Peak.MaxIntensityValue, ionStats.SICStats.Peak.SignalToNoiseRatio, ionStats.MZ,
+                                minimumIntensity, minimumSN, mzFilter, mzFilterTol, ionStats.CustomSICPeak))
                         {
                             mParentIonPointerArray[mParentIonPointerArrayCount] = index;
                             sortKeys[mParentIonPointerArrayCount] = mParentIonStats[index].SICStats.Peak.SignalToNoiseRatio;
@@ -2871,8 +2880,9 @@ namespace MASICBrowser
                     for (var index = 0; index < mParentIonStats.Count; index++)
                     {
                         var ionStats = mParentIonStats[index];
-                        if (SortDataFilterCheck(ionStats.SICStats.Peak.MaxIntensityValue, ionStats.SICStats.Peak.SignalToNoiseRatio, ionStats.MZ,
-                                                minimumIntensity, minimumSN, mzFilter, mzFilterTol, ionStats.CustomSICPeak))
+                        if (SortDataFilterCheck(
+                                ionStats.SICStats.Peak.MaxIntensityValue, ionStats.SICStats.Peak.SignalToNoiseRatio, ionStats.MZ,
+                                minimumIntensity, minimumSN, mzFilter, mzFilterTol, ionStats.CustomSICPeak))
                         {
                             mParentIonPointerArray[mParentIonPointerArrayCount] = index;
                             sortKeys[mParentIonPointerArrayCount] = clsMASICPeakFinder.BaselineAdjustIntensity(mParentIonStats[index].SICStats.Peak, true);
@@ -2886,8 +2896,9 @@ namespace MASICBrowser
                     for (var index = 0; index < mParentIonStats.Count; index++)
                     {
                         var ionStats = mParentIonStats[index];
-                        if (SortDataFilterCheck(ionStats.SICStats.Peak.MaxIntensityValue, ionStats.SICStats.Peak.SignalToNoiseRatio, ionStats.MZ,
-                                                minimumIntensity, minimumSN, mzFilter, mzFilterTol, ionStats.CustomSICPeak))
+                        if (SortDataFilterCheck(
+                                ionStats.SICStats.Peak.MaxIntensityValue, ionStats.SICStats.Peak.SignalToNoiseRatio, ionStats.MZ,
+                                minimumIntensity, minimumSN, mzFilter, mzFilterTol, ionStats.CustomSICPeak))
                         {
                             mParentIonPointerArray[mParentIonPointerArrayCount] = index;
                             {
@@ -2904,13 +2915,16 @@ namespace MASICBrowser
                     for (var index = 0; index < mParentIonStats.Count; index++)
                     {
                         var ionStats = mParentIonStats[index];
-                        if (SortDataFilterCheck(ionStats.SICStats.Peak.MaxIntensityValue, ionStats.SICStats.Peak.SignalToNoiseRatio, ionStats.MZ,
-                                                minimumIntensity, minimumSN, mzFilter, mzFilterTol, ionStats.CustomSICPeak))
+                        if (SortDataFilterCheck(
+                                ionStats.SICStats.Peak.MaxIntensityValue, ionStats.SICStats.Peak.SignalToNoiseRatio, ionStats.MZ,
+                                minimumIntensity, minimumSN, mzFilter, mzFilterTol, ionStats.CustomSICPeak))
                         {
                             mParentIonPointerArray[mParentIonPointerArrayCount] = index;
                             // Create a sort key that is based on both PeakFWHMScans and ScanNumberMaxIntensity by separating the two integers with a "."
-                            sortKeys[mParentIonPointerArrayCount] = GetSortKey(mParentIonStats[index].SICStats.Peak.FWHMScanWidth,
-                                                                               mParentIonStats[index].SICStats.ScanNumberMaxIntensity);
+                            sortKeys[mParentIonPointerArrayCount] = GetSortKey(
+                                mParentIonStats[index].SICStats.Peak.FWHMScanWidth,
+                                mParentIonStats[index].SICStats.ScanNumberMaxIntensity);
+
                             mParentIonPointerArrayCount++;
                         }
                     }
@@ -2920,8 +2934,9 @@ namespace MASICBrowser
                     for (var index = 0; index < mParentIonStats.Count; index++)
                     {
                         var ionStats = mParentIonStats[index];
-                        if (SortDataFilterCheck(ionStats.SICStats.Peak.MaxIntensityValue, ionStats.SICStats.Peak.SignalToNoiseRatio, ionStats.MZ,
-                                                minimumIntensity, minimumSN, mzFilter, mzFilterTol, ionStats.CustomSICPeak))
+                        if (SortDataFilterCheck(
+                                ionStats.SICStats.Peak.MaxIntensityValue, ionStats.SICStats.Peak.SignalToNoiseRatio, ionStats.MZ,
+                                minimumIntensity, minimumSN, mzFilter, mzFilterTol, ionStats.CustomSICPeak))
                         {
                             mParentIonPointerArray[mParentIonPointerArrayCount] = index;
                             sortKeys[mParentIonPointerArrayCount] = Math.Round(mParentIonStats[index].SICIntensityMax, 0);
@@ -2944,8 +2959,9 @@ namespace MASICBrowser
                     for (var index = 0; index < mParentIonStats.Count; index++)
                     {
                         var ionStats = mParentIonStats[index];
-                        if (SortDataFilterCheck(ionStats.SICStats.Peak.MaxIntensityValue, ionStats.SICStats.Peak.SignalToNoiseRatio, ionStats.MZ,
-                                                minimumIntensity, minimumSN, mzFilter, mzFilterTol, ionStats.CustomSICPeak))
+                        if (SortDataFilterCheck(
+                                ionStats.SICStats.Peak.MaxIntensityValue, ionStats.SICStats.Peak.SignalToNoiseRatio, ionStats.MZ,
+                                minimumIntensity, minimumSN, mzFilter, mzFilterTol, ionStats.CustomSICPeak))
                         {
                             mParentIonPointerArray[mParentIonPointerArrayCount] = index;
                             sortKeys[mParentIonPointerArrayCount] = mParentIonStats[index].SICStats.Peak.MaxIntensityValue;
@@ -2958,8 +2974,9 @@ namespace MASICBrowser
                     for (var index = 0; index < mParentIonStats.Count; index++)
                     {
                         var ionStats = mParentIonStats[index];
-                        if (SortDataFilterCheck(ionStats.SICStats.Peak.MaxIntensityValue, ionStats.SICStats.Peak.SignalToNoiseRatio, ionStats.MZ,
-                                                minimumIntensity, minimumSN, mzFilter, mzFilterTol, ionStats.CustomSICPeak))
+                        if (SortDataFilterCheck(
+                                ionStats.SICStats.Peak.MaxIntensityValue, ionStats.SICStats.Peak.SignalToNoiseRatio, ionStats.MZ,
+                                minimumIntensity, minimumSN, mzFilter, mzFilterTol, ionStats.CustomSICPeak))
                         {
                             mParentIonPointerArray[mParentIonPointerArrayCount] = index;
                             sortKeys[mParentIonPointerArrayCount] = mParentIonStats[index].SICStats.Peak.Area;
@@ -2972,13 +2989,16 @@ namespace MASICBrowser
                     for (var index = 0; index < mParentIonStats.Count; index++)
                     {
                         var ionStats = mParentIonStats[index];
-                        if (SortDataFilterCheck(ionStats.SICStats.Peak.MaxIntensityValue, ionStats.SICStats.Peak.SignalToNoiseRatio, ionStats.MZ,
-                                                minimumIntensity, minimumSN, mzFilter, mzFilterTol, ionStats.CustomSICPeak))
+                        if (SortDataFilterCheck(
+                                ionStats.SICStats.Peak.MaxIntensityValue, ionStats.SICStats.Peak.SignalToNoiseRatio, ionStats.MZ,
+                                minimumIntensity, minimumSN, mzFilter, mzFilterTol, ionStats.CustomSICPeak))
                         {
                             mParentIonPointerArray[mParentIonPointerArrayCount] = index;
                             // Create a sort key that is based on both FragScan-OptimalPeakApexScanNumber and OptimalPeakApexScanNumber by separating the two integers with a "."
-                            sortKeys[mParentIonPointerArrayCount] = GetSortKey(mParentIonStats[index].FragScanObserved - mParentIonStats[index].OptimalPeakApexScanNumber,
-                                                                               mParentIonStats[index].OptimalPeakApexScanNumber);
+                            sortKeys[mParentIonPointerArrayCount] = GetSortKey(
+                                mParentIonStats[index].FragScanObserved - mParentIonStats[index].OptimalPeakApexScanNumber,
+                                mParentIonStats[index].OptimalPeakApexScanNumber);
+
                             mParentIonPointerArrayCount++;
                         }
                     }
@@ -2988,13 +3008,16 @@ namespace MASICBrowser
                     for (var index = 0; index < mParentIonStats.Count; index++)
                     {
                         var ionStats = mParentIonStats[index];
-                        if (SortDataFilterCheck(ionStats.SICStats.Peak.MaxIntensityValue, ionStats.SICStats.Peak.SignalToNoiseRatio, ionStats.MZ,
-                                                minimumIntensity, minimumSN, mzFilter, mzFilterTol, ionStats.CustomSICPeak))
+                        if (SortDataFilterCheck(
+                                ionStats.SICStats.Peak.MaxIntensityValue, ionStats.SICStats.Peak.SignalToNoiseRatio, ionStats.MZ,
+                                minimumIntensity, minimumSN, mzFilter, mzFilterTol, ionStats.CustomSICPeak))
                         {
                             mParentIonPointerArray[mParentIonPointerArrayCount] = index;
                             // Create a sort key that is based on both ScanNumberMaxIntensity-OptimalPeakApexScanNumber and OptimalPeakApexScanNumber by separating the two integers with a "."
-                            sortKeys[mParentIonPointerArrayCount] = GetSortKey(mParentIonStats[index].SICStats.ScanNumberMaxIntensity - mParentIonStats[index].OptimalPeakApexScanNumber,
-                                                                               mParentIonStats[index].OptimalPeakApexScanNumber);
+                            sortKeys[mParentIonPointerArrayCount] = GetSortKey(
+                                mParentIonStats[index].SICStats.ScanNumberMaxIntensity - mParentIonStats[index].OptimalPeakApexScanNumber,
+                                mParentIonStats[index].OptimalPeakApexScanNumber);
+
                             mParentIonPointerArrayCount++;
                         }
                     }
@@ -3004,13 +3027,16 @@ namespace MASICBrowser
                     for (var index = 0; index < mParentIonStats.Count; index++)
                     {
                         var ionStats = mParentIonStats[index];
-                        if (SortDataFilterCheck(ionStats.SICStats.Peak.MaxIntensityValue, ionStats.SICStats.Peak.SignalToNoiseRatio, ionStats.MZ,
-                                                minimumIntensity, minimumSN, mzFilter, mzFilterTol, ionStats.CustomSICPeak))
+                        if (SortDataFilterCheck(
+                                ionStats.SICStats.Peak.MaxIntensityValue, ionStats.SICStats.Peak.SignalToNoiseRatio, ionStats.MZ,
+                                minimumIntensity, minimumSN, mzFilter, mzFilterTol, ionStats.CustomSICPeak))
                         {
                             mParentIonPointerArray[mParentIonPointerArrayCount] = index;
                             // Create a sort key that is based on both ShoulderCount and OptimalPeakApexScanNumber by separating the two integers with a "."
-                            sortKeys[mParentIonPointerArrayCount] = GetSortKey(mParentIonStats[index].SICStats.Peak.ShoulderCount,
-                                                                               mParentIonStats[index].OptimalPeakApexScanNumber);
+                            sortKeys[mParentIonPointerArrayCount] = GetSortKey(
+                                mParentIonStats[index].SICStats.Peak.ShoulderCount,
+                                mParentIonStats[index].OptimalPeakApexScanNumber);
+
                             mParentIonPointerArrayCount++;
                         }
                     }
@@ -3020,8 +3046,9 @@ namespace MASICBrowser
                     for (var index = 0; index < mParentIonStats.Count; index++)
                     {
                         var ionStats = mParentIonStats[index];
-                        if (SortDataFilterCheck(ionStats.SICStats.Peak.MaxIntensityValue, ionStats.SICStats.Peak.SignalToNoiseRatio, ionStats.MZ,
-                                                minimumIntensity, minimumSN, mzFilter, mzFilterTol, ionStats.CustomSICPeak))
+                        if (SortDataFilterCheck(
+                                ionStats.SICStats.Peak.MaxIntensityValue, ionStats.SICStats.Peak.SignalToNoiseRatio, ionStats.MZ,
+                                minimumIntensity, minimumSN, mzFilter, mzFilterTol, ionStats.CustomSICPeak))
                         {
                             mParentIonPointerArray[mParentIonPointerArrayCount] = index;
                             sortKeys[mParentIonPointerArrayCount] = mParentIonStats[index].SICStats.Peak.ParentIonIntensity;
@@ -3034,8 +3061,9 @@ namespace MASICBrowser
                     for (var index = 0; index < mParentIonStats.Count; index++)
                     {
                         var ionStats = mParentIonStats[index];
-                        if (SortDataFilterCheck(ionStats.SICStats.Peak.MaxIntensityValue, ionStats.SICStats.Peak.SignalToNoiseRatio, ionStats.MZ,
-                                                minimumIntensity, minimumSN, mzFilter, mzFilterTol, ionStats.CustomSICPeak))
+                        if (SortDataFilterCheck(
+                                ionStats.SICStats.Peak.MaxIntensityValue, ionStats.SICStats.Peak.SignalToNoiseRatio, ionStats.MZ,
+                                minimumIntensity, minimumSN, mzFilter, mzFilterTol, ionStats.CustomSICPeak))
                         {
                             mParentIonPointerArray[mParentIonPointerArrayCount] = index;
                             sortKeys[mParentIonPointerArrayCount] = mParentIonStats[index].SICStats.Peak.StatisticalMoments.Skew;
@@ -3048,8 +3076,9 @@ namespace MASICBrowser
                     for (var index = 0; index < mParentIonStats.Count; index++)
                     {
                         var ionStats = mParentIonStats[index];
-                        if (SortDataFilterCheck(ionStats.SICStats.Peak.MaxIntensityValue, ionStats.SICStats.Peak.SignalToNoiseRatio, ionStats.MZ,
-                                                minimumIntensity, minimumSN, mzFilter, mzFilterTol, ionStats.CustomSICPeak))
+                        if (SortDataFilterCheck(
+                                ionStats.SICStats.Peak.MaxIntensityValue, ionStats.SICStats.Peak.SignalToNoiseRatio, ionStats.MZ,
+                                minimumIntensity, minimumSN, mzFilter, mzFilterTol, ionStats.CustomSICPeak))
                         {
                             mParentIonPointerArray[mParentIonPointerArrayCount] = index;
                             sortKeys[mParentIonPointerArrayCount] = mParentIonStats[index].SICStats.Peak.StatisticalMoments.KSStat;
@@ -3062,12 +3091,15 @@ namespace MASICBrowser
                     for (var index = 0; index < mParentIonStats.Count; index++)
                     {
                         var ionStats = mParentIonStats[index];
-                        if (SortDataFilterCheck(ionStats.SICStats.Peak.MaxIntensityValue, ionStats.SICStats.Peak.SignalToNoiseRatio, ionStats.MZ,
-                                                minimumIntensity, minimumSN, mzFilter, mzFilterTol, ionStats.CustomSICPeak))
+                        if (SortDataFilterCheck(
+                                ionStats.SICStats.Peak.MaxIntensityValue, ionStats.SICStats.Peak.SignalToNoiseRatio, ionStats.MZ,
+                                minimumIntensity, minimumSN, mzFilter, mzFilterTol, ionStats.CustomSICPeak))
                         {
                             mParentIonPointerArray[mParentIonPointerArrayCount] = index;
-                            sortKeys[mParentIonPointerArrayCount] = GetSortKey((int)Math.Round(mParentIonStats[index].SICStats.Peak.BaselineNoiseStats.NoiseLevel, 0),
-                                                                               mParentIonStats[index].SICStats.Peak.SignalToNoiseRatio);
+                            sortKeys[mParentIonPointerArrayCount] = GetSortKey(
+                                (int)Math.Round(mParentIonStats[index].SICStats.Peak.BaselineNoiseStats.NoiseLevel, 0),
+                                mParentIonStats[index].SICStats.Peak.SignalToNoiseRatio);
+
                             mParentIonPointerArrayCount++;
                         }
                     }
@@ -3285,10 +3317,11 @@ namespace MASICBrowser
 
                     // Note that the SavitzkyGolayFilter doesn't work right for PolynomialDegree values greater than 0
                     // Also note that a PolynomialDegree value of 0 results in the equivalent of a moving average filter
-                    dataFilter.SavitzkyGolayFilter(intensities,
-                                                  0, currentParentIon.SICData.Count - 1,
-                                                  filterThirdWidth, filterThirdWidth,
-                                                  (short)savitzkyGolayFilterOrder, out _, true);
+                    dataFilter.SavitzkyGolayFilter(
+                        intensities,
+                        0, currentParentIon.SICData.Count - 1,
+                        filterThirdWidth, filterThirdWidth,
+                        (short)savitzkyGolayFilterOrder, out _, true);
                 }
                 else
                 {

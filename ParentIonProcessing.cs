@@ -437,9 +437,10 @@ namespace MASIC
 
             for (var index = 0; index < fragSpectrum.IonCount; index++)
             {
-                if (!Utilities.CheckPointInMZIgnoreRange(fragSpectrum.IonsMZ[index],
-                                                            mReporterIons.MZIntensityFilterIgnoreRangeStart,
-                                                            mReporterIons.MZIntensityFilterIgnoreRangeEnd))
+                if (!Utilities.CheckPointInMZIgnoreRange(
+                        fragSpectrum.IonsMZ[index],
+                          mReporterIons.MZIntensityFilterIgnoreRangeStart,
+                          mReporterIons.MZIntensityFilterIgnoreRangeEnd))
                 {
                     xData.Add((float)(fragSpectrum.IonsMZ[index]));
                     yData.Add((float)(fragSpectrum.IonsIntensity[index]));
@@ -701,48 +702,57 @@ namespace MASIC
                             if (currentMZ < double.Epsilon)
                                 continue;
 
-                            FindSimilarParentIonsWork(spectraCache, currentMZ, 0, originalIndex,
-                                                      scanList, similarParentIonsData,
-                                                      masicOptions, dataImportUtilities, searchRange);
+                            FindSimilarParentIonsWork(
+                                spectraCache, currentMZ, 0, originalIndex,
+                                scanList, similarParentIonsData,
+                                masicOptions, dataImportUtilities, searchRange);
 
                             // Look for similar 1+ spaced m/z values
-                            FindSimilarParentIonsWork(spectraCache, currentMZ, 1, originalIndex,
-                                                      scanList, similarParentIonsData,
-                                                      masicOptions, dataImportUtilities, searchRange);
+                            FindSimilarParentIonsWork(
+                                spectraCache, currentMZ, 1, originalIndex,
+                                scanList, similarParentIonsData,
+                                masicOptions, dataImportUtilities, searchRange);
 
-                            FindSimilarParentIonsWork(spectraCache, currentMZ, -1, originalIndex,
-                                                      scanList, similarParentIonsData,
-                                                      masicOptions, dataImportUtilities, searchRange);
+                            FindSimilarParentIonsWork(
+                                spectraCache, currentMZ, -1, originalIndex,
+                                scanList, similarParentIonsData,
+                                masicOptions, dataImportUtilities, searchRange);
 
                             // Look for similar 2+ spaced m/z values
-                            FindSimilarParentIonsWork(spectraCache, currentMZ, 0.5, originalIndex,
-                                                      scanList, similarParentIonsData,
-                                                      masicOptions, dataImportUtilities, searchRange);
+                            FindSimilarParentIonsWork(
+                                spectraCache, currentMZ, 0.5, originalIndex,
+                                scanList, similarParentIonsData,
+                                masicOptions, dataImportUtilities, searchRange);
 
-                            FindSimilarParentIonsWork(spectraCache, currentMZ, -0.5, originalIndex,
-                                                      scanList, similarParentIonsData,
-                                                      masicOptions, dataImportUtilities, searchRange);
+                            FindSimilarParentIonsWork(
+                                spectraCache, currentMZ, -0.5, originalIndex,
+                                scanList, similarParentIonsData,
+                                masicOptions, dataImportUtilities, searchRange);
 
                             var parentIonToleranceDa = GetParentIonToleranceDa(masicOptions.SICOptions, currentMZ);
 
                             if (parentIonToleranceDa <= 0.25 && masicOptions.SICOptions.SimilarIonMZToleranceHalfWidth <= 0.15)
                             {
                                 // Also look for similar 3+ spaced m/z values
-                                FindSimilarParentIonsWork(spectraCache, currentMZ, 0.666, originalIndex,
-                                                          scanList, similarParentIonsData,
-                                                          masicOptions, dataImportUtilities, searchRange);
+                                FindSimilarParentIonsWork(
+                                    spectraCache, currentMZ, 0.666, originalIndex,
+                                    scanList, similarParentIonsData,
+                                    masicOptions, dataImportUtilities, searchRange);
 
-                                FindSimilarParentIonsWork(spectraCache, currentMZ, 0.333, originalIndex,
-                                                          scanList, similarParentIonsData,
-                                                          masicOptions, dataImportUtilities, searchRange);
+                                FindSimilarParentIonsWork(
+                                    spectraCache, currentMZ, 0.333, originalIndex,
+                                    scanList, similarParentIonsData,
+                                    masicOptions, dataImportUtilities, searchRange);
 
-                                FindSimilarParentIonsWork(spectraCache, currentMZ, -0.333, originalIndex,
-                                                          scanList, similarParentIonsData,
-                                                          masicOptions, dataImportUtilities, searchRange);
+                                FindSimilarParentIonsWork(
+                                    spectraCache, currentMZ, -0.333, originalIndex,
+                                    scanList, similarParentIonsData,
+                                    masicOptions, dataImportUtilities, searchRange);
 
-                                FindSimilarParentIonsWork(spectraCache, currentMZ, -0.666, originalIndex,
-                                                          scanList, similarParentIonsData,
-                                                          masicOptions, dataImportUtilities, searchRange);
+                                FindSimilarParentIonsWork(
+                                    spectraCache, currentMZ, -0.666, originalIndex,
+                                    scanList, similarParentIonsData,
+                                    masicOptions, dataImportUtilities, searchRange);
                             }
                         }
                         while (similarParentIonsData.IonInUseCount > ionInUseCountOriginal);

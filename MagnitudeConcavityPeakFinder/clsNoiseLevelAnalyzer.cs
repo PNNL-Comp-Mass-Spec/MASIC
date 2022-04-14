@@ -90,8 +90,7 @@ namespace MagnitudeConcavityPeakFinder
             int countSummed;
 
             // Initialize baselineNoiseStats
-            baselineNoiseStats = GetBaselineNoiseStats(baselineNoiseOptions.MinimumBaselineNoiseLevel,
-                                                          baselineNoiseOptions.BaselineNoiseMode);
+            baselineNoiseStats = GetBaselineNoiseStats(baselineNoiseOptions.MinimumBaselineNoiseLevel, baselineNoiseOptions.BaselineNoiseMode);
 
             if (intensityData == null || indexEnd - indexStart < 0)
             {
@@ -156,14 +155,16 @@ namespace MagnitudeConcavityPeakFinder
                     if (baselineNoiseOptions.BaselineNoiseMode == NoiseThresholdModes.TrimmedMeanByAbundance)
                     {
                         // TrimmedMeanByAbundance
-                        countSummed = ComputeTrimmedMeanByAbundance(sortedData, dataSortedCount, baselineNoiseOptions,
-                                                                    out indexEnd, out summedIntensity);
+                        countSummed = ComputeTrimmedMeanByAbundance(
+                            sortedData, dataSortedCount, baselineNoiseOptions,
+                            out indexEnd, out summedIntensity);
                     }
                     else
                     {
                         // TrimmedMeanByCount
-                        countSummed = ComputeTrimmedMeanByCount(sortedData, dataSortedCount, baselineNoiseOptions,
-                                                                out indexEnd, out summedIntensity);
+                        countSummed = ComputeTrimmedMeanByCount(
+                            sortedData, dataSortedCount, baselineNoiseOptions,
+                            out indexEnd, out summedIntensity);
                     }
 
                     if (countSummed == 0)
@@ -208,10 +209,11 @@ namespace MagnitudeConcavityPeakFinder
                         //Find the median of the data that has intensity values less than
                         //  Minimum + baselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage * (Maximum - Minimum)
 
-                        var dblIntensityThreshold = sortedData[0] +
-                                                       baselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage *
-                                                       (sortedData[dataSortedCount - 1] -
-                                                        sortedData[0]);
+                        var dblIntensityThreshold =
+                            sortedData[0] +
+                            baselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage *
+                            (sortedData[dataSortedCount - 1] -
+                            sortedData[0]);
 
                         // Find the first point with an intensity value <= dblIntensityThreshold
                         indexEnd = dataSortedCount - 1;
@@ -267,8 +269,7 @@ namespace MagnitudeConcavityPeakFinder
                     break;
                 default:
                     // Unknown mode
-                    throw new Exception("Unknown Noise Threshold Mode encountered: " +
-                                        baselineNoiseOptions.BaselineNoiseMode);
+                    throw new Exception("Unknown Noise Threshold Mode encountered: " + baselineNoiseOptions.BaselineNoiseMode);
             }
 
             // Assure that .NoiseLevel is >= .MinimumBaselineNoiseLevel
@@ -317,9 +318,10 @@ namespace MagnitudeConcavityPeakFinder
             // Average the data that has intensity values less than
             //  Minimum + baselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage * (Maximum - Minimum)
 
-            var dblIntensityThreshold = sortedData[0] +
-                                           baselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage *
-                                           (sortedData[dataSortedCount - 1] - sortedData[0]);
+            var dblIntensityThreshold =
+                sortedData[0] +
+                baselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage *
+                (sortedData[dataSortedCount - 1] - sortedData[0]);
 
             // Initialize countSummed to intDataSortedCount for now, in case all data is within the intensity threshold
             var countSummed = dataSortedCount;

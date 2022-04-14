@@ -401,9 +401,9 @@ namespace MASIC.DataOutput
                     return true;
                 }
 
-                var numberOfBins = Options.PlotOptions.PeakAreaHistogramBinCount <= 0 ?
-                                       40 :
-                                       Options.PlotOptions.PeakAreaHistogramBinCount;
+                var numberOfBins = Options.PlotOptions.PeakAreaHistogramBinCount <= 0
+                    ? 40
+                    : Options.PlotOptions.PeakAreaHistogramBinCount;
 
                 var histogram = new MathNet.Numerics.Statistics.Histogram(peakAreaData, numberOfBins);
 
@@ -515,9 +515,9 @@ namespace MASIC.DataOutput
                 PeakWidthHistogramUnits = timeBasedPeakWidths ? "seconds" : "scans";
 
                 // Make an initial histogram
-                var numberOfBins = Options.PlotOptions.PeakWidthHistogramBinCount <= 0 ?
-                                       40 :
-                                       Options.PlotOptions.PeakWidthHistogramBinCount;
+                var numberOfBins = Options.PlotOptions.PeakWidthHistogramBinCount <= 0
+                    ? 40
+                    : Options.PlotOptions.PeakWidthHistogramBinCount;
 
                 var histogram = new MathNet.Numerics.Statistics.Histogram(peakWidths, numberOfBins);
 

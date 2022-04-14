@@ -174,9 +174,10 @@ namespace MASIC
                 var mzBinList = CreateMZLookupList(masicOptions, scanList, false, 0);
                 if (mzBinList.Count > 0)
                 {
-                    success = ProcessMZList(scanList, spectraCache, masicOptions,
-                                            dataOutputHandler, xmlResultsWriter,
-                                            mzBinList, false, 0, ref parentIonsProcessed);
+                    success = ProcessMZList(
+                        scanList, spectraCache, masicOptions,
+                        dataOutputHandler, xmlResultsWriter,
+                        mzBinList, false, 0, ref parentIonsProcessed);
                 }
 
                 if (success && !masicOptions.CustomSICList.LimitSearchToCustomMZList)
@@ -199,9 +200,10 @@ namespace MASIC
                         var mzBinListSIM = CreateMZLookupList(masicOptions, scanList, true, simIndex);
                         if (mzBinListSIM.Count > 0)
                         {
-                            ProcessMZList(scanList, spectraCache, masicOptions,
-                                          dataOutputHandler, xmlResultsWriter,
-                                          mzBinListSIM, true, simIndex, ref parentIonsProcessed);
+                            ProcessMZList(
+                                scanList, spectraCache, masicOptions,
+                                dataOutputHandler, xmlResultsWriter,
+                                mzBinListSIM, true, simIndex, ref parentIonsProcessed);
                         }
                     }
                 }
@@ -389,8 +391,9 @@ namespace MASIC
                                 scanIndexBelowThresholdLeft = -1;
                             }
 
-                            var peakWidthMinutesBackward = scanList.SurveyScans[fullSICScanIndices[mzIndexWork, scanIndexObservedInFullSIC]].ScanTime -
-                                                           scanList.SurveyScans[fullSICScanIndices[mzIndexWork, scanIndexStart]].ScanTime;
+                            var peakWidthMinutesBackward =
+                                scanList.SurveyScans[fullSICScanIndices[mzIndexWork, scanIndexObservedInFullSIC]].ScanTime -
+                                scanList.SurveyScans[fullSICScanIndices[mzIndexWork, scanIndexStart]].ScanTime;
 
                             if (leftDone)
                             {
@@ -465,8 +468,9 @@ namespace MASIC
                                 scanIndexBelowThresholdRight = -1;
                             }
 
-                            var peakWidthMinutesForward = scanList.SurveyScans[fullSICScanIndices[mzIndexWork, scanIndexEnd]].ScanTime -
-                                                          scanList.SurveyScans[fullSICScanIndices[mzIndexWork, scanIndexObservedInFullSIC]].ScanTime;
+                            var peakWidthMinutesForward =
+                                scanList.SurveyScans[fullSICScanIndices[mzIndexWork, scanIndexEnd]].ScanTime -
+                                scanList.SurveyScans[fullSICScanIndices[mzIndexWork, scanIndexObservedInFullSIC]].ScanTime;
 
                             if (rightDone)
                             {
@@ -829,9 +833,10 @@ namespace MASIC
                         mzToleranceDa = current.MZTolerance;
                     }
 
-                    var ionSum = dataAggregation.AggregateIonsInRange(spectrum,
-                                                                      current.SearchMZ, mzToleranceDa,
-                                                                      out _, out var closestMZ, false);
+                    var ionSum = dataAggregation.AggregateIonsInRange(
+                        spectrum,
+                        current.SearchMZ, mzToleranceDa,
+                        out _, out var closestMZ, false);
 
                     var dataIndex = fullSICDataCount[mzIndexWork];
                     fullSICScanIndices[mzIndexWork, dataIndex] = surveyScanIndex;
@@ -1019,21 +1024,23 @@ namespace MASIC
 
                     currentParentIon.SICStats.SICPotentialAreaStatsForPeak = potentialAreaStatsForPeakOut;
 
-                    StorePeakInParentIon(scanList,
-                                         parentIonIndices[parentIonIndexPointer],
-                                         sicDetails,
-                                         currentParentIon.SICStats.SICPotentialAreaStatsForPeak,
-                                         sicStatsPeak,
-                                         peakIsValid);
+                    StorePeakInParentIon(
+                        scanList,
+                        parentIonIndices[parentIonIndexPointer],
+                        sicDetails,
+                        currentParentIon.SICStats.SICPotentialAreaStatsForPeak,
+                        sicStatsPeak,
+                        peakIsValid);
 
                     // Possibly save the stats for this SIC to the SICData file
                     dataOutputHandler.SaveSICDataToText(masicOptions.SICOptions, scanList,
                         parentIonIndices[parentIonIndexPointer], sicDetails);
 
                     // Save the stats for this SIC to the XML file
-                    xmlResultsWriter.SaveDataToXML(scanList,
-                                                   parentIonIndices[parentIonIndexPointer], sicDetails,
-                                                   smoothedYDataSubsetInSearchChunk, dataOutputHandler);
+                    xmlResultsWriter.SaveDataToXML(
+                        scanList,
+                        parentIonIndices[parentIonIndexPointer], sicDetails,
+                        smoothedYDataSubsetInSearchChunk, dataOutputHandler);
 
                     parentIonUpdated[parentIonIndexPointer] = true;
                     parentIonsProcessed++;
@@ -1135,17 +1142,20 @@ namespace MASIC
                 if (!storePeak)
                     continue;
 
-                StorePeakInParentIon(scanList, parentIonIndices[parentIonIndexPointer],
-                                     sicDetails, potentialAreaStatsForPeak, sicPeak, true);
+                StorePeakInParentIon(
+                    scanList, parentIonIndices[parentIonIndexPointer],
+                    sicDetails, potentialAreaStatsForPeak, sicPeak, true);
 
                 // Possibly save the stats for this SIC to the SICData file
-                dataOutputHandler.SaveSICDataToText(masicOptions.SICOptions, scanList,
-                                                    parentIonIndices[parentIonIndexPointer], sicDetails);
+                dataOutputHandler.SaveSICDataToText(
+                    masicOptions.SICOptions, scanList,
+                    parentIonIndices[parentIonIndexPointer], sicDetails);
 
                 // Save the stats for this SIC to the XML file
-                xmlResultsWriter.SaveDataToXML(scanList,
-                                               parentIonIndices[parentIonIndexPointer], sicDetails,
-                                               smoothedYDataSubset, dataOutputHandler);
+                xmlResultsWriter.SaveDataToXML(
+                    scanList,
+                    parentIonIndices[parentIonIndexPointer], sicDetails,
+                    smoothedYDataSubset, dataOutputHandler);
 
                 parentIonUpdated[parentIonIndexPointer] = true;
                 parentIonsProcessed++;

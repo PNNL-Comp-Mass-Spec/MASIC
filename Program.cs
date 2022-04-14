@@ -231,9 +231,10 @@ namespace MASIC
             if (mRecurseDirectories)
             {
                 // This call will lead to calls to method ProcessFile in clsMASIC
-                if (mMASIC.ProcessFilesAndRecurseDirectories(mInputFilePath, mOutputDirectoryPath,
-                                                             mOutputDirectoryAlternatePath, mRecreateDirectoryHierarchyInAlternatePath,
-                                                             mParameterFilePath, mMaxLevelsToRecurse))
+                if (mMASIC.ProcessFilesAndRecurseDirectories(
+                        mInputFilePath, mOutputDirectoryPath,
+                        mOutputDirectoryAlternatePath, mRecreateDirectoryHierarchyInAlternatePath,
+                        mParameterFilePath, mMaxLevelsToRecurse))
                 {
                     return 0;
                 }

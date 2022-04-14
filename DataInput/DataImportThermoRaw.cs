@@ -339,8 +339,9 @@ namespace MASIC.DataInput
             if (thermoScanInfo.MSLevel <= 1)
             {
                 // Survey Scan
-                return ExtractThermoSurveyScan(rawFileReader, scanList, spectraCache, dataOutputHandler,
-                                                    sicOptions, thermoScanInfo);
+                return ExtractThermoSurveyScan(
+                    rawFileReader, scanList, spectraCache, dataOutputHandler,
+                    sicOptions, thermoScanInfo);
             }
 
             // Fragmentation Scan
@@ -581,14 +582,16 @@ namespace MASIC.DataInput
             if (thermoScanInfo.MRMScanType == MRMScanTypeConstants.NotMRM)
             {
                 // This is not an MRM scan
-                mParentIonProcessor.AddUpdateParentIons(scanList, mLastNonZoomSurveyScanIndex, thermoScanInfo.ParentIonMZ,
-                                                        fragScanIndex, spectraCache, sicOptions);
+                mParentIonProcessor.AddUpdateParentIons(
+                    scanList, mLastNonZoomSurveyScanIndex, thermoScanInfo.ParentIonMZ,
+                    fragScanIndex, spectraCache, sicOptions);
             }
             else
             {
                 // This is an MRM scan
-                mParentIonProcessor.AddUpdateParentIons(scanList, mLastNonZoomSurveyScanIndex, thermoScanInfo.ParentIonMZ,
-                                                        scanInfo.MRMScanInfo, spectraCache, sicOptions);
+                mParentIonProcessor.AddUpdateParentIons(
+                    scanList, mLastNonZoomSurveyScanIndex, thermoScanInfo.ParentIonMZ,
+                    scanInfo.MRMScanInfo, spectraCache, sicOptions);
             }
 
             if (mLastNonZoomSurveyScanIndex >= 0)
@@ -683,8 +686,9 @@ namespace MASIC.DataInput
 
                     if (mBpiUpdateCount < 10)
                     {
-                        ConsoleMsgUtils.ShowDebug("Updating BPI in scan {0} from {1:F3} m/z to {2:F3} m/z, and BPI Intensity from {3:F0} to {4:F0}",
-                                                  scanInfo.ScanNumber, scanInfo.BasePeakIonMZ, basePeakMz, scanInfo.BasePeakIonIntensity, basePeakIntensity);
+                        ConsoleMsgUtils.ShowDebug(
+                            "Updating BPI in scan {0} from {1:F3} m/z to {2:F3} m/z, and BPI Intensity from {3:F0} to {4:F0}",
+                            scanInfo.ScanNumber, scanInfo.BasePeakIonMZ, basePeakMz, scanInfo.BasePeakIonIntensity, basePeakIntensity);
                     }
 
                     scanInfo.BasePeakIonMZ = basePeakMz;

@@ -487,11 +487,14 @@ namespace MASICPeakFinder
                     {
                         // Not a significant difference; recompute the Baseline Noise stats using the two segments combined
                         previous.SegmentIndexEnd = current.SegmentIndexEnd;
-                        ComputeDualTrimmedNoiseLevel(dataList,
-                                                          previous.SegmentIndexStart,
-                                                          previous.SegmentIndexEnd,
-                                                          baselineNoiseOptions,
-                                                          out var baselineNoiseStats);
+
+                        ComputeDualTrimmedNoiseLevel(
+                            dataList,
+                            previous.SegmentIndexStart,
+                            previous.SegmentIndexEnd,
+                            baselineNoiseOptions,
+                            out var baselineNoiseStats);
+
                         previous.BaselineNoiseStats = baselineNoiseStats;
 
                         for (var segmentIndexCopy = segmentIndex; segmentIndexCopy < segmentCountLocal - 1; segmentIndexCopy++)
@@ -533,9 +536,10 @@ namespace MASICPeakFinder
         /// Replaces values of 0 with the minimum positive value in dataList()
         /// You cannot use dataList.Length to determine the length of the array; use indexStart and indexEnd to find the limits
         /// </remarks>
-        public bool ComputeDualTrimmedNoiseLevel(IReadOnlyList<double> dataList, int indexStart, int indexEnd,
-                                                 BaselineNoiseOptions baselineNoiseOptions,
-                                                 out BaselineNoiseStats baselineNoiseStats)
+        public bool ComputeDualTrimmedNoiseLevel(
+            IReadOnlyList<double> dataList, int indexStart, int indexEnd,
+            BaselineNoiseOptions baselineNoiseOptions,
+            out BaselineNoiseStats baselineNoiseStats)
         {
             // Initialize baselineNoiseStats
             baselineNoiseStats = InitializeBaselineNoiseStats(
@@ -961,9 +965,10 @@ namespace MASICPeakFinder
         /// <param name="baselineNoiseStats"></param>
         /// <returns>Returns True if success, false in an error</returns>
         /// <remarks>Updates baselineNoiseStats with the baseline noise level</remarks>
-        public bool ComputeNoiseLevelForSICData(int dataCount, IReadOnlyList<double> dataList,
-                                                BaselineNoiseOptions baselineNoiseOptions,
-                                                out BaselineNoiseStats baselineNoiseStats)
+        public bool ComputeNoiseLevelForSICData(
+            int dataCount, IReadOnlyList<double> dataList,
+            BaselineNoiseOptions baselineNoiseOptions,
+            out BaselineNoiseStats baselineNoiseStats)
         {
             const bool IGNORE_NON_POSITIVE_DATA = false;
 
@@ -2025,9 +2030,10 @@ namespace MASICPeakFinder
                     {
                         // Find the median of the data that has intensity values less than
                         // Minimum + baselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage * (Maximum - Minimum)
-                        var intensityThreshold = dataListSorted[0] +
-                                                 baselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage *
-                                                 (dataListSorted[dataSortedCount - 1] - dataListSorted[0]);
+                        var intensityThreshold =
+                            dataListSorted[0] +
+                            baselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage *
+                            (dataListSorted[dataSortedCount - 1] - dataListSorted[0]);
 
                         // Find the first point with an intensity value <= intensityThreshold
                         indexEnd = dataSortedCount - 1;
@@ -2372,8 +2378,9 @@ namespace MASICPeakFinder
                     sicPeakFinderOptions.ButterworthSamplingFrequency = 0.25;
                 }
 
-                peakData.PeakWidthPointsMinimum = (int)Math.Round(sicPeakFinderOptions.InitialPeakWidthScansScaler *
-                                                                  Math.Log10(Math.Floor(peakAreaSignalToNoise)) * 10);
+                peakData.PeakWidthPointsMinimum =
+                    (int)Math.Round(sicPeakFinderOptions.InitialPeakWidthScansScaler *
+                    Math.Log10(Math.Floor(peakAreaSignalToNoise)) * 10);
 
                 // Assure that .InitialPeakWidthScansMaximum is no greater than .InitialPeakWidthScansMaximum
                 // and no greater than dataPointCountAboveThreshold/2 (rounded up)
@@ -3758,8 +3765,8 @@ namespace MASICPeakFinder
                         if (indexSegmentA != indexSegmentB)
                         {
                             // Interpolate between the two segments
-                            var fractionFromSegmentB = (scanIndexObserved - segmentMidPointA) /
-                                                       (double)(segmentMidPointB - segmentMidPointA);
+                            var fractionFromSegmentB = (scanIndexObserved - segmentMidPointA) / (double)(segmentMidPointB - segmentMidPointA);
+
                             if (fractionFromSegmentB < 0)
                             {
                                 fractionFromSegmentB = 0;

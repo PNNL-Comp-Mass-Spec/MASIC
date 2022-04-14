@@ -188,8 +188,9 @@ namespace MASIC
 
             if (reporterIonIntensities.Length != matrixSize)
             {
-                throw new InvalidOperationException("Length of ReporterIonIntensities array must be " + matrixSize +
-                                                    " when using the " + reporterIonMode + " mode");
+                throw new InvalidOperationException(
+                    "Length of ReporterIonIntensities array must be " + matrixSize +
+                          " when using the " + reporterIonMode + " mode");
             }
 
             var correctedIntensities = mMatrixUtility.ProcessData(mCoeffs, matrixSize, reporterIonIntensities);

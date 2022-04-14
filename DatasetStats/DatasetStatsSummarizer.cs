@@ -167,20 +167,22 @@ namespace MASIC.DatasetStats
                     if (statEntry.ScanType > 1)
                     {
                         // MSn spectrum
-                        ComputeScanStatsUpdateDetails(statEntry,
-                                                      summaryStats,
-                                                      summaryStats.MSnStats,
-                                                      ticListMSn,
-                                                      bpiListMSn);
+                        ComputeScanStatsUpdateDetails(
+                            statEntry,
+                            summaryStats,
+                            summaryStats.MSnStats,
+                            ticListMSn,
+                            bpiListMSn);
                     }
                     else
                     {
                         // MS spectrum
-                        ComputeScanStatsUpdateDetails(statEntry,
-                                                      summaryStats,
-                                                      summaryStats.MSStats,
-                                                      ticListMS,
-                                                      bpiListMS);
+                        ComputeScanStatsUpdateDetails(
+                            statEntry,
+                            summaryStats,
+                            summaryStats.MSStats,
+                            ticListMS,
+                            bpiListMS);
                     }
 
                     var scanTypeKey = statEntry.ScanTypeName + SCAN_TYPE_STATS_SEP_CHAR + statEntry.ScanFilterText;

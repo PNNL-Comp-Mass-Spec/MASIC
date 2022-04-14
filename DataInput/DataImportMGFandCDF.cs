@@ -173,9 +173,10 @@ namespace MASIC.DataInput
 
                         scanList.SurveyScans.Add(newSurveyScan);
 
-                        success = cdfReader.GetMassSpectrum(msScanIndex, out var mzData,
-                                                               out var intensityData,
-                                                               out var intIonCount, out _);
+                        success = cdfReader.GetMassSpectrum(
+                            msScanIndex, out var mzData,
+                            out var intensityData,
+                            out var intIonCount, out _);
 
                         if (success && intIonCount > 0)
                         {
@@ -203,12 +204,14 @@ namespace MASIC.DataInput
                                 // However, if the lowest m/z value is < 100, use 100 m/z
                                 if (mzMin < 100)
                                 {
-                                    msDataResolution = ParentIonProcessing.GetParentIonToleranceDa(sicOptions, 100) /
+                                    msDataResolution =
+                                        ParentIonProcessing.GetParentIonToleranceDa(sicOptions, 100) /
                                         sicOptions.CompressToleranceDivisorForPPM;
                                 }
                                 else
                                 {
-                                    msDataResolution = ParentIonProcessing.GetParentIonToleranceDa(sicOptions, mzMin) /
+                                    msDataResolution =
+                                        ParentIonProcessing.GetParentIonToleranceDa(sicOptions, mzMin) /
                                         sicOptions.CompressToleranceDivisorForPPM;
                                 }
                             }
@@ -318,6 +321,7 @@ namespace MASIC.DataInput
                                     fragScan.ScanNumber += scanNumberCorrection;
                                     var scanTimeInterpolated = InterpolateRTandFragScanNumber(
                                         scanList.SurveyScans, 0, fragScan.ScanNumber, out var fragScanIterationOut);
+
                                     fragScan.FragScanInfo.FragScanNumber = fragScanIterationOut;
 
                                     fragScan.ScanTime = scanTimeInterpolated;
@@ -406,8 +410,9 @@ namespace MASIC.DataInput
                         newFragScan.IonCountRaw = newFragScan.IonCount;
 
                         // Find the base peak ion mass and intensity
-                        newFragScan.BasePeakIonMZ = FindBasePeakIon(msSpectrum.IonsMZ, msSpectrum.IonsIntensity,
-                                                                    out var basePeakIonIntensity, out _);
+                        newFragScan.BasePeakIonMZ = FindBasePeakIon(
+                            msSpectrum.IonsMZ, msSpectrum.IonsIntensity,
+                                 out var basePeakIonIntensity, out _);
 
                         newFragScan.BasePeakIonIntensity = basePeakIonIntensity;
 
@@ -440,8 +445,9 @@ namespace MASIC.DataInput
                         newFragScan.TotalIonIntensity = 0;
                     }
 
-                    mParentIonProcessor.AddUpdateParentIons(scanList, lastSurveyScanIndex, spectrumInfo.ParentIonMZ,
-                                                            scanList.FragScans.Count - 1, spectraCache, sicOptions);
+                    mParentIonProcessor.AddUpdateParentIons(
+                        scanList, lastSurveyScanIndex, spectrumInfo.ParentIonMZ,
+                        scanList.FragScans.Count - 1, spectraCache, sicOptions);
 
                     // Note: We need to take msScanCount * 2, in addition to adding msScanCount to lastSurveyScanIndex, since we have to read two different files
                     if (msScanCount > 1)

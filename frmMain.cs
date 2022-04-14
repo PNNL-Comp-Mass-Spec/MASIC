@@ -1138,8 +1138,11 @@ namespace MASIC
 
                     if (mz > 0)
                     {
-                        AddCustomSICRow(mz, mzToleranceDa, scanOrAcqTime, scanOrAcqTimeTolerance, comment,
-                                        out var existingRowFound);
+                        AddCustomSICRow(
+                            mz, mzToleranceDa,
+                            scanOrAcqTime, scanOrAcqTimeTolerance,
+                            comment,
+                            out var existingRowFound);
 
                         if (existingRowFound)
                         {
@@ -1908,16 +1911,24 @@ namespace MASIC
                 exportOptions.IncludeMSMS = chkExportRawDataIncludeMSMS.Checked;
                 exportOptions.RenumberScans = chkExportRawDataRenumberScans.Checked;
 
-                exportOptions.MinimumSignalToNoiseRatio = TextBoxUtils.ParseTextBoxValueFloat(txtExportRawDataSignalToNoiseRatioMinimum,
-                                                                                              lblExportRawDataSignalToNoiseRatioMinimum.Text + " must be a value", out parseError);
+                exportOptions.MinimumSignalToNoiseRatio = TextBoxUtils.ParseTextBoxValueFloat(
+                    txtExportRawDataSignalToNoiseRatioMinimum,
+                    lblExportRawDataSignalToNoiseRatioMinimum.Text + " must be a value", out parseError);
+
                 if (parseError)
                     return false;
-                exportOptions.MaxIonCountPerScan = TextBoxUtils.ParseTextBoxValueInt(txtExportRawDataMaxIonCountPerScan,
-                                                                                     lblExportRawDataMaxIonCountPerScan.Text + " must be an integer value", out parseError);
+
+                exportOptions.MaxIonCountPerScan = TextBoxUtils.ParseTextBoxValueInt(
+                    txtExportRawDataMaxIonCountPerScan,
+                    lblExportRawDataMaxIonCountPerScan.Text + " must be an integer value", out parseError);
+
                 if (parseError)
                     return false;
-                exportOptions.IntensityMinimum = TextBoxUtils.ParseTextBoxValueFloat(txtExportRawDataIntensityMinimum,
-                                                                                     lblExportRawDataIntensityMinimum.Text + " must be a value", out parseError);
+
+                exportOptions.IntensityMinimum = TextBoxUtils.ParseTextBoxValueFloat(
+                    txtExportRawDataIntensityMinimum,
+                    lblExportRawDataIntensityMinimum.Text + " must be a value", out parseError);
+
                 if (parseError)
                     return false;
 
@@ -2117,8 +2128,10 @@ namespace MASIC
                 reporterIonOptions.ReporterIonMassMode = SelectedReporterIonMode;
 
                 // Update .ReporterIonToleranceDa based on txtReporterIonMZToleranceDa
-                reporterIonOptions.ReporterIonToleranceDaDefault = TextBoxUtils.ParseTextBoxValueDbl(txtReporterIonMZToleranceDa, "", out parseError,
-                                                                                                     ReporterIons.REPORTER_ION_TOLERANCE_DA_DEFAULT, false);
+                reporterIonOptions.ReporterIonToleranceDaDefault = TextBoxUtils.ParseTextBoxValueDbl(
+                    txtReporterIonMZToleranceDa, "", out parseError,
+                    ReporterIons.REPORTER_ION_TOLERANCE_DA_DEFAULT, false);
+
                 reporterIonOptions.SetReporterIonMassMode(reporterIonOptions.ReporterIonMassMode, reporterIonOptions.ReporterIonToleranceDaDefault);
 
                 reporterIonOptions.ReporterIonApplyAbundanceCorrection = chkReporterIonApplyAbundanceCorrection.Checked;

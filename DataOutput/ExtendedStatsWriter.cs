@@ -405,11 +405,10 @@ namespace MASIC.DataOutput
                 // Lookup extended stats values that are constants for all scans
                 // The following will also remove the constant header values from mExtendedHeaderNameMap
                 var constantExtendedHeaderValues = ExtractConstantExtendedHeaderValues(
-                                                       out var nonConstantHeaderIDs,
-                                                       scanList.SurveyScans,
-                                                       scanList.FragScans,
-                                                       TAB_DELIMITER)
-                                                   ?? string.Empty;
+                    out var nonConstantHeaderIDs,
+                    scanList.SurveyScans,
+                    scanList.FragScans,
+                    TAB_DELIMITER) ?? string.Empty;
 
                 // Write the constant extended stats values to a text file
 
