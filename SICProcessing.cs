@@ -187,12 +187,9 @@ namespace MASIC
                     foreach (var parentIon in scanList.ParentIons)
                     {
                         var surveyScan = scanList.SurveyScans[parentIon.SurveyScanIndex];
-                        if (surveyScan.SIMScan)
+                        if (surveyScan.SIMScan && surveyScan.SIMIndex > simIndexMax)
                         {
-                            if (surveyScan.SIMIndex > simIndexMax)
-                            {
-                                simIndexMax = surveyScan.SIMIndex;
-                            }
+                            simIndexMax = surveyScan.SIMIndex;
                         }
                     }
 
@@ -405,12 +402,9 @@ namespace MASIC
                                     leftDone = false;
 
                                 // For custom SIC values, make sure the scan range has been satisfied
-                                if (leftDone && customSICPeak)
+                                if (leftDone && customSICPeak && peakWidthMinutesBackward < customSICScanToleranceMinutesHalfWidth)
                                 {
-                                    if (peakWidthMinutesBackward < customSICScanToleranceMinutesHalfWidth)
-                                    {
-                                        leftDone = false;
-                                    }
+                                    leftDone = false;
                                 }
                             }
 
@@ -483,12 +477,9 @@ namespace MASIC
                                     rightDone = false;
 
                                 // For custom SIC values, make sure the scan range has been satisfied
-                                if (rightDone && customSICPeak)
+                                if (rightDone && customSICPeak && peakWidthMinutesForward < customSICScanToleranceMinutesHalfWidth)
                                 {
-                                    if (peakWidthMinutesForward < customSICScanToleranceMinutesHalfWidth)
-                                    {
-                                        rightDone = false;
-                                    }
+                                    rightDone = false;
                                 }
                             }
 

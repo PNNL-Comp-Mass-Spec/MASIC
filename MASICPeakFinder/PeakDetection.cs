@@ -742,14 +742,11 @@ namespace MASICPeakFinder
                         {
                             for (var k = 0; k < termCount; k++)
                             {
-                                if (ipiv[k] == 0)
+                                if (ipiv[k] == 0 && Math.Abs(A[j, k]) >= bigValue)
                                 {
-                                    if (Math.Abs(A[j, k]) >= bigValue)
-                                    {
-                                        bigValue = Math.Abs(A[j, k]);
-                                        rowIndex = j;
-                                        columnIndex = k;
-                                    }
+                                    bigValue = Math.Abs(A[j, k]);
+                                    rowIndex = j;
+                                    columnIndex = k;
                                 }
                             }
                         }
