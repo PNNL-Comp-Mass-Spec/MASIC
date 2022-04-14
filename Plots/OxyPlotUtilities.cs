@@ -59,11 +59,15 @@ namespace MASIC.Plots
         {
             var myPlot = GetPlotModel(title);
 
-            var xAxisInfo = new AxisInfo(string.Empty);
+            var xAxisInfo = new AxisInfo(string.Empty)
+            {
+                AxisKey = "Category"
+            };
             var xAxis = MakeCategoryAxis(AxisPosition.Bottom, xAxisInfo, PlotContainer.DEFAULT_BASE_FONT_SIZE);
 
             xAxis.Labels.AddRange(xAxisLabels);
 
+            yAxisInfo.AxisKey = "Value";
             var yAxis = MakeYAxis(yAxisInfo, PlotContainer.DEFAULT_BASE_FONT_SIZE);
 
             var yAxisFormatString = AddAxes(myPlot, xAxis, yAxis, yAxisInfo);
@@ -180,6 +184,7 @@ namespace MASIC.Plots
                 axis.Title = axisInfo.Title ?? string.Empty;
             }
 
+            axis.Key = axisInfo.AxisKey;
             axis.TitleFontSize = baseFontSize + 2;
             axis.TitleFontWeight = FontWeights.Normal;
             axis.TitleFont = "Arial";

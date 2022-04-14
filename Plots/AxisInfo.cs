@@ -27,6 +27,11 @@ namespace MASIC.Plots
         public bool AutoScale { get; set; }
 
         /// <summary>
+        /// Axis key, used for mapping some series appropriately
+        /// </summary>
+        public string AxisKey { get; set; }
+
+        /// <summary>
         /// When true, add a color axis
         /// </summary>
         public bool AddColorAxis { get; set; }

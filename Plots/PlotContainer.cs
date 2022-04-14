@@ -192,6 +192,7 @@ namespace MASIC.Plots
             OnDebugEvent("Saving " + PathUtils.CompactPathString(imageFile.FullName, 120));
 
             // Note that this operation can be slow if there are over 100,000 data points
+            Plot.Background = OxyColors.White;
             var plotBitmap = ExportToBitMap(Plot, width, height, resolution);
 
             var drawVisual = new DrawingVisual();

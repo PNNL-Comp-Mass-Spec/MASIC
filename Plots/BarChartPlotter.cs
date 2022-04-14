@@ -84,7 +84,9 @@ namespace MASIC.Plots
         private void AddOxyPlotSeries(PlotModel myPlot, IReadOnlyCollection<BarItem> points)
         {
             // A column series represents a bar chart with vertical bars
-            var series = new BarSeries();
+            // OxyPlot 2.1 removed ColumnSeries in favor of a transposed BarSeries
+            // We must specify the X/Y Axis Keys appropriately to trigger the transposition.
+            var series = new BarSeries() { XAxisKey = "Value", YAxisKey = "Category" };
 
             if (points.Count == 0)
             {
