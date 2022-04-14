@@ -24,7 +24,7 @@ namespace MASICBrowser
 
     internal static class Program
     {
-        public const string PROGRAM_DATE = "January 5, 2022";
+        public const string PROGRAM_DATE = "April 14, 2022";
 
         private static string mInputFilePath;
 

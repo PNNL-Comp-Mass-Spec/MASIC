@@ -28,7 +28,7 @@ namespace MASICPeakFinder
         /// <summary>
         /// Program date
         /// </summary>
-        public string PROGRAM_DATE = "January 18, 2022";
+        public string PROGRAM_DATE = "April 14, 2022";
 
         /// <summary>
         /// Minimum peak width, in points
