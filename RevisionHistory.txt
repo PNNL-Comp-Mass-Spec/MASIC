@@ -1,5 +1,8 @@
 MASIC Change Log
 
+Version 3.2.8139; April 14, 2022
+	- Update to OxyPlot 2.1
+
 Version 3.2.8059; January 24, 2022
 	- Add 18-plex TMT (aka TMT18)
 
