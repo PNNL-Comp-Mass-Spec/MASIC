@@ -44,7 +44,7 @@ namespace MASICBrowser
         // ReSharper disable once CommentTypo
         // Ignore Spelling: cancelled, const, Ctrl, frag, fragscan, Golay, Loc, resmooth, Savitzky, similarFragScan
 
-        private const string PROGRAM_DATE = "April 14, 2022";
+        private const string PROGRAM_DATE = "April 18, 2022";
 
         /// <summary>
         /// Constructor

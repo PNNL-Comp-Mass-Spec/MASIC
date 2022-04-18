@@ -177,7 +177,7 @@
       <Version>1.1.13</Version>
     </PackageReference>
     <PackageReference Include="PRISM-Library">
-      <Version>2.6.49</Version>
+      <Version>2.6.50</Version>
     </PackageReference>
     <PackageReference Include="PSI_Interface">
       <Version>2.5.69</Version>
