@@ -25,4 +25,4 @@ xcopy ..\Readme.md                      \\pnl\projects\OmicsSW\DMS_Programs\Anal
 xcopy ..\RevisionHistory.txt            \\pnl\projects\OmicsSW\DMS_Programs\AnalysisToolManagerDistribution\MASIC /D /Y
 
 echo.
-pause
+if not "%1"=="NoPause" pause
