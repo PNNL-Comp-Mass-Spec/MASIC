@@ -1,5 +1,9 @@
 MASIC Change Log
 
+Version 3.2.8152; April 27, 2022
+	- Add OxyPlot.Wpf.Shared.dll to the installer
+	- Update PRISM.dll, PRISMDatabaseUtils.dll, InterDetect.dll, and MSDataFileReader.dll
+
 Version 3.2.8139; April 14, 2022
 	- Update to OxyPlot 2.1
 
