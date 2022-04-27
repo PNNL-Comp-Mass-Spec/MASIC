@@ -30,6 +30,7 @@ Source: ..\bin\Release\OpenMcdf.dll                               ; DestDir: {ap
 Source: ..\bin\Release\OpenMcdf.Extensions.dll                    ; DestDir: {app}
 Source: ..\bin\Release\OxyPlot.dll                                ; DestDir: {app}
 Source: ..\bin\Release\OxyPlot.Wpf.dll                            ; DestDir: {app}
+Source: ..\bin\Release\OxyPlot.Wpf.Shared.dll                     ; DestDir: {app}
 Source: ..\bin\Release\PRISM.dll                                  ; DestDir: {app}
 Source: ..\bin\Release\PRISMDatabaseUtils.dll                     ; DestDir: {app}
 Source: ..\bin\Release\PRISMWin.dll                               ; DestDir: {app}
