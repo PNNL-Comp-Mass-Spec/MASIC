@@ -162,6 +162,54 @@ namespace MASIC
         public int SpectrumCount { get; set; }
 
         /// <summary>
+        /// Checks the spectraPool for available capacity, caching the oldest item if full
+        /// </summary>
+        private void AddItemToSpectraPool(ScanMemoryCacheItem itemToAdd)
+        {
+            // Disk caching disabled: expand the size of the in-memory cache
+            if (mSpectraPool.Count >= mMaximumPoolLength &&
+                mCacheOptions.DiskCachingAlwaysDisabled)
+            {
+                // The pool is full, but disk caching is disabled, so we have to expand the pool
+                var newPoolLength = mMaximumPoolLength + 500;
+
+                var currentPoolLength = Math.Min(mMaximumPoolLength, mSpectraPool.Capacity);
+                mMaximumPoolLength = newPoolLength;
+
+                if (newPoolLength > currentPoolLength)
+                {
+                    mSpectraPool.Capacity = mMaximumPoolLength;
+                }
+            }
+
+            // Need to cache the spectrum stored at mNextAvailablePoolIndex
+            // Removes the oldest spectrum from spectraPool
+            if (mSpectraPool.AddNew(itemToAdd, out var cacheItem))
+            {
+                // An item was removed from the spectraPool. Write it to the disk cache if needed.
+                if (cacheItem.CacheState == CacheStateConstants.LoadedFromCache)
+                {
+                    // Already cached previously, simply reset the slot
+                }
+                else if (cacheItem.CacheState == CacheStateConstants.NeverCached &&
+                         ValidatePageFileIO(true))
+                {
+                    // Store all of the spectra in one large file
+                    CacheSpectrumWork(cacheItem.Scan);
+                }
+
+                if (cacheItem.CacheState != CacheStateConstants.UnusedSlot)
+                {
+                    // Reset .ScanNumber, .IonCount, and .CacheState
+                    cacheItem.Scan.Clear(0);
+                    cacheItem.CacheState = CacheStateConstants.UnusedSlot;
+
+                    CacheEventCount++;
+                }
+            }
+        }
+
+        /// <summary>
         /// Adds spectrum to the spectrum pool
         /// </summary>
         /// <param name="spectrum"></param>
@@ -390,50 +438,43 @@ namespace MASIC
         }
 
         /// <summary>
-        /// Checks the spectraPool for available capacity, caching the oldest item if full
+        /// Get a spectrum from the pool or cache, potentially without updating the pool
         /// </summary>
-        private void AddItemToSpectraPool(ScanMemoryCacheItem itemToAdd)
+        /// <param name="scanNumber">Scan number to load</param>
+        /// <param name="spectrum">The requested spectrum</param>
+        /// <param name="canSkipPool">if true and the spectrum is not in the pool, it will be read from the disk cache without updating the pool.
+        /// This should be true for any spectrum requests that are not likely to be repeated within the next <see cref="SpectrumCacheOptions.SpectraToRetainInMemory"/> requests.</param>
+        /// <returns>True if the scan was found in the spectrum pool (or was successfully added to the pool)</returns>
+        public bool GetSpectrum(int scanNumber, out MSSpectrum spectrum, bool canSkipPool = true)
         {
-            // Disk caching disabled: expand the size of the in-memory cache
-            if (mSpectraPool.Count >= mMaximumPoolLength &&
-                mCacheOptions.DiskCachingAlwaysDisabled)
+            try
             {
-                // The pool is full, but disk caching is disabled, so we have to expand the pool
-                var newPoolLength = mMaximumPoolLength + 500;
-
-                var currentPoolLength = Math.Min(mMaximumPoolLength, mSpectraPool.Capacity);
-                mMaximumPoolLength = newPoolLength;
-
-                if (newPoolLength > currentPoolLength)
+                if (mSpectraPool.GetItem(scanNumber, out var cacheItem))
                 {
-                    mSpectraPool.Capacity = mMaximumPoolLength;
+                    SpectraPoolHitEventCount++;
+                    spectrum = cacheItem.Scan;
+                    return true;
                 }
+
+                if (!canSkipPool)
+                {
+                    // Need to load the spectrum
+                    var success = UnCacheSpectrum(scanNumber, out var cacheSpectrum);
+                    spectrum = cacheSpectrum;
+                    return success;
+                }
+
+                spectrum = new MSSpectrum(scanNumber);
+                UnCacheSpectrumWork(scanNumber, spectrum);
+
+                // Maintain functionality: return true, even if the spectrum was not in the cache file.
+                return true;
             }
-
-            // Need to cache the spectrum stored at mNextAvailablePoolIndex
-            // Removes the oldest spectrum from spectraPool
-            if (mSpectraPool.AddNew(itemToAdd, out var cacheItem))
+            catch (Exception ex)
             {
-                // An item was removed from the spectraPool. Write it to the disk cache if needed.
-                if (cacheItem.CacheState == CacheStateConstants.LoadedFromCache)
-                {
-                    // Already cached previously, simply reset the slot
-                }
-                else if (cacheItem.CacheState == CacheStateConstants.NeverCached &&
-                         ValidatePageFileIO(true))
-                {
-                    // Store all of the spectra in one large file
-                    CacheSpectrumWork(cacheItem.Scan);
-                }
-
-                if (cacheItem.CacheState != CacheStateConstants.UnusedSlot)
-                {
-                    // Reset .ScanNumber, .IonCount, and .CacheState
-                    cacheItem.Scan.Clear(0);
-                    cacheItem.CacheState = CacheStateConstants.UnusedSlot;
-
-                    CacheEventCount++;
-                }
+                ReportError(ex.Message, ex);
+                spectrum = null;
+                return false;
             }
         }
 
@@ -644,47 +685,6 @@ namespace MASIC
             catch (Exception ex)
             {
                 ReportError(ex.Message, ex);
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// Get a spectrum from the pool or cache, potentially without updating the pool
-        /// </summary>
-        /// <param name="scanNumber">Scan number to load</param>
-        /// <param name="spectrum">The requested spectrum</param>
-        /// <param name="canSkipPool">if true and the spectrum is not in the pool, it will be read from the disk cache without updating the pool.
-        /// This should be true for any spectrum requests that are not likely to be repeated within the next <see cref="SpectrumCacheOptions.SpectraToRetainInMemory"/> requests.</param>
-        /// <returns>True if the scan was found in the spectrum pool (or was successfully added to the pool)</returns>
-        public bool GetSpectrum(int scanNumber, out MSSpectrum spectrum, bool canSkipPool = true)
-        {
-            try
-            {
-                if (mSpectraPool.GetItem(scanNumber, out var cacheItem))
-                {
-                    SpectraPoolHitEventCount++;
-                    spectrum = cacheItem.Scan;
-                    return true;
-                }
-
-                if (!canSkipPool)
-                {
-                    // Need to load the spectrum
-                    var success = UnCacheSpectrum(scanNumber, out var cacheSpectrum);
-                    spectrum = cacheSpectrum;
-                    return success;
-                }
-
-                spectrum = new MSSpectrum(scanNumber);
-                UnCacheSpectrumWork(scanNumber, spectrum);
-
-                // Maintain functionality: return true, even if the spectrum was not in the cache file.
-                return true;
-            }
-            catch (Exception ex)
-            {
-                ReportError(ex.Message, ex);
-                spectrum = null;
                 return false;
             }
         }
