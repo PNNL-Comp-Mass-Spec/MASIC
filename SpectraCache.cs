@@ -59,7 +59,7 @@ namespace MASIC
         /// <summary>
         /// Pool (collection) of currently loaded spectra
         /// </summary>
-        private IScanMemoryCache spectraPool;
+        private IScanMemoryCache mSpectraPool;
 
         private readonly SpectrumCacheOptions mCacheOptions;
 
@@ -178,7 +178,7 @@ namespace MASIC
                     return true;
                 }
 
-                if (spectraPool.GetItem(scanNumber, out var cacheItem))
+                if (mSpectraPool.GetItem(scanNumber, out var cacheItem))
                 {
                     // Replace the spectrum data with spectrum
                     cacheItem.Scan.ReplaceData(spectrum, scanNumber);
@@ -390,24 +390,24 @@ namespace MASIC
         private void AddItemToSpectraPool(ScanMemoryCacheItem itemToAdd)
         {
             // Disk caching disabled: expand the size of the in-memory cache
-            if (spectraPool.Count >= mMaximumPoolLength &&
+            if (mSpectraPool.Count >= mMaximumPoolLength &&
                 mCacheOptions.DiskCachingAlwaysDisabled)
             {
                 // The pool is full, but disk caching is disabled, so we have to expand the pool
                 var newPoolLength = mMaximumPoolLength + 500;
 
-                var currentPoolLength = Math.Min(mMaximumPoolLength, spectraPool.Capacity);
+                var currentPoolLength = Math.Min(mMaximumPoolLength, mSpectraPool.Capacity);
                 mMaximumPoolLength = newPoolLength;
 
                 if (newPoolLength > currentPoolLength)
                 {
-                    spectraPool.Capacity = mMaximumPoolLength;
+                    mSpectraPool.Capacity = mMaximumPoolLength;
                 }
             }
 
             // Need to cache the spectrum stored at mNextAvailablePoolIndex
             // Removes the oldest spectrum from spectraPool
-            if (spectraPool.AddNew(itemToAdd, out var cacheItem))
+            if (mSpectraPool.AddNew(itemToAdd, out var cacheItem))
             {
                 // An item was removed from the spectraPool. Write it to the disk cache if needed.
                 if (cacheItem.CacheState == CacheStateConstants.LoadedFromCache)
@@ -449,20 +449,20 @@ namespace MASIC
 
             ClosePageFile();
 
-            if (spectraPool == null || spectraPool.Capacity < mMaximumPoolLength)
+            if (mSpectraPool == null || mSpectraPool.Capacity < mMaximumPoolLength)
             {
                 if (mCacheOptions.DiskCachingAlwaysDisabled)
                 {
-                    spectraPool = new MemoryCacheArray(mMaximumPoolLength);
+                    mSpectraPool = new MemoryCacheArray(mMaximumPoolLength);
                 }
                 else
                 {
-                    spectraPool = new MemoryCacheLRU(mMaximumPoolLength);
+                    mSpectraPool = new MemoryCacheLRU(mMaximumPoolLength);
                 }
             }
             else
             {
-                spectraPool.Clear();
+                mSpectraPool.Clear();
             }
         }
 
@@ -658,7 +658,7 @@ namespace MASIC
         {
             try
             {
-                if (spectraPool.GetItem(scanNumber, out var cacheItem))
+                if (mSpectraPool.GetItem(scanNumber, out var cacheItem))
                 {
                     SpectraPoolHitEventCount++;
                     spectrum = cacheItem.Scan;
