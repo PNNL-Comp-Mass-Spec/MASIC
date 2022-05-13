@@ -19,8 +19,9 @@ namespace MASIC
         /// <param name="cacheOptions"></param>
         public SpectraCache(SpectrumCacheOptions cacheOptions)
         {
-            mCacheOptions = cacheOptions;
-            InitializeVariables();
+            mCacheOptions = cacheOptions ?? new SpectrumCacheOptions();
+
+            InitializeSpectraPool();
         }
 
         /// <summary>
@@ -463,26 +464,6 @@ namespace MASIC
             {
                 spectraPool.Clear();
             }
-        }
-
-        private void InitializeVariables()
-        {
-            mCacheOptions.Reset();
-
-            InitializeSpectraPool();
-        }
-
-        /// <summary>
-        /// Get default cache options
-        /// </summary>
-        public static SpectrumCacheOptions GetDefaultCacheOptions()
-        {
-            return new SpectrumCacheOptions
-            {
-                DiskCachingAlwaysDisabled = false,
-                DirectoryPath = Path.GetTempPath(),
-                SpectraToRetainInMemory = 1000
-            };
         }
 
         /// <summary>
