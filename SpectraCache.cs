@@ -334,19 +334,21 @@ namespace MASIC
             try
             {
                 // Delete the cached files for this instance of clsMasic
-                var filePathMatch = ConstructCachedSpectrumPath();
-
-                var charIndex = filePathMatch.IndexOf(SPECTRUM_CACHE_FILE_BASENAME_TERMINATOR, StringComparison.Ordinal);
-                if (charIndex < 0)
+                if (!string.IsNullOrWhiteSpace(mCacheOptions.CacheFilePath))
                 {
-                    ReportError("charIndex was less than 0; this is unexpected in DeleteSpectrumCacheFiles");
-                    return;
-                }
+                    var charIndex = mCacheOptions.CacheFilePath.IndexOf(SPECTRUM_CACHE_FILE_BASENAME_TERMINATOR, StringComparison.Ordinal);
+                    if (charIndex < 0)
+                    {
+                        ReportError("charIndex was less than 0; this is unexpected in DeleteSpectrumCacheFiles");
+                        return;
+                    }
 
-                var basePath = filePathMatch.Substring(0, charIndex);
-                foreach (var cacheFile in Directory.GetFiles(mCacheOptions.DirectoryPath, Path.GetFileName(basePath) + "*"))
-                {
-                    File.Delete(cacheFile);
+                    var basePath = mCacheOptions.CacheFilePath.Substring(0, charIndex);
+
+                    foreach (var cacheFile in Directory.GetFiles(mCacheOptions.DirectoryPath, Path.GetFileName(basePath) + "*"))
+                    {
+                        File.Delete(cacheFile);
+                    }
                 }
             }
             catch (Exception ex)
@@ -628,6 +630,8 @@ namespace MASIC
 
                 // Initialize the binary reader
                 mPageFileReader = new BinaryReader(new FileStream(cacheFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite, 8192));
+
+                mCacheOptions.CacheFilePath = cacheFilePath;
 
                 return true;
             }

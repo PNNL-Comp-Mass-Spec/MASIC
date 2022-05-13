@@ -13,6 +13,11 @@ namespace MASIC.Options
         private const int DEFAULT_SPECTRA_TO_CACHE = 1000;
 
         /// <summary>
+        /// Current cache file path
+        /// </summary>
+        public string CacheFilePath { get; set; }
+
+        /// <summary>
         /// If True, spectra will never be cached to disk and the spectra pool will consequently be increased as needed
         /// </summary>
         public bool DiskCachingAlwaysDisabled { get; set; }
