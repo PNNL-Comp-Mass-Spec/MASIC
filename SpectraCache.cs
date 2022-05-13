@@ -562,38 +562,36 @@ namespace MASIC
                 mDirectoryPathValidated = false;
             }
 
-            if (!mDirectoryPathValidated)
+            if (mDirectoryPathValidated)
+                return true;
+
+            try
             {
-                try
+                if (!Path.IsPathRooted(mCacheOptions.DirectoryPath))
                 {
-                    if (!Path.IsPathRooted(mCacheOptions.DirectoryPath))
-                    {
-                        mCacheOptions.DirectoryPath = Path.Combine(Path.GetTempPath(), mCacheOptions.DirectoryPath);
-                    }
+                    mCacheOptions.DirectoryPath = Path.Combine(Path.GetTempPath(), mCacheOptions.DirectoryPath);
+                }
+
+                if (!Directory.Exists(mCacheOptions.DirectoryPath))
+                {
+                    Directory.CreateDirectory(mCacheOptions.DirectoryPath);
 
                     if (!Directory.Exists(mCacheOptions.DirectoryPath))
                     {
-                        Directory.CreateDirectory(mCacheOptions.DirectoryPath);
-
-                        if (!Directory.Exists(mCacheOptions.DirectoryPath))
-                        {
-                            ReportError("Error creating spectrum cache directory: " + mCacheOptions.DirectoryPath);
-                            return false;
-                        }
+                        ReportError("Error creating spectrum cache directory: " + mCacheOptions.DirectoryPath);
+                        return false;
                     }
+                }
 
-                    mDirectoryPathValidated = true;
-                    return true;
-                }
-                catch (Exception ex)
-                {
-                    // Error defining .DirectoryPath
-                    ReportError("Error creating spectrum cache directory: " + ex.Message);
-                    return false;
-                }
+                mDirectoryPathValidated = true;
+                return true;
             }
-
-            return true;
+            catch (Exception ex)
+            {
+                // Error defining .DirectoryPath
+                ReportError("Error creating spectrum cache directory: " + ex.Message);
+                return false;
+            }
         }
 
         /// <summary>
