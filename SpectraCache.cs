@@ -210,9 +210,6 @@ namespace MASIC
                 // Page file already contains the given scan;
                 // re-cache the item. for some reason we have updated peaks.
                 mSpectrumByteOffset.Remove(scanNumber);
-
-                // Data not changed; do not re-write
-                //return;
             }
 
             var initialOffset = mPageFileWriter.BaseStream.Position;
@@ -542,12 +539,6 @@ namespace MASIC
                 mPageFileReader.Read(byteBuffer, 0, byteCount);
                 Buffer.BlockCopy(byteBuffer, 0, dblBuffer, 0, byteCount);
                 msSpectrum.IonsIntensity.AddRange(dblBuffer);
-
-                //for (var index = 0; index < ionCount; index++)
-                //    msSpectrum.IonsMZ.Add(mPageFileReader.ReadDouble());
-                //
-                //for (var index = 0; index < ionCount; index++)
-                //    msSpectrum.IonsIntensity.Add(mPageFileReader.ReadDouble());
 
                 UnCacheEventCount++;
                 success = true;
