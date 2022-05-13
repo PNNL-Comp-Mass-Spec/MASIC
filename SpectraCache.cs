@@ -735,7 +735,7 @@ namespace MASIC
             /// </summary>
             /// <param name="scanNumber"></param>
             /// <param name="item"></param>
-            /// <returns>true if item available in cache</returns>
+            /// <returns>True if item available in cache</returns>
             bool GetItem(int scanNumber, out ScanMemoryCacheItem item);
 
             /// <summary>
@@ -743,7 +743,7 @@ namespace MASIC
             /// </summary>
             /// <param name="newItem">Item to add to the cache</param>
             /// <param name="removedItem">Item removed from the cache, or default if remove not needed</param>
-            /// <returns>true if <paramref name="removedItem"/> is an item removed from the cache</returns>
+            /// <returns>True if <paramref name="removedItem"/> is an item removed from the cache</returns>
             bool AddNew(ScanMemoryCacheItem newItem, out ScanMemoryCacheItem removedItem);
 
             /// <summary>
@@ -832,7 +832,7 @@ namespace MASIC
             /// Add an item to the cache.
             /// </summary>
             /// <param name="newItem"></param>
-            /// <returns>true if the item could be added, false otherwise (like if the cache is already full)</returns>
+            /// <returns>True if the item could be added, false otherwise (like if the cache is already full)</returns>
             private bool Add(ScanMemoryCacheItem newItem)
             {
                 if (Count == mCapacity)
@@ -869,7 +869,7 @@ namespace MASIC
             /// Remove the oldest item from the cache, but only if it is full
             /// </summary>
             /// <param name="oldItem">oldest item in the cache</param>
-            /// <returns>true if item was removed, false otherwise</returns>
+            /// <returns>True if item was removed, false otherwise</returns>
             private bool RemoveOldestItem(out ScanMemoryCacheItem oldItem)
             {
                 if (Count < mCapacity)
@@ -994,7 +994,7 @@ namespace MASIC
             /// Add an item to the cache.
             /// </summary>
             /// <param name="newItem"></param>
-            /// <returns>true if the item could be added, false otherwise (like if the cache is already full)</returns>
+            /// <returns>True if the item could be added, false otherwise (like if the cache is already full)</returns>
             private bool Add(ScanMemoryCacheItem newItem)
             {
                 if (mMemoryCache.Count == mCapacity)
@@ -1009,6 +1009,7 @@ namespace MASIC
 
                 var node = mMemoryCache.AddLast(newItem);
                 mScanNumberToNodeMap.Add(newItem.Scan.ScanNumber, node);
+
                 return true;
             }
 
@@ -1016,7 +1017,7 @@ namespace MASIC
             /// Remove the oldest item from the cache, but only if it is full
             /// </summary>
             /// <param name="oldItem">oldest item in the cache</param>
-            /// <returns>true if item was removed, false otherwise</returns>
+            /// <returns>True if item was removed, false otherwise</returns>
             private bool RemoveOldestItem(out ScanMemoryCacheItem oldItem)
             {
                 if (Count < mCapacity)
