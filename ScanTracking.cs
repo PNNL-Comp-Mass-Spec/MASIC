@@ -53,6 +53,7 @@ namespace MASIC
             int scanNumber,
             SICOptions sicOptions)
         {
+            // ReSharper disable once InvertIf
             if (sicOptions.ScanRangeStart >= 0 && sicOptions.ScanRangeEnd > sicOptions.ScanRangeStart)
             {
                 if (scanNumber < sicOptions.ScanRangeStart || scanNumber > sicOptions.ScanRangeEnd)

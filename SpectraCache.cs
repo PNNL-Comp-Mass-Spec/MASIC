@@ -532,10 +532,13 @@ namespace MASIC
                 var byteCount = ionCount * 8;
                 var byteBuffer = new byte[byteCount];
                 var dblBuffer = new double[ionCount];
+
+                // ReSharper disable once MustUseReturnValue
                 mPageFileReader.Read(byteBuffer, 0, byteCount);
                 Buffer.BlockCopy(byteBuffer, 0, dblBuffer, 0, byteCount);
                 msSpectrum.IonsMZ.AddRange(dblBuffer);
 
+                // ReSharper disable once MustUseReturnValue
                 mPageFileReader.Read(byteBuffer, 0, byteCount);
                 Buffer.BlockCopy(byteBuffer, 0, dblBuffer, 0, byteCount);
                 msSpectrum.IonsIntensity.AddRange(dblBuffer);
