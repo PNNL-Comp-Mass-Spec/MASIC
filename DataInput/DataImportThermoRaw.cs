@@ -223,15 +223,18 @@ namespace MASIC.DataInput
                 UpdateProgress(string.Format("Reading Thermo data ({0:N0} scans){1}", scanCount, Environment.NewLine + Path.GetFileName(filePath)));
                 ReportMessage(string.Format("Reading Thermo data; Total scan count: {0:N0}", scanCount));
 
-                var scanCountToRead = scanEnd - scanStart + 1;
+                var scanCountToRead = Math.Max(1, scanEnd - scanStart + 1);
+
                 var scansEst = mOptions.SICOptions.ScanRangeCount;
                 if (scansEst <= 0)
                 {
                     scansEst = scanCountToRead;
                 }
+
                 scanList.ReserveListCapacity(scansEst);
                 mScanTracking.ReserveListCapacity(scansEst);
                 spectraCache.SpectrumCount = Math.Max(spectraCache.SpectrumCount, scansEst);
+
                 for (var scanNumber = scanStart; scanNumber <= scanEnd; scanNumber++)
                 {
                     if (!mScanTracking.CheckScanInRange(scanNumber, mOptions.SICOptions))
@@ -241,6 +244,7 @@ namespace MASIC.DataInput
                     }
 
                     success = rawFileReader.GetScanInfo(scanNumber, out var thermoScanInfo);
+
                     if (!success)
                     {
                         // GetScanInfo returned false
@@ -248,7 +252,7 @@ namespace MASIC.DataInput
                         break;
                     }
 
-                    var percentComplete = scanList.MasterScanOrderCount / (double)(scanCountToRead) * 100;
+                    var percentComplete = scanList.MasterScanOrderCount / (double)(scansEst) * 100;
                     var extractSuccess = ExtractScanInfoCheckRange(rawFileReader, thermoScanInfo, scanList, spectraCache, dataOutputHandler, percentComplete);
 
                     if (!extractSuccess)
