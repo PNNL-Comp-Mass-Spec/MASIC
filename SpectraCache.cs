@@ -712,6 +712,11 @@ namespace MASIC
                 Scan = scan;
                 CacheState = cacheState;
             }
+
+            public override string ToString()
+            {
+                return string.Format("Scan {0}, {1}", Scan.ScanNumber, CacheState);
+            }
         }
 
         /// <summary>
