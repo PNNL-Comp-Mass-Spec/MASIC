@@ -8,13 +8,21 @@ namespace MASIC.Options
     public class SpectrumCacheOptions
     {
         /// <summary>
+        /// Default number of spectra to cache in memory
+        /// </summary>
+        private const int DEFAULT_SPECTRA_TO_CACHE = 1000;
+
+        /// <summary>
         /// If True, spectra will never be cached to disk and the spectra pool will consequently be increased as needed
         /// </summary>
         public bool DiskCachingAlwaysDisabled { get; set; }
 
         /// <summary>
-        /// Path to the cache directory (can be relative or absolute, aka rooted); if empty, the user's AppData directory is used
+        /// Path to the cache directory (can be relative or absolute, aka rooted)
         /// </summary>
+        /// <remarks>
+        /// If this is an empty string, the user's Temp directory is used (as returned by Path.GetTempPath())
+        /// </remarks>
         public string DirectoryPath { get; set; }
 
         /// <summary>
@@ -43,18 +51,25 @@ namespace MASIC.Options
         [Obsolete("Legacy parameter; no longer used")]
         public float MaximumMemoryUsageMB { get; set; }
 
-        private int mSpectraToRetainInMemory = 1000;
+        private int mSpectraToRetainInMemory;
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        public SpectrumCacheOptions()
+        {
+            Reset();
+        }
 
         /// <summary>
         /// Reset the options
         /// </summary>
         public void Reset()
         {
-            var defaultOptions = SpectraCache.GetDefaultCacheOptions();
-
-            DiskCachingAlwaysDisabled = defaultOptions.DiskCachingAlwaysDisabled;
-            DirectoryPath = defaultOptions.DirectoryPath;
-            SpectraToRetainInMemory = defaultOptions.SpectraToRetainInMemory;
+            CacheFilePath = string.Empty;
+            DiskCachingAlwaysDisabled = false;
+            DirectoryPath = System.IO.Path.GetTempPath();
+            SpectraToRetainInMemory = DEFAULT_SPECTRA_TO_CACHE;
         }
 
         /// <summary>
