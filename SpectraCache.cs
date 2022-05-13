@@ -17,9 +17,12 @@ namespace MASIC
         /// Constructor
         /// </summary>
         /// <param name="cacheOptions"></param>
-        public SpectraCache(SpectrumCacheOptions cacheOptions)
+        /// <param name="instrumentDataFile"></param>
+        public SpectraCache(SpectrumCacheOptions cacheOptions, FileInfo instrumentDataFile)
         {
             mCacheOptions = cacheOptions ?? new SpectrumCacheOptions();
+
+            mInstrumentDataFile = instrumentDataFile;
 
             InitializeSpectraPool();
         }
@@ -63,7 +66,10 @@ namespace MASIC
 
         private readonly SpectrumCacheOptions mCacheOptions;
 
+        private readonly FileInfo mInstrumentDataFile;
+
         private BinaryReader mPageFileReader;
+
         private BinaryWriter mPageFileWriter;
 
         private bool mDirectoryPathValidated;

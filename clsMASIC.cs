@@ -1323,6 +1323,9 @@ namespace MASIC
             DataOutput.DataOutput dataOutputHandler,
             out bool existingResultsFound)
         {
+            // Obtain the full path to the input file
+            var instrumentDataFile = new FileInfo(inputFilePath);
+            
             try
             {
                 // ---------------------------------------------------------
@@ -1332,12 +1335,9 @@ namespace MASIC
                 // do not reprocess
                 // ---------------------------------------------------------
 
-                // Obtain the full path to the input file
-                var inputFileInfo = new FileInfo(inputFilePath);
-
                 LogMessage("Checking for existing results in the output path: " + outputDirectoryPath);
 
-                existingResultsFound = dataOutputHandler.CheckForExistingResults(inputFileInfo.FullName, outputDirectoryPath, Options);
+                existingResultsFound = dataOutputHandler.CheckForExistingResults(instrumentDataFile.FullName, outputDirectoryPath, Options);
 
                 if (existingResultsFound)
                 {
@@ -1358,7 +1358,7 @@ namespace MASIC
                 // Instantiate the SpectraCache
                 // ---------------------------------------------------------
 
-                using var spectraCache = new SpectraCache(Options.CacheOptions)
+                using var spectraCache = new SpectraCache(Options.CacheOptions, instrumentDataFile)
                 {
                     DiskCachingAlwaysDisabled = Options.CacheOptions.DiskCachingAlwaysDisabled,
                     CacheDirectoryPath = Options.CacheOptions.DirectoryPath,
