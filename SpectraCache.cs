@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using MASIC.Data;
+using MASIC.DataInput;
 using MASIC.Options;
 
 namespace MASIC
@@ -21,6 +22,9 @@ namespace MASIC
         public SpectraCache(SpectrumCacheOptions cacheOptions, FileInfo instrumentDataFile)
         {
             mCacheOptions = cacheOptions ?? new SpectrumCacheOptions();
+
+            mDirectorySpaceTools = new DirectorySpaceTools();
+            RegisterEvents(mDirectorySpaceTools);
 
             mInstrumentDataFile = instrumentDataFile;
 
@@ -65,6 +69,8 @@ namespace MASIC
         private IScanMemoryCache mSpectraPool;
 
         private readonly SpectrumCacheOptions mCacheOptions;
+
+        private readonly DirectorySpaceTools mDirectorySpaceTools;
 
         private readonly FileInfo mInstrumentDataFile;
 
@@ -135,6 +141,35 @@ namespace MASIC
         /// Number of times a spectrum was loaded from disk and cached in the SpectraPool
         /// </summary>
         public int UnCacheEventCount { get; private set; }
+
+        /// <summary>
+        /// Add the directory to the list if its drive letter (or network share) does not match any of the entries in the list
+        /// </summary>
+        /// <param name="directoryList"></param>
+        /// <param name="comparisonDirectory"></param>
+        private void AddDirectoryIfNewDrive(List<DirectoryInfo> directoryList, DirectoryInfo comparisonDirectory)
+        {
+            try
+            {
+                var comparisonRootPath = Path.GetPathRoot(comparisonDirectory.FullName);
+
+                // ReSharper disable once ForeachCanBeConvertedToQueryUsingAnotherGetEnumerator
+                foreach (var directory in directoryList)
+                {
+                    var pathRoot = Path.GetPathRoot(directory.FullName);
+
+                    if (pathRoot.Equals(comparisonRootPath, StringComparison.OrdinalIgnoreCase))
+                        return;
+                }
+
+                directoryList.Add(comparisonDirectory);
+            }
+            catch (Exception ex)
+            {
+                ReportError("Error comparing directory root path to directories in list", ex);
+            }
+        }
+
         /// <summary>
         /// Checks the spectraPool for available capacity, caching the oldest item if full
         /// </summary>
@@ -332,9 +367,9 @@ namespace MASIC
         /// Constructs the full path for the given spectrum file
         /// </summary>
         /// <returns>The file path, or an empty string if unable to validate the spectrum cache directory</returns>
-        private string ConstructCachedSpectrumPath()
+        private string ConstructCachedSpectrumPath(bool ignoreInstrumentDataFileSize = false)
         {
-            if (!ValidateCachedSpectrumDirectory())
+            if (!ValidateCachedSpectrumDirectory(ignoreInstrumentDataFileSize))
             {
                 return string.Empty;
             }
@@ -390,7 +425,13 @@ namespace MASIC
             {
                 const string filePathMatch = SPECTRUM_CACHE_FILE_PREFIX + "*" + SPECTRUM_CACHE_FILE_BASENAME_TERMINATOR + "*";
 
-                var spectrumFile = new FileInfo(Path.GetFullPath(ConstructCachedSpectrumPath()));
+                var cacheFilePath = ConstructCachedSpectrumPath(true);
+
+                if (string.IsNullOrWhiteSpace(cacheFilePath))
+                    return;
+
+                var spectrumFile = new FileInfo(cacheFilePath);
+
                 if (spectrumFile.Directory == null)
                 {
                     ReportWarning("Unable to determine the spectrum cache directory path in DeleteSpectrumCacheFiles; this is unexpected");
@@ -570,7 +611,7 @@ namespace MASIC
             return success;
         }
 
-        private bool ValidateCachedSpectrumDirectory()
+        private bool ValidateCachedSpectrumDirectory(bool ignoreInstrumentDataFileSize)
         {
             if (string.IsNullOrWhiteSpace(mCacheOptions.DirectoryPath))
             {
@@ -584,29 +625,74 @@ namespace MASIC
 
             try
             {
+                var directoriesToCheck = new List<DirectoryInfo>();
+
                 if (!Path.IsPathRooted(mCacheOptions.DirectoryPath))
                 {
                     mCacheOptions.DirectoryPath = Path.Combine(Path.GetTempPath(), mCacheOptions.DirectoryPath);
                 }
 
-                if (!Directory.Exists(mCacheOptions.DirectoryPath))
-                {
-                    Directory.CreateDirectory(mCacheOptions.DirectoryPath);
+                directoriesToCheck.Add(new DirectoryInfo(mCacheOptions.DirectoryPath));
 
-                    if (!Directory.Exists(mCacheOptions.DirectoryPath))
-                    {
-                        ReportError("Error creating spectrum cache directory: " + mCacheOptions.DirectoryPath);
-                        return false;
-                    }
+                // Assume that the cache file will be roughly the same size as the instrument data file
+                int minFreeSpaceMB;
+
+                if (ignoreInstrumentDataFileSize)
+                {
+                    minFreeSpaceMB = 0;
+                }
+                else if (mInstrumentDataFile == null)
+                {
+                    minFreeSpaceMB = 500;
+                }
+                else
+                {
+                    minFreeSpaceMB = Math.Max(500, (int)Math.Round(DirectorySpaceTools.BytesToMB(mInstrumentDataFile.Length)));
+
+                    AddDirectoryIfNewDrive(directoriesToCheck, mInstrumentDataFile.Directory);
                 }
 
-                mDirectoryPathValidated = true;
-                return true;
+                AddDirectoryIfNewDrive(directoriesToCheck, new DirectoryInfo("."));
+
+                var warningMessages = new List<string>();
+
+                foreach (var cacheDirectory in directoriesToCheck)
+                {
+                    if (!cacheDirectory.Exists)
+                    {
+                        cacheDirectory.Create();
+                        cacheDirectory.Refresh();
+                    }
+
+                    var validFreeSpace = mDirectorySpaceTools.ValidateFreeDiskSpace(
+                        "Spectrum cache directory on the " + Path.GetPathRoot(cacheDirectory.FullName).TrimEnd('\\'),
+                        cacheDirectory.FullName,
+                        minFreeSpaceMB,
+                        false,
+                        out var errorMessage);
+
+                    if (validFreeSpace)
+                    {
+                        mCacheOptions.DirectoryPath = cacheDirectory.FullName;
+                        mDirectoryPathValidated = true;
+                        return true;
+                    }
+
+                    warningMessages.Add(errorMessage);
+                }
+
+                OnErrorEvent("Unable to find a drive with sufficient free space to store the spectrum cache file");
+                foreach (var message in warningMessages)
+                {
+                    OnWarningEvent(message);
+                }
+
+                return false;
             }
             catch (Exception ex)
             {
                 // Error defining .DirectoryPath
-                ReportError("Error creating spectrum cache directory: " + ex.Message);
+                ReportError("Error validating spectrum cache directory: " + ex.Message);
                 return false;
             }
         }
