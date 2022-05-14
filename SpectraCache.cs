@@ -357,7 +357,7 @@ namespace MASIC
         /// </summary>
         public void DeleteSpectrumCacheFiles()
         {
-            var fileDateTolerance = DateTime.UtcNow.Subtract(new TimeSpan(SPECTRUM_CACHE_MAX_FILE_AGE_HOURS, 0, 0));
+            var dateTimeThreshold = DateTime.UtcNow.Subtract(new TimeSpan(SPECTRUM_CACHE_MAX_FILE_AGE_HOURS, 0, 0));
 
             try
             {
@@ -399,7 +399,7 @@ namespace MASIC
 
                 foreach (var candidateFile in spectrumFile.Directory.GetFiles(filePathMatch))
                 {
-                    if (candidateFile.LastWriteTimeUtc < fileDateTolerance)
+                    if (candidateFile.LastWriteTimeUtc < dateTimeThreshold)
                     {
                         candidateFile.Delete();
                     }
