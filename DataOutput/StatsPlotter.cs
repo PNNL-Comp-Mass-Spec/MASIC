@@ -369,6 +369,7 @@ namespace MASIC.DataOutput
             try
             {
                 var statsSummarized = mStatsSummarizer.SummarizeSICStats(sicStatsFilePath);
+
                 if (!statsSummarized)
                     return false;
 

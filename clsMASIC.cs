@@ -46,7 +46,7 @@ namespace MASIC
         /// </summary>
         public clsMASIC()
         {
-            mFileDate = "April 27, 2022";
+            mFileDate = "May 13, 2022";
 
             LocalErrorCode = MasicErrorCodes.NoError;
             StatusMessage = string.Empty;
@@ -1325,7 +1325,7 @@ namespace MASIC
         {
             // Obtain the full path to the input file
             var instrumentDataFile = new FileInfo(inputFilePath);
-            
+
             try
             {
                 // ---------------------------------------------------------

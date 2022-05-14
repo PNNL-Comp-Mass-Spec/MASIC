@@ -41,6 +41,7 @@ namespace MASIC
         }
 
         private const string SPECTRUM_CACHE_FILE_PREFIX = "$SpecCache";
+
         private const string SPECTRUM_CACHE_FILE_BASENAME_TERMINATOR = "_Temp";
 
         private const int SPECTRUM_CACHE_MAX_FILE_AGE_HOURS = 12;
