@@ -101,32 +101,7 @@ namespace MASIC
         }
 
         /// <summary>
-        /// Maximum memory that the cache is allowed to use
         /// </summary>
-        [Obsolete("Legacy parameter; no longer used")]
-        public float CacheMaximumMemoryUsageMB
-        {
-            get => mCacheOptions.MaximumMemoryUsageMB;
-            set => mCacheOptions.MaximumMemoryUsageMB = value;
-        }
-
-        /// <summary>
-        /// Minimum memory that the cache will use
-        /// </summary>
-        [Obsolete("Legacy parameter; no longer used")]
-        public float CacheMinimumFreeMemoryMB
-        {
-            get => mCacheOptions.MinimumFreeMemoryMB;
-            set
-            {
-                if (mCacheOptions.MinimumFreeMemoryMB < 10)
-                {
-                    mCacheOptions.MinimumFreeMemoryMB = 10;
-                }
-
-                mCacheOptions.MinimumFreeMemoryMB = value;
-            }
-        }
 
         /// <summary>
         /// Number of spectra to keep in the in-memory cache

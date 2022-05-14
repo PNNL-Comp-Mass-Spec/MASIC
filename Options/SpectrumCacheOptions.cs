@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace MASIC.Options
+﻿namespace MASIC.Options
 {
     /// <summary>
     /// Spectrum caching options
@@ -40,21 +38,10 @@ namespace MASIC.Options
             {
                 if (value < 100)
                     value = 100;
+
                 mSpectraToRetainInMemory = value;
             }
         }
-
-        /// <summary>
-        /// Required minimum free system memory size, in MB
-        /// </summary>
-        [Obsolete("Legacy parameter; no longer used")]
-        public float MinimumFreeMemoryMB { get; set; }
-
-        /// <summary>
-        /// Allowed maximum free system memory size, in MB
-        /// </summary>
-        [Obsolete("Legacy parameter; no longer used")]
-        public float MaximumMemoryUsageMB { get; set; }
 
         private int mSpectraToRetainInMemory;
 
