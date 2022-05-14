@@ -82,16 +82,6 @@ namespace MASIC
         private Dictionary<int, long> mSpectrumByteOffset;
 
         /// <summary>
-        /// Number of cache events
-        /// </summary>
-        public int CacheEventCount { get; private set; }
-
-        /// <summary>
-        /// Number of times the spectrum was found in the in-memory spectrum pool
-        /// </summary>
-        public int SpectraPoolHitEventCount { get; private set; }
-
-        /// <summary>
         /// Spectrum cache directory path
         /// </summary>
         public string CacheDirectoryPath
@@ -101,7 +91,9 @@ namespace MASIC
         }
 
         /// <summary>
+        /// Number of cache events
         /// </summary>
+        public int CacheEventCount { get; private set; }
 
         /// <summary>
         /// Number of spectra to keep in the in-memory cache
@@ -127,15 +119,22 @@ namespace MASIC
         }
 
         /// <summary>
-        /// Number of times a spectrum was loaded from disk and cached in the SpectraPool
         /// </summary>
-        public int UnCacheEventCount { get; private set; }
+
+        /// <summary>
+        /// Number of times the spectrum was found in the in-memory spectrum pool
+        /// </summary>
+        public int SpectraPoolHitEventCount { get; private set; }
 
         /// <summary>
         /// The number of spectra we expect to read, updated to the number cached (to disk)
         /// </summary>
         public int SpectrumCount { get; set; }
 
+        /// <summary>
+        /// Number of times a spectrum was loaded from disk and cached in the SpectraPool
+        /// </summary>
+        public int UnCacheEventCount { get; private set; }
         /// <summary>
         /// Checks the spectraPool for available capacity, caching the oldest item if full
         /// </summary>
