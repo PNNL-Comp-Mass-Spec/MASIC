@@ -1620,57 +1620,59 @@ namespace MASIC
 
         private void UpdateStatusFile(bool forceUpdate = false)
         {
-            if (forceUpdate || DateTime.UtcNow.Subtract(UpdateStatusFileLastFileWriteTime).TotalSeconds >= MINIMUM_STATUS_FILE_UPDATE_INTERVAL_SECONDS)
+            if (!forceUpdate && DateTime.UtcNow.Subtract(UpdateStatusFileLastFileWriteTime).TotalSeconds < MINIMUM_STATUS_FILE_UPDATE_INTERVAL_SECONDS)
             {
-                UpdateStatusFileLastFileWriteTime = DateTime.UtcNow;
+                return;
+            }
 
-                try
+            UpdateStatusFileLastFileWriteTime = DateTime.UtcNow;
+
+            try
+            {
+                var tempPath = Path.Combine(GetAppDirectoryPath(), "Temp_" + Options.MASICStatusFilename);
+                var statusFilePath = Path.Combine(GetAppDirectoryPath(), Options.MASICStatusFilename);
+
+                using (var writer = new System.Xml.XmlTextWriter(tempPath, System.Text.Encoding.UTF8))
                 {
-                    var tempPath = Path.Combine(GetAppDirectoryPath(), "Temp_" + Options.MASICStatusFilename);
-                    var statusFilePath = Path.Combine(GetAppDirectoryPath(), Options.MASICStatusFilename);
+                    writer.Formatting = System.Xml.Formatting.Indented;
+                    writer.Indentation = 2;
 
-                    using (var writer = new System.Xml.XmlTextWriter(tempPath, System.Text.Encoding.UTF8))
-                    {
-                        writer.Formatting = System.Xml.Formatting.Indented;
-                        writer.Indentation = 2;
+                    writer.WriteStartDocument(true);
+                    writer.WriteComment("MASIC processing status");
 
-                        writer.WriteStartDocument(true);
-                        writer.WriteComment("MASIC processing status");
+                    // Write the beginning of the "Root" element.
+                    writer.WriteStartElement("Root");
 
-                        // Write the beginning of the "Root" element.
-                        writer.WriteStartElement("Root");
+                    writer.WriteStartElement("General");
+                    writer.WriteElementString("LastUpdate", DateTime.Now.ToString(DatasetStatsSummarizer.DATE_TIME_FORMAT_STRING));
+                    writer.WriteElementString("ProcessingStep", ProcessStep.ToString());
+                    writer.WriteElementString("Progress", StringUtilities.DblToString(mProgressPercentComplete, 2));
+                    writer.WriteElementString("Error", GetErrorMessage());
+                    writer.WriteEndElement();
 
-                        writer.WriteStartElement("General");
-                        writer.WriteElementString("LastUpdate", DateTime.Now.ToString(DatasetStatsSummarizer.DATE_TIME_FORMAT_STRING));
-                        writer.WriteElementString("ProcessingStep", ProcessStep.ToString());
-                        writer.WriteElementString("Progress", StringUtilities.DblToString(mProgressPercentComplete, 2));
-                        writer.WriteElementString("Error", GetErrorMessage());
-                        writer.WriteEndElement();
+                    writer.WriteStartElement("Statistics");
+                    writer.WriteElementString("FreeMemoryMB", StringUtilities.DblToString(GetFreeMemoryMB(), 1));
+                    writer.WriteElementString("MemoryUsageMB", StringUtilities.DblToString(GetProcessMemoryUsageMB(), 1));
+                    writer.WriteElementString("PeakMemoryUsageMB", StringUtilities.DblToString(mProcessingStats.PeakMemoryUsageMB, 1));
 
-                        writer.WriteStartElement("Statistics");
-                        writer.WriteElementString("FreeMemoryMB", StringUtilities.DblToString(GetFreeMemoryMB(), 1));
-                        writer.WriteElementString("MemoryUsageMB", StringUtilities.DblToString(GetProcessMemoryUsageMB(), 1));
-                        writer.WriteElementString("PeakMemoryUsageMB", StringUtilities.DblToString(mProcessingStats.PeakMemoryUsageMB, 1));
+                    writer.WriteElementString("CacheEventCount", mProcessingStats.CacheEventCount.ToString());
+                    writer.WriteElementString("UnCacheEventCount", mProcessingStats.UnCacheEventCount.ToString());
+                    writer.WriteElementString("SpectraPoolHitEventCount", mProcessingStats.SpectraPoolHitEventCount.ToString());
 
-                        writer.WriteElementString("CacheEventCount", mProcessingStats.CacheEventCount.ToString());
-                        writer.WriteElementString("UnCacheEventCount", mProcessingStats.UnCacheEventCount.ToString());
-                        writer.WriteElementString("SpectraPoolHitEventCount", mProcessingStats.SpectraPoolHitEventCount.ToString());
+                    writer.WriteElementString("ProcessingTimeSec", StringUtilities.DblToString(GetTotalProcessingTimeSec(), 1));
+                    writer.WriteEndElement();
 
-                        writer.WriteElementString("ProcessingTimeSec", StringUtilities.DblToString(GetTotalProcessingTimeSec(), 1));
-                        writer.WriteEndElement();
-
-                        writer.WriteEndElement();  // End the "Root" element.
-                        writer.WriteEndDocument(); // End the document
-                    }
-
-                    // Copy the temporary file to the real one
-                    File.Copy(tempPath, statusFilePath, true);
-                    File.Delete(tempPath);
+                    writer.WriteEndElement();  // End the "Root" element.
+                    writer.WriteEndDocument(); // End the document
                 }
-                catch (Exception)
-                {
-                    // Ignore any errors
-                }
+
+                // Copy the temporary file to the real one
+                File.Copy(tempPath, statusFilePath, true);
+                File.Delete(tempPath);
+            }
+            catch (Exception)
+            {
+                // Ignore any errors
             }
         }
 
