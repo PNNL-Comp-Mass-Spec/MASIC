@@ -32,7 +32,7 @@ namespace MASIC
         }
 
         /// <summary>
-        /// Close the page file and delete spectrum cache values
+        /// Close the page file and delete spectrum cache files
         /// </summary>
         public void Dispose()
         {
