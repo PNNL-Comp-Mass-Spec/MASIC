@@ -125,7 +125,9 @@ namespace MASIC
         }
 
         /// <summary>
+        /// This will be set to true if unable to create the spectrum cache file
         /// </summary>
+        public bool PageFileInitializationFailed { get; private set; }
 
         /// <summary>
         /// Number of times the spectrum was found in the in-memory spectrum pool
@@ -240,6 +242,9 @@ namespace MASIC
                     CacheEventCount++;
                     return true;
                 }
+
+                if (PageFileInitializationFailed)
+                    return false;
 
                 if (mSpectraPool.GetItem(scanNumber, out var cacheItem))
                 {
@@ -508,6 +513,8 @@ namespace MASIC
 
             mDirectoryPathValidated = false;
 
+            PageFileInitializationFailed = false;
+
             ClosePageFile();
 
             if (mSpectraPool == null || mSpectraPool.Capacity < mMaximumPoolLength)
@@ -719,6 +726,12 @@ namespace MASIC
                 // Construct the page file path
                 var cacheFilePath = ConstructCachedSpectrumPath();
 
+                if (string.IsNullOrWhiteSpace(cacheFilePath))
+                {
+                    PageFileInitializationFailed = true;
+                    return false;
+                }
+
                 // Initialize the binary writer and create the file
                 mPageFileWriter = new BinaryWriter(new FileStream(cacheFilePath, FileMode.Create, FileAccess.Write, FileShare.Read));
 
@@ -744,6 +757,7 @@ namespace MASIC
             }
             catch (Exception ex)
             {
+                PageFileInitializationFailed = true;
                 ReportError(ex.Message, ex);
                 return false;
             }

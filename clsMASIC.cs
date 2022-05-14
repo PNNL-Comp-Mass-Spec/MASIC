@@ -1408,6 +1408,9 @@ namespace MASIC
                     return false;
                 }
 
+                if (Options.AbortProcessing)
+                    return false;
+
                 // ---------------------------------------------------------
                 // Find the Selected Ion Chromatograms, reporter ions, etc. and write the results to disk
                 // ---------------------------------------------------------

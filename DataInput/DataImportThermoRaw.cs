@@ -730,7 +730,7 @@ namespace MASIC.DataInput
                 }
 
                 lastKnownLocation = "Call ProcessAndStoreSpectrum";
-                mScanTracking.ProcessAndStoreSpectrum(
+                var spectrumStored = mScanTracking.ProcessAndStoreSpectrum(
                     scanInfo, this,
                     spectraCache, msSpectrum,
                     noiseThresholdOptions,
@@ -738,6 +738,15 @@ namespace MASIC.DataInput
                     compressSpectraDataWork,
                     msDataResolution,
                     keepRawSpectrum);
+
+                if (spectraCache.PageFileInitializationFailed)
+                {
+                    mOptions.AbortProcessing = true;
+                    return false;
+                }
+
+                if (!spectrumStored)
+                    return false;
             }
             catch (Exception ex)
             {
