@@ -423,7 +423,7 @@ namespace MASIC
             catch (Exception ex)
             {
                 // Report this error, but otherwise ignore it
-                ReportError("Error deleting cached spectrum files for this task", ex);
+                ReportWarning("Error deleting cached spectrum files for this task: " + ex.Message);
             }
 
             // Now look for old spectrum cache files
@@ -454,7 +454,7 @@ namespace MASIC
             }
             catch (Exception ex)
             {
-                ReportError("Error deleting old cached spectrum files", ex);
+                ReportWarning("Error deleting old cached spectrum files: " + ex.Message);
             }
         }
 
@@ -759,7 +759,8 @@ namespace MASIC
             catch (Exception ex)
             {
                 PageFileInitializationFailed = true;
-                ReportError(ex.Message, ex);
+                ReportError("Error in ValidatePageFileIO: " + ex.Message, ex);
+                ReportWarning(PRISM.StackTraceFormatter.GetExceptionStackTrace(ex));
                 return false;
             }
         }
