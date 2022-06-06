@@ -46,7 +46,7 @@ namespace MASIC
         /// </summary>
         public clsMASIC()
         {
-            mFileDate = "May 13, 2022";
+            mFileDate = "June 6, 2022";
 
             LocalErrorCode = MasicErrorCodes.NoError;
             StatusMessage = string.Empty;
@@ -1081,7 +1081,7 @@ namespace MASIC
 
                 UpdateProcessingStep(ProcessingStepConstants.Cancelled, true);
 
-                LogMessage("Processing ended in error");
+                LogMessage("Processing ended in error", MessageTypeConstants.ErrorMsg);
                 return false;
             }
 
@@ -1291,7 +1291,12 @@ namespace MASIC
                 }
                 else
                 {
-                    LogMessage("Processing ended in error");
+                    if (ErrorCode == ProcessFilesErrorCodes.NoError)
+                    {
+                        SetBaseClassErrorCode(ProcessFilesErrorCodes.UnspecifiedError);
+                    }
+
+                    LogMessage("Processing ended in error", MessageTypeConstants.ErrorMsg);
                 }
             }
             catch (Exception ex)
