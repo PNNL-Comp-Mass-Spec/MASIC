@@ -382,10 +382,14 @@ namespace MASIC
 
             var randomGenerator = new Random();
 
+            var workingDirectory = new DirectoryInfo(".");
+
             // Create the cache file name, using both a timestamp and a random number between 1 and 9999
-            var baseName = SPECTRUM_CACHE_FILE_PREFIX +
-                                 DateTime.UtcNow.Hour + DateTime.UtcNow.Minute + DateTime.UtcNow.Second + DateTime.UtcNow.Millisecond +
-                                 randomGenerator.Next(1, 9999);
+            var baseName = string.Format("{0}_{1}{2}{3}{4}{5}_{6}",
+                SPECTRUM_CACHE_FILE_PREFIX,
+                DateTime.UtcNow.Hour ,DateTime.UtcNow.Minute ,DateTime.UtcNow.Second ,DateTime.UtcNow.Millisecond,
+                randomGenerator.Next(1, 9999),
+                workingDirectory.Name);
 
             var fileName = baseName + SPECTRUM_CACHE_FILE_BASENAME_TERMINATOR + ".bin";
 
@@ -734,7 +738,43 @@ namespace MASIC
                 }
 
                 // Initialize the binary writer and create the file
-                mPageFileWriter = new BinaryWriter(new FileStream(cacheFilePath, FileMode.Create, FileAccess.Write, FileShare.Read));
+                // The initialization process sometimes fails with error "The process cannot access the file '...' because it is being used by another process"
+                // Use a while loop to try up to 3 times to initialize the writer
+
+                var iteration = 0;
+
+                while (true)
+                {
+                    iteration++;
+                    bool success;
+                    string exceptionMessage;
+
+                    try
+                    {
+                        mPageFileWriter = new BinaryWriter(new FileStream(cacheFilePath, FileMode.Create, FileAccess.Write, FileShare.Read));
+                        exceptionMessage = string.Empty;
+                        success = true;
+                    }
+                    catch (Exception ex)
+                    {
+                        ReportWarning(string.Format(
+                            "Error initializing the binary writer in ValidatePageFileIO (iteration {0}): {1}",
+                            iteration, ex.Message));
+
+                        exceptionMessage = ex.Message;
+                        success = false;
+                    }
+
+                    if (success)
+                        break;
+
+                    if (iteration < 3)
+                        continue;
+
+                    ReportError(string.Format("Error initializing the binary writer in ValidatePageFileIO: {0}", exceptionMessage));
+
+                    return false;
+                }
 
                 // Write a header line
                 mPageFileWriter.Write(
