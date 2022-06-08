@@ -380,7 +380,7 @@ namespace MASIC
                 return string.Empty;
             }
 
-            var randomGenerator = new Random();
+            var randomNumber = GetRandom(1, 9999);
 
             var workingDirectory = new DirectoryInfo(".");
 
@@ -388,7 +388,7 @@ namespace MASIC
             var baseName = string.Format("{0}_{1}{2}{3}{4}{5}_{6}",
                 SPECTRUM_CACHE_FILE_PREFIX,
                 DateTime.UtcNow.Hour ,DateTime.UtcNow.Minute ,DateTime.UtcNow.Second ,DateTime.UtcNow.Millisecond,
-                randomGenerator.Next(1, 9999),
+                randomNumber,
                 workingDirectory.Name);
 
             var fileName = baseName + SPECTRUM_CACHE_FILE_BASENAME_TERMINATOR + ".bin";
@@ -537,6 +537,13 @@ namespace MASIC
             {
                 mSpectraPool.Clear();
             }
+        }
+
+        private static int GetRandom(int minValue, int maxValue)
+        {
+            var rand = new Random();
+
+            return rand.Next(minValue, maxValue);
         }
 
         /// <summary>
@@ -769,7 +776,13 @@ namespace MASIC
                         break;
 
                     if (iteration < 3)
+                    {
+                        // Sleep between 250 and 1000 milliseconds
+                        var sleepDelayMsec = GetRandom(250, 1000);
+                        System.Threading.Thread.Sleep(sleepDelayMsec);
+
                         continue;
+                    }
 
                     ReportError(string.Format("Error initializing the binary writer in ValidatePageFileIO: {0}", exceptionMessage));
 
