@@ -541,7 +541,10 @@ namespace MASIC
 
         private static int GetRandom(int minValue, int maxValue)
         {
-            var rand = new Random();
+            // Use the hash code of the full path of the working directory as the seed for the random number generator
+            var workingDirectory = new DirectoryInfo(".");
+
+            var rand = new Random(workingDirectory.FullName.GetHashCode());
 
             return rand.Next(minValue, maxValue);
         }
