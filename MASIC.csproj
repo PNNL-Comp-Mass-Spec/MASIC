@@ -189,7 +189,7 @@
       <Version>2.5.71</Version>
     </PackageReference>
     <PackageReference Include="ThermoRawFileReader">
-      <Version>4.1.36</Version>
+      <Version>4.1.42</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
