@@ -276,10 +276,10 @@ namespace MASIC.DataInput
         /// <summary>
         /// Parse a double value from a string
         /// </summary>
+        /// <remarks>Raises an exception if unable to parse</remarks>
         /// <param name="valueText"></param>
         /// <param name="columnName"></param>
         /// <param name="rowNumber"></param>
-        /// <remarks>Raises an exception if unable to parse</remarks>
         private double ParseDouble(string valueText, string columnName, int rowNumber)
         {
             if (!double.TryParse(valueText, out var value))

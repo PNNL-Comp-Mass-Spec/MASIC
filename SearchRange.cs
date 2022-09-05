@@ -343,9 +343,9 @@ namespace MASIC
         /// Store data to search (integers)
         /// The data is sorted after being stored
         /// </summary>
+        /// <remarks>This class can only track one set of data at a time (doubles, floats, or integers)</remarks>
         /// <param name="values"></param>
         /// <returns>True if success, false if an error</returns>
-        /// <remarks>This class can only track one set of data at a time (doubles, floats, or integers)</remarks>
         // ReSharper disable once UnusedMember.Global
         public bool FillWithData(int[] values)
         {
@@ -390,9 +390,9 @@ namespace MASIC
         /// Store data to search (floats)
         /// The data is sorted after being stored
         /// </summary>
+        /// <remarks>This class can only track one set of data at a time (doubles, floats, or integers)</remarks>
         /// <param name="values"></param>
         /// <returns>True if success, false if an error</returns>
-        /// <remarks>This class can only track one set of data at a time (doubles, floats, or integers)</remarks>
         // ReSharper disable once UnusedMember.Global
         public bool FillWithData(float[] values)
         {
@@ -437,9 +437,9 @@ namespace MASIC
         /// Store data to search (doubles)
         /// The data is sorted after being stored
         /// </summary>
+        /// <remarks>This class can only track one set of data at a time (doubles, floats, or integers)</remarks>
         /// <param name="values"></param>
         /// <returns>True if success, false if an error</returns>
-        /// <remarks>This class can only track one set of data at a time (doubles, floats, or integers)</remarks>
         public bool FillWithData(double[] values)
         {
             bool success;

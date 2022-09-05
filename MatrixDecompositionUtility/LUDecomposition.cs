@@ -31,11 +31,11 @@ namespace MatrixDecompositionUtility
         /// <summary>
         /// Linear equation solution, back substitution
         /// </summary>
+        /// <remarks>From Numerical Recipes in C</remarks>
         /// <param name="a"></param>
         /// <param name="n"></param>
         /// <param name="index"></param>
         /// <param name="b"></param>
-        /// <remarks>From Numerical Recipes in C</remarks>
         private void lubksb(double[,] a, int n, IReadOnlyList<int> index, IList<double> b)
         {
             int i;
@@ -70,10 +70,10 @@ namespace MatrixDecompositionUtility
         /// <summary>
         /// Linear equation solution, LU decomposition
         /// </summary>
+        /// <remarks>From Numerical Recipes in C</remarks>
         /// <param name="a"></param>
         /// <param name="n"></param>
         /// <param name="index"></param>
-        /// <remarks>From Numerical Recipes in C</remarks>
         private void ludcmp(double[,] a, int n, IList<int> index)
         {
             int j;

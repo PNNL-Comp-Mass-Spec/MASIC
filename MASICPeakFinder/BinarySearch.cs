@@ -35,11 +35,11 @@ namespace MASICPeakFinder
         /// <summary>
         /// Looks through listToSearch for itemToFind
         /// </summary>
+        /// <remarks>Assumes listToSearch is already sorted</remarks>
         /// <param name="listToSearch"></param>
         /// <param name="itemToFind"></param>
         /// <param name="missingDataMode"></param>
         /// <returns>The index of the item if found, otherwise, the index of the closest match, based on missingDataMode</returns>
-        /// <remarks>Assumes listToSearch is already sorted</remarks>
         public static int BinarySearchFindNearest(
             List<int> listToSearch,
             int itemToFind,
@@ -93,11 +93,11 @@ namespace MASICPeakFinder
         /// <summary>
         /// Looks through listToSearch for itemToFind
         /// </summary>
+        /// <remarks>Assumes listToSearch is already sorted</remarks>
         /// <param name="listToSearch"></param>
         /// <param name="itemToFind"></param>
         /// <param name="missingDataMode"></param>
         /// <returns>The index of the item if found, otherwise, the index of the closest match, based on missingDataMode</returns>
-        /// <remarks>Assumes listToSearch is already sorted</remarks>
         public static int BinarySearchFindNearest(
             List<float> listToSearch,
             float itemToFind,
@@ -151,11 +151,11 @@ namespace MASICPeakFinder
         /// <summary>
         /// Looks through listToSearch for itemToFind
         /// </summary>
+        /// <remarks>Assumes listToSearch is already sorted</remarks>
         /// <param name="listToSearch"></param>
         /// <param name="itemToFind"></param>
         /// <param name="missingDataMode"></param>
         /// <returns>The index of the item if found, otherwise, the index of the closest match, based on missingDataMode</returns>
-        /// <remarks>Assumes listToSearch is already sorted</remarks>
         public static int BinarySearchFindNearest(
             List<double> listToSearch,
             double itemToFind,

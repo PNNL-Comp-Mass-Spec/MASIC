@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -295,13 +295,13 @@ namespace MagnitudeConcavityPeakFinder
         /// <summary>
         /// Computes the minimum potential peak area for a given SIC
         /// </summary>
-        /// <param name="xyData"></param>
-        /// <param name="udtSICPeakFinderOptions"></param>
-        /// <returns>Struct with the MinimumPotentialPeakArea</returns>
         /// <remarks>
         /// The summed intensity is not used if the number of points greater than or equal to
         /// .SICBaselineNoiseOptions.MinimumBaselineNoiseLevel is less than Minimum_Peak_Width
         /// </remarks>
+        /// <param name="xyData"></param>
+        /// <param name="udtSICPeakFinderOptions"></param>
+        /// <returns>Struct with the MinimumPotentialPeakArea</returns>
         public SICPotentialAreaStatsType FindMinimumPotentialPeakArea(
             List<KeyValuePair<int, double>> xyData,
             SICPeakFinderOptionsType udtSICPeakFinderOptions)

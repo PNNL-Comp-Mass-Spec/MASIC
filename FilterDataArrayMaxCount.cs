@@ -450,12 +450,12 @@ namespace MASIC
         /// <summary>
         /// This method uses a full sort to filter the data
         /// </summary>
+        /// <remarks>Sorting will be slow for large arrays and you should therefore use FilterDataByMaxDataCountToKeep if possible</remarks>
         /// <param name="abundances"></param>
         /// <param name="dataIndices"></param>
         /// <param name="dataCount"></param>
         /// <param name="maximumDataCountInArraysToLoad"></param>
         /// <param name="subtaskStepCount"></param>
-        /// <remarks>Sorting will be slow for large arrays and you should therefore use FilterDataByMaxDataCountToKeep if possible</remarks>
         private void SortAndMarkPointsToSkip(double[] abundances, int[] dataIndices, int dataCount, int maximumDataCountInArraysToLoad, int subtaskStepCount)
         {
             if (dataCount > 0)

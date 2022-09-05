@@ -147,6 +147,7 @@ namespace MASIC.DataOutput
         /// <summary>
         /// Looks through surveyScans and fragScans for ExtendedHeaderInfo values that are constant across all scans
         /// </summary>
+        /// <remarks>mExtendedHeaderNameMap is updated so that constant header values are removed from it</remarks>
         /// <param name="nonConstantHeaderIDs">Output: the ID values of the header values that are not constant</param>
         /// <param name="surveyScans"></param>
         /// <param name="fragScans"></param>
@@ -155,7 +156,6 @@ namespace MASIC.DataOutput
         /// String that is a newline separated list of header values that are constant, tab delimited, and their constant values, also tab delimited
         /// Each line is in the form ParameterName_ColumnDelimiter_ParameterValue
         /// </returns>
-        /// <remarks>mExtendedHeaderNameMap is updated so that constant header values are removed from it</remarks>
         public string ExtractConstantExtendedHeaderValues(
             out List<int> nonConstantHeaderIDs,
             IList<ScanInfo> surveyScans,
@@ -454,7 +454,6 @@ namespace MASIC.DataOutput
         /// Get extended header info ID by extended header name
         /// </summary>
         /// <param name="keyName"></param>
-        /// <returns></returns>
         public int GetExtendedHeaderInfoIdByName(string keyName)
         {
             if (TryGetExtendedHeaderInfoValue(keyName, out var idValue))

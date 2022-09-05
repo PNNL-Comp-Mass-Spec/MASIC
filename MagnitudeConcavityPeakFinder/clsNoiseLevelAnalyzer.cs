@@ -69,6 +69,7 @@ namespace MagnitudeConcavityPeakFinder
         /// If ignoreNonPositiveData is True, removes data from intensityData if less than zero and/or less than baselineNoiseOptions.MinimumBaselineNoiseLevel
         /// Returns True if success, False if error (or no data in intensityData)
         /// </summary>
+        /// <remarks>Replaces values of 0 with the minimum positive value in intensityData()</remarks>
         /// <param name="intensityData"></param>
         /// <param name="indexStart"></param>
         /// <param name="indexEnd"></param>
@@ -76,7 +77,6 @@ namespace MagnitudeConcavityPeakFinder
         /// <param name="ignoreNonPositiveData"></param>
         /// <param name="baselineNoiseStats"></param>
         /// <returns>True if success, false if an error (or no data in intensityData)</returns>
-        /// <remarks>Replaces values of 0 with the minimum positive value in intensityData()</remarks>
         public bool ComputeTrimmedNoiseLevel(
             double[] intensityData,
             int indexStart,
@@ -364,9 +364,9 @@ namespace MagnitudeConcavityPeakFinder
         /// Looks for the minimum positive value in sortedData[] then
         /// replaces all values of 0 in sortedData[] with minimumPositiveValue
         /// </summary>
+        /// <remarks>Assumes sortedData[] is sorted ascending</remarks>
         /// <param name="dataCount"></param>
         /// <param name="sortedData"></param>
-        /// <remarks>Assumes sortedData[] is sorted ascending</remarks>
         /// <returns>The minimum positive value</returns>
         private double ReplaceSortedDataWithMinimumPositiveValue(int dataCount, IList<double> sortedData)
         {

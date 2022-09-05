@@ -91,6 +91,12 @@ namespace MASICPeakFinder
         /// <summary>
         /// Finds peaks in the parallel arrays xValues() and yValues()
         /// </summary>
+        /// <remarks>
+        /// Note that the maximum value of intensityThreshold vs. MaxValue*peakDetectIntensityThresholdPercentageOfMaximum is used as the minimum
+        /// For example, if intensityThreshold = 10 and peakDetectIntensityThresholdPercentageOfMaximum =  5 (indicating 5%),
+        /// then if the maximum of yValues() is 50, the minimum intensity of identified peaks is 10, and not 2.5
+        /// However, if the maximum of yValues() is 500, the minimum intensity of identified peaks is 50, and not 10
+        /// </remarks>
         /// <param name="xValues"></param>
         /// <param name="yValues"></param>
         /// <param name="intensityThresholdAbsoluteMinimum">Minimum absolute intensity allowable for a peak</param>
@@ -107,12 +113,6 @@ namespace MASICPeakFinder
         /// .PeakArea is the peak area
         /// Compute peak width using: peakWidthPoints = newPeak.RightEdge - newPeak.LeftEdge + 1
         /// </returns>
-        /// <remarks>
-        /// Note that the maximum value of intensityThreshold vs. MaxValue*peakDetectIntensityThresholdPercentageOfMaximum is used as the minimum
-        /// For example, if intensityThreshold = 10 and peakDetectIntensityThresholdPercentageOfMaximum =  5 (indicating 5%),
-        /// then if the maximum of yValues() is 50, the minimum intensity of identified peaks is 10, and not 2.5
-        /// However, if the maximum of yValues() is 500, the minimum intensity of identified peaks is 50, and not 10
-        /// </remarks>
         public List<PeakInfo> DetectPeaks(
             double[] xValues,
             double[] yValues,
@@ -522,10 +522,6 @@ namespace MASICPeakFinder
         /// <summary>
         /// Least squares fit
         /// </summary>
-        /// <param name="xValues"></param>
-        /// <param name="yValues"></param>
-        /// <param name="coefficients"></param>
-        /// <param name="polynomialOrder"></param>
         /// <remarks>
         /// Code from article "Fit for Purpose" written by Steven Abbot
         /// and published in the February 2003 issue of Hardcore Visual Basic.
@@ -533,6 +529,10 @@ namespace MASICPeakFinder
         /// http://msdn.microsoft.com/library/default.asp?url=/library/en-us/dnhcvb03/html/hcvb03b1.asp
         /// </remarks>
         // ReSharper restore CommentTypo
+        /// <param name="xValues"></param>
+        /// <param name="yValues"></param>
+        /// <param name="coefficients"></param>
+        /// <param name="polynomialOrder"></param>
         private void LeastSquaresFit(IReadOnlyList<double> xValues, IReadOnlyList<double> yValues, out double[] coefficients, int polynomialOrder)
         {
             var equationTerms = new LeastSquaresFitEquationTermType[polynomialOrder + 1];

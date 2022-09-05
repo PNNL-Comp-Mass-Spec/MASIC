@@ -1767,8 +1767,8 @@ namespace MASIC
         /// This function can be used to prevent the form from resizing itself
         /// if the MyBase.Resize event fires within 2 seconds of the current time
         /// </summary>
-        /// <param name="heightToForce"></param>
         /// <remarks>See CatchUnrequestedHeightChange for more info</remarks>
+        /// <param name="heightToForce"></param>
         public void SetHeightAdjustForce(int heightToForce)
         {
             mHeightAdjustForce = heightToForce;

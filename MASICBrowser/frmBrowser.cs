@@ -268,12 +268,12 @@ namespace MASICBrowser
         /// <summary>
         /// Display SIC stats
         /// </summary>
+        /// <remarks>If re-smooth data is enabled, the SIC data returned in sicStats will be re-smoothed</remarks>
         /// <param name="parentIonIndex"></param>
         /// <param name="sicStats">
         /// Output: populated with either the original SIC stats found by MASIC
         /// or with the updated SIC stats if chkUsePeakFinder is Checked
         /// </param>
-        /// <remarks>If re-smooth data is enabled, the SIC data returned in sicStats will be re-smoothed</remarks>
         private void DisplaySICStats(int parentIonIndex, out clsSICStats sicStats)
         {
             UpdateSICPeakFinderOptions();
@@ -421,13 +421,13 @@ namespace MASICBrowser
         /// Find the minimum potential peak area in the parent ions between
         /// parentIonIndexStart and parentIonIndexEnd, storing in ionStats.SICStats.SICPotentialAreaStatsForPeak
         /// </summary>
-        /// <param name="parentIonIndexStart"></param>
-        /// <param name="parentIonIndexEnd"></param>
-        /// <param name="potentialAreaStatsForRegion"></param>
         /// <remarks>
         /// The summed intensity is not used if the number of points greater than or equal to
         /// .SICNoiseThresholdIntensity is less than Minimum_Peak_Width
         /// </remarks>
+        /// <param name="parentIonIndexStart"></param>
+        /// <param name="parentIonIndexEnd"></param>
+        /// <param name="potentialAreaStatsForRegion"></param>
         private void FindMinimumPotentialPeakAreaInRegion(int parentIonIndexStart, int parentIonIndexEnd, SICPotentialAreaStats potentialAreaStatsForRegion)
         {
             potentialAreaStatsForRegion.MinimumPotentialPeakArea = double.MaxValue;

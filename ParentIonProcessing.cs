@@ -266,6 +266,10 @@ namespace MASIC
         /// <summary>
         /// Compare the fragmentation spectra for the two parent ions
         /// </summary>
+        /// <remarks>
+        /// Returns 0 if no similarity or no spectra to compare
+        /// Returns -1 if an error
+        /// </remarks>
         /// <param name="scanList"></param>
         /// <param name="spectraCache"></param>
         /// <param name="parentIonIndex1"></param>
@@ -273,10 +277,6 @@ namespace MASIC
         /// <param name="binningOptions"></param>
         /// <param name="noiseThresholdOptions"></param>
         /// <param name="dataImportUtilities"></param>
-        /// <remarks>
-        /// Returns 0 if no similarity or no spectra to compare
-        /// Returns -1 if an error
-        /// </remarks>
         /// <returns>
         /// The highest similarity score (ranging from 0 to 1, where 1 is a perfect match)
         /// </returns>
@@ -364,10 +364,6 @@ namespace MASIC
         /// <summary>
         /// Compares two spectra and returns a similarity score (ranging from 0 to 1)
         /// </summary>
-        /// <param name="fragSpectrum1"></param>
-        /// <param name="fragSpectrum2"></param>
-        /// <param name="binningOptions"></param>
-        /// <param name="considerOffsetBinnedData"></param>
         /// <remarks>
         /// <para>
         /// Both the standard binned data and the offset binned data are compared
@@ -380,6 +376,10 @@ namespace MASIC
         /// </para>
         /// </remarks>
         /// The highest similarity score (ranging from 0 to 1, where 1 is a perfect match)
+        /// <param name="fragSpectrum1"></param>
+        /// <param name="fragSpectrum2"></param>
+        /// <param name="binningOptions"></param>
+        /// <param name="considerOffsetBinnedData"></param>
         private float CompareSpectra(
             MSSpectrum fragSpectrum1,
             MSSpectrum fragSpectrum2,

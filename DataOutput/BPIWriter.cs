@@ -37,11 +37,11 @@ namespace MASIC.DataOutput
         /// Save BPIs as an ICR-2LS compatible .TIC file (using only the MS1 scans),
         /// plus two Decon2LS compatible .CSV files (one for the MS1 scans and one for the MS2, MS3, etc. scans)
         /// </summary>
+        /// <remarks>SaveExtendedScanStatsFiles() creates a tab-delimited text file with the BPI and TIC information for each scan</remarks>
         /// <param name="scanList"></param>
         /// <param name="spectraCache"></param>
         /// <param name="inputFilePathFull"></param>
         /// <param name="outputDirectoryPath"></param>
-        /// <remarks>SaveExtendedScanStatsFiles() creates a tab-delimited text file with the BPI and TIC information for each scan</remarks>
         /// <returns>True if success, false if an error</returns>
         public bool SaveBPIs(
             ScanList scanList,

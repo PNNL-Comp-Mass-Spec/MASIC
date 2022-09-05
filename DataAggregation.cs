@@ -17,6 +17,11 @@ namespace MASIC
         /// When returnMax is false, determine the sum of the data within the search mass tolerance
         /// When returnMaxis true, determine the maximum of the data within the search mass tolerance
         /// </summary>
+        /// <remarks>
+        /// Note that this function performs a recursive search of msSpectrum.IonsMZ
+        /// It is therefore very efficient regardless of the number of data points in the spectrum
+        /// For sparse spectra, you can alternatively use FindMaxValueInMZRange
+        /// </remarks>
         /// <param name="msSpectrum"></param>
         /// <param name="searchMZ"></param>
         /// <param name="searchToleranceHalfWidth"></param>
@@ -24,11 +29,6 @@ namespace MASIC
         /// <param name="closestMZ"></param>
         /// <param name="returnMax"></param>
         /// <returns>The sum or maximum of the matching data; 0 if no matches</returns>
-        /// <remarks>
-        /// Note that this function performs a recursive search of msSpectrum.IonsMZ
-        /// It is therefore very efficient regardless of the number of data points in the spectrum
-        /// For sparse spectra, you can alternatively use FindMaxValueInMZRange
-        /// </remarks>
         public double AggregateIonsInRange(
             MSSpectrum msSpectrum,
             double searchMZ,
@@ -96,6 +96,11 @@ namespace MASIC
         /// If a match is found, updates bestMatchMZ to the m/z of the match,
         /// updates matchIntensity to its intensity, and returns True
         /// </summary>
+        /// <remarks>
+        /// Note that this function performs a linear search of .IonsMZ
+        /// It is therefore good for spectra with less than 10 data points and bad for spectra with more than 10 data points
+        /// As an alternative to this function, use AggregateIonsInRange
+        /// </remarks>
         /// <param name="spectraCache"></param>
         /// <param name="currentScan"></param>
         /// <param name="mzStart"></param>
@@ -103,11 +108,6 @@ namespace MASIC
         /// <param name="bestMatchMZ">Output: m/z of the most intense ion in the given range</param>
         /// <param name="matchIntensity">Output: intensity of the most intense ion in the given range</param>
         /// <returns>True if a match is found, false if no data exists within the m/z range (or if the spectrum could not be obtained)</returns>
-        /// <remarks>
-        /// Note that this function performs a linear search of .IonsMZ
-        /// It is therefore good for spectra with less than 10 data points and bad for spectra with more than 10 data points
-        /// As an alternative to this function, use AggregateIonsInRange
-        /// </remarks>
         public bool FindMaxValueInMZRange(
             SpectraCache spectraCache,
             ScanInfo currentScan,
@@ -145,6 +145,11 @@ namespace MASIC
         /// If a match is found, updates bestMatchMZ to the m/z of the match,
         /// updates matchIntensity to its intensity, and returns True
         /// </summary>
+        /// <remarks>
+        /// Note that this function performs a linear search of .IonsMZ
+        /// It is therefore good for spectra with less than 10 data points and bad for spectra with more than 10 data points
+        /// As an alternative to this function, use AggregateIonsInRange
+        /// </remarks>
         /// <param name="mzList"></param>
         /// <param name="intensityList"></param>
         /// <param name="ionCount"></param>
@@ -153,11 +158,6 @@ namespace MASIC
         /// <param name="bestMatchMZ">Output: m/z of the most intense ion in the given range</param>
         /// <param name="matchIntensity">Output: intensity of the most intense ion in the given range</param>
         /// <returns>True if a match is found, false if no data exists within the m/z range (or if the spectrum could not be obtained)</returns>
-        /// <remarks>
-        /// Note that this function performs a linear search of .IonsMZ
-        /// It is therefore good for spectra with less than 10 data points and bad for spectra with more than 10 data points
-        /// As an alternative to this function, use AggregateIonsInRange
-        /// </remarks>
         private bool FindMaxValueInMZRange(
             IList<double> mzList,
             IList<double> intensityList,

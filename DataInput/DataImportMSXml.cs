@@ -312,6 +312,7 @@ namespace MASIC.DataInput
         /// <summary>
         /// Extract scan info from a .mzXML or .mzData file
         /// </summary>
+        /// <remarks>Assumes filePath exists</remarks>
         /// <param name="filePath"></param>
         /// <param name="xmlReader"></param>
         /// <param name="scanList"></param>
@@ -320,7 +321,6 @@ namespace MASIC.DataInput
         /// <param name="keepRawSpectra"></param>
         /// <param name="keepMSMSSpectra"></param>
         /// <returns>True if Success, False if failure</returns>
-        /// <remarks>Assumes filePath exists</remarks>
         private bool ExtractScanInfoFromMSXMLDataFile(
             string filePath,
             MsDataFileReaderBaseClass xmlReader,

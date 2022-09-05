@@ -168,9 +168,9 @@ namespace MASIC.Plots
         /// <summary>
         /// Set the axis range
         /// </summary>
+        /// <remarks>Set min and max to 0 (or double.NaN) to enable auto scaling</remarks>
         /// <param name="min"></param>
         /// <param name="max"></param>
-        /// <remarks>Set min and max to 0 (or double.NaN) to enable auto scaling</remarks>
         public void SetRange(double min, double max)
         {
             if (double.IsNaN(min) ||

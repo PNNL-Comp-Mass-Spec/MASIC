@@ -104,9 +104,9 @@ namespace MASIC
         /// <summary>
         /// Constructor
         /// </summary>
+        /// <remarks>The iTraqCorrectionFactorType parameter is only used if reporterIonMode is ITraqFourMZ</remarks>
         /// <param name="reporterIonMode">iTRAQ or TMT mode</param>
         /// <param name="iTraqCorrectionFactorType">Correction factor type for 4-plex iTRAQ</param>
-        /// <remarks>The iTraqCorrectionFactorType parameter is only used if reporterIonMode is ITraqFourMZ</remarks>
         public ITraqIntensityCorrection(ReporterIons.ReporterIonMassModeConstants reporterIonMode, CorrectionFactorsiTRAQ4Plex iTraqCorrectionFactorType)
         {
             ReporterIonMode = reporterIonMode;
@@ -1183,12 +1183,12 @@ namespace MASIC
         /// <summary>
         /// Given a set of isotope correction values
         /// </summary>
+        /// <remarks>The values should sum to 100; however, if zero (aka the Monoisotopic Peak) is 0, its value will be auto-computed</remarks>
         /// <param name="minus2">Value between 0 and 100, but typically close to 0</param>
         /// <param name="minus1">Value between 0 and 100, but typically close to 0</param>
         /// <param name="zero">Value between 0 and 100, but typically close to 98; if this is 0 or 100, it is auto-computed</param>
         /// <param name="plus1">Value between 0 and 100, but typically close to 0</param>
         /// <param name="plus2">Value between 0 and 100, but typically close to 0</param>
-        /// <remarks>The values should sum to 100; however, if zero (aka the Monoisotopic Peak) is 0, its value will be auto-computed</remarks>
         private IsotopeContributionType DefineIsotopeContribution(
             float minus2,
             float minus1,

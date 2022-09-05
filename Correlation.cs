@@ -406,11 +406,11 @@ namespace MASIC
         /// The lists must have the same number of data points
         /// If they have fewer than MIN_NON_ZERO_ION_COUNT non-zero values, the correlation value returned will be 0
         /// </summary>
+        /// <remarks>If necessary, use the BinData function before calling this function to bin the data</remarks>
         /// <param name="dataList1"></param>
         /// <param name="dataList2"></param>
         /// <param name="correlationMethod"></param>
         /// <returns>Correlation value (0 to 1), or -1 if an error</returns>
-        /// <remarks>If necessary, use the BinData function before calling this function to bin the data</remarks>
         public float Correlate(
             IReadOnlyList<float> dataList1,
             IReadOnlyList<float> dataList2,

@@ -153,11 +153,11 @@ namespace MASICPeakFinder
         /// <summary>
         /// Compute an updated peak area by adjusting for the baseline
         /// </summary>
+        /// <remarks>This method is used by MASIC Browser</remarks>
         /// <param name="sicPeak"></param>
         /// <param name="sicPeakWidthFullScans"></param>
         /// <param name="allowNegativeValues"></param>
         /// <returns>Adjusted peak area</returns>
-        /// <remarks>This method is used by MASIC Browser</remarks>
         public static double BaselineAdjustArea(
             SICStatsPeak sicPeak, int sicPeakWidthFullScans, bool allowNegativeValues)
         {
@@ -526,16 +526,16 @@ namespace MASICPeakFinder
         /// Next, discards the data above and below baselineNoiseOptions.DualTrimmedMeanStdDevLimits of the mean
         /// Finally, recomputes the average using the data that remains
         /// </summary>
+        /// <remarks>
+        /// Replaces values of 0 with the minimum positive value in dataList()
+        /// You cannot use dataList.Length to determine the length of the array; use indexStart and indexEnd to find the limits
+        /// </remarks>
         /// <param name="dataList"></param>
         /// <param name="indexStart"></param>
         /// <param name="indexEnd"></param>
         /// <param name="baselineNoiseOptions"></param>
         /// <param name="baselineNoiseStats"></param>
         /// <returns>True if success, False if error (or no data in dataList)</returns>
-        /// <remarks>
-        /// Replaces values of 0 with the minimum positive value in dataList()
-        /// You cannot use dataList.Length to determine the length of the array; use indexStart and indexEnd to find the limits
-        /// </remarks>
         public bool ComputeDualTrimmedNoiseLevel(
             IReadOnlyList<double> dataList, int indexStart, int indexEnd,
             BaselineNoiseOptions baselineNoiseOptions,
@@ -959,12 +959,12 @@ namespace MASICPeakFinder
         /// <summary>
         /// Compute the noise level
         /// </summary>
+        /// <remarks>Updates baselineNoiseStats with the baseline noise level</remarks>
         /// <param name="dataCount"></param>
         /// <param name="dataList"></param>
         /// <param name="baselineNoiseOptions"></param>
         /// <param name="baselineNoiseStats"></param>
         /// <returns>Returns True if success, false in an error</returns>
-        /// <remarks>Updates baselineNoiseStats with the baseline noise level</remarks>
         public bool ComputeNoiseLevelForSICData(
             int dataCount, IReadOnlyList<double> dataList,
             BaselineNoiseOptions baselineNoiseOptions,
@@ -1258,9 +1258,9 @@ namespace MASICPeakFinder
         /// <summary>
         /// Compute the peak area
         /// </summary>
+        /// <remarks>The calling function must populate sicPeak.IndexMax, sicPeak.IndexBaseLeft, and sicPeak.IndexBaseRight</remarks>
         /// <param name="sicData"></param>
         /// <param name="sicPeak"></param>
-        /// <remarks>The calling function must populate sicPeak.IndexMax, sicPeak.IndexBaseLeft, and sicPeak.IndexBaseRight</remarks>
         private bool ComputeSICPeakArea(IList<SICDataPoint> sicData, SICStatsPeak sicPeak)
         {
             try
@@ -1868,6 +1868,10 @@ namespace MASICPeakFinder
         /// Additionally, computes a full median using all data in dataList
         /// If ignoreNonPositiveData is True, removes data from dataList() less than zero 0 and less than .MinimumBaselineNoiseLevel
         /// </summary>
+        /// <remarks>
+        /// Replaces values of 0 with the minimum positive value in dataList()
+        /// You cannot use dataList.Length to determine the length of the array; use dataCount
+        /// </remarks>
         /// <param name="dataList"></param>
         /// <param name="indexStart"></param>
         /// <param name="indexEnd"></param>
@@ -1875,10 +1879,6 @@ namespace MASICPeakFinder
         /// <param name="ignoreNonPositiveData"></param>
         /// <param name="baselineNoiseStats"></param>
         /// <returns>Returns True if success, False if error (or no data in dataList)</returns>
-        /// <remarks>
-        /// Replaces values of 0 with the minimum positive value in dataList()
-        /// You cannot use dataList.Length to determine the length of the array; use dataCount
-        /// </remarks>
         public bool ComputeTrimmedNoiseLevel(
             IReadOnlyList<double> dataList, int indexStart, int indexEnd,
             BaselineNoiseOptions baselineNoiseOptions,
@@ -2133,10 +2133,10 @@ namespace MASICPeakFinder
         /// <summary>
         /// Computes the width of the peak (in scans) using the fwhm value
         /// </summary>
+        /// <remarks>Does not allow the width determined to be larger than sicPeakWidthFullScans</remarks>
         /// <param name="sicPeakFWHMScans"></param>
         /// <param name="sicPeakWidthFullScans"></param>
         /// <param name="sigmaValueForBase"></param>
-        /// <remarks>Does not allow the width determined to be larger than sicPeakWidthFullScans</remarks>
         private static int ComputeWidthAtBaseUsingFWHM(
             int sicPeakFWHMScans,
             int sicPeakWidthFullScans,
@@ -2226,13 +2226,13 @@ namespace MASICPeakFinder
         /// <summary>
         /// Determine the minimum positive value in the list, examining the first dataCount items
         /// </summary>
-        /// <param name="dataCount"></param>
-        /// <param name="dataList"></param>
-        /// <param name="absoluteMinimumValue"></param>
         /// <remarks>
         /// Does not use dataList.Length to determine the length of the list; uses dataCount
         /// However, if dataCount is > dataList.Length, dataList.Length-1 will be used for the maximum index to examine
         /// </remarks>
+        /// <param name="dataCount"></param>
+        /// <param name="dataList"></param>
+        /// <param name="absoluteMinimumValue"></param>
         public double FindMinimumPositiveValue(int dataCount, IReadOnlyList<double> dataList, double absoluteMinimumValue)
         {
             if (dataCount > dataList.Count)
@@ -2681,6 +2681,7 @@ namespace MASICPeakFinder
         /// <summary>
         /// Find peaks
         /// </summary>
+        /// <remarks>All of the identified peaks are returned in peaksContainer.Peaks(), regardless of whether they are valid or not</remarks>
         /// <param name="peakDetector">peak detector object</param>
         /// <param name="scanNumbers">Scan numbers of the data tracked by peaksContainer</param>
         /// <param name="peaksContainer">Container object with XData, YData, SmoothedData, found Peaks, and various tracking properties</param>
@@ -2695,7 +2696,6 @@ namespace MASICPeakFinder
         /// When false, stores the index of the most intense peak in peaksContainer.BestPeakIndex
         /// </param>
         /// <returns>True if a valid peak is found; otherwise, returns false</returns>
-        /// <remarks>All of the identified peaks are returned in peaksContainer.Peaks(), regardless of whether they are valid or not</remarks>
         private bool FindPeaksWork(
             PeakDetection peakDetector,
             IList<int> scanNumbers,
@@ -3282,6 +3282,10 @@ namespace MASICPeakFinder
         /// <summary>
         /// Find SIC Peak and Area
         /// </summary>
+        /// <remarks>
+        /// The calling function should populate sicPeak.IndexObserved with the index in SICData() where the
+        /// parent ion m/z was actually observed; this will be used as the default peak location if a peak cannot be found
+        /// </remarks>
         /// <param name="sicData">Selected Ion Chromatogram data (scan, intensity, mass)</param>
         /// <param name="potentialAreaStatsForPeak">Output: potential area stats for the identified peak</param>
         /// <param name="sicPeak">Output: identified Peak</param>
@@ -3291,10 +3295,6 @@ namespace MASICPeakFinder
         /// <param name="returnClosestPeak"></param>
         /// <param name="simDataPresent">Set to true if Select Ion Monitoring data is present and there are thus large gaps in the survey scan numbers</param>
         /// <param name="recomputeNoiseLevel"></param>
-        /// <remarks>
-        /// The calling function should populate sicPeak.IndexObserved with the index in SICData() where the
-        /// parent ion m/z was actually observed; this will be used as the default peak location if a peak cannot be found
-        /// </remarks>
         public bool FindSICPeakAndArea(
             List<SICDataPoint> sicData,
             out SICPotentialAreaStats potentialAreaStatsForPeak,
@@ -3802,10 +3802,10 @@ namespace MASICPeakFinder
         /// <summary>
         /// Looks for the minimum positive value in dataListSorted and replaces all values of 0 in dataListSorted with the minimumPositiveValue
         /// </summary>
+        /// <remarks>Assumes data in dataListSorted() is sorted ascending</remarks>
         /// <param name="dataCount"></param>
         /// <param name="dataListSorted"></param>
         /// <returns>Minimum positive value</returns>
-        /// <remarks>Assumes data in dataListSorted() is sorted ascending</remarks>
         private double ReplaceSortedDataWithMinimumPositiveValue(int dataCount, IList<double> dataListSorted)
         {
             // Find the minimum positive value in dataListSorted

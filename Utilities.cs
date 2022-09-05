@@ -119,8 +119,8 @@ namespace MASIC
         /// <summary>
         /// Convert from a double to float
         /// </summary>
-        /// <param name="value"></param>
         /// <remarks>Assures that the value is between float.MinValue and float.MaxValue</remarks>
+        /// <param name="value"></param>
         public static float CFloatSafe(double value)
         {
             if (value > float.MaxValue)
@@ -179,10 +179,10 @@ namespace MASIC
         /// <summary>
         /// Return true if the two values match, when rounded to the given number of digits after the decimal point
         /// </summary>
+        /// <remarks>If digitsOfPrecision is negative, the values must match within float.Epsilon</remarks>
         /// <param name="value1"></param>
         /// <param name="value2"></param>
         /// <param name="digitsOfPrecision">Digits to round the numbers to before comparing</param>
-        /// <remarks>If digitsOfPrecision is negative, the values must match within float.Epsilon</remarks>
         public static bool ValuesMatch(float value1, float value2, int digitsOfPrecision)
         {
             if (digitsOfPrecision < 0)
@@ -213,10 +213,10 @@ namespace MASIC
         /// <summary>
         /// Return true if the two values match, when rounded to the given number of digits after the decimal point
         /// </summary>
+        /// <remarks>If digitsOfPrecision is negative, the values must match within double.Epsilon</remarks>
         /// <param name="value1"></param>
         /// <param name="value2"></param>
         /// <param name="digitsOfPrecision">Digits to round the numbers to before comparing</param>
-        /// <remarks>If digitsOfPrecision is negative, the values must match within double.Epsilon</remarks>
         public static bool ValuesMatch(double value1, double value2, int digitsOfPrecision)
         {
             if (digitsOfPrecision < 0)

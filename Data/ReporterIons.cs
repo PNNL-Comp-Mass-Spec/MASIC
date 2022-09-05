@@ -669,8 +669,8 @@ namespace MASIC.Data
         /// <summary>
         /// Define reporter ions to search for
         /// </summary>
-        /// <param name="reporterIonMZList"></param>
         /// <remarks>Will use REPORTER_ION_TOLERANCE_DA_DEFAULT for the search tolerance</remarks>
+        /// <param name="reporterIonMZList"></param>
         // ReSharper disable once UnusedMember.Global
         public void SetReporterIons(
             double[] reporterIonMZList)
@@ -693,10 +693,10 @@ namespace MASIC.Data
         /// <summary>
         /// Define reporter ions to search for
         /// </summary>
+        /// <remarks>When customReportIons is true, sets mReporterIonMassMode to ReporterIonMassModeConstants.CustomOrNone</remarks>
         /// <param name="reporterIonMZList"></param>
         /// <param name="mzToleranceDa">Search tolerance (half width); must be 0.001 or larger</param>
         /// <param name="customReporterIons">True if these are custom reporter ions</param>
-        /// <remarks>When customReportIons is true, sets mReporterIonMassMode to ReporterIonMassModeConstants.CustomOrNone</remarks>
         public void SetReporterIons(
             double[] reporterIonMZList,
             double mzToleranceDa,

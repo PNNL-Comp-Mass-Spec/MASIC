@@ -125,6 +125,7 @@ namespace MASIC.DataInput
         /// <summary>
         /// Read scan data and ions from a Thermo .raw file
         /// </summary>
+        /// <remarks>Assumes filePath exists</remarks>
         /// <param name="filePath"></param>
         /// <param name="scanList"></param>
         /// <param name="spectraCache"></param>
@@ -132,7 +133,6 @@ namespace MASIC.DataInput
         /// <param name="keepRawSpectra"></param>
         /// <param name="keepMSMSSpectra"></param>
         /// <returns>True if Success, False if failure</returns>
-        /// <remarks>Assumes filePath exists</remarks>
         public bool ExtractScanInfoFromThermoDataFile(
             string filePath,
             ScanList scanList,
