@@ -26,8 +26,6 @@ Source: ..\bin\Release\MSDataFileReader.dll                       ; DestDir: {ap
 Source: ..\bin\Release\netcdf.dll                                 ; DestDir: {app}
 Source: ..\bin\Release\NetCDFReader.dll                           ; DestDir: {app}
 Source: ..\bin\Release\Npgsql.dll                                 ; DestDir: {app}
-Source: ..\bin\Release\OpenMcdf.dll                               ; DestDir: {app}
-Source: ..\bin\Release\OpenMcdf.Extensions.dll                    ; DestDir: {app}
 Source: ..\bin\Release\OxyPlot.dll                                ; DestDir: {app}
 Source: ..\bin\Release\OxyPlot.Wpf.dll                            ; DestDir: {app}
 Source: ..\bin\Release\OxyPlot.Wpf.Shared.dll                     ; DestDir: {app}
@@ -38,18 +36,15 @@ Source: ..\bin\Release\ProgressFormNET.dll                        ; DestDir: {ap
 Source: ..\bin\Release\PSI_Interface.dll                          ; DestDir: {app}
 Source: ..\bin\Release\ShFolderBrowser.dll                        ; DestDir: {app}
 Source: ..\bin\Release\SpectraTypeClassifier.dll                  ; DestDir: {app}
-Source: ..\bin\Release\System.IO.FileSystem.AccessControl.dll     ; DestDir: {app}
+Source: ..\bin\Release\System.Buffers.dll                         ; DestDir: {app}
 Source: ..\bin\Release\System.Memory.dll                          ; DestDir: {app}
 Source: ..\bin\Release\System.Numerics.Vectors.dll                ; DestDir: {app}
 Source: ..\bin\Release\System.Runtime.CompilerServices.Unsafe.dll ; DestDir: {app}
-Source: ..\bin\Release\System.Security.AccessControl.dll          ; DestDir: {app}
-Source: ..\bin\Release\System.Security.Principal.Windows.dll      ; DestDir: {app}
 Source: ..\bin\Release\System.Text.Encodings.Web.dll              ; DestDir: {app}
 Source: ..\bin\Release\System.Text.Json.dll                       ; DestDir: {app}
 Source: ..\bin\Release\System.Threading.Channels.dll              ; DestDir: {app}
 Source: ..\bin\Release\System.Threading.Tasks.Extensions.dll      ; DestDir: {app}
 Source: ..\bin\Release\System.ValueTuple.dll                      ; DestDir: {app}
-Source: ..\bin\Release\System.Buffers.dll                         ; DestDir: {app}
 
 Source: ..\bin\Release\ThermoFisher.CommonCore.BackgroundSubtraction.dll    ; DestDir: {app}
 Source: ..\bin\Release\ThermoFisher.CommonCore.Data.dll                     ; DestDir: {app}
@@ -59,6 +54,7 @@ Source: ..\bin\Release\ThermoRawFileReader.dll                              ; De
 
 Source: ..\MASICBrowser\bin\Release\MASICBrowser.exe                        ; DestDir: {app}
 Source: ..\MASICBrowser\bin\Release\C5.dll                                  ; DestDir: {app}
+Source: ..\MASICBrowser\bin\Release\ExCSS.dll                               ; DestDir: {app}
 Source: ..\MASICBrowser\bin\Release\Fizzler.dll                             ; DestDir: {app}
 Source: ..\MASICBrowser\bin\Release\OxyDataPlotter.dll                      ; DestDir: {app}
 Source: ..\MASICBrowser\bin\Release\OxyPlot.WindowsForms.dll                ; DestDir: {app}
@@ -74,19 +70,37 @@ Source: Images\delete_16x.ico                                               ; De
 
 Source: ..\ExampleData\MASICParameters.xml                                      ; DestDir: {app}
 Source: ..\ExampleData\LTQ_Example\Default_2008-08-22.xml                       ; DestDir: {app}\LTQ_Example
+Source: ..\ExampleData\LTQ_Example\index.html                                   ; DestDir: {app}\LTQ_Example
 Source: ..\ExampleData\LTQ_Example\QC_Standards_Excerpt.mzXML                   ; DestDir: {app}\LTQ_Example
 Source: ..\ExampleData\LTQ_Example\QC_Standards_Excerpt_SICs.xml                ; DestDir: {app}\LTQ_Example
 Source: ..\ExampleData\LTQ_Example\QC_Standards_Excerpt_ScanStats.txt           ; DestDir: {app}\LTQ_Example
 Source: ..\ExampleData\LTQ_Example\QC_Standards_Excerpt_SICstats.txt            ; DestDir: {app}\LTQ_Example
+Source: ..\ExampleData\LTQ_Example\QC_Standards_Excerpt_DatasetInfo.xml         ; DestDir: {app}\LTQ_Example
+Source: ..\ExampleData\LTQ_Example\QC_Standards_Excerpt_PeakAreaHistogram.png   ; DestDir: {app}\LTQ_Example
+Source: ..\ExampleData\LTQ_Example\QC_Standards_Excerpt_PeakWidthHistogram.png  ; DestDir: {app}\LTQ_Example
 
+Source: ..\ExampleData\QExactive_Example\index.html                             ; DestDir: {app}\QExactive_Example
 Source: ..\ExampleData\QExactive_Example\LTQ-FT_10ppm_2014-08-06.xml            ; DestDir: {app}\QExactive_Example
 Source: ..\ExampleData\QExactive_Example\QC_Shew_18_02_Excerpt.mzXML            ; DestDir: {app}\QExactive_Example
 Source: ..\ExampleData\QExactive_Example\QC_Shew_18_02_Excerpt_ScanStats.txt    ; DestDir: {app}\QExactive_Example
 Source: ..\ExampleData\QExactive_Example\QC_Shew_18_02_Excerpt_SICs.xml         ; DestDir: {app}\QExactive_Example
 Source: ..\ExampleData\QExactive_Example\QC_Shew_18_02_Excerpt_SICstats.txt     ; DestDir: {app}\QExactive_Example
+Source: ..\ExampleData\QExactive_Example\QC_Shew_18_02_Excerpt_DatasetInfo.xml  ; DestDir: {app}\QExactive_Example
+Source: ..\ExampleData\QExactive_Example\QC_Shew_18_02_Excerpt_MS_scans.csv     ; DestDir: {app}\QExactive_Example
+Source: ..\ExampleData\QExactive_Example\QC_Shew_18_02_Excerpt_MSMS_scans.csv   ; DestDir: {app}\QExactive_Example
+Source: ..\ExampleData\QExactive_Example\QC_Shew_18_02_Excerpt_PeakAreaHistogram.png   ; DestDir: {app}\QExactive_Example
+Source: ..\ExampleData\QExactive_Example\QC_Shew_18_02_Excerpt_PeakWidthHistogram.png  ; DestDir: {app}\QExactive_Example
 
-Source: ..\ExampleData\Orbitrap_Example\Example_Orbitrap_Data_SICs.xml          ; DestDir: {app}\Orbitrap_Example
-Source: ..\ExampleData\Orbitrap_Example\Example_Orbitrap_Data_SICstats.txt      ; DestDir: {app}\Orbitrap_Example
+Source: ..\ExampleData\Orbitrap_Example\index.html                                     ; DestDir: {app}\Orbitrap_Example
+Source: ..\ExampleData\Orbitrap_Example\Example_Orbitrap_Data_SICs.xml                 ; DestDir: {app}\Orbitrap_Example
+Source: ..\ExampleData\Orbitrap_Example\Example_Orbitrap_Data_SICstats.txt             ; DestDir: {app}\Orbitrap_Example
+Source: ..\ExampleData\Orbitrap_Example\Example_Orbitrap_Data_DatasetInfo.xml          ; DestDir: {app}\Orbitrap_Example                                  
+Source: ..\ExampleData\Orbitrap_Example\Example_Orbitrap_Data_MS_scans.csv             ; DestDir: {app}\Orbitrap_Example
+Source: ..\ExampleData\Orbitrap_Example\Example_Orbitrap_Data_MSMS_scans.csv           ; DestDir: {app}\Orbitrap_Example
+Source: ..\ExampleData\Orbitrap_Example\Example_Orbitrap_Data_PeakAreaHistogram.png    ; DestDir: {app}\Orbitrap_Example
+Source: ..\ExampleData\Orbitrap_Example\Example_Orbitrap_Data_PeakWidthHistogram.png   ; DestDir: {app}\Orbitrap_Example
+Source: ..\ExampleData\Orbitrap_Example\Example_Orbitrap_Data_ScanStats.txt            ; DestDir: {app}\Orbitrap_Example
+Source: ..\ExampleData\Orbitrap_Example\LTQ-FT_10ppm_2014-08-06.xml                    ; DestDir: {app}\Orbitrap_Example
 
 Source: ..\ExampleData\Parameter_Files\ITRAQ_LTQ-FT_10ppm_ReporterTol0.015Da_2014-08-06.xml     ; DestDir: {app}\Parameter_Files
 Source: ..\ExampleData\Parameter_Files\ITRAQ8_LTQ-FT_10ppm_ReporterTol0.015Da_2014-08-06.xml    ; DestDir: {app}\Parameter_Files
