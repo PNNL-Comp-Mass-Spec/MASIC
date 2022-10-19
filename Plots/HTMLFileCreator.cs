@@ -51,7 +51,9 @@ namespace MASIC.Plots
                 if (PlotFiles.Count == 0)
                 {
                     OnWarningEvent("No plot files defined; cannot create the index.html file");
-                    return false;
+
+                    // Return true since this is not a fatal error
+                    return true;
                 }
 
                 if (string.IsNullOrWhiteSpace(outputDirectoryPath))
