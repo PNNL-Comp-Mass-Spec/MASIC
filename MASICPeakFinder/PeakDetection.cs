@@ -528,11 +528,11 @@ namespace MASICPeakFinder
         /// Code excerpted from the VB6 program FitIt, previously available at
         /// http://msdn.microsoft.com/library/default.asp?url=/library/en-us/dnhcvb03/html/hcvb03b1.asp
         /// </remarks>
-        // ReSharper restore CommentTypo
         /// <param name="xValues"></param>
         /// <param name="yValues"></param>
         /// <param name="coefficients"></param>
         /// <param name="polynomialOrder"></param>
+        // ReSharper restore CommentTypo
         private void LeastSquaresFit(IReadOnlyList<double> xValues, IReadOnlyList<double> yValues, out double[] coefficients, int polynomialOrder)
         {
             var equationTerms = new LeastSquaresFitEquationTermType[polynomialOrder + 1];
