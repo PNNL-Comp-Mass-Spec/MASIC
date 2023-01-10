@@ -112,20 +112,20 @@ namespace MASIC
 
                     if (string.IsNullOrEmpty(sqlQuery))
                     {
-                        sqlQuery = "Select Dataset, ID FROM V_Dataset_Export";
+                        sqlQuery = "Select dataset, id FROM V_Dataset_Export";
                     }
 
-                    if (sqlQuery.StartsWith("SELECT Dataset", StringComparison.OrdinalIgnoreCase))
+                    if (sqlQuery.StartsWith("SELECT dataset", StringComparison.OrdinalIgnoreCase))
                     {
                         // Add a where clause to the query
                         if (iteration == 1)
                         {
-                            sqlQuery += " WHERE Dataset = '" + datasetName + "'";
+                            sqlQuery += " WHERE dataset = '" + datasetName + "'";
                             queryingSingleDataset = true;
                         }
                         else
                         {
-                            sqlQuery += " WHERE Dataset Like '" + datasetName + "%'";
+                            sqlQuery += " WHERE dataset LIKE '" + datasetName + "%'";
                         }
                     }
 
