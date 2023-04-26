@@ -47,12 +47,19 @@ namespace MASIC.DatasetStats
         /// </summary>
         public const string DATE_TIME_FORMAT_STRING = "yyyy-MM-dd hh:mm:ss tt";
 
+        private struct SummaryStatsStatus
+        {
+            public bool UpToDate;
+            public bool ScanFiltersIncludePrecursorMZValues;
+        }
+
         private string mDatasetStatsSummaryFileName;
 
         private readonly List<ScanStatsEntry> mDatasetScanStats;
 
-        private bool mDatasetSummaryStatsUpToDate;
         private DatasetSummaryStats mDatasetSummaryStats;
+
+        private SummaryStatsStatus mDatasetStatsSummaryStatus;
 
         /// <summary>
         /// Dataset stats summary filename
@@ -101,7 +108,8 @@ namespace MASIC.DatasetStats
             mDatasetScanStats = new List<ScanStatsEntry>();
             mDatasetSummaryStats = new DatasetSummaryStats();
 
-            mDatasetSummaryStatsUpToDate = false;
+            mDatasetStatsSummaryStatus.UpToDate = false;
+            mDatasetStatsSummaryStatus.ScanFiltersIncludePrecursorMZValues = false;
 
             DatasetFileInfo = new DatasetFileInfo();
             SampleInfo = new SampleInfo();
@@ -116,7 +124,8 @@ namespace MASIC.DatasetStats
         public void AddDatasetScan(ScanStatsEntry scanStats)
         {
             mDatasetScanStats.Add(scanStats);
-            mDatasetSummaryStatsUpToDate = false;
+            mDatasetStatsSummaryStatus.UpToDate = false;
+        }
 
         private double AssureNumeric(double value)
         {
@@ -143,7 +152,8 @@ namespace MASIC.DatasetStats
             DatasetFileInfo.Clear();
             SampleInfo.Clear();
 
-            mDatasetSummaryStatsUpToDate = false;
+            mDatasetStatsSummaryStatus.UpToDate = false;
+            mDatasetStatsSummaryStatus.ScanFiltersIncludePrecursorMZValues = false;
         }
 
         /// <summary>
@@ -655,7 +665,22 @@ namespace MASIC.DatasetStats
         /// <summary>
         /// Get dataset summary stats
         /// </summary>
-        public DatasetSummaryStats GetDatasetSummaryStats()
+        /// <param name="includePrecursorMZ">
+        /// When true, include precursor m/z values in the generic scan filters
+        /// When false, replace the actual precursor m/z with 0
+        /// </param>
+        public DatasetSummaryStats GetDatasetSummaryStats(bool includePrecursorMZ)
+        {
+            if (mDatasetStatsSummaryStatus.UpToDate && mDatasetStatsSummaryStatus.ScanFiltersIncludePrecursorMZValues == includePrecursorMZ)
+                return mDatasetSummaryStats;
+
+            ComputeScanStatsSummary(mDatasetScanStats, includePrecursorMZ, out mDatasetSummaryStats);
+
+            mDatasetStatsSummaryStatus.UpToDate = true;
+            mDatasetStatsSummaryStatus.ScanFiltersIncludePrecursorMZValues = includePrecursorMZ;
+
+            return mDatasetSummaryStats;
+        }
 
         /// <summary>
         /// Extract out the scan type and filter text from the key in scanTypeEntry
@@ -669,7 +694,6 @@ namespace MASIC.DatasetStats
             out string scanType,
             out string scanFilterText)
         {
-            if (!mDatasetSummaryStatsUpToDate)
             var scanTypeKey = scanTypeEntry.Key;
             var indexMatch = scanTypeKey.IndexOf(SCAN_TYPE_STATS_SEP_CHAR, StringComparison.Ordinal);
 
@@ -688,13 +712,10 @@ namespace MASIC.DatasetStats
             }
             else
             {
-                ComputeScanStatsSummary(mDatasetScanStats, out mDatasetSummaryStats);
-                mDatasetSummaryStatsUpToDate = true;
                 scanType = scanTypeKey;
                 scanFilterText = string.Empty;
             }
 
-            return mDatasetSummaryStats;
             return scanTypeEntry.Value;
         }
 
@@ -731,7 +752,7 @@ namespace MASIC.DatasetStats
 
                 scan.ScanType = scanType;
                 scan.ScanTypeName = scanTypeName;
-                mDatasetSummaryStatsUpToDate = false;
+                mDatasetStatsSummaryStatus.UpToDate = false;
 
                 matchFound = true;
                 break;
