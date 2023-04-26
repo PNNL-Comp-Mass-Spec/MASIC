@@ -53,10 +53,10 @@
       <Version>3.13.3</Version>
     </PackageReference>
     <PackageReference Include="PRISM-Library">
-      <Version>2.8.0</Version>
+      <Version>2.8.7</Version>
     </PackageReference>
     <PackageReference Include="ThermoRawFileReader">
-      <Version>4.1.42</Version>
+      <Version>4.1.65</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
