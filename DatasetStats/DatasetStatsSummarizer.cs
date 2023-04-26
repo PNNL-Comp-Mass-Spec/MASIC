@@ -177,7 +177,7 @@ namespace MASIC.DatasetStats
             {
                 if (scanStats == null)
                 {
-                    ReportError("scanStats is Nothing; unable to continue in ComputeScanStatsSummary");
+                    ReportError("scanStats is null; unable to continue in ComputeScanStatsSummary");
                     return false;
                 }
 
@@ -322,7 +322,7 @@ namespace MASIC.DatasetStats
             {
                 if (scanStats == null)
                 {
-                    ReportError("scanStats is Nothing; unable to continue in CreateDatasetInfoFile");
+                    ReportError("scanStats is null; unable to continue in CreateDatasetInfoFile");
                     return false;
                 }
 
@@ -424,7 +424,7 @@ namespace MASIC.DatasetStats
             {
                 if (scanStats == null)
                 {
-                    ReportError("scanStats is Nothing; unable to continue in CreateDatasetInfoXML");
+                    ReportError("scanStats is null; unable to continue in CreateDatasetInfoXML");
                     return string.Empty;
                 }
 
@@ -590,7 +590,7 @@ namespace MASIC.DatasetStats
             {
                 if (scanStats == null)
                 {
-                    ReportError("scanStats is Nothing; unable to continue in CreateScanStatsFile");
+                    ReportError("scanStats is null; unable to continue in CreateScanStatsFile");
                     return false;
                 }
 
@@ -810,7 +810,7 @@ namespace MASIC.DatasetStats
             {
                 if (scanStats == null)
                 {
-                    ReportError("scanStats is Nothing; unable to continue in UpdateDatasetStatsTextFile");
+                    ReportError("scanStats is null; unable to continue in UpdateDatasetStatsTextFile");
                     return false;
                 }
 
