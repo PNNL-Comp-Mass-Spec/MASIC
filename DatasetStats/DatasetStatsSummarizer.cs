@@ -667,14 +667,14 @@ namespace MASIC.DatasetStats
             }
         }
 
-        private string FixNull(string item)
+        private string FixNull(string text)
         {
-            if (string.IsNullOrEmpty(item))
+            if (string.IsNullOrEmpty(text))
             {
                 return string.Empty;
             }
 
-            return item;
+            return text;
         }
 
         /// <summary>
