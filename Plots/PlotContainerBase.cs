@@ -165,7 +165,7 @@ namespace MASIC.Plots
         protected void OpenDebugFile(string dataSource)
         {
             var appName = System.Reflection.Assembly.GetExecutingAssembly().GetName().Name;
-            var logDirectory = ProcessFilesOrDirectoriesBase.GetAppDataDirectoryPath(appName);
+            var logDirectory = AppUtils.GetAppDataDirectoryPath(appName);
 
             string logFileName;
             if (string.IsNullOrWhiteSpace(dataSource))

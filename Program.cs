@@ -143,7 +143,7 @@ namespace MASIC
 
                 if (returnCode != 0)
                 {
-                    ProgRunner.SleepMilliseconds(1500);
+                    AppUtils.SleepMilliseconds(1500);
                 }
 
                 return returnCode;
@@ -151,7 +151,7 @@ namespace MASIC
             catch (Exception ex)
             {
                 ShowErrorMessage("Error occurred in Program->Main: " + Environment.NewLine + ex.Message);
-                ProgRunner.SleepMilliseconds(1500);
+                AppUtils.SleepMilliseconds(1500);
                 return -1;
             }
 #if GUI
@@ -193,7 +193,7 @@ namespace MASIC
 
         private static string GetAppVersion()
         {
-            return ProcessFilesOrDirectoriesBase.GetAppVersion(PROGRAM_DATE);
+            return AppUtils.GetAppVersion(PROGRAM_DATE);
         }
 
         private static int ProcessFiles()
@@ -446,7 +446,7 @@ namespace MASIC
 
                 Console.WriteLine();
 
-                Console.WriteLine("Program syntax:" + Environment.NewLine + Path.GetFileName(ProcessFilesOrDirectoriesBase.GetAppPath()));
+                Console.WriteLine("Program syntax:" + Environment.NewLine + Path.GetFileName(AppUtils.GetAppPath()));
                 Console.WriteLine(" /I:InputFilePath [/O:OutputDirectoryPath]");
                 Console.WriteLine(" [/P:ParamFilePath] [/D:DatasetID or DatasetLookupFilePath] ");
                 Console.WriteLine(" [/S:[MaxLevel]] [/A:AlternateOutputDirectoryPath] [/R]");

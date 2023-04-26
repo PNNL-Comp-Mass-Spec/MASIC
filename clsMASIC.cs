@@ -1047,7 +1047,7 @@ namespace MASIC
 
             if (!mLoggedMASICVersion)
             {
-                LogMessage("Starting MASIC v" + GetAppVersion(mFileDate));
+                LogMessage("Starting MASIC v" + AppUtils.GetAppVersion(mFileDate));
                 Console.WriteLine();
                 mLoggedMASICVersion = true;
             }
@@ -1637,8 +1637,8 @@ namespace MASIC
 
             try
             {
-                var tempPath = Path.Combine(GetAppDirectoryPath(), "Temp_" + Options.MASICStatusFilename);
-                var statusFilePath = Path.Combine(GetAppDirectoryPath(), Options.MASICStatusFilename);
+                var tempPath = Path.Combine(AppUtils.GetAppDirectoryPath(), "Temp_" + Options.MASICStatusFilename);
+                var statusFilePath = Path.Combine(AppUtils.GetAppDirectoryPath(), Options.MASICStatusFilename);
 
                 using (var writer = new System.Xml.XmlTextWriter(tempPath, System.Text.Encoding.UTF8))
                 {

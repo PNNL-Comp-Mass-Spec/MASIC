@@ -669,12 +669,12 @@ namespace MASIC
                 }
                 catch
                 {
-                    fileSelector.InitialDirectory = ProcessFilesOrDirectoriesBase.GetAppDirectoryPath();
+                    fileSelector.InitialDirectory = AppUtils.GetAppDirectoryPath();
                 }
             }
             else
             {
-                fileSelector.InitialDirectory = ProcessFilesOrDirectoriesBase.GetAppDirectoryPath();
+                fileSelector.InitialDirectory = AppUtils.GetAppDirectoryPath();
             }
 
             if (File.Exists(filePath))
@@ -766,7 +766,7 @@ namespace MASIC
 
                     if (txtOutputDirectoryPath.TextLength == 0)
                     {
-                        txtOutputDirectoryPath.Text = ProcessFilesOrDirectoriesBase.GetAppDirectoryPath();
+                        txtOutputDirectoryPath.Text = AppUtils.GetAppDirectoryPath();
                     }
 
                     mPreferredInputFileExtension = xmlFileReader.GetParam(MASICOptions.XML_SECTION_IMPORT_OPTIONS, "PreferredInputFileExtension", mPreferredInputFileExtension);
@@ -817,12 +817,12 @@ namespace MASIC
                 }
                 catch
                 {
-                    fileSelector.InitialDirectory = ProcessFilesOrDirectoriesBase.GetAppDirectoryPath();
+                    fileSelector.InitialDirectory = AppUtils.GetAppDirectoryPath();
                 }
             }
             else
             {
-                fileSelector.InitialDirectory = ProcessFilesOrDirectoriesBase.GetAppDirectoryPath();
+                fileSelector.InitialDirectory = AppUtils.GetAppDirectoryPath();
             }
 
             if (File.Exists(filePath))
@@ -1344,7 +1344,7 @@ namespace MASIC
             {
                 if (txtOutputDirectoryPath.TextLength == 0 || !Directory.Exists(txtOutputDirectoryPath.Text))
                 {
-                    txtOutputDirectoryPath.Text = ProcessFilesOrDirectoriesBase.GetAppDirectoryPath();
+                    txtOutputDirectoryPath.Text = AppUtils.GetAppDirectoryPath();
                 }
             }
             catch (Exception ex)
@@ -1577,12 +1577,12 @@ namespace MASIC
                 }
                 catch
                 {
-                    fileSelector.InitialDirectory = ProcessFilesOrDirectoriesBase.GetAppDirectoryPath();
+                    fileSelector.InitialDirectory = AppUtils.GetAppDirectoryPath();
                 }
             }
             else
             {
-                fileSelector.InitialDirectory = ProcessFilesOrDirectoriesBase.GetAppDirectoryPath();
+                fileSelector.InitialDirectory = AppUtils.GetAppDirectoryPath();
             }
 
             fileSelector.Title = "Select dataset lookup file";
@@ -1634,12 +1634,12 @@ namespace MASIC
                 }
                 catch
                 {
-                    fileSelector.InitialDirectory = ProcessFilesOrDirectoriesBase.GetAppDirectoryPath();
+                    fileSelector.InitialDirectory = AppUtils.GetAppDirectoryPath();
                 }
             }
             else
             {
-                fileSelector.InitialDirectory = ProcessFilesOrDirectoriesBase.GetAppDirectoryPath();
+                fileSelector.InitialDirectory = AppUtils.GetAppDirectoryPath();
             }
 
             fileSelector.Title = "Select custom SIC values file";
@@ -1673,7 +1673,7 @@ namespace MASIC
                          "CDF files (*.cdf)|*.cdf|" +
                          "All files (*.*)|*.*"
             };
-            var fileExtension = string.Copy(mPreferredInputFileExtension);
+            var fileExtension = mPreferredInputFileExtension;
 
             if (txtInputFilePath.TextLength > 0)
             {
@@ -1700,12 +1700,12 @@ namespace MASIC
                 }
                 catch
                 {
-                    fileSelector.InitialDirectory = ProcessFilesOrDirectoriesBase.GetAppDirectoryPath();
+                    fileSelector.InitialDirectory = AppUtils.GetAppDirectoryPath();
                 }
             }
             else
             {
-                fileSelector.InitialDirectory = ProcessFilesOrDirectoriesBase.GetAppDirectoryPath();
+                fileSelector.InitialDirectory = AppUtils.GetAppDirectoryPath();
             }
 
             fileSelector.Title = "Select input file";

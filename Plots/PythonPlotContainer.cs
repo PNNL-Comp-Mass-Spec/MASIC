@@ -186,7 +186,7 @@ namespace MASIC.Plots
                 // Loop until program is complete, or until MAX_RUNTIME_SECONDS seconds elapses
                 while (programRunner.State != ProgRunner.States.NotMonitoring)
                 {
-                    ProgRunner.SleepMilliseconds(MONITOR_INTERVAL_MILLISECONDS);
+                    AppUtils.SleepMilliseconds(MONITOR_INTERVAL_MILLISECONDS);
 
                     if (DateTime.UtcNow.Subtract(startTime).TotalSeconds < MAX_RUNTIME_SECONDS)
                         continue;

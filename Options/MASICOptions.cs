@@ -394,7 +394,7 @@ namespace MASIC.Options
                 if (!File.Exists(parameterFilePath))
                 {
                     // See if parameterFilePath points to a file in the same directory as the application
-                    parameterFilePath = Path.Combine(PRISM.FileProcessor.ProcessFilesOrDirectoriesBase.GetAppDirectoryPath(), Path.GetFileName(parameterFilePath));
+                    parameterFilePath = Path.Combine(AppUtils.GetAppDirectoryPath(), Path.GetFileName(parameterFilePath));
                     if (!File.Exists(parameterFilePath))
                     {
                         if (!string.IsNullOrWhiteSpace(inputFilePath))
