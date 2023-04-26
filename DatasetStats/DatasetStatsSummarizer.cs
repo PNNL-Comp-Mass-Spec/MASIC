@@ -117,6 +117,19 @@ namespace MASIC.DatasetStats
         {
             mDatasetScanStats.Add(scanStats);
             mDatasetSummaryStatsUpToDate = false;
+
+        private double AssureNumeric(double value)
+        {
+            if (double.IsNaN(value))
+                return 0;
+
+            if (double.IsPositiveInfinity(value))
+                return double.MaxValue;
+
+            if (double.IsNegativeInfinity(value))
+                return double.MinValue;
+
+            return value;
         }
 
         /// <summary>
@@ -201,11 +214,11 @@ namespace MASIC.DatasetStats
                     }
                 }
 
-                summaryStats.MSStats.TICMedian = Utilities.ComputeMedian(ticListMS);
-                summaryStats.MSStats.BPIMedian = Utilities.ComputeMedian(bpiListMS);
+                summaryStats.MSStats.TICMedian = AssureNumeric(MathNet.Numerics.Statistics.Statistics.Median(ticListMS));
+                summaryStats.MSStats.BPIMedian = AssureNumeric(MathNet.Numerics.Statistics.Statistics.Median(bpiListMS));
 
-                summaryStats.MSnStats.TICMedian = Utilities.ComputeMedian(ticListMSn);
-                summaryStats.MSnStats.BPIMedian = Utilities.ComputeMedian(bpiListMSn);
+                summaryStats.MSnStats.TICMedian = AssureNumeric(MathNet.Numerics.Statistics.Statistics.Median(ticListMSn));
+                summaryStats.MSnStats.BPIMedian = AssureNumeric(MathNet.Numerics.Statistics.Statistics.Median(bpiListMSn));
 
                 return true;
             }
@@ -449,30 +462,11 @@ namespace MASIC.DatasetStats
 
                 foreach (var scanTypeEntry in summaryStats.ScanTypeStats)
                 {
-                    var scanType = scanTypeEntry.Key;
-                    var indexMatch = scanType.IndexOf(SCAN_TYPE_STATS_SEP_CHAR, StringComparison.Ordinal);
-                    string scanFilterText;
-
-                    if (indexMatch >= 0)
-                    {
-                        scanFilterText = scanType.Substring(indexMatch + SCAN_TYPE_STATS_SEP_CHAR.Length);
-                        if (indexMatch > 0)
-                        {
-                            scanType = scanType.Substring(0, indexMatch);
-                        }
-                        else
-                        {
-                            scanType = string.Empty;
-                        }
-                    }
-                    else
-                    {
-                        scanFilterText = string.Empty;
-                    }
+                    var scanCountForType = GetScanTypeAndFilter(scanTypeEntry, out var scanType, out var genericScanFilter);
 
                     writer.WriteStartElement("ScanType");
-                    writer.WriteAttributeString("ScanCount", scanTypeEntry.Value.ToString());
-                    writer.WriteAttributeString("ScanFilterText", FixNull(scanFilterText));
+                    writer.WriteAttributeString("ScanCount", scanCountForType.ToString());
+                    writer.WriteAttributeString("ScanFilterText", FixNull(genericScanFilter));
                     writer.WriteString(scanType);
                     writer.WriteEndElement();     // ScanType
                 }
@@ -662,14 +656,46 @@ namespace MASIC.DatasetStats
         /// Get dataset summary stats
         /// </summary>
         public DatasetSummaryStats GetDatasetSummaryStats()
+
+        /// <summary>
+        /// Extract out the scan type and filter text from the key in scanTypeEntry
+        /// </summary>
+        /// <param name="scanTypeEntry">Key is scan type, value is number of scans with the given scan type</param>
+        /// <param name="scanType">Scan Type, e.g. HMS or HCD-HMSn or DIA-HCD-HMSn</param>
+        /// <param name="scanFilterText">Scan filter text, e.g. "FTMS + p NSI Full ms" or "FTMS + p NSI d Full ms2 0@hcd25.00" or "IMS"</param>
+        /// <returns>Scan count for this scan type and filter string</returns>
+        private int GetScanTypeAndFilter(
+            KeyValuePair<string, int> scanTypeEntry,
+            out string scanType,
+            out string scanFilterText)
         {
             if (!mDatasetSummaryStatsUpToDate)
+            var scanTypeKey = scanTypeEntry.Key;
+            var indexMatch = scanTypeKey.IndexOf(SCAN_TYPE_STATS_SEP_CHAR, StringComparison.Ordinal);
+
+            if (indexMatch >= 0)
+            {
+                scanFilterText = scanTypeKey.Substring(indexMatch + SCAN_TYPE_STATS_SEP_CHAR.Length);
+
+                if (indexMatch > 0)
+                {
+                    scanType = scanTypeKey.Substring(0, indexMatch);
+                }
+                else
+                {
+                    scanType = string.Empty;
+                }
+            }
+            else
             {
                 ComputeScanStatsSummary(mDatasetScanStats, out mDatasetSummaryStats);
                 mDatasetSummaryStatsUpToDate = true;
+                scanType = scanTypeKey;
+                scanFilterText = string.Empty;
             }
 
             return mDatasetSummaryStats;
+            return scanTypeEntry.Value;
         }
 
         private void ReportError(string message, Exception ex = null)
