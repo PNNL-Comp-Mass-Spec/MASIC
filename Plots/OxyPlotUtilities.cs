@@ -163,7 +163,7 @@ namespace MASIC.Plots
         {
             var myPlot = new PlotModel
             {
-                Title = string.Copy(title),
+                Title = title,
                 TitleFont = "Arial",
                 TitleFontSize = PlotContainer.DEFAULT_BASE_FONT_SIZE + 4,
                 TitleFontWeight = FontWeights.Normal

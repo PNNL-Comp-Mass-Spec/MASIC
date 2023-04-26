@@ -664,8 +664,16 @@ namespace MASIC.DatasetStats
 
         private void ReportError(string message, Exception ex = null)
         {
-            ErrorMessage = string.Copy(message);
-            OnErrorEvent(ErrorMessage, ex);
+            if (ex is null)
+            {
+                ErrorMessage = message;
+            }
+            else
+            {
+                ErrorMessage = message + ": " + ex.Message;
+            }
+
+            OnErrorEvent(message, ex);
         }
 
         /// <summary>

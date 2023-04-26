@@ -3659,7 +3659,7 @@ namespace MASICPeakFinder
             Exception ex,
             bool allowThrowingException = true)
         {
-            mStatusMessage = string.Copy(message);
+            mStatusMessage = message;
 
             var messageWithoutCRLF = mStatusMessage.Replace(Environment.NewLine, "; ");
 

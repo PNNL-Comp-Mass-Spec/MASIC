@@ -555,7 +555,7 @@ namespace MASIC.DataInput
             if (scanType == ScanList.ScanTypeConstants.SurveyScan)
             {
                 scanStatsEntry.ScanType = 1;
-                scanStatsEntry.ScanTypeName = string.Copy(currentScan.ScanTypeName);
+                scanStatsEntry.ScanTypeName = currentScan.ScanTypeName;
             }
             else
             {
@@ -570,7 +570,7 @@ namespace MASIC.DataInput
                     scanStatsEntry.ScanType = currentScan.FragScanInfo.MSLevel;
                 }
 
-                scanStatsEntry.ScanTypeName = string.Copy(currentScan.ScanTypeName);
+                scanStatsEntry.ScanTypeName = currentScan.ScanTypeName;
             }
 
             scanStatsEntry.ScanFilterText = currentScan.ScanHeaderText;

@@ -71,7 +71,7 @@ namespace MASIC.DataOutput
 
                 // Second, write an MS-based _scans.csv file (readable with Decon2LS)
                 var msScansFilePath = DataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, DataOutput.OutputFileTypeConstants.DeconToolsMSChromatogramFile);
-                currentFilePath = string.Copy(msScansFilePath);
+                currentFilePath = msScansFilePath;
 
                 ReportMessage("Saving Decon2LS MS Chromatogram File to " + Path.GetFileName(msScansFilePath));
 
@@ -82,7 +82,7 @@ namespace MASIC.DataOutput
 
                 // Third, write an MSMS-based _scans.csv file (readable with Decon2LS)
                 var msmsScansFilePath = DataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, DataOutput.OutputFileTypeConstants.DeconToolsMSMSChromatogramFile);
-                currentFilePath = string.Copy(msmsScansFilePath);
+                currentFilePath = msmsScansFilePath;
 
                 ReportMessage("Saving Decon2LS MSMS Chromatogram File to " + Path.GetFileName(msmsScansFilePath));
 
