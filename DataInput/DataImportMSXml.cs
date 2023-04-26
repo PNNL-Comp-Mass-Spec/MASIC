@@ -1033,7 +1033,8 @@ namespace MASIC.DataInput
                 SIMScan = false,
                 MRMScanType = MRMScanTypeConstants.NotMRM,
                 LowMass = spectrumInfo.MzRangeStart,
-                HighMass = spectrumInfo.MzRangeEnd
+                HighMass = spectrumInfo.MzRangeEnd,
+                IsDIA = false
             };
 
             if (mzXmlSourceSpectrum != null && !string.IsNullOrWhiteSpace(mzXmlSourceSpectrum.FilterLine))
@@ -1147,27 +1148,44 @@ namespace MASIC.DataInput
             SimpleMzMLReader.SimpleSpectrum mzMLSpectrum)
         {
             int parentScan;
+            bool isDIA;
 
             if (mzMLSpectrum != null)
             {
                 parentScan = GetParentScan(mzMLSpectrum);
+
+                if (mzMLSpectrum.Precursors.Count > 0)
+                {
+                    var isolationWindowMZ = mzMLSpectrum.Precursors[0].IsolationWindow.LowerOffset +
+                                            mzMLSpectrum.Precursors[0].IsolationWindow.UpperOffset;
+
+                    isDIA = mzMLSpectrum.MsLevel > 1 && isolationWindowMZ >= 6.5;
+                }
+                else
+                {
+                    isDIA = false;
+                }
             }
             else if (mzXmlSourceSpectrum != null)
             {
                 parentScan = mzXmlSourceSpectrum.PrecursorScanNum;
+                isDIA = mzXmlSourceSpectrum.MSLevel > 1 && mzXmlSourceSpectrum.IsolationWindow >= 6.5;
             }
             else if (spectrumInfo is SpectrumInfoMzData mzDataSpectrum)
             {
                 parentScan = mzDataSpectrum.ParentIonSpectrumID;
+                isDIA = false;
             }
             else if (scanList.SurveyScans.Count > 0)
             {
                 // Use the scan number of the most recent MS1 scan
                 parentScan = scanList.SurveyScans.Last().ScanNumber;
+                isDIA = false;
             }
             else
             {
                 parentScan = 0;
+                isDIA = false;
             }
 
             var scanInfo = new ScanInfo(parentScan, spectrumInfo.ParentIonMZ)
@@ -1182,7 +1200,8 @@ namespace MASIC.DataInput
                 MinimumPositiveIntensity = 0,
                 ZoomScan = false,
                 SIMScan = false,
-                MRMScanType = MRMScanTypeConstants.NotMRM
+                MRMScanType = MRMScanTypeConstants.NotMRM,
+                IsDIA = isDIA
             };
 
             // 1 for the first MS/MS scan after the survey scan, 2 for the second one, etc.
@@ -1433,9 +1452,14 @@ namespace MASIC.DataInput
                 mzXmlSourceSpectrum.MzRangeEnd = Utilities.CFloatSafe(mzMax);
             }
 
+            bool isDIA;
+
             if (mzXmlSourceSpectrum.MSLevel > 1 && mzMLSpectrum.Precursors.Count > 0)
             {
                 var firstPrecursor = mzMLSpectrum.Precursors[0];
+
+                var isolationWindowWidthMZ = firstPrecursor.IsolationWindow.LowerOffset + firstPrecursor.IsolationWindow.UpperOffset;
+                isDIA = isolationWindowWidthMZ >= 6.5;
 
                 mzXmlSourceSpectrum.ParentIonMZ = firstPrecursor.IsolationWindow.TargetMz;
 
@@ -1522,6 +1546,10 @@ namespace MASIC.DataInput
 
                 mzXmlSourceSpectrum.ActivationMethod = string.Join(",", activationMethods);
             }
+            else
+            {
+                isDIA = false;
+            }
 
             // Store the "filter string" in .FilterLine
 
@@ -1531,8 +1559,10 @@ namespace MASIC.DataInput
             {
                 if (isThermoRawFile)
                 {
-                    mzXmlSourceSpectrum.FilterLine = XRawFileIO.MakeGenericThermoScanFilter(filterString);
-                    mzXmlSourceSpectrum.ScanType = XRawFileIO.GetScanTypeNameFromThermoScanFilterText(filterString);
+                    var includeParentMZ = isDIA;
+
+                    mzXmlSourceSpectrum.FilterLine = XRawFileIO.MakeGenericThermoScanFilter(filterString, includeParentMZ);
+                    mzXmlSourceSpectrum.ScanType = XRawFileIO.GetScanTypeNameFromThermoScanFilterText(filterString, isDIA);
                 }
                 else
                 {
@@ -1770,7 +1800,7 @@ namespace MASIC.DataInput
             if (!string.IsNullOrEmpty(scanInfo.ScanHeaderText))
             {
                 // This is a Thermo file; auto define .ScanTypeName using the FilterLine text
-                scanInfo.ScanTypeName = XRawFileIO.GetScanTypeNameFromThermoScanFilterText(scanInfo.ScanHeaderText);
+                scanInfo.ScanTypeName = XRawFileIO.GetScanTypeNameFromThermoScanFilterText(scanInfo.ScanHeaderText, scanInfo.IsDIA);
 
                 // Now populate .SIMScan, .MRMScanType and .ZoomScan
 

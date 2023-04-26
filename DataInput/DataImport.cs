@@ -568,6 +568,7 @@ namespace MASIC.DataInput
                 {
                     // .MSLevel is 2 or higher, record the actual MSLevel value
                     scanStatsEntry.ScanType = currentScan.FragScanInfo.MSLevel;
+                    scanStatsEntry.IsDIA = currentScan.IsDIA;
                 }
 
                 scanStatsEntry.ScanTypeName = currentScan.ScanTypeName;

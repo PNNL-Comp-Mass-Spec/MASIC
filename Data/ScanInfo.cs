@@ -82,6 +82,12 @@ namespace MASIC.Data
         /// </summary>
         public double HighMass { get; set; }
 
+
+        /// <summary>
+        /// True if this is a data independent acquisition scan
+        /// </summary>
+        public bool IsDIA { get; set; }
+
         /// <summary>
         /// True if the scan was collected in the FT cell of a Thermo instrument
         /// </summary>

@@ -361,12 +361,14 @@ namespace MASIC.DataInput
             SICOptions sicOptions,
             clsScanInfo thermoScanInfo)
         {
+            var includeParentMZ = thermoScanInfo.IsDIA;
+
             var scanInfo = new ScanInfo
             {
                 ScanNumber = thermoScanInfo.ScanNumber,
                 ScanTime = (float)thermoScanInfo.RetentionTime,
-                ScanHeaderText = XRawFileIO.MakeGenericThermoScanFilter(thermoScanInfo.FilterText),
-                ScanTypeName = XRawFileIO.GetScanTypeNameFromThermoScanFilterText(thermoScanInfo.FilterText),
+                ScanHeaderText = XRawFileIO.MakeGenericThermoScanFilter(thermoScanInfo.FilterText, includeParentMZ),
+                ScanTypeName = XRawFileIO.GetScanTypeNameFromThermoScanFilterText(thermoScanInfo.FilterText, thermoScanInfo.IsDIA),
                 BasePeakIonMZ = thermoScanInfo.BasePeakMZ,
                 BasePeakIonIntensity = thermoScanInfo.BasePeakIntensity,
                 TotalIonIntensity = thermoScanInfo.TotalIonCurrent,
@@ -376,6 +378,7 @@ namespace MASIC.DataInput
                 MRMScanType = thermoScanInfo.MRMScanType,
                 LowMass = thermoScanInfo.LowMass,
                 HighMass = thermoScanInfo.HighMass,
+                IsDIA = false,
                 IsFTMS = thermoScanInfo.IsFTMS,
                 FragScanInfo =
                 {
@@ -484,12 +487,14 @@ namespace MASIC.DataInput
         {
             // Note that MinimumPositiveIntensity will be determined in LoadSpectraForThermoRawFile
 
+            var includeParentMZ = thermoScanInfo.IsDIA;
+
             var scanInfo = new ScanInfo(thermoScanInfo.ParentScan, thermoScanInfo.ParentIonMZ)
             {
                 ScanNumber = thermoScanInfo.ScanNumber,
                 ScanTime = (float)thermoScanInfo.RetentionTime,
-                ScanHeaderText = XRawFileIO.MakeGenericThermoScanFilter(thermoScanInfo.FilterText),
-                ScanTypeName = XRawFileIO.GetScanTypeNameFromThermoScanFilterText(thermoScanInfo.FilterText),
+                ScanHeaderText = XRawFileIO.MakeGenericThermoScanFilter(thermoScanInfo.FilterText, includeParentMZ),
+                ScanTypeName = XRawFileIO.GetScanTypeNameFromThermoScanFilterText(thermoScanInfo.FilterText, thermoScanInfo.IsDIA),
                 BasePeakIonMZ = thermoScanInfo.BasePeakMZ,
                 BasePeakIonIntensity = thermoScanInfo.BasePeakIntensity,
                 TotalIonIntensity = thermoScanInfo.TotalIonCurrent,
@@ -541,6 +546,7 @@ namespace MASIC.DataInput
 
             scanInfo.LowMass = thermoScanInfo.LowMass;
             scanInfo.HighMass = thermoScanInfo.HighMass;
+            scanInfo.IsDIA = thermoScanInfo.IsDIA;
             scanInfo.IsFTMS = thermoScanInfo.IsFTMS;
 
             // Store the ScanEvent values in .ExtendedHeaderInfo
@@ -549,6 +555,7 @@ namespace MASIC.DataInput
             // Store the collision mode and possibly the scan filter text
             scanInfo.FragScanInfo.CollisionMode = thermoScanInfo.CollisionMode;
             StoreExtendedHeaderInfo(dataOutputHandler, scanInfo, ExtendedStatsWriter.EXTENDED_STATS_HEADER_COLLISION_MODE, thermoScanInfo.CollisionMode);
+
             if (mOptions.WriteExtendedStatsIncludeScanFilterText)
             {
                 StoreExtendedHeaderInfo(dataOutputHandler, scanInfo, ExtendedStatsWriter.EXTENDED_STATS_HEADER_SCAN_FILTER_TEXT, thermoScanInfo.FilterText);

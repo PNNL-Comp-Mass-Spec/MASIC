@@ -277,6 +277,7 @@ namespace MASIC.Data
                 MRMScanType = MRMScanTypeConstants.NotMRM,
                 LowMass = 0,
                 HighMass = 0,
+                IsDIA = false,
                 IsFTMS = false
             };
 

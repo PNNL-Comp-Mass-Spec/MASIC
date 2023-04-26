@@ -194,6 +194,11 @@ namespace MASIC.DatasetStats
                     {
                         summaryStats.ScanTypeStats.Add(scanTypeKey, 1);
                     }
+
+                    if (statEntry.IsDIA)
+                    {
+                        summaryStats.DIAScanCount++;
+                    }
                 }
 
                 summaryStats.MSStats.TICMedian = Utilities.ComputeMedian(ticListMS);
@@ -483,6 +488,8 @@ namespace MASIC.DatasetStats
 
                 writer.WriteElementString("ScanCountMS", summaryStats.MSStats.ScanCount.ToString());
                 writer.WriteElementString("ScanCountMSn", summaryStats.MSnStats.ScanCount.ToString());
+                writer.WriteElementString("ScanCountDIA", summaryStats.DIAScanCount.ToString());
+
                 writer.WriteElementString("Elution_Time_Max", summaryStats.ElutionTimeMax.ToString("0.0###"));
 
                 writer.WriteElementString("AcqTimeMinutes", datasetInfo.AcqTimeEnd.Subtract(datasetInfo.AcqTimeStart).TotalMinutes.ToString("0.00"));

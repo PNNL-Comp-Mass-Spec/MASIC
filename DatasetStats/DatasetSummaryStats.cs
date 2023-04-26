@@ -8,7 +8,12 @@ namespace MASIC.DatasetStats
     public class DatasetSummaryStats
     {
         /// <summary>
-        /// Maximum elution time (retention time)
+        /// Number of DIA spectra
+        /// </summary>
+        public int DIAScanCount { get; set; }
+
+        /// <summary>
+        /// Maximum elution time (retention time, in minutes
         /// </summary>
         public double ElutionTimeMax { get; set; }
 
@@ -50,6 +55,7 @@ namespace MASIC.DatasetStats
         /// </summary>
         public void Clear()
         {
+            DIAScanCount = 0;
             ElutionTimeMax = 0;
             MSStats.Clear();
             MSnStats.Clear();
