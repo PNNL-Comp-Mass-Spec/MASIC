@@ -160,9 +160,16 @@ namespace MASIC.DatasetStats
         /// Summarizes the scan info in scanStats()
         /// </summary>
         /// <param name="scanStats">ScanStats data to parse</param>
-        /// <param name="summaryStats">Stats output (initialized if nothing)</param>
+        /// <param name="includePrecursorMZ">
+        /// When true, include precursor m/z values in the generic scan filters
+        /// When false, replace the actual precursor m/z with 0
+        /// </param>
+        /// <param name="summaryStats">Output: summarized scan stats</param>
         /// <returns>>True if success, false if error</returns>
-        public bool ComputeScanStatsSummary(List<ScanStatsEntry> scanStats, out DatasetSummaryStats summaryStats)
+        public bool ComputeScanStatsSummary(
+            List<ScanStatsEntry> scanStats,
+            bool includePrecursorMZ,
+            out DatasetSummaryStats summaryStats)
         {
             summaryStats = new DatasetSummaryStats();
 
@@ -187,6 +194,10 @@ namespace MASIC.DatasetStats
 
                 foreach (var statEntry in scanStats)
                 {
+                    var genericScanFilter = includePrecursorMZ
+                        ? statEntry.ScanFilterText
+                        : ThermoRawFileReader.XRawFileIO.GetScanFilterWithGenericPrecursorMZ(statEntry.ScanFilterText);
+
                     if (statEntry.ScanType > 1)
                     {
                         // MSn spectrum
@@ -421,14 +432,17 @@ namespace MASIC.DatasetStats
 
                 DatasetSummaryStats summaryStats;
 
+                // This is true in MASIC, but false in MS_File_Info_Scanner
+                const bool includePrecursorMZ = true;
+
                 if (scanStats == mDatasetScanStats)
                 {
-                    summaryStats = GetDatasetSummaryStats();
+                    summaryStats = GetDatasetSummaryStats(includePrecursorMZ);
                 }
                 else
                 {
                     // Parse the data in scanStats to compute the bulk values
-                    ComputeScanStatsSummary(scanStats, out summaryStats);
+                    ComputeScanStatsSummary(scanStats, includePrecursorMZ, out summaryStats);
                 }
 
                 var xmlSettings = new XmlWriterSettings
@@ -486,6 +500,7 @@ namespace MASIC.DatasetStats
                 writer.WriteStartElement("AcquisitionInfo");
 
                 var scanCountTotal = summaryStats.MSStats.ScanCount + summaryStats.MSnStats.ScanCount;
+
                 if (scanCountTotal == 0 && datasetInfo.ScanCount > 0)
                 {
                     scanCountTotal = datasetInfo.ScanCount;
@@ -802,14 +817,18 @@ namespace MASIC.DatasetStats
                 ErrorMessage = string.Empty;
 
                 DatasetSummaryStats summaryStats;
+
+                const bool includePrecursorMZ = false;
+
                 if (scanStats == mDatasetScanStats)
                 {
-                    summaryStats = GetDatasetSummaryStats();
+                    summaryStats = GetDatasetSummaryStats(includePrecursorMZ);
                 }
                 else
                 {
                     // Parse the data in scanStats to compute the bulk values
-                    var summarySuccess = ComputeScanStatsSummary(scanStats, out summaryStats);
+                    var summarySuccess = ComputeScanStatsSummary(scanStats, includePrecursorMZ, out summaryStats);
+
                     if (!summarySuccess)
                     {
                         ReportError("ComputeScanStatsSummary returned false; unable to continue in UpdateDatasetStatsTextFile");
@@ -821,6 +840,8 @@ namespace MASIC.DatasetStats
                 {
                     writeHeaders = true;
                 }
+
+                OnDebugEvent("Updating {0}", datasetStatsFilePath);
 
                 // Create or open the output file
                 using var writer = new StreamWriter(new FileStream(datasetStatsFilePath, FileMode.Append, FileAccess.Write, FileShare.Read));
