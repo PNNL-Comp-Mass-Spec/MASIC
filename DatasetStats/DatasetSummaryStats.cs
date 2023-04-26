@@ -31,11 +31,14 @@ namespace MASIC.DatasetStats
         /// Keeps track of each ScanType in the dataset, along with the number of scans of this type
         /// </summary>
         /// <remarks>
+        /// Keys are of the form "ScanTypeName::###::ScanFilterText"
+        /// Values are number of scans with the given scan type and scan filter
         /// Examples
-        /// FTMS + p NSI Full ms
-        /// ITMS + c ESI Full ms
-        /// ITMS + p ESI d Z ms
-        /// ITMS + c ESI d Full ms2 @cid35.00
+        ///   HMS::###::FTMS + p NSI Full ms
+        ///   HMSn::###::FTMS + p NSI d Full ms2 0@hcd25.00
+        ///   MS::###::ITMS + c ESI Full ms
+        ///   MSn::###::ITMS + p ESI d Z ms
+        ///   MSn::###::ITMS + c ESI d Full ms2 @cid35.00
         /// </remarks>
         public Dictionary<string, int> ScanTypeStats { get; }
 
@@ -51,7 +54,7 @@ namespace MASIC.DatasetStats
         }
 
         /// <summary>
-        /// Reset data to defaults
+        /// Reset stats
         /// </summary>
         public void Clear()
         {

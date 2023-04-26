@@ -110,7 +110,7 @@ namespace MASIC.DatasetStats
         }
 
         /// <summary>
-        /// Add a New scan
+        /// Add a new scan
         /// </summary>
         /// <param name="scanStats"></param>
         public void AddDatasetScan(ScanStatsEntry scanStats)
@@ -258,7 +258,7 @@ namespace MASIC.DatasetStats
         }
 
         /// <summary>
-        /// Creates an XML file summarizing the data stored in this class (in mDatasetScanStats, Me.DatasetFileInfo, and Me.SampleInfo)
+        /// Creates an XML file summarizing the data stored in this class (in mDatasetScanStats, this.DatasetFileInfo, and this.SampleInfo)
         /// </summary>
         /// <param name="datasetName">Dataset Name</param>
         /// <param name="datasetInfoFilePath">File path to write the XML to</param>
@@ -275,7 +275,7 @@ namespace MASIC.DatasetStats
         /// <param name="datasetInfoFilePath">File path to write the XML to</param>
         /// <param name="scanStats">Scan stats to parse</param>
         /// <param name="datasetInfo">Dataset Info</param>
-        /// <param name="oSampleInfo">Sample Info</param>
+        /// <param name="sampleInfo">Sample Info</param>
         /// <returns>True if success; False if failure</returns>
         public bool CreateDatasetInfoFile(
             string datasetName,
@@ -310,8 +310,8 @@ namespace MASIC.DatasetStats
         }
 
         /// <summary>
-        /// Creates XML summarizing the data stored in this class (in mDatasetScanStats, Me.DatasetFileInfo, and Me.SampleInfo)
-        /// Auto-determines the dataset name using Me.DatasetFileInfo.DatasetName
+        /// Creates XML summarizing the data stored in this class (in mDatasetScanStats, this.DatasetFileInfo, and this.SampleInfo)
+        /// Auto-determines the dataset name using this.DatasetFileInfo.DatasetName
         /// </summary>
         /// <returns>XML (as string)</returns>
         public string CreateDatasetInfoXML()
@@ -320,7 +320,7 @@ namespace MASIC.DatasetStats
         }
 
         /// <summary>
-        /// Creates XML summarizing the data stored in this class (in mDatasetScanStats, Me.DatasetFileInfo, and Me.SampleInfo)
+        /// Creates XML summarizing the data stored in this class (in mDatasetScanStats, this.DatasetFileInfo, and this.SampleInfo)
         /// </summary>
         /// <param name="datasetName">Dataset Name</param>
         /// <returns>XML (as string)</returns>
@@ -421,16 +421,19 @@ namespace MASIC.DatasetStats
                 //
                 // var datasetInfo = new StringBuilder();
                 // var stringWriter = new StringWriter(datasetInfo);
-                // var writer = new System.Xml.XmlTextWriter(stringWriter);
-                // writer.Formatting = System.Xml.Formatting.Indented;
-                // writer.Indentation = 2;
+                // var writer = new XmlTextWriter(stringWriter)
+                // {
+                //     Formatting = Formatting.Indented,
+                //     Indentation = 2
+                // };
 
                 // However, when you send the output to a StringBuilder it is always encoded as Unicode (UTF-16)
                 // since this is the only character encoding used in the .NET Framework for String values,
                 // and thus you'll see the attribute encoding="UTF-16" in the opening XML declaration
+
                 // The alternative is to use a MemoryStream.  Here, the stream encoding is set by the XmlWriter
                 // and so you see the attribute encoding="UTF-8" in the opening XML declaration encoding
-                // (since we used xmlSettings.Encoding = System.Encoding.UTF8)
+                // (since we used xmlSettings.Encoding = Encoding.UTF8)
                 //
                 var memStream = new MemoryStream();
                 var writer = XmlWriter.Create(memStream, xmlSettings);
@@ -712,7 +715,7 @@ namespace MASIC.DatasetStats
         }
 
         /// <summary>
-        /// Updates a tab-delimited text file, adding a new line summarizing the data stored in this class (in mDatasetScanStats and Me.DatasetFileInfo)
+        /// Updates a tab-delimited text file, adding a new line summarizing the data stored in this class (in mDatasetScanStats and this.DatasetFileInfo)
         /// </summary>
         /// <param name="datasetName">Dataset Name</param>
         /// <param name="datasetInfoFilePath">File path to write the XML to</param>
@@ -724,6 +727,7 @@ namespace MASIC.DatasetStats
 
         /// <summary>
         /// Updates a tab-delimited text file, adding a new line summarizing the data in scanStats and datasetInfo
+        /// This method does not check for duplicate entries; it simply appends a new line
         /// </summary>
         /// <param name="datasetName">Dataset Name</param>
         /// <param name="datasetStatsFilePath">Tab-delimited file to create/update</param>

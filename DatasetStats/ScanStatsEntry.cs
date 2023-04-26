@@ -19,14 +19,14 @@
         public int ScanType { get; set; }
 
         /// <summary>
-        /// Scan filter text
+        /// Scan filter text (for Thermo files, generic scan filter text, created using XRawFileIO.MakeGenericThermoScanFilter)
         /// </summary>
         /// <remarks>
         /// Examples:
-        /// FTMS + p NSI Full ms [400.00-2000.00]
-        /// ITMS + c ESI Full ms [300.00-2000.00]
-        /// ITMS + p ESI d Z ms [1108.00-1118.00]
-        /// ITMS + c ESI d Full ms2 342.90@cid35.00
+        ///   FTMS + p NSI Full ms [400.00-2000.00]
+        ///   ITMS + c ESI Full ms [300.00-2000.00]
+        ///   ITMS + p ESI d Z ms [1108.00-1118.00]
+        ///   ITMS + c ESI d Full ms2 342.90@cid35.00
         /// </remarks>
         public string ScanFilterText { get; set; }
 
@@ -35,7 +35,7 @@
         /// </summary>
         /// <remarks>
         /// Examples:
-        /// MS, HMS, Zoom, CID-MSn, or PQD-MSn
+        ///   MS, HMS, Zoom, CID-MSn, or PQD-MSn
         /// </remarks>
         public string ScanTypeName { get; set; }
 

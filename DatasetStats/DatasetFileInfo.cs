@@ -8,12 +8,12 @@ namespace MASIC.DatasetStats
     public class DatasetFileInfo
     {
         /// <summary>
-        /// File system creation time
+        /// File creation time (local time)
         /// </summary>
         public DateTime FileSystemCreationTime { get; set; }
 
         /// <summary>
-        /// File system modification time
+        /// File modification time (local time)
         /// </summary>
         public DateTime FileSystemModificationTime { get; set; }
 
@@ -61,7 +61,7 @@ namespace MASIC.DatasetStats
         }
 
         /// <summary>
-        /// Reset settings to defaults
+        /// Clear all values
         /// </summary>
         public void Clear()
         {
