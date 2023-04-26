@@ -282,7 +282,7 @@ namespace MASIC.DatasetStats
             string datasetInfoFilePath,
             List<ScanStatsEntry> scanStats,
             DatasetFileInfo datasetInfo,
-            SampleInfo oSampleInfo)
+            SampleInfo sampleInfo)
         {
             try
             {
@@ -298,7 +298,7 @@ namespace MASIC.DatasetStats
                 // However, CreateDatasetInfoXML() now uses a MemoryStream, so we're able to use UTF8
                 using var writer = new StreamWriter(new FileStream(datasetInfoFilePath, FileMode.Create, FileAccess.Write, FileShare.Read), Encoding.UTF8);
 
-                writer.WriteLine(CreateDatasetInfoXML(datasetName, scanStats, datasetInfo, oSampleInfo));
+                writer.WriteLine(CreateDatasetInfoXML(datasetName, scanStats, datasetInfo, sampleInfo));
 
                 return true;
             }
@@ -342,19 +342,19 @@ namespace MASIC.DatasetStats
         }
 
         /// <summary>
-        /// Creates XML summarizing the data in scanStats, datasetInfo, and oSampleInfo
+        /// Creates XML summarizing the data in scanStats, datasetInfo, and sampleInfo
         /// Auto-determines the dataset name using datasetInfo.DatasetName
         /// </summary>
         /// <param name="scanStats">Scan stats to parse</param>
         /// <param name="datasetInfo">Dataset Info</param>
-        /// <param name="oSampleInfo">Sample Info</param>
+        /// <param name="sampleInfo">Sample Info</param>
         /// <returns>XML (as string)</returns>
         public string CreateDatasetInfoXML(
             List<ScanStatsEntry> scanStats,
             DatasetFileInfo datasetInfo,
-            SampleInfo oSampleInfo)
+            SampleInfo sampleInfo)
         {
-            return CreateDatasetInfoXML(datasetInfo.DatasetName, scanStats, datasetInfo, oSampleInfo);
+            return CreateDatasetInfoXML(datasetInfo.DatasetName, scanStats, datasetInfo, sampleInfo);
         }
 
         /// <summary>
@@ -514,7 +514,7 @@ namespace MASIC.DatasetStats
                 writer.WriteElementString("BPI_Median_MSn", ValueToString(summaryStats.MSnStats.BPIMedian, 5, 0));
                 writer.WriteEndElement();       // TICInfo
 
-                // Only write the oSampleInfo block if oSampleInfo contains entries
+                // Only write the SampleInfo block if sampleInfo contains entries
                 if (sampleInfo.HasData())
                 {
                     writer.WriteStartElement("SampleInfo");
@@ -733,14 +733,14 @@ namespace MASIC.DatasetStats
         /// <param name="datasetStatsFilePath">Tab-delimited file to create/update</param>
         /// <param name="scanStats">Scan stats to parse</param>
         /// <param name="datasetInfo">Dataset Info</param>
-        /// <param name="oSampleInfo">Sample Info</param>
+        /// <param name="sampleInfo">Sample Info</param>
         /// <returns>True if success; False if failure</returns>
         public bool UpdateDatasetStatsTextFile(
             string datasetName,
             string datasetStatsFilePath,
             List<ScanStatsEntry> scanStats,
             DatasetFileInfo datasetInfo,
-            SampleInfo oSampleInfo)
+            SampleInfo sampleInfo)
         {
             var writeHeaders = false;
 
@@ -811,9 +811,9 @@ namespace MASIC.DatasetStats
                     datasetInfo.AcqTimeStart.ToString(DATE_TIME_FORMAT_STRING),
                     datasetInfo.AcqTimeEnd.ToString(DATE_TIME_FORMAT_STRING),
                     datasetInfo.FileSizeBytes.ToString(),
-                    FixNull(oSampleInfo.SampleName),
-                    FixNull(oSampleInfo.Comment1),
-                    FixNull(oSampleInfo.Comment2)
+                    FixNull(sampleInfo.SampleName),
+                    FixNull(sampleInfo.Comment1),
+                    FixNull(sampleInfo.Comment2)
                 };
 
                 writer.WriteLine(string.Join("\t", dataValues));
