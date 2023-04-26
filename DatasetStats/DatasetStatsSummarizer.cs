@@ -101,7 +101,7 @@ namespace MASIC.DatasetStats
         /// </summary>
         public DatasetStatsSummarizer()
         {
-            FileDate = "August 14, 2020";
+            FileDate = "April 25, 2023";
 
             ErrorMessage = string.Empty;
 
@@ -187,9 +187,9 @@ namespace MASIC.DatasetStats
 
                 // Initialize the TIC and BPI Lists
                 var ticListMS = new List<double>(scanStatsCount);
-                var ticListMSn = new List<double>(scanStatsCount);
-
                 var bpiListMS = new List<double>(scanStatsCount);
+
+                var ticListMSn = new List<double>(scanStatsCount);
                 var bpiListMSn = new List<double>(scanStatsCount);
 
                 foreach (var statEntry in scanStats)
@@ -219,7 +219,9 @@ namespace MASIC.DatasetStats
                             bpiListMS);
                     }
 
-                    var scanTypeKey = statEntry.ScanTypeName + SCAN_TYPE_STATS_SEP_CHAR + statEntry.ScanFilterText;
+                    // The scan type key is of the form "ScanTypeName::###::GenericScanFilter"
+                    var scanTypeKey = statEntry.ScanTypeName + SCAN_TYPE_STATS_SEP_CHAR + genericScanFilter;
+
                     if (summaryStats.ScanTypeStats.ContainsKey(scanTypeKey))
                     {
                         summaryStats.ScanTypeStats[scanTypeKey]++;
@@ -510,7 +512,8 @@ namespace MASIC.DatasetStats
 
                 writer.WriteElementString("Elution_Time_Max", summaryStats.ElutionTimeMax.ToString("0.0###"));
 
-                writer.WriteElementString("AcqTimeMinutes", datasetInfo.AcqTimeEnd.Subtract(datasetInfo.AcqTimeStart).TotalMinutes.ToString("0.00"));
+                var acqTimeMinutes = datasetInfo.AcqTimeEnd.Subtract(datasetInfo.AcqTimeStart).TotalMinutes;
+                writer.WriteElementString("AcqTimeMinutes", acqTimeMinutes.ToString("0.00"));
                 writer.WriteElementString("StartTime", datasetInfo.AcqTimeStart.ToString(DATE_TIME_FORMAT_STRING));
                 writer.WriteElementString("EndTime", datasetInfo.AcqTimeEnd.ToString(DATE_TIME_FORMAT_STRING));
 
@@ -536,10 +539,11 @@ namespace MASIC.DatasetStats
                     writer.WriteElementString("SampleName", FixNull(sampleInfo.SampleName));
                     writer.WriteElementString("Comment1", FixNull(sampleInfo.Comment1));
                     writer.WriteElementString("Comment2", FixNull(sampleInfo.Comment2));
-                    writer.WriteEndElement();       // SampleInfo
+                    writer.WriteEndElement();
                 }
 
                 writer.WriteEndElement();  // End the "Root" element (DatasetInfo)
+
                 writer.WriteEndDocument(); // End the document
 
                 writer.Close();
@@ -594,7 +598,7 @@ namespace MASIC.DatasetStats
 
                 using var scanStatsWriter = new StreamWriter(new FileStream(scanStatsFilePath, FileMode.Create, FileAccess.Write, FileShare.Read));
 
-                // Write the headers
+                // Write the ScanStats headers
                 var headerNames = new List<string>
                 {
                     "Dataset",
@@ -612,7 +616,7 @@ namespace MASIC.DatasetStats
 
                 scanStatsWriter.WriteLine(string.Join("\t", headerNames));
 
-                var dataValues = new List<string>(12);
+                var dataValues = new List<string>();
 
                 foreach (var scanStatsEntry in scanStats)
                 {
