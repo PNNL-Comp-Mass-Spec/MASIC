@@ -498,14 +498,14 @@ namespace MASIC.DatasetStats
                 writer.WriteEndElement();       // AcquisitionInfo
 
                 writer.WriteStartElement("TICInfo");
-                writer.WriteElementString("TIC_Max_MS", ValueToString(summaryStats.MSStats.TICMax, 5, 0));
-                writer.WriteElementString("TIC_Max_MSn", ValueToString(summaryStats.MSnStats.TICMax, 5, 0));
-                writer.WriteElementString("BPI_Max_MS", ValueToString(summaryStats.MSStats.BPIMax, 5, 0));
-                writer.WriteElementString("BPI_Max_MSn", ValueToString(summaryStats.MSnStats.BPIMax, 5, 0));
-                writer.WriteElementString("TIC_Median_MS", ValueToString(summaryStats.MSStats.TICMedian, 5, 0));
-                writer.WriteElementString("TIC_Median_MSn", ValueToString(summaryStats.MSnStats.TICMedian, 5, 0));
-                writer.WriteElementString("BPI_Median_MS", ValueToString(summaryStats.MSStats.BPIMedian, 5, 0));
-                writer.WriteElementString("BPI_Median_MSn", ValueToString(summaryStats.MSnStats.BPIMedian, 5, 0));
+                writer.WriteElementString("TIC_Max_MS", ValueToString(summaryStats.MSStats.TICMax, 5));
+                writer.WriteElementString("TIC_Max_MSn", ValueToString(summaryStats.MSnStats.TICMax, 5));
+                writer.WriteElementString("BPI_Max_MS", ValueToString(summaryStats.MSStats.BPIMax, 5));
+                writer.WriteElementString("BPI_Max_MSn", ValueToString(summaryStats.MSnStats.BPIMax, 5));
+                writer.WriteElementString("TIC_Median_MS", ValueToString(summaryStats.MSStats.TICMedian, 5));
+                writer.WriteElementString("TIC_Median_MSn", ValueToString(summaryStats.MSnStats.TICMedian, 5));
+                writer.WriteElementString("BPI_Median_MS", ValueToString(summaryStats.MSStats.BPIMedian, 5));
+                writer.WriteElementString("BPI_Median_MSn", ValueToString(summaryStats.MSnStats.BPIMedian, 5));
                 writer.WriteEndElement();       // TICInfo
 
                 // Only write the SampleInfo block if sampleInfo contains entries
@@ -853,11 +853,11 @@ namespace MASIC.DatasetStats
             }
         }
 
-        private string ValueToString(double value, byte digitsOfPrecision, double valueIfNaN)
+        private string ValueToString(double value, byte digitsOfPrecision)
         {
             if (double.IsNaN(value))
             {
-                return StringUtilities.ValueToString(valueIfNaN, digitsOfPrecision);
+                return 0.ToString();
             }
 
             if (double.IsNegativeInfinity(value))
