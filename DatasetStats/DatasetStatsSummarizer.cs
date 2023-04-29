@@ -14,6 +14,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Xml;
 using PRISM;
@@ -101,7 +102,7 @@ namespace MASIC.DatasetStats
         /// </summary>
         public DatasetStatsSummarizer()
         {
-            FileDate = "April 25, 2023";
+            FileDate = "April 28, 2023";
 
             ErrorMessage = string.Empty;
 
@@ -491,9 +492,12 @@ namespace MASIC.DatasetStats
                 {
                     var scanCountForType = GetScanTypeAndFilter(scanTypeEntry, out var scanType, out var genericScanFilter);
 
+                    var windowWidths = GetDelimitedWindowWidthList(scanTypeEntry.Key, summaryStats.ScanTypeWindowWidths);
+
                     writer.WriteStartElement("ScanType");
                     writer.WriteAttributeString("ScanCount", scanCountForType.ToString());
                     writer.WriteAttributeString("ScanFilterText", FixNull(genericScanFilter));
+                    writer.WriteAttributeString("IsolationWindowMZ", FixNull(windowWidths));
                     writer.WriteString(scanType);
                     writer.WriteEndElement();     // ScanType
                 }
@@ -700,6 +704,27 @@ namespace MASIC.DatasetStats
             mDatasetStatsSummaryStatus.ScanFiltersIncludePrecursorMZValues = includePrecursorMZ;
 
             return mDatasetSummaryStats;
+        }
+
+        /// <summary>
+        /// Convert the non-zero isolation window widths to a comma separated list
+        /// </summary>
+        /// <param name="scanTypeKey"></param>
+        /// <param name="scanTypeWindowWidths"></param>
+        /// <returns>Comma separated list, or an empty string if no valid window widths</returns>
+        private string GetDelimitedWindowWidthList(string scanTypeKey, IReadOnlyDictionary<string, SortedSet<double>> scanTypeWindowWidths)
+        {
+            if (!scanTypeWindowWidths.TryGetValue(scanTypeKey, out var windowWidthList))
+                return string.Empty;
+
+            var windowWidthsToShow = new SortedSet<double>();
+
+            foreach (var item in windowWidthList.Where(item => item > 0))
+            {
+                windowWidthsToShow.Add(item);
+            }
+
+            return string.Join(", ", windowWidthsToShow);
         }
 
         /// <summary>
