@@ -82,7 +82,6 @@ namespace MASIC.Data
         /// </summary>
         public double HighMass { get; set; }
 
-
         /// <summary>
         /// True if this is a data independent acquisition scan
         /// </summary>
@@ -92,6 +91,11 @@ namespace MASIC.Data
         /// True if the scan was collected in the FT cell of a Thermo instrument
         /// </summary>
         public bool IsFTMS { get; set; }
+
+        /// <summary>
+        /// Isolation window width (m/z)
+        /// </summary>
+        public double IsolationWindowWidthMZ { get; set; }
 
         /// <summary>
         /// Information specific to fragmentation scans

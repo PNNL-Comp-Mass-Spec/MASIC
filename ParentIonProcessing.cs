@@ -33,15 +33,17 @@ namespace MASIC
         /// <param name="fragScanIndex"></param>
         /// <param name="spectraCache"></param>
         /// <param name="sicOptions"></param>
+        /// <param name="isDIA"></param>
         public void AddUpdateParentIons(
             ScanList scanList,
             int surveyScanIndex,
             double parentIonMZ,
             int fragScanIndex,
             SpectraCache spectraCache,
-            SICOptions sicOptions)
+            SICOptions sicOptions,
+            bool isDIA)
         {
-            AddUpdateParentIons(scanList, surveyScanIndex, parentIonMZ, 0, 0, fragScanIndex, spectraCache, sicOptions);
+            AddUpdateParentIons(scanList, surveyScanIndex, parentIonMZ, 0, 0, fragScanIndex, spectraCache, sicOptions, isDIA);
         }
 
         /// <summary>
@@ -70,7 +72,7 @@ namespace MASIC
                     mrmToleranceHalfWidth = 0.001;
                 }
 
-                AddUpdateParentIons(scanList, surveyScanIndex, parentIonMZ, mrmDaughterMZ, mrmToleranceHalfWidth, scanList.FragScans.Count - 1, spectraCache, sicOptions);
+                AddUpdateParentIons(scanList, surveyScanIndex, parentIonMZ, mrmDaughterMZ, mrmToleranceHalfWidth, scanList.FragScans.Count - 1, spectraCache, sicOptions, false);
             }
         }
 
@@ -98,6 +100,7 @@ namespace MASIC
         /// <param name="fragScanIndex">This is typically equal to scanList.FragScans.Count - 1</param>
         /// <param name="spectraCache"></param>
         /// <param name="sicOptions"></param>
+        /// <param name="isDIA"></param>
         private void AddUpdateParentIons(
             ScanList scanList,
             int surveyScanIndex,
@@ -106,7 +109,8 @@ namespace MASIC
             double mrmToleranceHalfWidth,
             int fragScanIndex,
             SpectraCache spectraCache,
-            SICOptions sicOptions)
+            SICOptions sicOptions,
+            bool isDIA)
         {
             const double MINIMUM_TOLERANCE_PPM = 0.01;
             const double MINIMUM_TOLERANCE_DA = 0.0001;
@@ -186,7 +190,8 @@ namespace MASIC
                     SurveyScanIndex = surveyScanIndex,
                     CustomSICPeak = false,
                     MRMDaughterMZ = mrmDaughterMZ,
-                    MRMToleranceHalfWidth = mrmToleranceHalfWidth
+                    MRMToleranceHalfWidth = mrmToleranceHalfWidth,
+                    IsDIA = isDIA
                 };
 
                 newParentIon.FragScanIndices.Add(fragScanIndex);

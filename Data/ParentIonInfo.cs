@@ -59,6 +59,14 @@ namespace MASIC.Data
         public float CustomSICPeakScanOrAcqTimeTolerance { get; set; }
 
         /// <summary>
+        /// True if associated with a DIA scan
+        /// </summary>
+        /// <remarks>
+        /// Selected ion chromatograms are not created for DIA spectra
+        /// </remarks>
+        public bool IsDIA { get; set; }
+
+        /// <summary>
         /// Only applicable to MRM scans
         /// </summary>
         public double MRMDaughterMZ { get; set; }

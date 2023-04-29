@@ -1149,6 +1149,7 @@ namespace MASIC.DataInput
         {
             int parentScan;
             bool isDIA;
+            double isolationWindowMZ;
 
             if (mzMLSpectrum != null)
             {
@@ -1156,7 +1157,7 @@ namespace MASIC.DataInput
 
                 if (mzMLSpectrum.Precursors.Count > 0)
                 {
-                    var isolationWindowMZ = mzMLSpectrum.Precursors[0].IsolationWindow.LowerOffset +
+                    isolationWindowMZ = mzMLSpectrum.Precursors[0].IsolationWindow.LowerOffset +
                                             mzMLSpectrum.Precursors[0].IsolationWindow.UpperOffset;
 
                     isDIA = mzMLSpectrum.MsLevel > 1 && isolationWindowMZ >= 6.5;
@@ -1164,28 +1165,33 @@ namespace MASIC.DataInput
                 else
                 {
                     isDIA = false;
+                    isolationWindowMZ = 0;
                 }
             }
             else if (mzXmlSourceSpectrum != null)
             {
                 parentScan = mzXmlSourceSpectrum.PrecursorScanNum;
                 isDIA = mzXmlSourceSpectrum.MSLevel > 1 && mzXmlSourceSpectrum.IsolationWindow >= 6.5;
+                isolationWindowMZ = mzXmlSourceSpectrum.IsolationWindow;
             }
             else if (spectrumInfo is SpectrumInfoMzData mzDataSpectrum)
             {
                 parentScan = mzDataSpectrum.ParentIonSpectrumID;
                 isDIA = false;
+                isolationWindowMZ = 0;
             }
             else if (scanList.SurveyScans.Count > 0)
             {
                 // Use the scan number of the most recent MS1 scan
                 parentScan = scanList.SurveyScans.Last().ScanNumber;
                 isDIA = false;
+                isolationWindowMZ = 0;
             }
             else
             {
                 parentScan = 0;
                 isDIA = false;
+                isolationWindowMZ = 0;
             }
 
             var scanInfo = new ScanInfo(parentScan, spectrumInfo.ParentIonMZ)
@@ -1201,7 +1207,8 @@ namespace MASIC.DataInput
                 ZoomScan = false,
                 SIMScan = false,
                 MRMScanType = MRMScanTypeConstants.NotMRM,
-                IsDIA = isDIA
+                IsDIA = isDIA,
+                IsolationWindowWidthMZ = isolationWindowMZ
             };
 
             // 1 for the first MS/MS scan after the survey scan, 2 for the second one, etc.
@@ -1339,7 +1346,7 @@ namespace MASIC.DataInput
                 // This is not an MRM scan
                 mParentIonProcessor.AddUpdateParentIons(
                     scanList, mLastNonZoomSurveyScanIndex, spectrumInfo.ParentIonMZ,
-                    fragScanIndex, spectraCache, sicOptions);
+                    fragScanIndex, spectraCache, sicOptions, scanInfo.IsDIA);
             }
             else
             {

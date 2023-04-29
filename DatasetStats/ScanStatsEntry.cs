@@ -87,6 +87,11 @@
         public bool IsDIA { get; set; }
 
         /// <summary>
+        /// For MS2 spectra, the window width (in m/z) of the isolated ions
+        /// </summary>
+        public double IsolationWindowWidth { get; set; }
+
+        /// <summary>
         /// Smallest m/z value in the scan
         /// </summary>
         public double MzMin { get; set; }

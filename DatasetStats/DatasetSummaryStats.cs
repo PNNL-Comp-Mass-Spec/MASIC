@@ -32,8 +32,8 @@ namespace MASIC.DatasetStats
         /// </summary>
         /// <remarks>
         /// Keys are of the form "ScanTypeName::###::ScanFilterText"
-        /// Values are number of scans with the given scan type and scan filter
-        /// Examples
+        /// Values are the number of scans with the given scan type and scan filter
+        /// Example keys:
         ///   HMS::###::FTMS + p NSI Full ms
         ///   HMSn::###::FTMS + p NSI d Full ms2 0@hcd25.00
         ///   MS::###::ITMS + c ESI Full ms
@@ -43,6 +43,21 @@ namespace MASIC.DatasetStats
         public Dictionary<string, int> ScanTypeStats { get; }
 
         /// <summary>
+        /// Keeps track of each ScanType in the dataset, along with the isolation window width(s) for the scan type
+        /// </summary>
+        /// <remarks>
+        /// Keys are of the form "ScanTypeName::###::ScanFilterText"
+        /// Values are a sorted set of isolation window widths (typically 0 or -1 for MS1 spectra)
+        /// Example keys:
+        ///   HMS::###::FTMS + p NSI Full ms
+        ///   HMSn::###::FTMS + p NSI d Full ms2 0@hcd25.00
+        ///   MS::###::ITMS + c ESI Full ms
+        ///   MSn::###::ITMS + p ESI d Z ms
+        ///   MSn::###::ITMS + c ESI d Full ms2 @cid35.00
+        /// </remarks>
+        public Dictionary<string, SortedSet<double>> ScanTypeWindowWidths { get; }
+
+        /// <summary>
         /// Constructor
         /// </summary>
         public DatasetSummaryStats()
@@ -50,6 +65,7 @@ namespace MASIC.DatasetStats
             MSStats = new SummaryStatDetails();
             MSnStats = new SummaryStatDetails();
             ScanTypeStats = new Dictionary<string, int>();
+            ScanTypeWindowWidths = new Dictionary<string, SortedSet<double>>();
             Clear();
         }
 
@@ -63,6 +79,7 @@ namespace MASIC.DatasetStats
             MSStats.Clear();
             MSnStats.Clear();
             ScanTypeStats.Clear();
+            ScanTypeWindowWidths.Clear();
         }
     }
 }

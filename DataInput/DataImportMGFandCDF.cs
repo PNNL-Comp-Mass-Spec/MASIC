@@ -447,7 +447,7 @@ namespace MASIC.DataInput
 
                     mParentIonProcessor.AddUpdateParentIons(
                         scanList, lastSurveyScanIndex, spectrumInfo.ParentIonMZ,
-                        scanList.FragScans.Count - 1, spectraCache, sicOptions);
+                        scanList.FragScans.Count - 1, spectraCache, sicOptions, false);
 
                     // Note: We need to take msScanCount * 2, in addition to adding msScanCount to lastSurveyScanIndex, since we have to read two different files
                     if (msScanCount > 1)

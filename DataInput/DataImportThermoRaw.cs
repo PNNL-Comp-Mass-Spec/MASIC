@@ -548,6 +548,7 @@ namespace MASIC.DataInput
             scanInfo.HighMass = thermoScanInfo.HighMass;
             scanInfo.IsDIA = thermoScanInfo.IsDIA;
             scanInfo.IsFTMS = thermoScanInfo.IsFTMS;
+            scanInfo.IsolationWindowWidthMZ = thermoScanInfo.IsolationWindowWidthMZ;
 
             // Store the ScanEvent values in .ExtendedHeaderInfo
             StoreExtendedHeaderInfo(dataOutputHandler, scanInfo, thermoScanInfo.ScanEvents);
@@ -595,7 +596,7 @@ namespace MASIC.DataInput
                 // This is not an MRM scan
                 mParentIonProcessor.AddUpdateParentIons(
                     scanList, mLastNonZoomSurveyScanIndex, thermoScanInfo.ParentIonMZ,
-                    fragScanIndex, spectraCache, sicOptions);
+                    fragScanIndex, spectraCache, sicOptions, thermoScanInfo.IsDIA);
             }
             else
             {

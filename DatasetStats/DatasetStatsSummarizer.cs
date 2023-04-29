@@ -225,10 +225,15 @@ namespace MASIC.DatasetStats
                     if (summaryStats.ScanTypeStats.ContainsKey(scanTypeKey))
                     {
                         summaryStats.ScanTypeStats[scanTypeKey]++;
+
+                        // Add the window width (if not yet present)
+                        summaryStats.ScanTypeWindowWidths[scanTypeKey].Add(statEntry.IsolationWindowWidth);
                     }
                     else
                     {
                         summaryStats.ScanTypeStats.Add(scanTypeKey, 1);
+
+                        summaryStats.ScanTypeWindowWidths.Add(scanTypeKey, new SortedSet<double> { statEntry.IsolationWindowWidth });
                     }
 
                     if (statEntry.IsDIA)

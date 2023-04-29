@@ -572,6 +572,11 @@ namespace MASIC.DataInput
                 }
 
                 scanStatsEntry.ScanTypeName = currentScan.ScanTypeName;
+
+                if (!scanStatsEntry.ScanTypeName.Equals("HMS") && !scanStatsEntry.ScanTypeName.Equals("MS"))
+                {
+                    scanStatsEntry.IsolationWindowWidth = currentScan.IsolationWindowWidthMZ;
+                }
             }
 
             scanStatsEntry.ScanFilterText = currentScan.ScanHeaderText;
