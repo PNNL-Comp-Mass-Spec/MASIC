@@ -51,6 +51,7 @@ namespace MASIC.DataOutput
                 {
                     // Did not find the previous survey scan; find the next survey scan
                     surveyScanIndexMatch++;
+
                     while (surveyScanIndexMatch < scanList.MasterScanOrderCount && scanList.MasterScanOrder[surveyScanIndexMatch].ScanType == ScanList.ScanTypeConstants.FragScan)
                     {
                         surveyScanIndexMatch++;
@@ -248,6 +249,7 @@ namespace MASIC.DataOutput
             }
 
             var fragScanMatches = (from item in scanList.FragScans where item.ScanNumber == scanNumber select item).ToList();
+
             if (fragScanMatches.Count > 0)
             {
                 return fragScanMatches.First().ScanTime;

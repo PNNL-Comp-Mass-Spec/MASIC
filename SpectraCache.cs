@@ -274,6 +274,7 @@ namespace MASIC
 
             // See if the given spectrum is already present in the page file
             var scanNumber = spectrumToCache.ScanNumber;
+
             if (mSpectrumByteOffset.ContainsKey(scanNumber))
             {
                 // Page file already contains the given scan;
@@ -286,10 +287,12 @@ namespace MASIC
             // Write the spectrum to the page file
             // Record the current offset in the hash table
             mSpectrumByteOffset.Add(scanNumber, mPageFileWriter.BaseStream.Position);
+
             if (mSpectrumByteOffset.Count > SpectrumCount)
                 SpectrumCount = mSpectrumByteOffset.Count;
 
             var retryCount = MAX_RETRIES;
+
             while (true)
             {
                 try
@@ -320,6 +323,7 @@ namespace MASIC
                 {
                     retryCount--;
                     var message = string.Format("Error caching scan {0}: {1}", scanNumber, ex.Message);
+
                     if (retryCount >= 0)
                     {
                         OnWarningEvent(message);
@@ -410,6 +414,7 @@ namespace MASIC
                 if (!string.IsNullOrWhiteSpace(mCacheOptions.CacheFilePath))
                 {
                     var charIndex = mCacheOptions.CacheFilePath.IndexOf(SPECTRUM_CACHE_FILE_BASENAME_TERMINATOR, StringComparison.Ordinal);
+
                     if (charIndex < 0)
                     {
                         ReportError("charIndex was less than 0; this is unexpected in DeleteSpectrumCacheFiles");
@@ -509,6 +514,7 @@ namespace MASIC
         public void InitializeSpectraPool()
         {
             mMaximumPoolLength = mCacheOptions.SpectraToRetainInMemory;
+
             if (mMaximumPoolLength < 1)
                 mMaximumPoolLength = 1;
 
@@ -704,6 +710,7 @@ namespace MASIC
                 }
 
                 OnErrorEvent("Unable to find a drive with sufficient free space to store the spectrum cache file");
+
                 foreach (var message in warningMessages)
                 {
                     OnWarningEvent(message);
@@ -986,6 +993,7 @@ namespace MASIC
                 if (Count >= mCapacity)
                 {
                     mLastIndex++;
+
                     if (mLastIndex >= Count)
                         mLastIndex = 0;
 

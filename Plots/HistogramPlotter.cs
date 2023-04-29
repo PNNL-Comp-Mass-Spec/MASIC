@@ -102,6 +102,7 @@ namespace MASIC.Plots
             }
 
             var symbolType = MarkerType.None;
+
             if (points.Count == 1)
             {
                 symbolType = MarkerType.Circle;
@@ -289,6 +290,7 @@ namespace MASIC.Plots
             {
                 DeleteTempFiles = Options.DeleteTempFiles
             };
+
             RegisterEvents(plotContainer);
 
             plotContainer.SetData(points);
@@ -316,6 +318,7 @@ namespace MASIC.Plots
 
             var indexNonZeroValue = -1;
             var zeroPointCount = 0;
+
             for (var index = histogramInfo.DataCount - 1; index >= 0; index += -1)
             {
                 if (Math.Abs(histogramInfo.GetDataPoint(index).BinCount) < float.Epsilon)
@@ -327,7 +330,9 @@ namespace MASIC.Plots
                     indexNonZeroValue = index;
                     break;
                 }
+
                 pointsChecked++;
+
                 if (pointsChecked >= MAX_POINTS_TO_CHECK)
                     break;
             }
@@ -340,6 +345,7 @@ namespace MASIC.Plots
             // Now check the first few values
             indexNonZeroValue = -1;
             zeroPointCount = 0;
+
             for (var index = 0; index <= histogramInfo.DataCount - 1; index++)
             {
                 if (Math.Abs(histogramInfo.GetDataPoint(index).BinCount) < float.Epsilon)
@@ -351,7 +357,9 @@ namespace MASIC.Plots
                     indexNonZeroValue = index;
                     break;
                 }
+
                 pointsChecked++;
+
                 if (pointsChecked >= MAX_POINTS_TO_CHECK)
                     break;
             }
@@ -467,6 +475,7 @@ namespace MASIC.Plots
                 {
                     throw new Exception("Histogram list is empty; cannot retrieve data point at index " + index);
                 }
+
                 if (index < 0 || index >= DataPoints.Count)
                 {
                     throw new Exception("Histogram index out of range: " + index + "; should be between 0 and " + (DataPoints.Count - 1));

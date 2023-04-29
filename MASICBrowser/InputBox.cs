@@ -174,20 +174,26 @@ namespace MASICBrowser
             using var form = new InputBox();
 
             form.labelPrompt.Text = prompt;
+
             form.Text = title;
+
             form.textBoxText.Text = defaultResponse;
 
             if (xPos >= 0 && yPos >= 0)
             {
                 form.StartPosition = FormStartPosition.Manual;
+
                 form.Left = xPos;
+
                 form.Top = yPos;
             }
+
             form.Validator = validator;
 
             var result = form.ShowDialog();
 
             var returnValue = new InputBoxResult();
+
             if (result == DialogResult.OK)
             {
                 returnValue.Text = form.textBoxText.Text;
@@ -229,7 +235,9 @@ namespace MASICBrowser
             if (Validator != null)
             {
                 var args = new InputBoxValidatingArgs { Text = textBoxText.Text };
+
                 Validator(this, args);
+
                 if (args.Cancel)
                 {
                     e.Cancel = true;

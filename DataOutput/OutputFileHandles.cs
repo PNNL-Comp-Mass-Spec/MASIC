@@ -58,6 +58,7 @@ namespace MASIC.DataOutput
             try
             {
                 CloseScanStats();
+
                 if (SICDataFile != null)
                 {
                     SICDataFile.Close();

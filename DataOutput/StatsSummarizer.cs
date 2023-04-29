@@ -387,6 +387,7 @@ namespace MASIC.DataOutput
                 foreach (var parentIon in mParentIons.Values)
                 {
                     var peakArea = parentIon.SICStats.Peak.Area;
+
                     if (peakArea <= 0)
                         continue;
 
@@ -458,6 +459,7 @@ namespace MASIC.DataOutput
                 foreach (var parentIon in mParentIons)
                 {
                     var fwhmWidthScans = parentIon.Value.SICStats.Peak.FWHMScanWidth;
+
                     if (fwhmWidthScans <= 0)
                     {
                         continue;
@@ -472,10 +474,12 @@ namespace MASIC.DataOutput
                             BinarySearch.MissingDataModeConstants.ReturnClosestPoint);
 
                         var startScanIndex = (int)Math.Floor(scanIndexMatch - fwhmWidthScans / 2.0);
+
                         if (startScanIndex < 0)
                             startScanIndex = 0;
 
                         var endScanIndex = startScanIndex + fwhmWidthScans;
+
                         if (endScanIndex >= scanNumbers.Count)
                             endScanIndex = scanNumbers.Count - 1;
 
@@ -593,6 +597,7 @@ namespace MASIC.DataOutput
                 mReporterIonAbundances.Clear();
 
                 var reporterIonsFile = new FileInfo(reporterIonsFilePath);
+
                 if (!reporterIonsFile.Exists)
                 {
                     // ReporterIons file not found
@@ -634,6 +639,7 @@ namespace MASIC.DataOutput
                 while (!reader.EndOfStream)
                 {
                     var dataLine = reader.ReadLine();
+
                     if (dataLine == null)
                         continue;
 
@@ -736,6 +742,7 @@ namespace MASIC.DataOutput
                 mScanList.Clear();
 
                 var scanStatsFile = new FileInfo(scanStatsFilePath);
+
                 if (!scanStatsFile.Exists)
                 {
                     OnWarningEvent("ScanStats file not found, cannot convert FWHM in scans to minutes; file path:" + scanStatsFile.FullName);
@@ -774,6 +781,7 @@ namespace MASIC.DataOutput
                 while (!reader.EndOfStream)
                 {
                     var dataLine = reader.ReadLine();
+
                     if (dataLine == null)
                         continue;
 
@@ -849,6 +857,7 @@ namespace MASIC.DataOutput
                 mParentIons.Clear();
 
                 var sicStatsFile = new FileInfo(sicStatsFilePath);
+
                 if (!sicStatsFile.Exists)
                 {
                     OnWarningEvent("File not found: " + sicStatsFile.FullName);
@@ -889,6 +898,7 @@ namespace MASIC.DataOutput
                 while (!reader.EndOfStream)
                 {
                     var dataLine = reader.ReadLine();
+
                     if (dataLine == null)
                         continue;
 
@@ -955,6 +965,7 @@ namespace MASIC.DataOutput
                         continue;
 
                     duplicateParentIonIndices.Add(parentIonIndex);
+
                     if (duplicateParentIonIndices.Count > 5)
                         continue;
 

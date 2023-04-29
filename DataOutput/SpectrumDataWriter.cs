@@ -77,6 +77,7 @@ namespace MASIC.DataOutput
                 for (var masterOrderIndex = 0; masterOrderIndex < scanList.MasterScanOrderCount; masterOrderIndex++)
                 {
                     var scanPointer = scanList.MasterScanOrder[masterOrderIndex].ScanIndexPointer;
+
                     if (scanList.MasterScanOrder[masterOrderIndex].ScanType == ScanList.ScanTypeConstants.SurveyScan)
                     {
                         SaveRawDataToDiskWork(dataWriter, scanInfoWriter, scanList.SurveyScans[scanPointer], spectraCache, inputFileName, false, ref spectrumExportCount);
@@ -147,6 +148,7 @@ namespace MASIC.DataOutput
             }
 
             int msLevel;
+
             if (fragmentationScan)
             {
                 msLevel = currentScan.FragScanInfo.MSLevel;
@@ -160,6 +162,7 @@ namespace MASIC.DataOutput
             var numPeaks = spectrum.IonCount;
 
             var baselineNoiseLevel = currentScan.BaselineNoiseStats.NoiseLevel;
+
             if (baselineNoiseLevel < 1)
                 baselineNoiseLevel = 1;
 
@@ -173,6 +176,7 @@ namespace MASIC.DataOutput
 
                 var intensities = new double[spectrum.IonCount];
                 var pointerArray = new int[spectrum.IonCount];
+
                 for (var ionIndex = 0; ionIndex < spectrum.IonCount; ionIndex++)
                 {
                     intensities[ionIndex] = spectrum.IonsIntensity[ionIndex];
@@ -183,10 +187,12 @@ namespace MASIC.DataOutput
                 Array.Sort(intensities, pointerArray);
 
                 int startIndex;
+
                 if (mOptions.RawDataExportOptions.MaxIonCountPerScan > 0)
                 {
                     // Possibly limit the number of ions to maxIonCount
                     startIndex = spectrum.IonCount - mOptions.RawDataExportOptions.MaxIonCountPerScan;
+
                     if (startIndex < 0)
                         startIndex = 0;
                 }
@@ -252,6 +258,7 @@ namespace MASIC.DataOutput
 
             writer.WriteLine("MASIC " + mOptions.MASICVersion);                     // Software version
             var pekFileInfoLine = "MS/MS-based PEK file";
+
             if (mOptions.RawDataExportOptions.IncludeMSMS)
             {
                 pekFileInfoLine += " (includes both survey scans and fragmentation spectra)";
@@ -264,6 +271,7 @@ namespace MASIC.DataOutput
             writer.WriteLine(pekFileInfoLine);
 
             int scanNumber;
+
             if (mOptions.RawDataExportOptions.RenumberScans)
             {
                 scanNumber = spectrumExportCount;
@@ -294,6 +302,7 @@ namespace MASIC.DataOutput
 
                 var intensities = new double[spectrum.IonCount];
                 var pointerArray = new int[spectrum.IonCount];
+
                 for (var ionIndex = 0; ionIndex < spectrum.IonCount; ionIndex++)
                 {
                     intensities[ionIndex] = spectrum.IonsIntensity[ionIndex];
@@ -309,6 +318,7 @@ namespace MASIC.DataOutput
                 {
                     // Possibly limit the number of ions to maxIonCount
                     startIndex = spectrum.IonCount - mOptions.RawDataExportOptions.MaxIonCountPerScan;
+
                     if (startIndex < 0)
                         startIndex = 0;
                 }
@@ -330,6 +340,7 @@ namespace MASIC.DataOutput
                 }
 
                 exportCount = 0;
+
                 for (var ionIndex = 0; ionIndex < spectrum.IonCount; ionIndex++)
                 {
                     if (spectrum.IonsIntensity[ionIndex] < minimumIntensityCurrentScan)

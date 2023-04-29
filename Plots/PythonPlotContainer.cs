@@ -88,6 +88,7 @@ namespace MASIC.Plots
             foreach (var directoryPath in PythonPathsToCheck())
             {
                 var exePath = FindPythonExe(directoryPath);
+
                 if (string.IsNullOrWhiteSpace(exePath))
                     continue;
 
@@ -105,6 +106,7 @@ namespace MASIC.Plots
         private static string FindPythonExe(string directoryPath)
         {
             var directory = new DirectoryInfo(directoryPath);
+
             if (!directory.Exists)
                 return string.Empty;
 
@@ -117,6 +119,7 @@ namespace MASIC.Plots
             foreach (var subDirectory in subDirectories)
             {
                 var files = subDirectory.GetFiles("python.exe");
+
                 if (files.Length == 0)
                     continue;
 
@@ -141,6 +144,7 @@ namespace MASIC.Plots
             }
 
             var exeDirectory = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+
             if (exeDirectory == null)
             {
                 OnErrorEvent("Unable to determine the path to the directory with the MSFileInfoScanner executable");
@@ -148,6 +152,7 @@ namespace MASIC.Plots
             }
 
             var pythonScriptFile = new FileInfo(Path.Combine(exeDirectory, "MASIC_Plotter.py"));
+
             if (!pythonScriptFile.Exists)
             {
                 OnErrorEvent("Python plotting script not found: " + pythonScriptFile.FullName);
@@ -222,6 +227,7 @@ namespace MASIC.Plots
             OnErrorEvent(currentTask + "; Python not found");
 
             var debugMsg = "Paths searched:";
+
             foreach (var item in PythonPathsToCheck())
             {
                 debugMsg += "\n  " + item;
@@ -250,6 +256,7 @@ namespace MASIC.Plots
             {
                 // Confirm that the PNG file was created, then rename it
                 var pngFile = new FileInfo(Path.Combine(workDir.FullName, Path.GetFileNameWithoutExtension(exportFile.Name) + ".png"));
+
                 if (!pngFile.Exists)
                 {
                     OnErrorEvent("Plot file not found: " + pngFile.FullName);
@@ -260,6 +267,7 @@ namespace MASIC.Plots
                 newFileName = baseFileName.Substring(0, baseFileName.Length - TMP_FILE_SUFFIX.Length) + ".png";
 
                 var finalPngFile = new FileInfo(Path.Combine(workDir.FullName, newFileName));
+
                 if (finalPngFile.Exists)
                     finalPngFile.Delete();
 

@@ -390,6 +390,7 @@ namespace MASIC
                 RegisterEvents(statsPlotter);
 
                 var success = statsPlotter.ProcessFile(sicStatsFile.FullName, outputDirectoryPath);
+
                 if (!success)
                 {
                     SetLocalErrorCode(MasicErrorCodes.OutputFileWriteError);
@@ -462,6 +463,7 @@ namespace MASIC
                 dataOutputHandler.CreateDatasetInfoFile(inputFileName, outputDirectoryPath, scanTracking, datasetFileInfo);
 
                 int similarParentIonUpdateCount;
+
                 if (Options.SkipSICAndRawDataProcessing)
                 {
                     LogMessage("FindSICsAndWriteOutput: Skipping SIC Processing");
@@ -517,6 +519,7 @@ namespace MASIC
                 UpdatePeakMemoryUsage();
 
                 string sicStatsFilePath;
+
                 if (!Options.ExportRawDataOnly)
                 {
                     var sicStatsWriter = new SICStatsWriter();
@@ -635,6 +638,7 @@ namespace MASIC
 
                 var reporterIonProcessor = new ReporterIonProcessor(Options);
                 RegisterEvents(reporterIonProcessor);
+
                 reporterIonProcessor.FindReporterIons(scanList, spectraCache, inputFilePathFull, outputDirectoryPath);
             }
 
@@ -663,6 +667,7 @@ namespace MASIC
                 if (Options.WriteDetailedSICDataFile)
                 {
                     var sicDetailsFileCreated = dataOutputHandler.InitializeSICDetailsTextFile(inputFilePathFull, outputDirectoryPath);
+
                     if (!sicDetailsFileCreated)
                     {
                         SetLocalErrorCode(MasicErrorCodes.OutputFileWriteError);
@@ -675,6 +680,7 @@ namespace MASIC
                 // ---------------------------------------------------------
                 var xmlWriterInitialized = xmlResultsWriter.XMLOutputFileInitialize(inputFilePathFull, outputDirectoryPath, dataOutputHandler, scanList,
                     spectraCache, Options.SICOptions, Options.BinningOptions);
+
                 if (!xmlWriterInitialized)
                 {
                     SetLocalErrorCode(MasicErrorCodes.OutputFileWriteError);
@@ -691,6 +697,7 @@ namespace MASIC
                 UpdatePeakMemoryUsage();
 
                 LogMessage("FindSICsWork: Call CreateParentIonSICs", MessageTypeConstants.Debug);
+
                 var sicProcessor = new SICProcessing(mMASICPeakFinder, mrmProcessor);
                 RegisterEvents(sicProcessor);
 
@@ -715,6 +722,7 @@ namespace MASIC
                 UpdatePeakMemoryUsage();
 
                 LogMessage("FindSICsWork: Call FindSimilarParentIons", MessageTypeConstants.Debug);
+
                 var foundSimilarParentIons = parentIonProcessor.FindSimilarParentIons(
                     scanList, spectraCache, Options, dataImporterBase, out similarParentIonUpdateCount);
 
@@ -1004,6 +1012,7 @@ namespace MASIC
             Options.StatusMessage = message;
 
             var messageWithoutCRLF = Options.StatusMessage.Replace(Environment.NewLine, "; ");
+
             if (ex != null && !string.IsNullOrEmpty(ex.Message) && !message.Contains(ex.Message))
             {
                 messageWithoutCRLF += "; " + ex.Message;
@@ -1092,9 +1101,10 @@ namespace MASIC
             }
 
             var dataOutputHandler = new DataOutput.DataOutput(Options);
+            RegisterEvents(dataOutputHandler);
+
             var existingResultsFound = false;
 
-            RegisterEvents(dataOutputHandler);
             try
             {
                 var keepProcessing = true;
@@ -1106,6 +1116,7 @@ namespace MASIC
 
                     LogMessage("ProcessFile: Reading custom SIC values file: " + Options.CustomSICList.CustomSICListFileName);
                     success = sicListReader.LoadCustomSICListFromFile(Options.CustomSICList.CustomSICListFileName);
+
                     if (!success)
                     {
                         SetLocalErrorCode(MasicErrorCodes.InvalidCustomSICValues);
@@ -1250,6 +1261,7 @@ namespace MASIC
                 LogMessage("ProcessFile: Processing nearly complete");
 
                 Console.WriteLine();
+
                 if (existingResultsFound)
                 {
                     StatusMessage = "Existing valid results were found; processing was not repeated.";
@@ -1369,6 +1381,7 @@ namespace MASIC
                     CacheDirectoryPath = Options.CacheOptions.DirectoryPath,
                     CacheSpectraToRetainInMemory = Options.CacheOptions.SpectraToRetainInMemory
                 };
+
                 RegisterEvents(spectraCache);
 
                 spectraCache.InitializeSpectraPool();
@@ -1398,6 +1411,7 @@ namespace MASIC
 
                 // Record that the file is finished loading
                 mProcessingStats.FileLoadEndTime = DateTime.UtcNow;
+
                 if (!dataLoadSuccess)
                 {
                     if (string.IsNullOrEmpty(StatusMessage))
@@ -1588,10 +1602,12 @@ namespace MASIC
             try
             {
                 var currentStep = (int)ProcessStep;
+
                 if (currentStep >= weightingFactors.Length)
                     currentStep = weightingFactors.Length - 1;
 
                 float overallPctCompleted = 0;
+
                 for (var index = 0; index < currentStep; index++)
                 {
                     overallPctCompleted += weightingFactors[index] * 100;
@@ -1612,6 +1628,7 @@ namespace MASIC
         private void UpdatePeakMemoryUsage()
         {
             var memoryUsageMB = GetProcessMemoryUsageMB();
+
             if (memoryUsageMB > mProcessingStats.PeakMemoryUsageMB)
             {
                 mProcessingStats.PeakMemoryUsageMB = memoryUsageMB;
@@ -1739,6 +1756,7 @@ namespace MASIC
         private void UpdateMemoryUsageEventHandler()
         {
             var memoryUsageMB = GetProcessMemoryUsageMB();
+
             if (memoryUsageMB > mProcessingStats.MemoryUsageMBDuringLoad)
             {
                 mProcessingStats.MemoryUsageMBDuringLoad = memoryUsageMB;

@@ -24,6 +24,7 @@ namespace FindFailedMasicJobs
             try
             {
                 var workingDirectory = new DirectoryInfo(".");
+
                 if (workingDirectory.Parent == null)
                 {
                     ConsoleMsgUtils.ShowError("Cannot determine the parent directory of the working directory: " + workingDirectory.FullName);
@@ -91,6 +92,7 @@ namespace FindFailedMasicJobs
                 foreach (var item in directoriesToSearch)
                 {
                     var inputDirectory = new DirectoryInfo(item);
+
                     if (!inputDirectory.Exists)
                     {
                         ConsoleMsgUtils.ShowWarning("Directory not found: " + item);
@@ -120,16 +122,19 @@ namespace FindFailedMasicJobs
                 while (!reader.EndOfStream)
                 {
                     var dataLine = reader.ReadLine();
+
                     if (string.IsNullOrWhiteSpace(dataLine))
                         continue;
 
                     var jobStart = mJobStartMatcher.Match(dataLine);
+
                     if (jobStart.Success)
                     {
                         currentJob = jobStart.Groups["Job"].Value;
                         continue;
                     }
                     var masicStart = mStartMasicMatcher.Match(dataLine);
+
                     if (masicStart.Success)
                     {
                         currentJob = masicStart.Groups["Job"].Value;
@@ -137,6 +142,7 @@ namespace FindFailedMasicJobs
                     }
 
                     var jobEnd = mJobEndMatcher.Match(dataLine);
+
                     if (jobEnd.Success)
                     {
                         currentJob = jobEnd.Groups["Job"].Value;

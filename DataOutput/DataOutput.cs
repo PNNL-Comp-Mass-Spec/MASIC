@@ -252,10 +252,12 @@ namespace MASIC.DataOutput
 
                     // If we get here, the file opened successfully
                     var rootElement = xmlDoc.DocumentElement;
+
                     if (rootElement?.Name == "SICData")
                     {
                         // See if the ProcessingComplete node has a value of True
                         var matchingNodeList = rootElement.GetElementsByTagName("ProcessingComplete");
+
                         if (matchingNodeList.Count != 1)
                             return false;
 
@@ -264,6 +266,7 @@ namespace MASIC.DataOutput
 
                         // Read the ProcessingSummary and populate
                         matchingNodeList = rootElement.GetElementsByTagName("ProcessingSummary");
+
                         if (matchingNodeList.Count != 1)
                             return false;
 
@@ -316,8 +319,10 @@ namespace MASIC.DataOutput
                         // Check if the source file stats match
                         var inputFileInfo = new FileInfo(inputFilePathFull);
                         var sourceFileDateTime = inputFileInfo.LastWriteTime;
+
                         if ((sourceFileDateTimeCheck ?? string.Empty) != (sourceFileDateTime.ToShortDateString() + " " + sourceFileDateTime.ToShortTimeString() ?? string.Empty))
                             return false;
+
                         if (sourceFileSizeBytes != inputFileInfo.Length)
                             return false;
 
@@ -327,6 +332,7 @@ namespace MASIC.DataOutput
 
                         // Read the ProcessingOptions and populate
                         matchingNodeList = rootElement.GetElementsByTagName("ProcessingOptions");
+
                         if (matchingNodeList == null || matchingNodeList.Count != 1)
                             return false;
 
@@ -466,6 +472,7 @@ namespace MASIC.DataOutput
 
                         // Read the BinningOptions and populate
                         matchingNodeList = rootElement.GetElementsByTagName("BinningOptions");
+
                         if (matchingNodeList == null || matchingNodeList.Count != 1)
                             return false;
 
@@ -502,6 +509,7 @@ namespace MASIC.DataOutput
                         var customSICListCompare = new CustomSICList();
 
                         matchingNodeList = rootElement.GetElementsByTagName("CustomSICValues");
+
                         if (matchingNodeList == null || matchingNodeList.Count != 1)
                         {
                             // Custom values not defined; that's OK
@@ -608,14 +616,17 @@ namespace MASIC.DataOutput
                             // All of the options match, make sure the other output files exist
 
                             filePathToCheck = ConstructOutputFilePath(inputFilePathFull, outputDirectoryPath, OutputFileTypeConstants.ScanStatsFlatFile);
+
                             if (!File.Exists(filePathToCheck))
                                 return false;
 
                             filePathToCheck = ConstructOutputFilePath(inputFilePathFull, outputDirectoryPath, OutputFileTypeConstants.SICStatsFlatFile);
+
                             if (!File.Exists(filePathToCheck))
                                 return false;
 
                             filePathToCheck = ConstructOutputFilePath(inputFilePathFull, outputDirectoryPath, OutputFileTypeConstants.BPIFile);
+
                             if (!File.Exists(filePathToCheck))
                                 return false;
 
@@ -749,6 +760,7 @@ namespace MASIC.DataOutput
             DatasetFileInfo datasetFileInfo)
         {
             var sampleInfo = new SampleInfo();
+
             try
             {
                 var datasetName = Path.GetFileNameWithoutExtension(inputFileName);
@@ -965,6 +977,7 @@ namespace MASIC.DataOutput
             // Scan Stats file
             var outputFilePath = ConstructOutputFilePath(inputFileName, outputDirectoryPath, OutputFileTypeConstants.ScanStatsFlatFile);
             OutputFileHandles.ScanStats = new StreamWriter(outputFilePath, false);
+
             if (writeHeaders)
                 OutputFileHandles.ScanStats.WriteLine(GetHeadersForOutputFile(null, OutputFileTypeConstants.ScanStatsFlatFile));
 
@@ -1005,6 +1018,7 @@ namespace MASIC.DataOutput
 
                 // ScanStatsExtended
                 var headers = GetHeadersForOutputFile(scanList, OutputFileTypeConstants.ScanStatsExtendedFlatFile);
+
                 if (!string.IsNullOrWhiteSpace(headers))
                 {
                     writer.WriteLine(ConstructOutputFilePath(string.Empty, string.Empty, OutputFileTypeConstants.ScanStatsExtendedFlatFile) + ":");

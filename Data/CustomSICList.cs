@@ -172,6 +172,7 @@ namespace MASIC.Data
 
                     // Find the next MS2 scan that occurs after the survey scan (parent scan)
                     var surveyScanNumberAbsolute = 0;
+
                     if (currentParentIon.SurveyScanIndex < scanList.SurveyScans.Count)
                     {
                         surveyScanNumberAbsolute = scanList.SurveyScans[currentParentIon.SurveyScanIndex].ScanNumber + 1;
@@ -197,6 +198,7 @@ namespace MASIC.Data
                         {
                             // Did not find the next frag scan; find the previous frag scan
                             fragScanIndexMatch--;
+
                             while (fragScanIndexMatch > 0 && scanList.MasterScanOrder[fragScanIndexMatch].ScanType == ScanList.ScanTypeConstants.SurveyScan)
                             {
                                 fragScanIndexMatch--;

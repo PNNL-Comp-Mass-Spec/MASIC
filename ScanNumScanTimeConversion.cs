@@ -68,6 +68,7 @@ namespace MASIC
                     if (scanList.SurveyScans[index].ScanNumber >= scanNumberToFind)
                     {
                         surveyScanIndexMatch = index;
+
                         if (scanList.SurveyScans[index].ScanNumber != scanNumberToFind && index < scanList.SurveyScans.Count - 1)
                         {
                             // Didn't find an exact match; determine which survey scan is closer
@@ -155,6 +156,7 @@ namespace MASIC
                         if (convertingRangeOrTolerance)
                         {
                             var totalRunTime = scanList.MasterScanTimeList[scanList.MasterScanOrderCount - 1] - scanList.MasterScanTimeList[0];
+
                             if (totalRunTime < 0.1)
                             {
                                 totalRunTime = 1;
@@ -167,6 +169,7 @@ namespace MASIC
                         else
                         {
                             var masterScanIndex = FindNearestScanNumIndex(scanList, scanOrAcqTime, scanType);
+
                             if (masterScanIndex >= 0 && scanList.MasterScanOrderCount > 0)
                             {
                                 absoluteScanNumber = scanList.MasterScanNumList[masterScanIndex];
@@ -219,6 +222,7 @@ namespace MASIC
                         if (convertingRangeOrTolerance)
                         {
                             var totalScans = scanList.MasterScanNumList[scanList.MasterScanOrderCount - 1] - scanList.MasterScanNumList[0];
+
                             if (totalScans < 1)
                             {
                                 totalScans = 1;
@@ -231,6 +235,7 @@ namespace MASIC
                         else
                         {
                             var masterScanIndex = FindNearestScanNumIndex(scanList, scanOrAcqTime, scanType);
+
                             if (masterScanIndex >= 0 && scanList.MasterScanOrderCount > 0)
                             {
                                 return scanList.MasterScanTimeList[masterScanIndex];

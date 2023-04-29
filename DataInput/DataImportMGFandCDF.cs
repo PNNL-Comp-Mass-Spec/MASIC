@@ -113,6 +113,7 @@ namespace MASIC.DataInput
                 // Reserve memory for all of the Survey Scan data
                 scanList.Initialize();
                 var scanCount = mOptions.SICOptions.ScanRangeCount;
+
                 if (scanCount <= 0)
                 {
                     scanCount = msScanCount * 3;
@@ -129,6 +130,7 @@ namespace MASIC.DataInput
                 // Read all of the Survey scans from the CDF file
                 // CDF files created by the Agilent XCT list the first scan number as 0; use scanNumberCorrection to correct for this
                 var scanNumberCorrection = 0;
+
                 for (var msScanIndex = 0; msScanIndex < msScanCount; msScanIndex++)
                 {
                     success = cdfReader.GetScanInfo(msScanIndex, out var scanNumber, out var scanTotalIntensity, out scanTime, out _, out _);
@@ -249,6 +251,7 @@ namespace MASIC.DataInput
                     }
 
                     UpdateCacheStats(spectraCache);
+
                     if (mOptions.AbortProcessing)
                     {
                         scanList.ProcessingIncomplete = true;
@@ -285,6 +288,7 @@ namespace MASIC.DataInput
                 while (true)
                 {
                     var fragScanFound = mgfReader.ReadNextSpectrum(out var spectrumInfo);
+
                     if (!fragScanFound)
                         break;
 
@@ -297,6 +301,7 @@ namespace MASIC.DataInput
                         // Need to decrement lastSurveyScanIndex until we find the appropriate survey scan
 
                         lastSurveyScanIndex--;
+
                         if (lastSurveyScanIndex == 0)
                             break;
                     }
@@ -349,6 +354,7 @@ namespace MASIC.DataInput
                     // Make sure this fragmentation scan isn't present yet in scanList.FragScans
                     // This can occur in Agilent .MGF files if the scan is listed both singly and grouped with other MS/MS scans
                     var validFragScan = true;
+
                     foreach (var fragScan in scanList.FragScans)
                     {
                         if (fragScan.ScanNumber == spectrumInfo.ScanNumber)
@@ -418,6 +424,7 @@ namespace MASIC.DataInput
 
                         // Compute the total scan intensity
                         newFragScan.TotalIonIntensity = 0;
+
                         for (var ionIndex = 0; ionIndex < newFragScan.IonCount; ionIndex++)
                         {
                             newFragScan.TotalIonIntensity += msSpectrum.IonsIntensity[ionIndex];
@@ -460,6 +467,7 @@ namespace MASIC.DataInput
                     }
 
                     UpdateCacheStats(spectraCache);
+
                     if (mOptions.AbortProcessing)
                     {
                         scanList.ProcessingIncomplete = true;
@@ -553,6 +561,7 @@ namespace MASIC.DataInput
                 mzMin = mzList[0];
 
                 var basePeakIndex = 0;
+
                 for (var dataIndex = 0; dataIndex < mzList.Count; dataIndex++)
                 {
                     if (ionIntensity[dataIndex] > ionIntensity[basePeakIndex])
@@ -714,6 +723,7 @@ namespace MASIC.DataInput
 
             // Check whether we need to re-populate the lists
             var needToSort = false;
+
             for (var index = 1; index < scanList.MasterScanOrderCount; index++)
             {
                 if (masterScanOrderIndices[index] < masterScanOrderIndices[index - 1])

@@ -195,6 +195,7 @@ namespace MASICBrowser
             var dataDirectoryInfo = new DirectoryInfo(Path.GetDirectoryName(masicFilePath) ?? ".");
 
             var fileNameBase = Path.GetFileNameWithoutExtension(masicFilePath);
+
             if (fileNameBase.EndsWith("_sics", StringComparison.OrdinalIgnoreCase))
             {
                 fileNameBase = fileNameBase.Substring(0, fileNameBase.Length - 5);
@@ -204,6 +205,7 @@ namespace MASICBrowser
             fileNameToFind = Path.Combine(dataDirectoryInfo.FullName, fileNameToFind);
 
             txtStats3.Visible = false;
+
             if (File.Exists(fileNameToFind))
             {
                 ReadMsMsSearchEngineResults(fileNameToFind, progressForm);
@@ -281,6 +283,7 @@ namespace MASICBrowser
             if (parentIonIndex >= 0 && parentIonIndex < mParentIonStats.Count)
             {
                 SmoothModeConstants smoothMode;
+
                 if (optUseButterworthSmooth.Checked)
                 {
                     smoothMode = SmoothModeConstants.Butterworth;
@@ -300,6 +303,7 @@ namespace MASICBrowser
                 var ionStats = mParentIonStats[parentIonIndex];
                 var statDetails = string.Empty;
                 statDetails += "Index: " + ionStats.Index;
+
                 if (ionStats.OptimalPeakApexScanNumber == ionStats.SICStats.ScanNumberMaxIntensity)
                 {
                     statDetails += Environment.NewLine + "Scan at apex: " + ionStats.SICStats.ScanNumberMaxIntensity;
@@ -314,6 +318,7 @@ namespace MASICBrowser
                     statDetails += Environment.NewLine + "Center of mass: " + sicStats.Peak.StatisticalMoments.CenterOfMassScan;
                     double areaToDisplay;
                     double intensityToDisplay;
+
                     if (chkShowBaselineCorrectedStats.Checked)
                     {
                         intensityToDisplay = clsMASICPeakFinder.BaselineAdjustIntensity(sicStats.Peak, false);
@@ -342,6 +347,7 @@ namespace MASICBrowser
                 txtStats1.Text = statDetails;
 
                 statDetails = "m/z: " + mParentIonStats[parentIonIndex].MZ;
+
                 if (validPeakFound)
                 {
                     var statMoments = sicStats.Peak.StatisticalMoments;
@@ -432,9 +438,11 @@ namespace MASICBrowser
         {
             potentialAreaStatsForRegion.MinimumPotentialPeakArea = double.MaxValue;
             potentialAreaStatsForRegion.PeakCountBasisForMinimumPotentialArea = 0;
+
             for (var parentIonIndex = parentIonIndexStart; parentIonIndex <= parentIonIndexEnd; parentIonIndex++)
             {
                 var ionStats = mParentIonStats[parentIonIndex];
+
                 if (Math.Abs(ionStats.SICStats.SICPotentialAreaStatsForPeak.MinimumPotentialPeakArea) < float.Epsilon && ionStats.SICStats.SICPotentialAreaStatsForPeak.PeakCountBasisForMinimumPotentialArea == 0)
                 {
                     // Need to compute the minimum potential peak area for parentIonIndex
@@ -445,6 +453,7 @@ namespace MASICBrowser
                 }
 
                 var sicPotentialStats = ionStats.SICStats.SICPotentialAreaStatsForPeak;
+
                 if (sicPotentialStats.MinimumPotentialPeakArea > 0 && sicPotentialStats.PeakCountBasisForMinimumPotentialArea >= clsMASICPeakFinder.MINIMUM_PEAK_WIDTH)
                 {
                     if (sicPotentialStats.PeakCountBasisForMinimumPotentialArea > potentialAreaStatsForRegion.PeakCountBasisForMinimumPotentialArea)
@@ -471,6 +480,7 @@ namespace MASICBrowser
             {
                 // Determine the minimum potential peak area in the last 500 scans
                 var parentIonIndexStart = parentIonIndex - 500;
+
                 if (parentIonIndexStart < 0)
                     parentIonIndexStart = 0;
 
@@ -496,6 +506,7 @@ namespace MASICBrowser
                 mMASICPeakFinder.ComputeParentIonIntensity(parentIon.SICData, sicStats.Peak, parentIon.FragScanObserved);
 
                 bool recomputeNoiseLevel;
+
                 if (parentIon.SICStats.Peak.BaselineNoiseStats.NoiseThresholdModeUsed == clsMASICPeakFinder.NoiseThresholdModes.DualTrimmedMeanByAbundance)
                 {
                     recomputeNoiseLevel = false;
@@ -595,11 +606,13 @@ namespace MASICBrowser
                 {
                     // Percent complete will be between 0.5 and 1.0
                     var percentComplete = 0.5 + parentIonIndex / (double)parentIonCount / 2;
+
                     if (percentComplete > 1.0)
                         percentComplete = 1.0;
 
                     progressForm.UpdateProgressBar(percentComplete);
                     Application.DoEvents();
+
                     if (progressForm.KeyPressAbortProcess)
                         break;
 
@@ -656,6 +669,7 @@ namespace MASICBrowser
                     for (var indexCompare = 0; indexCompare < mParentIonStats.Count; indexCompare++)
                     {
                         var ionStats = mParentIonStats[indexCompare];
+
                         if (indexCompare != parentIonIndex && ionStats.FragScanObserved >= scanStart && ionStats.FragScanObserved <= scanEnd)
                         {
                             if (Math.Abs(ionStats.MZ - parentIonMZ) <= similarMZTolerance)
@@ -701,6 +715,7 @@ namespace MASICBrowser
                         {
                             // Match not found; find the closest match via brute-force searching
                             matchIndex = -1;
+
                             for (var scanIndex = 0; scanIndex < scanNumbers.Count - 1; scanIndex++)
                             {
                                 if (scanNumbers[scanIndex] <= similarFragScan &&
@@ -762,6 +777,7 @@ namespace MASICBrowser
         private bool GetSettingValue(RegistryKey regKey, string name, bool defaultValue)
         {
             var value = regKey?.GetValue(name, defaultValue.ToString())?.ToString() ?? string.Empty;
+
             if (bool.TryParse(value, out var parsedValue))
                 return parsedValue;
 
@@ -771,6 +787,7 @@ namespace MASICBrowser
         private int GetSettingValue(RegistryKey regKey, string name, int defaultValue)
         {
             var value = regKey?.GetValue(name, defaultValue.ToString())?.ToString() ?? string.Empty;
+
             if (int.TryParse(value, out var parsedValue))
                 return parsedValue;
 
@@ -780,6 +797,7 @@ namespace MASICBrowser
         private float GetSettingValue(RegistryKey regKey, string name, float defaultValue)
         {
             var value = regKey?.GetValue(name, defaultValue.ToString(CultureInfo.InvariantCulture))?.ToString() ?? string.Empty;
+
             if (float.TryParse(value, out var parsedValue))
                 return parsedValue;
 
@@ -789,6 +807,7 @@ namespace MASICBrowser
         private string GetSettingValue(RegistryKey regKey, string name, string defaultValue)
         {
             var value = regKey?.GetValue(name, defaultValue)?.ToString() ?? string.Empty;
+
             if (!string.IsNullOrWhiteSpace(value))
                 return value;
 
@@ -992,6 +1011,7 @@ namespace MASICBrowser
                         // Find the best match to scanNumberToFind
                         // First search for an exact match
                         var indexMatch = -1;
+
                         for (var index = 0; index < lstParentIonData.Items.Count; index++)
                         {
                             if (mParentIonStats[mParentIonPointerArray[index]].FragScanObserved == scanNumberToFind)
@@ -1009,6 +1029,7 @@ namespace MASICBrowser
                         {
                             // Exact match not found; find the closest match to scanNumberToFind
                             var scanDifference = int.MaxValue;
+
                             for (var index = 0; index < lstParentIonData.Items.Count; index++)
                             {
                                 if (Math.Abs(mParentIonStats[mParentIonPointerArray[index]].FragScanObserved - scanNumberToFind) < scanDifference)
@@ -1052,6 +1073,7 @@ namespace MASICBrowser
             {
                 var matchingRows = resultTable.Select(COL_NAME_PARENT_ION_INDEX + " = " + parentIonIndex);
                 var sequenceCount = 0;
+
                 foreach (var currentRow in matchingRows)
                 {
                     var sequenceID = (int)currentRow[COL_NAME_SEQUENCE_ID];
@@ -1100,6 +1122,7 @@ namespace MASICBrowser
             var trimmedSequence = sequence.Trim();
 
             string sequenceNoSuffixes;
+
             if (trimmedSequence.Length >= 4)
             {
                 if (trimmedSequence.Substring(1, 1).Equals(".") && trimmedSequence.Substring(trimmedSequence.Length - 2, 1).Equals("."))
@@ -1121,6 +1144,7 @@ namespace MASICBrowser
             {
                 var sequencesTable = mMsMsResults.Tables[TABLE_NAME_SEQUENCES];
                 var newSequenceRow = sequencesTable.Rows.Find(sequenceNoSuffixes);
+
                 if (newSequenceRow == null)
                 {
                     newSequenceRow = sequencesTable.NewRow();
@@ -1136,6 +1160,7 @@ namespace MASICBrowser
                     {
                         // Possibly add sequenceNoSuffixes and protein to .Tables(TABLE_NAME_SEQ_TO_PROTEIN_MAP)
                         var seqToProteinMapTable = mMsMsResults.Tables[TABLE_NAME_SEQ_TO_PROTEIN_MAP];
+
                         if (!seqToProteinMapTable.Rows.Contains(new object[] { sequenceID, protein }))
                         {
                             var newMapRow = seqToProteinMapTable.NewRow();
@@ -1264,6 +1289,7 @@ namespace MASICBrowser
                     smoothedYDataIndexStart = sicStats.SICSmoothedYDataIndexStart;
 
                     smoothedYData = new double[sicStats.SICSmoothedYData.Count];
+
                     for (var index = 0; index < sicStats.SICSmoothedYData.Count; index++)
                     {
                         smoothedYData[index] = sicStats.SICSmoothedYData[index];
@@ -1474,6 +1500,7 @@ namespace MASICBrowser
                 }
 
                 int xRangeHalfWidth;
+
                 if (PRISM.DataUtils.StringToValueUtils.IsNumber(txtFixXRange.Text))
                 {
                     xRangeHalfWidth = (int)(int.Parse(txtFixXRange.Text) / 2.0);
@@ -1484,6 +1511,7 @@ namespace MASICBrowser
                 }
 
                 double yRange;
+
                 if (PRISM.DataUtils.StringToValueUtils.IsNumber(txtFixYRange.Text))
                 {
                     yRange = double.Parse(txtFixYRange.Text);
@@ -1696,6 +1724,7 @@ namespace MASICBrowser
             {
                 // Initialize the stream reader and the XML Text Reader
                 CurrentXMLDataFileSectionConstants currentXMLDataFileSection;
+
                 using (var reader = new StreamReader(filePath))
                 using (var xmlReader = new XmlTextReader(reader))
                 {
@@ -1712,6 +1741,7 @@ namespace MASICBrowser
                     while (xmlReader.Read())
                     {
                         XMLTextReaderSkipWhitespace(xmlReader);
+
                         if (xmlReader.ReadState != ReadState.Interactive)
                             break;
 
@@ -1760,17 +1790,20 @@ namespace MASICBrowser
                                             // Update the progress bar
                                             // Dividing by two since FindSimilarParentIons can take time
                                             var percentComplete = reader.BaseStream.Position / (double)reader.BaseStream.Length / 2;
+
                                             if (percentComplete > 1.0)
                                                 percentComplete = 1.0;
 
                                             progressForm.UpdateProgressBar(percentComplete);
                                             Application.DoEvents();
+
                                             if (progressForm.KeyPressAbortProcess)
                                                 break;
 
                                             // Advance to the next tag
                                             xmlReader.Read();
                                             XMLTextReaderSkipWhitespace(xmlReader);
+
                                             if (xmlReader.ReadState != ReadState.Interactive)
                                                 break;
                                         }
@@ -1827,6 +1860,7 @@ namespace MASICBrowser
                                             for (var charIndex = 1; charIndex < scanIntervals.Length; charIndex++)
                                             {
                                                 int interval;
+
                                                 if (char.IsNumber(scanIntervals[charIndex]))
                                                 {
                                                     interval = int.Parse(scanIntervals.Substring(charIndex, 1));
@@ -1903,6 +1937,7 @@ namespace MASICBrowser
                                             }
 
                                             var massValue = 0.0;
+
                                             if (index < sicMasses.Count)
                                             {
                                                 massValue = sicMasses[index];
@@ -2212,6 +2247,7 @@ namespace MASICBrowser
 
                                                 case "SICDataCount":
                                                     value = XMLTextReaderGetInnerText(xmlReader);
+
                                                     if (PRISM.DataUtils.StringToValueUtils.IsNumber(value))
                                                     {
                                                         expectedSicDataCount = int.Parse(value);
@@ -2225,6 +2261,7 @@ namespace MASICBrowser
 
                                                 case "SICSmoothedYDataIndexStart":
                                                     value = XMLTextReaderGetInnerText(xmlReader);
+
                                                     if (PRISM.DataUtils.StringToValueUtils.IsNumber(value))
                                                     {
                                                         ionStats.SICStats.SICSmoothedYDataIndexStart = int.Parse(value);
@@ -2377,6 +2414,7 @@ namespace MASICBrowser
                     }
 
                     var linesRead = 0;
+
                     while (!reader.EndOfStream)
                     {
                         var dataLine = reader.ReadLine();
@@ -2390,6 +2428,7 @@ namespace MASICBrowser
                             {
                                 progressForm.UpdateProgressBar(bytesRead);
                                 Application.DoEvents();
+
                                 if (progressForm.KeyPressAbortProcess)
                                     break;
                             }
@@ -2408,6 +2447,7 @@ namespace MASICBrowser
                                         var charge = int.Parse(dataCols[(int)MsMsSearchEngineResultColumns.Charge]);
 
                                         var msMsResultsTable = mMsMsResults.Tables[TABLE_NAME_MSMS_RESULTS];
+
                                         if (!msMsResultsTable.Rows.Contains(new object[] { scanNumber, charge, sequenceID }))
                                         {
                                             var newRow = mMsMsResults.Tables[TABLE_NAME_MSMS_RESULTS].NewRow();
@@ -2482,6 +2522,7 @@ namespace MASICBrowser
 
                     progressForm.UpdateProgressBar(parentIonIndex + 1);
                     Application.DoEvents();
+
                     if (progressForm.KeyPressAbortProcess)
                         break;
                 }
@@ -2680,6 +2721,7 @@ namespace MASICBrowser
             }
 
             dlgOpenFile.ShowDialog();
+
             if (dlgOpenFile.FileName.Length > 0)
             {
                 ReadMsMsSearchEngineResults(dlgOpenFile.FileName, null);
@@ -2806,6 +2848,7 @@ namespace MASICBrowser
                     for (var index = 0; index < mParentIonStats.Count; index++)
                     {
                         var ionStats = mParentIonStats[index];
+
                         if (SortDataFilterCheck(
                                 ionStats.SICStats.Peak.MaxIntensityValue, ionStats.SICStats.Peak.SignalToNoiseRatio, ionStats.MZ,
                                 minimumIntensity, minimumSN, mzFilter, mzFilterTol, ionStats.CustomSICPeak))
@@ -2821,6 +2864,7 @@ namespace MASICBrowser
                     for (var index = 0; index < mParentIonStats.Count; index++)
                     {
                         var ionStats = mParentIonStats[index];
+
                         if (SortDataFilterCheck(
                                 ionStats.SICStats.Peak.MaxIntensityValue, ionStats.SICStats.Peak.SignalToNoiseRatio, ionStats.MZ,
                                 minimumIntensity, minimumSN, mzFilter, mzFilterTol, ionStats.CustomSICPeak))
@@ -2836,6 +2880,7 @@ namespace MASICBrowser
                     for (var index = 0; index < mParentIonStats.Count; index++)
                     {
                         var ionStats = mParentIonStats[index];
+
                         if (SortDataFilterCheck(
                                 ionStats.SICStats.Peak.MaxIntensityValue, ionStats.SICStats.Peak.SignalToNoiseRatio, ionStats.MZ,
                                 minimumIntensity, minimumSN, mzFilter, mzFilterTol, ionStats.CustomSICPeak))
@@ -2851,6 +2896,7 @@ namespace MASICBrowser
                     for (var index = 0; index < mParentIonStats.Count; index++)
                     {
                         var ionStats = mParentIonStats[index];
+
                         if (SortDataFilterCheck(
                                 ionStats.SICStats.Peak.MaxIntensityValue, ionStats.SICStats.Peak.SignalToNoiseRatio, ionStats.MZ,
                                 minimumIntensity, minimumSN, mzFilter, mzFilterTol, ionStats.CustomSICPeak))
@@ -2866,6 +2912,7 @@ namespace MASICBrowser
                     for (var index = 0; index < mParentIonStats.Count; index++)
                     {
                         var ionStats = mParentIonStats[index];
+
                         if (SortDataFilterCheck(
                                 ionStats.SICStats.Peak.MaxIntensityValue, ionStats.SICStats.Peak.SignalToNoiseRatio, ionStats.MZ,
                                 minimumIntensity, minimumSN, mzFilter, mzFilterTol, ionStats.CustomSICPeak))
@@ -2881,6 +2928,7 @@ namespace MASICBrowser
                     for (var index = 0; index < mParentIonStats.Count; index++)
                     {
                         var ionStats = mParentIonStats[index];
+
                         if (SortDataFilterCheck(
                                 ionStats.SICStats.Peak.MaxIntensityValue, ionStats.SICStats.Peak.SignalToNoiseRatio, ionStats.MZ,
                                 minimumIntensity, minimumSN, mzFilter, mzFilterTol, ionStats.CustomSICPeak))
@@ -2897,6 +2945,7 @@ namespace MASICBrowser
                     for (var index = 0; index < mParentIonStats.Count; index++)
                     {
                         var ionStats = mParentIonStats[index];
+
                         if (SortDataFilterCheck(
                                 ionStats.SICStats.Peak.MaxIntensityValue, ionStats.SICStats.Peak.SignalToNoiseRatio, ionStats.MZ,
                                 minimumIntensity, minimumSN, mzFilter, mzFilterTol, ionStats.CustomSICPeak))
@@ -2916,6 +2965,7 @@ namespace MASICBrowser
                     for (var index = 0; index < mParentIonStats.Count; index++)
                     {
                         var ionStats = mParentIonStats[index];
+
                         if (SortDataFilterCheck(
                                 ionStats.SICStats.Peak.MaxIntensityValue, ionStats.SICStats.Peak.SignalToNoiseRatio, ionStats.MZ,
                                 minimumIntensity, minimumSN, mzFilter, mzFilterTol, ionStats.CustomSICPeak))
@@ -2935,6 +2985,7 @@ namespace MASICBrowser
                     for (var index = 0; index < mParentIonStats.Count; index++)
                     {
                         var ionStats = mParentIonStats[index];
+
                         if (SortDataFilterCheck(
                                 ionStats.SICStats.Peak.MaxIntensityValue, ionStats.SICStats.Peak.SignalToNoiseRatio, ionStats.MZ,
                                 minimumIntensity, minimumSN, mzFilter, mzFilterTol, ionStats.CustomSICPeak))
@@ -2960,6 +3011,7 @@ namespace MASICBrowser
                     for (var index = 0; index < mParentIonStats.Count; index++)
                     {
                         var ionStats = mParentIonStats[index];
+
                         if (SortDataFilterCheck(
                                 ionStats.SICStats.Peak.MaxIntensityValue, ionStats.SICStats.Peak.SignalToNoiseRatio, ionStats.MZ,
                                 minimumIntensity, minimumSN, mzFilter, mzFilterTol, ionStats.CustomSICPeak))
@@ -2975,6 +3027,7 @@ namespace MASICBrowser
                     for (var index = 0; index < mParentIonStats.Count; index++)
                     {
                         var ionStats = mParentIonStats[index];
+
                         if (SortDataFilterCheck(
                                 ionStats.SICStats.Peak.MaxIntensityValue, ionStats.SICStats.Peak.SignalToNoiseRatio, ionStats.MZ,
                                 minimumIntensity, minimumSN, mzFilter, mzFilterTol, ionStats.CustomSICPeak))
@@ -2990,6 +3043,7 @@ namespace MASICBrowser
                     for (var index = 0; index < mParentIonStats.Count; index++)
                     {
                         var ionStats = mParentIonStats[index];
+
                         if (SortDataFilterCheck(
                                 ionStats.SICStats.Peak.MaxIntensityValue, ionStats.SICStats.Peak.SignalToNoiseRatio, ionStats.MZ,
                                 minimumIntensity, minimumSN, mzFilter, mzFilterTol, ionStats.CustomSICPeak))
@@ -3009,6 +3063,7 @@ namespace MASICBrowser
                     for (var index = 0; index < mParentIonStats.Count; index++)
                     {
                         var ionStats = mParentIonStats[index];
+
                         if (SortDataFilterCheck(
                                 ionStats.SICStats.Peak.MaxIntensityValue, ionStats.SICStats.Peak.SignalToNoiseRatio, ionStats.MZ,
                                 minimumIntensity, minimumSN, mzFilter, mzFilterTol, ionStats.CustomSICPeak))
@@ -3028,6 +3083,7 @@ namespace MASICBrowser
                     for (var index = 0; index < mParentIonStats.Count; index++)
                     {
                         var ionStats = mParentIonStats[index];
+
                         if (SortDataFilterCheck(
                                 ionStats.SICStats.Peak.MaxIntensityValue, ionStats.SICStats.Peak.SignalToNoiseRatio, ionStats.MZ,
                                 minimumIntensity, minimumSN, mzFilter, mzFilterTol, ionStats.CustomSICPeak))
@@ -3047,6 +3103,7 @@ namespace MASICBrowser
                     for (var index = 0; index < mParentIonStats.Count; index++)
                     {
                         var ionStats = mParentIonStats[index];
+
                         if (SortDataFilterCheck(
                                 ionStats.SICStats.Peak.MaxIntensityValue, ionStats.SICStats.Peak.SignalToNoiseRatio, ionStats.MZ,
                                 minimumIntensity, minimumSN, mzFilter, mzFilterTol, ionStats.CustomSICPeak))
@@ -3062,6 +3119,7 @@ namespace MASICBrowser
                     for (var index = 0; index < mParentIonStats.Count; index++)
                     {
                         var ionStats = mParentIonStats[index];
+
                         if (SortDataFilterCheck(
                                 ionStats.SICStats.Peak.MaxIntensityValue, ionStats.SICStats.Peak.SignalToNoiseRatio, ionStats.MZ,
                                 minimumIntensity, minimumSN, mzFilter, mzFilterTol, ionStats.CustomSICPeak))
@@ -3077,6 +3135,7 @@ namespace MASICBrowser
                     for (var index = 0; index < mParentIonStats.Count; index++)
                     {
                         var ionStats = mParentIonStats[index];
+
                         if (SortDataFilterCheck(
                                 ionStats.SICStats.Peak.MaxIntensityValue, ionStats.SICStats.Peak.SignalToNoiseRatio, ionStats.MZ,
                                 minimumIntensity, minimumSN, mzFilter, mzFilterTol, ionStats.CustomSICPeak))
@@ -3092,6 +3151,7 @@ namespace MASICBrowser
                     for (var index = 0; index < mParentIonStats.Count; index++)
                     {
                         var ionStats = mParentIonStats[index];
+
                         if (SortDataFilterCheck(
                                 ionStats.SICStats.Peak.MaxIntensityValue, ionStats.SICStats.Peak.SignalToNoiseRatio, ionStats.MZ,
                                 minimumIntensity, minimumSN, mzFilter, mzFilterTol, ionStats.CustomSICPeak))
@@ -3176,6 +3236,7 @@ namespace MASICBrowser
         private void TestValueToString()
         {
             var results = string.Empty;
+
             for (byte digits = 1; digits <= 5; digits++)
             {
                 results += this.TestValueToStringWork(0.00001234F, digits) + Environment.NewLine;
@@ -3307,6 +3368,7 @@ namespace MASICBrowser
                     var peakWidthsPointsMinimum = PRISMWin.TextBoxUtils.ParseTextBoxValueInt(txtPeakWidthPointsMinimum, lblPeakWidthPointsMinimum.Text + " should be a positive integer; assuming 6", out _, 6);
 
                     var filterThirdWidth = (int)Math.Floor(peakWidthsPointsMinimum / 3.0);
+
                     if (filterThirdWidth > 3)
                         filterThirdWidth = 3;
 
@@ -3503,6 +3565,7 @@ namespace MASICBrowser
             if (PRISM.DataUtils.StringToValueUtils.IsNumber(txtAutoStep.Text))
             {
                 var newInterval = int.Parse(txtAutoStep.Text);
+
                 if (newInterval < 10)
                     newInterval = 10;
                 mAutoStepIntervalMsec = newInterval;

@@ -121,6 +121,7 @@ namespace MagnitudeConcavityPeakFinder
                 // Remove data with a value <= 0
 
                 var validDataCount = 0;
+
                 for (var intIndex = 0; intIndex < dataSortedCount; intIndex++)
                 {
                     if (sortedData[intIndex] > 0)
@@ -191,6 +192,7 @@ namespace MagnitudeConcavityPeakFinder
 
                     // Compute the variance
                     summedIntensity = 0;
+
                     for (var intIndex = 0; intIndex <= indexEnd; intIndex++)
                     {
                         summedIntensity += Math.Pow(sortedData[intIndex] - baselineNoiseStats.NoiseLevel, 2);
@@ -217,6 +219,7 @@ namespace MagnitudeConcavityPeakFinder
 
                         // Find the first point with an intensity value <= dblIntensityThreshold
                         indexEnd = dataSortedCount - 1;
+
                         for (var intIndex = 1; intIndex < dataSortedCount; intIndex++)
                         {
                             if (sortedData[intIndex] > dblIntensityThreshold)
@@ -236,11 +239,13 @@ namespace MagnitudeConcavityPeakFinder
                     {
                         // Odd value; average the values on either side of intIndexEnd/2
                         var intIndex = (indexEnd - 1) / 2;
+
                         if (intIndex < 0)
                             intIndex = 0;
                         summedIntensity = sortedData[intIndex];
 
                         intIndex++;
+
                         if (intIndex == dataSortedCount)
                             intIndex = dataSortedCount - 1;
                         summedIntensity += sortedData[intIndex];
@@ -250,12 +255,14 @@ namespace MagnitudeConcavityPeakFinder
 
                     // Compute the variance
                     summedIntensity = 0;
+
                     for (var intIndex = 0; intIndex <= indexEnd; intIndex++)
                     {
                         summedIntensity += Math.Pow(sortedData[intIndex] - baselineNoiseStats.NoiseLevel, 2);
                     }
 
                     countSummed = indexEnd + 1;
+
                     if (countSummed > 0)
                     {
                         baselineNoiseStats.NoiseStDev = Math.Sqrt(summedIntensity / (countSummed - 1));
@@ -300,6 +307,7 @@ namespace MagnitudeConcavityPeakFinder
             var countSummed = indexEnd + 1;
 
             summedIntensity = 0;
+
             for (var intIndex = 0; intIndex <= indexEnd; intIndex++)
             {
                 summedIntensity += sortedData[intIndex];
@@ -327,6 +335,7 @@ namespace MagnitudeConcavityPeakFinder
             var countSummed = dataSortedCount;
 
             summedIntensity = 0;
+
             for (var intIndex = 0; intIndex < dataSortedCount; intIndex++)
             {
                 if (sortedData[intIndex] <= dblIntensityThreshold)
@@ -375,6 +384,7 @@ namespace MagnitudeConcavityPeakFinder
 
             var indexFirstPositiveValue = -1;
             double minimumPositiveValue = 0;
+
             for (var intIndex = 0; intIndex < dataCount; intIndex++)
             {
                 if (sortedData[intIndex] > 0)

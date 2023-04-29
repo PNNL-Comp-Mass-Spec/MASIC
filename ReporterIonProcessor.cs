@@ -160,6 +160,7 @@ namespace MASIC
                     for (var masterOrderIndex = 0; masterOrderIndex < scanList.MasterScanOrderCount; masterOrderIndex++)
                     {
                         var scanPointer = scanList.MasterScanOrder[masterOrderIndex].ScanIndexPointer;
+
                         if (scanList.MasterScanOrder[masterOrderIndex].ScanType == ScanList.ScanTypeConstants.SurveyScan)
                         {
                             // Skip survey scans
@@ -189,6 +190,7 @@ namespace MASIC
                 var reporterIons = new ReporterIonInfo[mOptions.ReporterIons.ReporterIonList.Count];
 
                 var index = 0;
+
                 foreach (var reporterIon in mOptions.ReporterIons.ReporterIonList)
                 {
                     reporterIons[index] = reporterIon;
@@ -241,6 +243,7 @@ namespace MASIC
                     // We skip contaminant ions, unless saveUncorrectedIntensities is True, in which case we include them
 
                     string mzValue;
+
                     if (mOptions.ReporterIons.ReporterIonMassMode is
                         ReporterIons.ReporterIonMassModeConstants.TMTTenMZ or
                         ReporterIons.ReporterIonMassModeConstants.TMTElevenMZ or
@@ -323,6 +326,7 @@ namespace MASIC
                 for (var masterOrderIndex = 0; masterOrderIndex < scanList.MasterScanOrderCount; masterOrderIndex++)
                 {
                     var scanPointer = scanList.MasterScanOrder[masterOrderIndex].ScanIndexPointer;
+
                     if (scanList.MasterScanOrder[masterOrderIndex].ScanType == ScanList.ScanTypeConstants.SurveyScan)
                     {
                         // Survey scan; write the cached data, then move on to the next scan
@@ -358,6 +362,7 @@ namespace MASIC
                     }
 
                     UpdateCacheStats(spectraCache);
+
                     if (mOptions.AbortProcessing)
                     {
                         break;
@@ -558,6 +563,7 @@ namespace MASIC
 
             // Populate reporterIntensitiesCorrected with the data in reporterIntensities
             Array.Copy(reporterIntensities, reporterIntensitiesCorrected, reporterIntensities.Length);
+
             if (mOptions.ReporterIons.ReporterIonApplyAbundanceCorrection)
             {
                 if (mOptions.ReporterIons.ReporterIonMassMode is
@@ -581,6 +587,7 @@ namespace MASIC
 
                     // Count the number of non-zero data points in reporterIntensitiesCorrected()
                     var positiveCount = 0;
+
                     for (var reporterIonIndex = 0; reporterIonIndex < reporterIons.Count; reporterIonIndex++)
                     {
                         if (reporterIntensitiesCorrected[reporterIonIndex] > 0)
@@ -680,6 +687,7 @@ namespace MASIC
             // This will be a value between 0 and 100
 
             float weightedAvgPctIntensityCorrection;
+
             if (originalIntensitySum > 0)
             {
                 weightedAvgPctIntensityCorrection = (float)(pctChangeSum / originalIntensitySum * 100);

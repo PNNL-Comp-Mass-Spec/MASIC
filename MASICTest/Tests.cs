@@ -365,6 +365,7 @@ namespace MASICTest
         public void TestValueToString(double valueToConvert, string expectedResult, byte digitsOfPrecision, int scientificNotationThreshold)
         {
             string result;
+
             if (scientificNotationThreshold > 0)
             {
                 result = StringUtilities.ValueToString(valueToConvert, digitsOfPrecision, scientificNotationThreshold);

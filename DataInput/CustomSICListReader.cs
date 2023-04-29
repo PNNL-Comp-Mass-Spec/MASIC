@@ -131,9 +131,11 @@ namespace MASIC.DataInput
                 using var reader = new StreamReader(new FileStream(customSICValuesFileName, FileMode.Open, FileAccess.Read, FileShare.Read));
 
                 var linesRead = 0;
+
                 while (!reader.EndOfStream)
                 {
                     var dataLine = reader.ReadLine();
+
                     if (dataLine == null)
                         continue;
 
@@ -194,18 +196,21 @@ namespace MASIC.DataInput
                     };
 
                     var mzTarget = DataTableUtils.GetColumnValue(dataCols, columnMap, CustomSICFileColumns.MZ, string.Empty, out var mzValuePresent);
+
                     if (mzValuePresent)
                     {
                         mzSearchSpec.MZ = ParseDouble(mzTarget, "MZ", linesRead);
                     }
 
                     var mzToleranceDa = DataTableUtils.GetColumnValue(dataCols, columnMap, CustomSICFileColumns.MZToleranceDa, string.Empty, out var mzTolerancePresent);
+
                     if (mzTolerancePresent)
                     {
                         mzSearchSpec.MZToleranceDa = ParseDouble(mzToleranceDa, "MZToleranceDa", linesRead);
                     }
 
                     var scanCenter = DataTableUtils.GetColumnValue(dataCols, columnMap, CustomSICFileColumns.ScanCenter, string.Empty, out var scanCenterPresent);
+
                     if (scanCenterPresent)
                     {
                         // Do not use this value if both the ScanTime and the TimeTolerance columns were present
@@ -216,6 +221,7 @@ namespace MASIC.DataInput
                     }
 
                     var scanTolerance = DataTableUtils.GetColumnValue(dataCols, columnMap, CustomSICFileColumns.ScanTolerance, string.Empty, out var scanTolPresent);
+
                     if (scanTolPresent)
                     {
                         // Do not use this value if both the ScanTime and the TimeTolerance columns were present
@@ -234,6 +240,7 @@ namespace MASIC.DataInput
                     }
 
                     var scanTime = DataTableUtils.GetColumnValue(dataCols, columnMap, CustomSICFileColumns.ScanTime, string.Empty, out var scanTimePresent);
+
                     if (scanTimePresent)
                     {
                         // Only use this value if both the ScanTime and the TimeTolerance columns were present
@@ -244,6 +251,7 @@ namespace MASIC.DataInput
                     }
 
                     var timeTolerance = DataTableUtils.GetColumnValue(dataCols, columnMap, CustomSICFileColumns.TimeTolerance, string.Empty, out var timeTolerancePresent);
+
                     if (timeTolerancePresent)
                     {
                         // Only use this value if both the ScanTime and the TimeTolerance columns were present

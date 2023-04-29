@@ -129,6 +129,7 @@ namespace MASIC.DataInput
             if (toleranceUnit is ThermoFisher.CommonCore.Data.Business.ToleranceMode.Ppm or ThermoFisher.CommonCore.Data.Business.ToleranceMode.Mmu)
             {
                 double massToleranceDa;
+
                 if (toleranceUnit == ThermoFisher.CommonCore.Data.Business.ToleranceMode.Ppm)
                 {
                     massToleranceDa = mass * 0.000001 * defaultMassTolerance;

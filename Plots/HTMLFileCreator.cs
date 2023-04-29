@@ -62,6 +62,7 @@ namespace MASIC.Plots
                 }
 
                 var outputDirectory = new DirectoryInfo(outputDirectoryPath ?? ".");
+
                 if (!outputDirectory.Exists)
                 {
                     outputDirectory.Create();
@@ -146,6 +147,7 @@ namespace MASIC.Plots
                 var reporterIonDataFileLinks = GetReporterIonDataFileLinks(datasetName, outputDirectoryPath);
 
                 writer.Write("      <td class=\"Links\">" + datasetDetailReportLink);
+
                 if (reporterIonDataFileLinks.Length > 0)
                 {
                     writer.WriteLine("<br><br>" + reporterIonDataFileLinks);
@@ -268,6 +270,7 @@ namespace MASIC.Plots
                 return string.Empty;
 
             string breakTag;
+
             if (obsRateURL.Length > 0 && intensityStatsURL.Length > 0)
                 breakTag = "<br>";
             else

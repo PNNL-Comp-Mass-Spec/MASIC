@@ -55,6 +55,7 @@ namespace MASIC.DataInput
         private double GetFreeDiskSpaceLinux(DirectoryInfo targetDirectory)
         {
             var driveInfo = GetLocalDriveInfo(targetDirectory);
+
             if (driveInfo == null)
                 return 0;
 
@@ -147,6 +148,7 @@ namespace MASIC.DataInput
                     // Alternatively, a Windows share like \\proto-4\DMS_Organism_Files
 
                     var driveLetter = targetDirectory.FullName.Substring(0, 2);
+
                     if (driveLetter.EndsWith(":"))
                     {
                         return new DriveInfo(driveLetter);
@@ -216,6 +218,7 @@ namespace MASIC.DataInput
             errorMessage = string.Empty;
 
             var targetDirectory = new DirectoryInfo(directoryPath);
+
             if (!targetDirectory.Exists)
             {
                 // Example error message: Organism DB directory not found: G:\DMS_Temp_Org

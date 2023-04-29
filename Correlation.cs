@@ -159,6 +159,7 @@ namespace MASIC
             {
                 if (value < 2)
                     value = 10;
+
                 if (value > 1000000)
                     value = 1000000;
                 mBinningOptions.MaximumBinCount = value;
@@ -236,6 +237,7 @@ namespace MASIC
             }
 
             double bt;
+
             if (Math.Abs(x) < double.Epsilon || Math.Abs(x - 1.0) < double.Epsilon)
             {
                 bt = 0.0;
@@ -273,6 +275,7 @@ namespace MASIC
             try
             {
                 var dataCount = xData.Count;
+
                 if (dataCount <= 0)
                 {
                     return false;
@@ -332,12 +335,14 @@ namespace MASIC
             try
             {
                 var maximumIntensity = float.MinValue;
+
                 for (var index = 0; index < dataCount; index++)
                 {
                     if (yData[index] < NoiseThresholdIntensity)
                         continue;
 
                     var binNumber = ValueToBinNumber(xData[index], binningOptions.StartX + offset, binningOptions.BinSize);
+
                     if (binNumber >= 0 && binNumber < binCount)
                     {
                         if (binningOptions.SumAllIntensitiesForBin)
@@ -370,8 +375,10 @@ namespace MASIC
                 {
                     // Quantize the intensities to .IntensityPrecisionPercent of maximumIntensity
                     var intensityQuantizationValue = binningOptions.IntensityPrecisionPercent / 100 * maximumIntensity;
+
                     if (intensityQuantizationValue <= 0)
                         intensityQuantizationValue = 1;
+
                     if (intensityQuantizationValue > 1)
                         intensityQuantizationValue = (float)(Math.Round(intensityQuantizationValue, 0));
 
@@ -425,6 +432,7 @@ namespace MASIC
             try
             {
                 var dataCount = dataList1.Count;
+
                 if (dataList2.Count != dataList1.Count)
                 {
                     return -1;
@@ -435,6 +443,7 @@ namespace MASIC
 
                 // Determine the number of non-zero data points in the two spectra
                 var nonZeroDataCount = 0;
+
                 for (var index = 0; index < dataCount; index++)
                 {
                     if (dataList1[index] > 0)
@@ -445,6 +454,7 @@ namespace MASIC
                     return 0;
 
                 nonZeroDataCount = 0;
+
                 for (var index = 0; index < dataCount; index++)
                 {
                     if (dataList2[index] > 0)
@@ -515,6 +525,7 @@ namespace MASIC
             fishersZ = 0;
 
             var n = dataList1.Count;
+
             if (n != dataList2.Count)
             {
                 throw new Exception("dataList1 and dataList2 must be lists of the same length");
@@ -587,6 +598,7 @@ namespace MASIC
             probabilityOfSignificance = 0;
 
             var n = dataList1.Count;
+
             if (n != dataList2.Count)
             {
                 throw new Exception("dataList1 and dataList2 must be lists of the same length");
@@ -602,10 +614,12 @@ namespace MASIC
                     double a1 = dataList1[j] - dataList1[k];
                     double a2 = dataList2[j] - dataList2[k];
                     var aa = a1 * a2;
+
                     if (Math.Abs(aa) > double.Epsilon)
                     {
                         n1++;
                         n2++;
+
                         if (aa > 0)
                         {
                             intIS++;
@@ -619,6 +633,7 @@ namespace MASIC
                     {
                         if (Math.Abs(a1) > double.Epsilon)
                             n1++;
+
                         if (Math.Abs(a2) > double.Epsilon)
                             n2++;
                     }
@@ -673,6 +688,7 @@ namespace MASIC
             ProbRS = 0;
 
             var n = dataList1.Count;
+
             if (n != dataList2.Count)
             {
                 throw new Exception("dataList1a and dataList2a must be lists of the same length");
@@ -694,6 +710,7 @@ namespace MASIC
             CRank(n, data2, out var sg);
 
             var DiffInRanksWork = 0.0;
+
             for (var j = 0; j < n; j++)
             {
                 DiffInRanksWork += SquareNum(data1[j] - data2[j]);
@@ -740,6 +757,7 @@ namespace MASIC
         {
             s = 0;
             var j = 0;
+
             while (j < n - 1)
             {
                 if (Math.Abs(w[j + 1] - w[j]) > float.Epsilon)
@@ -750,6 +768,7 @@ namespace MASIC
                 else
                 {
                     var jt = j + 1;
+
                     while (jt < n && Math.Abs(w[jt] - w[j]) < float.Epsilon)
                     {
                         jt++;

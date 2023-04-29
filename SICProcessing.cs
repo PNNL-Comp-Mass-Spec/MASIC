@@ -33,6 +33,7 @@ namespace MASIC
             double mzSearchChunkProgressFraction)
         {
             var progressAddon = surveyScanIndex / (double)surveyScansCount * mzSearchChunkProgressFraction * 100;
+
             if (parentIonsCount < 1)
             {
                 return (short)Math.Round(progressAddon, 0);
@@ -73,6 +74,7 @@ namespace MASIC
                 {
                     // Use processingSIMScans and .SIMScan to decide whether or not to include the entry
                     var surveyScan = scanList.SurveyScans[scanList.ParentIons[parentIonIndex].SurveyScanIndex];
+
                     if (processSIMScans)
                     {
                         if (surveyScan.SIMScan)
@@ -177,6 +179,7 @@ namespace MASIC
                 // First process the non SIM, non MRM scans
                 // If this file only has MRM scans, CreateMZLookupList will return False
                 var mzBinList = CreateMZLookupList(masicOptions, scanList, false, 0);
+
                 if (mzBinList.Count > 0)
                 {
                     success = ProcessMZList(
@@ -190,9 +193,11 @@ namespace MASIC
                     // Now process the SIM scans (if any)
                     // First, see if any SIMScans are present and determine the maximum SIM Index
                     var simIndexMax = -1;
+
                     foreach (var parentIon in scanList.ParentIons)
                     {
                         var surveyScan = scanList.SurveyScans[parentIon.SurveyScanIndex];
+
                         if (surveyScan.SIMScan && surveyScan.SIMIndex > simIndexMax)
                         {
                             simIndexMax = surveyScan.SIMIndex;
@@ -203,6 +208,7 @@ namespace MASIC
                     for (var simIndex = 0; simIndex <= simIndexMax; simIndex++)
                     {
                         var mzBinListSIM = CreateMZLookupList(masicOptions, scanList, true, simIndex);
+
                         if (mzBinListSIM.Count > 0)
                         {
                             ProcessMZList(
@@ -345,6 +351,7 @@ namespace MASIC
                     // Start by using the 3 survey scans centered around scanIndexObservedInFullSIC
                     maximumIntensity = -1;
                     scanIndexMax = -1;
+
                     for (var scanIndex = scanIndexStart; scanIndex <= scanIndexEnd; scanIndex++)
                     {
                         if (fullSICIntensities[mzIndexWork, scanIndex] > maximumIntensity)
@@ -426,6 +433,7 @@ namespace MASIC
                                 else
                                 {
                                     scanIndexStart--;
+
                                     if (fullSICIntensities[mzIndexWork, scanIndexStart] > maximumIntensity)
                                     {
                                         maximumIntensity = fullSICIntensities[mzIndexWork, scanIndexStart];
@@ -482,6 +490,7 @@ namespace MASIC
                                 // Require a minimum distance of InitialPeakWidthScansMaximum data points to the right of scanIndexObservedInFullSIC and to the right of scanIndexMax
                                 if (scanIndexEnd - scanIndexObservedInFullSIC < sicOptions.SICPeakFinderOptions.InitialPeakWidthScansMaximum)
                                     rightDone = false;
+
                                 if (scanIndexEnd - scanIndexMax < sicOptions.SICPeakFinderOptions.InitialPeakWidthScansMaximum)
                                     rightDone = false;
 
@@ -501,6 +510,7 @@ namespace MASIC
                                 else
                                 {
                                     scanIndexEnd++;
+
                                     if (fullSICIntensities[mzIndexWork, scanIndexEnd] > maximumIntensity)
                                     {
                                         maximumIntensity = fullSICIntensities[mzIndexWork, scanIndexEnd];
@@ -528,6 +538,7 @@ namespace MASIC
             // Populate sicDetails with the data between scanIndexStart and scanIndexEnd
             if (scanIndexStart < 0)
                 scanIndexStart = 0;
+
             if (scanIndexEnd >= fullSICDataCount)
                 scanIndexEnd = fullSICDataCount - 1;
 
@@ -547,6 +558,7 @@ namespace MASIC
                 sicDetails.SICData.Clear();
 
                 sicPeak.IndexObserved = 0;
+
                 for (var scanIndex = scanIndexStart; scanIndex <= scanIndexEnd; scanIndex++)
                 {
                     if (fullSICScanIndices[mzIndexWork, scanIndex] >= 0)
@@ -658,6 +670,7 @@ namespace MASIC
                     };
 
                     double mzToleranceDa;
+
                     if (mzSearchChunk.MZToleranceIsPPM)
                     {
                         mzToleranceDa = Utilities.PPMToMass(mzSearchChunk.MZTolerance, mzBinList[mzSearchChunk.MZIndexStart].MZ);
@@ -783,6 +796,7 @@ namespace MASIC
                 mzSearchChunk[mzIndexWork].ResetMaxIntensity();
 
                 fullSICDataCount[mzIndexWork] = 0;
+
                 for (var surveyScanIndex = 0; surveyScanIndex < scanList.SurveyScans.Count; surveyScanIndex++)
                 {
                     fullSICScanIndices[mzIndexWork, surveyScanIndex] = -1;
@@ -853,6 +867,7 @@ namespace MASIC
                     }
 
                     fullSICMasses[mzIndexWork, dataIndex] = closestMZ;
+
                     if (ionSum > current.MaximumIntensity)
                     {
                         current.MaximumIntensity = ionSum;
@@ -871,6 +886,7 @@ namespace MASIC
                     var progressMessage = "Loading raw SIC data: " + surveyScanIndex + " / " + scanList.SurveyScans.Count;
 
                     UpdateProgress(subtaskPercentComplete, progressMessage);
+
                     if (masicOptions.AbortProcessing)
                     {
                         scanList.ProcessingIncomplete = true;
@@ -986,6 +1002,7 @@ namespace MASIC
                     // Record the index in the Full SIC that the parent ion mass was first observed
                     // Search for .SurveyScanIndex in fullSICScanIndices
                     scanIndexObservedInFullSIC = -1;
+
                     for (var dataIndex = 0; dataIndex < fullSICDataCount[mzIndexWork]; dataIndex++)
                     {
                         if (fullSICScanIndices[mzIndexWork, dataIndex] >= currentParentIon.SurveyScanIndex)
@@ -1063,6 +1080,7 @@ namespace MASIC
                     UpdateProgress(subtaskPercentComplete);
 
                     UpdateCacheStats(spectraCache);
+
                     if (masicOptions.AbortProcessing)
                     {
                         scanList.ProcessingIncomplete = true;
@@ -1138,6 +1156,7 @@ namespace MASIC
 
                 // Assign the stats of the largest peak to each parent ion with .SurveyScanIndex contained in the peak
                 var currentParentIon = scanList.ParentIons[parentIonIndices[parentIonIndexPointer]];
+
                 if (currentParentIon.SurveyScanIndex >= mzIndexSICIndices[sicPeak.IndexBaseLeft] &&
                     currentParentIon.SurveyScanIndex <= mzIndexSICIndices[sicPeak.IndexBaseRight])
                 {
@@ -1205,6 +1224,7 @@ namespace MASIC
                 var currentParentIon = scanList.ParentIons[parentIonIndex];
 
                 var scanIndexObserved = currentParentIon.SurveyScanIndex;
+
                 if (scanIndexObserved < 0)
                     scanIndexObserved = 0;
 
@@ -1218,6 +1238,7 @@ namespace MASIC
                 sicStats.Peak = sicPeak.Clone();
 
                 sicStats.ScanTypeForPeakIndices = sicDetails.SICScanType;
+
                 if (processingMRMPeak)
                 {
                     if (sicStats.ScanTypeForPeakIndices != ScanList.ScanTypeConstants.FragScan)
@@ -1239,6 +1260,7 @@ namespace MASIC
 
                     // Search for scanIndexObserved in sicScanIndices()
                     sicStats.Peak.IndexObserved = -1;
+
                     for (var dataIndex = 0; dataIndex < sicDetails.SICDataCount; dataIndex++)
                     {
                         if (sicData[dataIndex].ScanIndex == scanIndexObserved)
@@ -1257,6 +1279,7 @@ namespace MASIC
                 }
 
                 int fragScanNumber;
+
                 if (scanList.FragScans.Count > 0 && currentParentIon.FragScanIndices[0] < scanList.FragScans.Count)
                 {
                     // Record the fragmentation scan number
@@ -1315,6 +1338,7 @@ namespace MASIC
                 // Update .OptimalPeakApexScanNumber
                 // Note that a valid peak will typically have .IndexBaseLeft or .IndexBaseRight different from .IndexMax
                 var scanIndexPointer = sicData[currentParentIon.SICStats.Peak.IndexMax].ScanIndex;
+
                 if (processingMRMPeak)
                 {
                     currentParentIon.OptimalPeakApexScanNumber = scanList.FragScans[scanIndexPointer].ScanNumber;

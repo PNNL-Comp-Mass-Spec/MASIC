@@ -168,6 +168,7 @@ namespace MASIC.Plots
             var logDirectory = AppUtils.GetAppDataDirectoryPath(appName);
 
             string logFileName;
+
             if (string.IsNullOrWhiteSpace(dataSource))
             {
                 logFileName = "MASIC_Plotter_Debug.txt";

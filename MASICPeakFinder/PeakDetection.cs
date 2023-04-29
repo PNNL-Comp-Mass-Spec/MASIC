@@ -139,6 +139,7 @@ namespace MASICPeakFinder
             try
             {
                 var sourceDataCount = xValues.Length;
+
                 if (sourceDataCount == 0)
                     return detectedPeaks;
 
@@ -151,6 +152,7 @@ namespace MASICPeakFinder
 
                 // Find the maximum intensity in the source data
                 double maximumIntensity = 0;
+
                 for (var dataIndex = 0; dataIndex < sourceDataCount; dataIndex++)
                 {
                     if (yValues[dataIndex] > maximumIntensity)
@@ -160,6 +162,7 @@ namespace MASICPeakFinder
                 }
 
                 var intensityThreshold = maximumIntensity * (peakDetectIntensityThresholdPercentageOfMaximum / 100.0);
+
                 if (intensityThreshold < intensityThresholdAbsoluteMinimum)
                 {
                     intensityThreshold = intensityThresholdAbsoluteMinimum;
@@ -298,6 +301,7 @@ namespace MASICPeakFinder
             {
                 newPeak.LeftEdge = 0;
                 var lowIntensityPointCount = 0;
+
                 for (var compareIndex = index - 1; compareIndex >= 0; compareIndex--)
                 {
                     if (firstDerivative[compareIndex] <= 0 && firstDerivative[compareIndex + 1] >= 0)
@@ -310,6 +314,7 @@ namespace MASICPeakFinder
                     if (yValues[compareIndex] < intensityThreshold)
                     {
                         lowIntensityPointCount++;
+
                         if (lowIntensityPointCount > peakHalfWidth)
                         {
                             newPeak.LeftEdge = compareIndex + (peakHalfWidth - 1);
@@ -331,6 +336,7 @@ namespace MASICPeakFinder
             {
                 newPeak.RightEdge = sourceDataCount - 1;
                 var lowIntensityPointCount = 0;
+
                 for (var compareIndex = index + 1; compareIndex < sourceDataCount - 1; compareIndex++)
                 {
                     if (firstDerivative[compareIndex] <= 0 && firstDerivative[compareIndex + 1] >= 0)
@@ -343,6 +349,7 @@ namespace MASICPeakFinder
                     if (yValues[compareIndex] < intensityThreshold)
                     {
                         lowIntensityPointCount++;
+
                         if (lowIntensityPointCount > peakHalfWidth)
                         {
                             newPeak.RightEdge = compareIndex - (peakHalfWidth - 1);
@@ -434,6 +441,7 @@ namespace MASICPeakFinder
         private double FindArea(IReadOnlyList<double> xValues, IReadOnlyList<double> yValues, int dataPointCount)
         {
             double area = 0;
+
             for (var index = 0; index < dataPointCount - 1; index++)
             {
                 // Area of a trapezoid (turned on its side) is:
@@ -492,10 +500,12 @@ namespace MASICPeakFinder
             // The peak finder often determines the peak center to be a few points away from the peak apex -- check for this
             // Define the maximum allowed peak apex shift to be 33% of peakWidthPointsMinimum
             var dataIndexCheckStart = peak.PeakLocation - (int)Math.Floor(peakWidthPointsMinimum / 3.0);
+
             if (dataIndexCheckStart < 0)
                 dataIndexCheckStart = 0;
 
             var dataIndexCheckEnd = peak.PeakLocation + (int)Math.Floor(peakWidthPointsMinimum / 3.0);
+
             if (dataIndexCheckEnd > sourceDataCount - 1)
                 dataIndexCheckEnd = sourceDataCount - 1;
 
@@ -557,6 +567,7 @@ namespace MASICPeakFinder
             }
 
             LLSqFit(xValues, yValues, ref equationTerms);
+
             for (var term = 0; term <= polynomialOrder; term++)
             {
                 coefficients[term] = equationTerms[term].ParamResult;
@@ -580,6 +591,7 @@ namespace MASICPeakFinder
                 GetLValues(xValues[i], equationTerms, ref pFuncValue);
 
                 var ym = yValues[i];
+
                 for (var L = 0; L < equationTerms.Length; L++)
                 {
                     for (var m = 0; m <= L; m++)
@@ -736,6 +748,7 @@ namespace MASICPeakFinder
                 for (var i = 0; i < termCount; i++)
                 {
                     double bigValue = 0;
+
                     for (var j = 0; j < termCount; j++)
                     {
                         if (ipiv[j] != 1)
@@ -753,9 +766,11 @@ namespace MASICPeakFinder
                     }
 
                     ipiv[columnIndex]++;
+
                     if (rowIndex != columnIndex)
                     {
                         double swapValue;
+
                         for (var L = 0; L < termCount; L++)
                         {
                             swapValue = A[rowIndex, L];
@@ -770,6 +785,7 @@ namespace MASICPeakFinder
 
                     indexR[i] = rowIndex;
                     indexC[i] = columnIndex;
+
                     if (Math.Abs(A[columnIndex, columnIndex]) < double.Epsilon)
                     {
                         // Error, the matrix was singular
@@ -778,18 +794,21 @@ namespace MASICPeakFinder
 
                     var PivInv = 1 / A[columnIndex, columnIndex];
                     A[columnIndex, columnIndex] = 1;
+
                     for (var L = 0; L < termCount; L++)
                     {
                         A[columnIndex, L] *= PivInv;
                     }
 
                     b[columnIndex] *= PivInv;
+
                     for (var ll = 0; ll < termCount; ll++)
                     {
                         if (ll != columnIndex)
                         {
                             var multiplier = A[ll, columnIndex];
                             A[ll, columnIndex] = 0;
+
                             for (var L = 0; L < termCount; L++)
                             {
                                 A[ll, L] -= A[columnIndex, L] * multiplier;

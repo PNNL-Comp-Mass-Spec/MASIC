@@ -254,6 +254,7 @@ namespace MASIC.DataInput
                         if (noiseThresholdOptions.BaselineNoiseLevelAbsolute > 0)
                         {
                             ionCountNew = 0;
+
                             for (var ionIndex = 0; ionIndex < msSpectrum.IonCount; ionIndex++)
                             {
                                 // Always keep points in the m/z ignore range
@@ -289,6 +290,7 @@ namespace MASIC.DataInput
                         if (noiseThresholdOptions.MinimumSignalToNoiseRatio > 0)
                         {
                             ionCountNew = 0;
+
                             for (var ionIndex = 0; ionIndex < msSpectrum.IonCount; ionIndex++)
                             {
                                 // Always keep points in the m/z ignore range
@@ -356,6 +358,7 @@ namespace MASIC.DataInput
             try
             {
                 int ionCountNew;
+
                 if (msSpectrum.IonCount > maxIonCountToRetain)
                 {
                     var filterDataArray = new FilterDataArrayMaxCount
@@ -366,6 +369,7 @@ namespace MASIC.DataInput
                     // ReSharper disable ConditionIsAlwaysTrueOrFalse
                     // ReSharper disable once RedundantAssignment
                     writeDebugData = false;
+
                     if (writeDebugData)
                     {
                         writer = new StreamWriter(new FileStream(Path.Combine(mOptions.OutputDirectoryPath, "DataDump_" + msSpectrum.ScanNumber + "_BeforeFilter.txt"), FileMode.Create, FileAccess.Write, FileShare.Read));
@@ -376,6 +380,7 @@ namespace MASIC.DataInput
                     for (var ionIndex = 0; ionIndex < msSpectrum.IonCount; ionIndex++)
                     {
                         filterDataArray.AddDataPoint(msSpectrum.IonsIntensity[ionIndex], ionIndex);
+
                         if (writeDebugData)
                         {
                             writer.WriteLine("{0:F3}\t{1:F0}", msSpectrum.IonsMZ[ionIndex], msSpectrum.IonsIntensity[ionIndex]);
@@ -392,6 +397,7 @@ namespace MASIC.DataInput
                     filterDataArray.FilterData();
 
                     ionCountNew = 0;
+
                     for (var ionIndex = 0; ionIndex < msSpectrum.IonCount; ionIndex++)
                     {
                         // Always keep points in the m/z ignore range
@@ -481,6 +487,7 @@ namespace MASIC.DataInput
             if (mPrecursorNotFoundCount > PRECURSOR_NOT_FOUND_WARNINGS_TO_SHOW)
             {
                 var precursorMissingPct = 0.0;
+
                 if (scanList.FragScans.Count > 0)
                 {
                     precursorMissingPct = mPrecursorNotFoundCount / (double)scanList.FragScans.Count * 100;
@@ -641,6 +648,7 @@ namespace MASIC.DataInput
             mCachedPrecursorIons.Capacity = Math.Max(mCachedPrecursorIons.Capacity, centroidedIonsMz.Count);
 
             var ionCount = centroidedIonsMz.Count;
+
             for (var index = 0; index < ionCount; index++)
             {
                 var newPeak = new InterDetect.Peak
@@ -717,6 +725,7 @@ namespace MASIC.DataInput
             {
                 // The precursor ion was not found in the centroided MS1 spectrum; this happens sometimes
                 mPrecursorNotFoundCount++;
+
                 if (mPrecursorNotFoundCount <= PRECURSOR_NOT_FOUND_WARNINGS_TO_SHOW || mPrecursorNotFoundCount > mNextPrecursorNotFoundCountThreshold)
                 {
                     OnWarningEvent(message);

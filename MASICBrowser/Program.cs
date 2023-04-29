@@ -40,6 +40,7 @@ namespace MASICBrowser
             try
             {
                 var proceed = false;
+
                 if (commandLineParser.ParseCommandLine())
                 {
                     if (SetOptionsUsingCommandLineParameters(commandLineParser))

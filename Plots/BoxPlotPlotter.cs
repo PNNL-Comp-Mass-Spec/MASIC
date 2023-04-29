@@ -312,6 +312,7 @@ namespace MASIC.Plots
             {
                 DeleteTempFiles = Options.DeleteTempFiles
             };
+
             RegisterEvents(plotContainer);
 
             var labelNames = (from item in xAxisLabels orderby item.Key select item.Value).ToList();

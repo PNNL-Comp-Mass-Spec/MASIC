@@ -190,6 +190,7 @@ namespace MASIC
                 UpdateProgress(0);
 
                 var useFullDataSort = false;
+
                 if (DataCount == 0)
                 {
                     // No data loaded
@@ -210,6 +211,7 @@ namespace MASIC
 
                 // First, determine the maximum abundance value in mDataValues
                 var maxAbundance = double.MinValue;
+
                 for (var index = 0; index < DataCount; index++)
                 {
                     if (mDataValues[index] > maxAbundance)
@@ -223,6 +225,7 @@ namespace MASIC
 
                 // Now determine the histogram bin size
                 var binSize = maxAbundance / HISTOGRAM_BIN_COUNT;
+
                 if (binSize < 1)
                     binSize = 1;
 
@@ -241,6 +244,7 @@ namespace MASIC
                 for (var index = 0; index < DataCount; index++)
                 {
                     int targetBin;
+
                     if (mDataValues[index] <= 0)
                     {
                         targetBin = 0;
@@ -278,9 +282,11 @@ namespace MASIC
                 // Now examine the frequencies in histogramBinCounts() to determine the minimum value to consider when sorting
                 var pointTotal = 0;
                 var binToSort = -1;
+
                 for (var index = binCount - 1; index >= 0; index += -1)
                 {
                     pointTotal += histogramBinCounts[index];
+
                     if (pointTotal >= MaximumDataCountToKeep)
                     {
                         binToSort = index;
@@ -329,6 +335,7 @@ namespace MASIC
                     if (!useFullDataSort)
                     {
                         var dataCountImplicitlyIncluded = 0;
+
                         for (var index = 0; index < DataCount; index++)
                         {
                             if (mDataValues[index] < binToSortAbundanceMinimum)
@@ -398,6 +405,7 @@ namespace MASIC
                         // binToSortDataIndices should also currently be sorted ascending on "valid data point index" so the following Do Loop within a For Loop should sync things up
 
                         var originalDataArrayIndex = 0;
+
                         for (var index = 0; index < binToSortDataCount; index++)
                         {
                             while (binToSortDataIndices[index] > mDataIndices[originalDataArrayIndex])

@@ -395,12 +395,14 @@ namespace MASIC.Options
                 {
                     // See if parameterFilePath points to a file in the same directory as the application
                     parameterFilePath = Path.Combine(AppUtils.GetAppDirectoryPath(), Path.GetFileName(parameterFilePath));
+
                     if (!File.Exists(parameterFilePath))
                     {
                         if (!string.IsNullOrWhiteSpace(inputFilePath))
                         {
                             // Also look in the same directory as the instrument data file
                             var instrumentDataFile = new FileInfo(inputFilePath);
+
                             if (instrumentDataFile.DirectoryName != null)
                             {
                                 // ReSharper disable once AssignNullToNotNullAttribute
@@ -1176,6 +1178,7 @@ namespace MASIC.Options
                 if (matchSpecList != null)
                 {
                     var query = (from item in matchSpecList select item).Distinct();
+
                     foreach (var item in query)
                     {
                         StatusLogKeyNameFilterList.Add(item);
@@ -1209,6 +1212,7 @@ namespace MASIC.Options
                     foreach (var item in items)
                     {
                         var trimmedItem = item.Trim();
+
                         if (trimmedItem.Length > 0)
                         {
                             validatedItems.Add(trimmedItem);

@@ -42,27 +42,39 @@ namespace MatrixDecompositionUtility
             int j;
             double sum;
             var ii = -1;
-            for (i = 0; i < n; i++) {
+
+            for (i = 0; i < n; i++)
+            {
                 var ip = index[i];
                 sum = b[ip];
                 b[ip] = b[i];
-                if (ii > -1) {
+
+                if (ii > -1)
+                {
                     j = ii;
-                    while (j < i) {
+
+                    while (j < i)
+                    {
                         sum -= a[i, j] * b[j];
                         j++;
                     }
                 }
-                else if (sum > 0.0) {
+                else if (sum > 0.0)
+                {
                     ii = i;
                 }
                 b[i] = sum;
             }
-            for (i = n - 1; i >= 0; i--) {
+
+            for (i = n - 1; i >= 0; i--)
+            {
                 sum = b[i];
-                for (j = i + 1; j < n; j++) {
+
+                for (j = i + 1; j < n; j++)
+                {
                     sum -= a[i, j] * b[j];
                 }
+
                 b[i] = sum / a[i, i];
             }
         }
@@ -82,69 +94,103 @@ namespace MatrixDecompositionUtility
             var vv = new double[n];
             var d = 1.0;
             var i = 0;
-            while (i < n) {
+
+            while (i < n)
+            {
                 big = 0.0;
                 j = 0;
-                while (j < n) {
+
+                while (j < n)
+                {
                     double temp;
-                    if ((temp = Math.Abs(a[i, j])) > big) {
+
+                    if ((temp = Math.Abs(a[i, j])) > big)
+                    {
                         big = temp;
                     }
                     j++;
                 }
-                if (Math.Abs(big) < double.Epsilon) {
+
+                if (Math.Abs(big) < double.Epsilon)
+                {
                     Console.WriteLine("Singular matrix in method ludcmp!!");
                 }
+
                 vv[i] = 1.0 / big;
                 i++;
             }
-            for (j = 0; j < n; j++) {
+
+            for (j = 0; j < n; j++)
+            {
                 int k;
                 double temp;
                 double sum;
                 i = 0;
-                while (i < j) {
+
+                while (i < j)
+                {
                     sum = a[i, j];
                     k = 0;
-                    while (k < i) {
+
+                    while (k < i)
+                    {
                         sum -= a[i, k] * a[k, j];
                         k++;
                     }
+
                     a[i, j] = sum;
                     i++;
                 }
+
                 big = 0.0;
                 i = j;
-                while (i < n) {
+
+                while (i < n)
+                {
                     sum = a[i, j];
                     k = 0;
-                    while (k < j) {
+
+                    while (k < j)
+                    {
                         sum -= a[i, k] * a[k, j];
                         k++;
                     }
                     a[i, j] = sum;
-                    if ((temp = vv[i] * Math.Abs(sum)) >= big) {
+
+                    if ((temp = vv[i] * Math.Abs(sum)) >= big)
+                    {
                         big = temp;
                         iMax = i;
                     }
                     i++;
                 }
-                if (j != iMax) {
-                    for (k = 0; k < n; k++) {
+
+                if (j != iMax)
+                {
+                    for (k = 0; k < n; k++)
+                    {
                         temp = a[iMax, k];
                         a[iMax, k] = a[j, k];
                         a[j, k] = temp;
                     }
+
                     d = -d;
                     vv[iMax] = vv[j];
                 }
+
                 index[j] = iMax;
-                if (Math.Abs(a[j, j]) < double.Epsilon) {
+
+                if (Math.Abs(a[j, j]) < double.Epsilon)
+                {
                     a[j, j] = double.MinValue;
                 }
-                if (j != n) {
+
+                if (j != n)
+                {
                     temp = 1.0 / a[j, j];
-                    for (i = j + 1; i < n; i++) {
+
+                    for (i = j + 1; i < n; i++)
+                    {
                         a[i, j] *= temp;
                     }
                 }
@@ -154,22 +200,31 @@ namespace MatrixDecompositionUtility
         // ReSharper disable once UnusedMember.Local
         private void PrintData(double[,] a, int n, IReadOnlyList<int> index, IReadOnlyList<double> b)
         {
-            for (var i = 0; i < n; i++) {
-                for (var m = 0; m < n; m++) {
+            for (var i = 0; i < n; i++)
+            {
+                for (var m = 0; m < n; m++)
+                {
                     Console.Write("{0}\t", a[i, m]);
                 }
                 Console.WriteLine("");
             }
+
             Console.WriteLine("N is {0}", n);
             Console.Write("index[]: ");
-            for (var j = 0; j < n; j++) {
+
+            for (var j = 0; j < n; j++)
+            {
                 Console.Write("{0}\t", index[j]);
             }
+
             Console.WriteLine("");
             Console.Write("B matrix: ");
-            for (var k = 0; k < n; k++) {
+
+            for (var k = 0; k < n; k++)
+            {
                 Console.Write("{0}\t", b[k]);
             }
+
             Console.WriteLine("");
         }
     }

@@ -38,6 +38,7 @@ namespace MASIC
         public MRMProcessing(MASICOptions masicOptions, DataOutput.DataOutput dataOutputHandler)
         {
             mOptions = masicOptions;
+
             mDataAggregation = new DataAggregation();
             RegisterEvents(mDataAggregation);
 
@@ -99,6 +100,7 @@ namespace MASIC
                             {
                                 // Add this new transition to srmList() only if not already present
                                 var matchFound = false;
+
                                 foreach (var srmItem in srmList)
                                 {
                                     if (MRMParentDaughterMatch(srmItem, mrmInfoForHash, mrmMassIndex))
@@ -268,6 +270,7 @@ namespace MASIC
                 for (var mrmInfoIndex = 0; mrmInfoIndex < mrmSettings.Count; mrmInfoIndex++)
                 {
                     var mrmSetting = mrmSettings[mrmInfoIndex];
+
                     for (var mrmMassIndex = 0; mrmMassIndex < mrmSetting.MRMMassCount; mrmMassIndex++)
                     {
                         dataColumns.Clear();
@@ -287,6 +290,7 @@ namespace MASIC
                 {
                     // Populate srmKeyToIndexMap
                     var srmKeyToIndexMap = new Dictionary<string, int>();
+
                     for (var srmIndex = 0; srmIndex < srmList.Count; srmIndex++)
                     {
                         srmKeyToIndexMap.Add(ConstructSRMMapKey(srmList[srmIndex]), srmIndex);
@@ -354,6 +358,7 @@ namespace MASIC
                             var mzStart = fragScan.MRMScanInfo.MRMMassList[mrmMassIndex].StartMass;
                             var mzEnd = fragScan.MRMScanInfo.MRMMassList[mrmMassIndex].EndMass;
                             var mrmToleranceHalfWidth = Math.Round((mzEnd - mzStart) / 2, 6);
+
                             if (mrmToleranceHalfWidth < 0.001)
                             {
                                 mrmToleranceHalfWidth = 0.001;
@@ -423,6 +428,7 @@ namespace MASIC
                         }
 
                         UpdateCacheStats(spectraCache);
+
                         if (mOptions.AbortProcessing)
                         {
                             break;
@@ -593,6 +599,7 @@ namespace MASIC
                         var fragScan = scanList.FragScans[scanIndex];
 
                         var useScan = false;
+
                         for (var mrmMassIndex = 0; mrmMassIndex < fragScan.MRMScanInfo.MRMMassCount; mrmMassIndex++)
                         {
                             if (MRMParentDaughterMatch(
@@ -643,9 +650,11 @@ namespace MASIC
                     // Find the data point with the maximum intensity
                     double maximumIntensity = 0;
                     scanList.ParentIons[parentIonIndex].SICStats.Peak.IndexObserved = 0;
+
                     for (var scanIndex = 0; scanIndex < sicDetails.SICDataCount; scanIndex++)
                     {
                         var intensity = sicDetails.SICIntensities[scanIndex];
+
                         if (intensity > maximumIntensity)
                         {
                             maximumIntensity = intensity;
@@ -711,6 +720,7 @@ namespace MASIC
                         }
 
                         UpdateCacheStats(spectraCache);
+
                         if (mOptions.AbortProcessing)
                         {
                             scanList.ProcessingIncomplete = true;

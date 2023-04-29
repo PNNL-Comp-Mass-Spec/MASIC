@@ -151,6 +151,7 @@ namespace MASIC.DataOutput
                 writer.WriteLine("ICR-2LS Data File (GA Anderson & JE Bruce); output from MASIC by Matthew E Monroe");
                 writer.WriteLine("Version " + masicOptions.MASICVersion);
                 writer.WriteLine("FileName:");
+
                 if (saveTICInsteadOfBPI)
                 {
                     writer.WriteLine("title:" + Path.GetFileName(inputFilePathFull) + " TIC");
@@ -185,6 +186,7 @@ namespace MASIC.DataOutput
 
                 // Since we're using XY pairs, the buffer length needs to be two times scanCount
                 var bufferLength = scanCount * 2;
+
                 if (bufferLength < 1)
                     bufferLength = 1;
 
@@ -200,6 +202,7 @@ namespace MASIC.DataOutput
                 writer.WriteLine("CalC: 29669467490280 ");
                 writer.WriteLine("Intensity: 0 ");
                 writer.WriteLine("CurrentXmin: 0 ");
+
                 if (scanCount > 0)
                 {
                     if (saveElutionTimeInsteadOfScan)
@@ -382,6 +385,7 @@ namespace MASIC.DataOutput
             var scanNumber = currentScan.ScanNumber;
 
             var msLevel = currentScan.FragScanInfo.MSLevel;
+
             if (msLevel < 1)
                 msLevel = 1;
 

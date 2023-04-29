@@ -158,6 +158,7 @@ namespace MASIC
             var dataCount = reporterIonIntensities.Length - 1;
 
             var originalIntensities = new double[dataCount + 1];
+
             for (var index = 0; index <= dataCount; index++)
             {
                 originalIntensities[index] = reporterIonIntensities[index];
@@ -196,6 +197,7 @@ namespace MASIC
             var correctedIntensities = mMatrixUtility.ProcessData(mCoeffs, matrixSize, reporterIonIntensities);
 
             var maxIntensity = 0.0;
+
             for (var index = 0; index < matrixSize; index++)
             {
                 maxIntensity = Math.Max(maxIntensity, reporterIonIntensities[index]);
@@ -216,6 +218,7 @@ namespace MASIC
                 }
 
                 double newIntensity;
+
                 if (correctedIntensities[index] < 0)
                 {
                     newIntensity = 0;
@@ -232,6 +235,7 @@ namespace MASIC
                     var percentChangeRounded = (int)Math.Round(percentChange, 0);
 
                     string visualPercentChange;
+
                     if (percentChangeRounded > 0)
                     {
                         visualPercentChange = new string('+', percentChangeRounded);
@@ -672,6 +676,7 @@ namespace MASIC
                     mCoeffs[8, 7] = 0;
                     mCoeffs[8, 8] = udtIsoPct130C.Zero;
                     mCoeffs[8, 9] = 0;
+
                     if (maxIndex >= 10)
                     {
                         mCoeffs[8, 10] = udtIsoPct131C.Minus1;
@@ -1125,12 +1130,14 @@ namespace MASIC
                 // Print out the matrix
                 Console.WriteLine();
                 Console.WriteLine("Reporter Ion Correction Matrix; mode = " + ReporterIonMode);
+
                 for (var i = 0; i <= maxIndex; i++)
                 {
                     if (i == 0)
                     {
                         // Header line
                         Console.Write("     ");
+
                         for (var j = 0; j <= maxIndex; j++)
                         {
                             if (j < 10)
@@ -1146,6 +1153,7 @@ namespace MASIC
                         Console.WriteLine();
 
                         Console.Write("     ");
+
                         for (var k = 0; k <= maxIndex; k++)
                         {
                             Console.Write(" ------ ");
@@ -1155,12 +1163,14 @@ namespace MASIC
                     }
 
                     string indexSpacer;
+
                     if (i < 10)
                         indexSpacer = "  ";
                     else
                         indexSpacer = " ";
 
                     Console.Write("  " + i + indexSpacer);
+
                     for (var j = 0; j <= maxIndex; j++)
                     {
                         if (Math.Abs(mCoeffs[i, j]) < float.Epsilon)
@@ -1207,6 +1217,7 @@ namespace MASIC
             }
 
             var sum = minus2 + minus1 + zero + plus1 + plus2;
+
             if (Math.Abs(100 - sum) > 0.05)
             {
                 throw new Exception(string.Format("Parameters for DefineIsotopeContribution should add up to 100; current sum is {0:F1}", sum));

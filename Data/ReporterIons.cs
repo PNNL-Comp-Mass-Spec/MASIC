@@ -644,6 +644,7 @@ namespace MASIC.Data
             bool customReporterIons)
         {
             ReporterIonList.Clear();
+
             if (reporterIons == null || reporterIons.Count == 0)
             {
                 return;
@@ -708,6 +709,7 @@ namespace MASIC.Data
             }
 
             ReporterIonList.Clear();
+
             if (reporterIonMZList == null || reporterIonMZList.Length == 0)
             {
                 mReporterIonMassMode = ReporterIonMassModeConstants.CustomOrNone;

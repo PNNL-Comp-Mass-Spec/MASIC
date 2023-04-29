@@ -111,6 +111,7 @@ namespace MASIC
             try
             {
                 var proceed = false;
+
                 if (commandLineParser.ParseCommandLine())
                 {
                     if (SetOptionsUsingCommandLineParameters(commandLineParser))
@@ -185,6 +186,7 @@ namespace MASIC
                 percentComplete = 100;
 
             Console.Write("Processing: " + percentComplete + "% ");
+
             if (addCarriageReturn)
             {
                 Console.WriteLine();
@@ -248,6 +250,7 @@ namespace MASIC
             }
 
             var returnCode = (int)mMASIC.ErrorCode;
+
             if (returnCode != 0)
             {
                 Console.WriteLine("Error while processing: " + mMASIC.GetErrorMessage());
@@ -328,6 +331,7 @@ namespace MASIC
                 if (commandLineParser.RetrieveValueForParameter("S", out var recursionDepth))
                 {
                     mRecurseDirectories = true;
+
                     if (int.TryParse(recursionDepth, out var levelsToRecurse))
                     {
                         mMaxLevelsToRecurse = levelsToRecurse;
@@ -355,6 +359,7 @@ namespace MASIC
                 if (logToFile)
                 {
                     mLogMessagesToFile = true;
+
                     if (!string.IsNullOrEmpty(logFileName))
                     {
                         mLogFilePath = logFileName.Trim('"');
@@ -369,6 +374,7 @@ namespace MASIC
                 if (commandLineParser.RetrieveValueForParameter("LogDir", out var logDirectoryPath))
                 {
                     mLogMessagesToFile = true;
+
                     if (!string.IsNullOrEmpty(logDirectoryPath))
                     {
                         mLogDirectoryPath = logDirectoryPath;
@@ -378,6 +384,7 @@ namespace MASIC
                 if (commandLineParser.RetrieveValueForParameter("LogFolder", out var logFolderPath))
                 {
                     mLogMessagesToFile = true;
+
                     if (!string.IsNullOrEmpty(logFolderPath))
                     {
                         mLogDirectoryPath = logFolderPath;
@@ -387,6 +394,7 @@ namespace MASIC
                 if (commandLineParser.RetrieveValueForParameter("CreateParamFile", out var exampleParamFilePath))
                 {
                     mCreateParamFile = true;
+
                     if (!string.IsNullOrEmpty(exampleParamFilePath))
                     {
                         mExampleParamFilePath = exampleParamFilePath;
@@ -540,6 +548,7 @@ namespace MASIC
             {
                 mProgressForm.UpdateCurrentTask(mMASIC.ProgressStepDescription);
                 mProgressForm.UpdateProgressBar(percentComplete);
+
                 if (mProgressForm.KeyPressAbortProcess)
                 {
                     mMASIC.AbortProcessingNow();
@@ -581,6 +590,7 @@ namespace MASIC
             {
                 mProgressForm.UpdateCurrentSubTask(mMASIC.SubtaskDescription);
                 mProgressForm.UpdateSubtaskProgressBar(mMASIC.SubtaskProgressPercentComplete);
+
                 if (mProgressForm.KeyPressAbortProcess)
                 {
                     mMASIC.AbortProcessingNow();

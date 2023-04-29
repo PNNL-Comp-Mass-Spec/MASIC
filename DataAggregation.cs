@@ -73,6 +73,7 @@ namespace MASIC
                     }
 
                     var testDifference = Math.Abs(msSpectrum.IonsMZ[ionIndex] - searchMZ);
+
                     if (testDifference < smallestDifference)
                     {
                         smallestDifference = testDifference;
@@ -269,11 +270,13 @@ namespace MASIC
             var rightDone = false;
 
             var indexMidpoint = (matchIndexStart + matchIndexEnd) / 2;
+
             if (indexMidpoint == matchIndexStart)
             {
                 // Min and Max are next to each other
                 if (Math.Abs(searchValue - dataValues[matchIndexStart]) > toleranceHalfWidth)
                     matchIndexStart = matchIndexEnd;
+
                 if (Math.Abs(searchValue - dataValues[matchIndexEnd]) > toleranceHalfWidth)
                     matchIndexEnd = indexMidpoint;
                 return;
@@ -295,9 +298,11 @@ namespace MASIC
             {
                 // Inside range; figure out the borders
                 var leftIndex = indexMidpoint;
+
                 do
                 {
                     leftIndex--;
+
                     if (leftIndex < matchIndexStart)
                     {
                         leftDone = true;
@@ -314,6 +319,7 @@ namespace MASIC
                 do
                 {
                     rightIndex++;
+
                     if (rightIndex > matchIndexEnd)
                     {
                         rightDone = true;

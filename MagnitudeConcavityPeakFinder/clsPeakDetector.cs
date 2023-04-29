@@ -169,6 +169,7 @@ namespace MagnitudeConcavityPeakFinder
 
             var intensityData = new double[xyData.Count];
             var scanNumbers = new int[xyData.Count];
+
             for (var index = 0; index < xyData.Count; index++)
             {
                 scanNumbers[index] = xyData[index].Key;
@@ -256,6 +257,7 @@ namespace MagnitudeConcavityPeakFinder
 
                 // Add this intensity to potentialPeakArea
                 potentialPeakArea += value;
+
                 if (queIntensityList.Count >= peakFinderOptions.InitialPeakWidthScansMaximum)
                 {
                     // Decrement potentialPeakArea by the oldest item in the queue
@@ -327,11 +329,13 @@ namespace MagnitudeConcavityPeakFinder
             var minimumPositiveValue = FindMinimumPositiveValue(xyData, 1.0);
 
             int index;
+
             for (index = 0; index < xyData.Count; index++)
             {
                 // If this data point is > .MinimumBaselineNoiseLevel, add this intensity to potentialPeakArea
                 //  and increment validPeakCount
                 var intensityToUse = Math.Max(minimumPositiveValue, xyData[index].Value);
+
                 if (intensityToUse >= udtSICPeakFinderOptions.SICBaselineNoiseOptions.MinimumBaselineNoiseLevel)
                 {
                     potentialPeakArea += intensityToUse;
@@ -401,6 +405,7 @@ namespace MagnitudeConcavityPeakFinder
         public void TestPeakFinder(string dataFilePath, SICPeakFinderOptionsType peakFinderOptions)
         {
             var dataFile = new FileInfo(dataFilePath);
+
             if (!dataFile.Exists)
             {
                 Console.WriteLine("File not found: " + dataFile.FullName);
@@ -414,10 +419,12 @@ namespace MagnitudeConcavityPeakFinder
                 while (!reader.EndOfStream)
                 {
                     var dataLine = reader.ReadLine();
+
                     if (string.IsNullOrWhiteSpace(dataLine))
                         continue;
 
                     var dataCols = dataLine.Split('\t');
+
                     if (dataCols.Length < 2)
                         continue;
 
@@ -442,6 +449,7 @@ namespace MagnitudeConcavityPeakFinder
 
             // Display the peaks
             var peakNumber = 0;
+
             foreach (var peak in detectedPeaks)
             {
                 peakNumber++;
@@ -472,9 +480,11 @@ namespace MagnitudeConcavityPeakFinder
             var outputData = new List<string>(50);
 
             writer.Write("Scan\tIntensity\tSmoothedIntensity\t");
+
             for (var peakIndex = 0; peakIndex < detectedPeaks.Count; peakIndex++)
             {
                 writer.Write("Peak " + (peakIndex + 1));
+
                 if (peakIndex < detectedPeaks.Count - 1)
                 {
                     writer.Write("\t");
@@ -512,6 +522,7 @@ namespace MagnitudeConcavityPeakFinder
                     for (var columnIndex = 0; columnIndex < outputData.Count; columnIndex++)
                     {
                         writer.Write(outputData[columnIndex]);
+
                         if (columnIndex < outputData.Count - 1)
                         {
                             writer.Write("\t");
@@ -589,6 +600,7 @@ namespace MagnitudeConcavityPeakFinder
 
             // Make sure one of the peaks is within 1 of the original peak location
             var blnSuccess = false;
+
             foreach (var peak in peakData.Peaks)
             {
                 if (peak.PeakLocation - peakData.OriginalPeakLocationIndex <= 1)
@@ -621,6 +633,7 @@ namespace MagnitudeConcavityPeakFinder
             bool dataIsSmoothed)
         {
             var stepOverIncreaseCount = 0;
+
             while (peak.LeftEdge > 0)
             {
                 if (peakData.SmoothedYData[peak.LeftEdge - 1] <
@@ -684,6 +697,7 @@ namespace MagnitudeConcavityPeakFinder
             bool dataIsSmoothed)
         {
             var stepOverIncreaseCount = 0;
+
             while (peak.RightEdge < peakData.DataCount - 1)
             {
                 if (peakData.SmoothedYData[peak.RightEdge + 1] < peakData.SmoothedYData[peak.RightEdge])
@@ -904,6 +918,7 @@ namespace MagnitudeConcavityPeakFinder
                 ExpandPeakRightEdge(peakData, peakFinderOptions, peak, peakMaximum, dataIsSmoothed);
 
                 peak.PeakIsValid = true;
+
                 if (!peakFinderOptions.ReturnClosestPeak)
                 {
                     continue;
@@ -938,6 +953,7 @@ namespace MagnitudeConcavityPeakFinder
             // Find the peak with the largest area that has peakData.PeakIsValid = True
             peakData.BestPeak = null;
             var bestPeakArea = double.MinValue;
+
             foreach (var peak in peakData.Peaks)
             {
                 if (peak.PeakIsValid)
@@ -1001,6 +1017,7 @@ namespace MagnitudeConcavityPeakFinder
 
             // Filter the data with a Butterworth filter (.UseButterworthSmooth takes precedence over .UseSavitzkyGolaySmooth)
             float butterWorthFrequency;
+
             if (peakFinderOptions.SelectedIonMonitoringDataIsPresent && peakFinderOptions.ButterworthSamplingFrequencyDoubledForSIMData)
             {
                 butterWorthFrequency = peakFinderOptions.ButterworthSamplingFrequency * 2;
@@ -1014,6 +1031,7 @@ namespace MagnitudeConcavityPeakFinder
             var endIndex = dataCount - 1;
 
             var success = dataFilter.ButterworthFilter(smoothedYData, startIndex, endIndex, butterWorthFrequency);
+
             if (!success)
             {
                 Console.WriteLine("Error with the Butterworth filter" + errorMessage);
@@ -1025,6 +1043,7 @@ namespace MagnitudeConcavityPeakFinder
             if (butterWorthFrequency > 0)
             {
                 var peakWidthPointsCompare = (int)Math.Round(1 / butterWorthFrequency, 0);
+
                 if (peakWidthPointsMinimum < peakWidthPointsCompare)
                 {
                     peakWidthPointsMinimum = peakWidthPointsCompare;
@@ -1045,6 +1064,7 @@ namespace MagnitudeConcavityPeakFinder
 
             // Filter the data with a Savitzky Golay filter
             var filterThirdWidth = (int)Math.Floor(peakWidthPointsMinimum / 3.0);
+
             if (filterThirdWidth > 3)
                 filterThirdWidth = 3;
 

@@ -346,6 +346,7 @@ namespace MASIC.DataInput
                 var datasetID = mOptions.SICOptions.DatasetID;
 
                 var fileStatsSuccess = UpdateDatasetFileStats(msXmlFileInfo, datasetID);
+
                 if (!fileStatsSuccess)
                 {
                     return false;
@@ -380,6 +381,7 @@ namespace MASIC.DataInput
                     {
                         // ScanCount property isn't populated until first spectrum is read.
                         var scanCount = mOptions.SICOptions.ScanRangeCount;
+
                         if (scanCount <= 0)
                         {
                             scanCount = xmlReader.ScanCount;
@@ -481,6 +483,7 @@ namespace MASIC.DataInput
                 fileOpened = true;
 
                 var fileStatsSuccess = UpdateDatasetFileStats(mzMLFile, datasetID, mzMLReader);
+
                 if (!fileStatsSuccess)
                 {
                     return false;
@@ -510,6 +513,7 @@ namespace MASIC.DataInput
                 if (mzMLReader.NumSpectra > 0)
                 {
                     var scansEst = mOptions.SICOptions.ScanRangeCount;
+
                     if (scansEst <= 0)
                     {
                         scansEst = mzMLReader.NumSpectra;
@@ -733,6 +737,7 @@ namespace MASIC.DataInput
                     continue;
 
                 var isSRM = IsSrmChromatogram(chromatogramItem);
+
                 if (!isSRM)
                     continue;
 
@@ -757,6 +762,7 @@ namespace MASIC.DataInput
                     if (i > 0)
                     {
                         var adjacentTimeDiff = scanTimes[i] - scanTimes[i - 1];
+
                         if (adjacentTimeDiff > 0)
                         {
                             scanTimeDiffs.Add(adjacentTimeDiff);
@@ -776,6 +782,7 @@ namespace MASIC.DataInput
 
             // First, compute the overall median time difference, e.g. 0.0216
             var medianScanTimeDiff = Utilities.ComputeMedian(scanTimeDiffMedians);
+
             if (Math.Abs(medianScanTimeDiff) < 0.000001)
             {
                 medianScanTimeDiff = 0.000001;
@@ -804,6 +811,7 @@ namespace MASIC.DataInput
                 // nearestPseudoScan will be 0.00461 / 0.0216 * 100 + 1 = 22
 
                 var elutionTimeToScanMap = chromatogramTimeEntry.Value;
+
                 foreach (var elutionTime in elutionTimeToScanMap.Keys.ToList())
                 {
                     var nearestPseudoScan = (int)Math.Round(elutionTime / medianScanTimeDiff * 100) + 1;
@@ -890,6 +898,7 @@ namespace MASIC.DataInput
             foreach (var chromatogramItem in mzMLReader2.ReadAllChromatograms(true))
             {
                 var isSRM = IsSrmChromatogram(chromatogramItem);
+
                 if (!isSRM)
                     continue;
 
@@ -925,6 +934,7 @@ namespace MASIC.DataInput
                     else
                     {
                         scanTimeLookupErrors++;
+
                         if (scanTimeLookupErrors <= 5 || scanTimeLookupErrors >= nextWarningThreshold)
                         {
                             ConsoleMsgUtils.ShowWarning(
@@ -1235,6 +1245,7 @@ namespace MASIC.DataInput
             UpdateMSXmlScanType(scanInfo, spectrumInfo.MSLevel, "MSn", mzXmlSourceSpectrum);
 
             var mrmScanType = scanInfo.MRMScanType;
+
             if (mrmScanType != MRMScanTypeConstants.NotMRM)
             {
                 // This is an MRM scan
@@ -1250,6 +1261,7 @@ namespace MASIC.DataInput
                 // In contrast, scanInfo.ScanHeaderText has a truncated filter string, e.g. "+ c NSI SRM ms2"
 
                 var filterString = GetFilterString(mzMLSpectrum);
+
                 if (string.IsNullOrWhiteSpace(filterString))
                 {
                     mrmScan.FilterText = scanInfo.ScanHeaderText;
@@ -1275,6 +1287,7 @@ namespace MASIC.DataInput
                         // We cannot currently handle data like this
                         // (would need to examine the mass values and find the clumps of data to infer the transitions present)
                         mWarnCount++;
+
                         if (mWarnCount <= 5)
                         {
                             ReportError(
@@ -1580,6 +1593,7 @@ namespace MASIC.DataInput
             if (string.IsNullOrWhiteSpace(filterString) || !isThermoRawFile)
             {
                 var matchingParams = mzMLSpectrum.GetCVParamsChildOf(CV.CVID.MS_spectrum_type);
+
                 if (matchingParams.Count > 0)
                 {
                     mzXmlSourceSpectrum.ScanType = matchingParams.First().TermInfo.Name;

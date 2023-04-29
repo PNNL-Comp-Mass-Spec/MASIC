@@ -499,6 +499,7 @@ namespace MASIC.DataOutput
                 using var writer = new StreamWriter(new FileStream(outputFilePath, FileMode.Create, FileAccess.Write, FileShare.ReadWrite));
 
                 writer.WriteLine("{0}\t{1}", dataColumnHeader, "Count");
+
                 foreach (var dataPoint in histogramData)
                 {
                     writer.WriteLine("{0:0.0#}\t{1}", dataPoint.Key, dataPoint.Value);
@@ -540,6 +541,7 @@ namespace MASIC.DataOutput
                 };
 
                 var columnWidths = new Dictionary<string, int>();
+
                 foreach (var item in statNames)
                 {
                     var columnWidth = Math.Max(10, (item + statNameSuffixTopNPct).Length);
@@ -614,6 +616,7 @@ namespace MASIC.DataOutput
                 var observationRateHighAbundance = string.Format("Observation_Rate_Top{0}Pct", Options.PlotOptions.ReporterIonObservationRateTopNPct);
 
                 writer.WriteLine("{0}\t{1}\t{2}", "Reporter_Ion", "Observation_Rate", observationRateHighAbundance);
+
                 foreach (var reporterIonIndex in reporterIonNames.Keys)
                 {
                     writer.WriteLine("{0,-12}\t{1,-16:0.0##}\t{2:0.0##}",

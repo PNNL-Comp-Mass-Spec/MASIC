@@ -66,6 +66,7 @@
             {
                 if (value < 2)
                     value = 10;
+
                 if (value > 1000000)
                     value = 1000000;
                 mMaximumBinCount = value;

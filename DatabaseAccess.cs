@@ -63,6 +63,7 @@ namespace MASIC
             if (!string.IsNullOrWhiteSpace(mOptions.DatabaseConnectionString))
             {
                 var datasetFoundInDB = GetDatasetIDFromDatabase(mOptions, datasetName, out newDatasetID);
+
                 if (datasetFoundInDB)
                 {
                     return newDatasetID;
@@ -72,6 +73,7 @@ namespace MASIC
             if (!string.IsNullOrWhiteSpace(datasetLookupFilePath))
             {
                 var datasetFoundInFile = GetDatasetIDFromFile(datasetLookupFilePath, datasetName, out newDatasetID);
+
                 if (datasetFoundInFile)
                 {
                     return newDatasetID;
@@ -130,6 +132,7 @@ namespace MASIC
                     }
 
                     var success = dbTools.GetQueryResults(sqlQuery, out var results);
+
                     if (success)
                     {
                         // Find the row in the lstResults that matches fileNameCompare
@@ -203,6 +206,7 @@ namespace MASIC
                 while (!reader.EndOfStream)
                 {
                     var dataLine = reader.ReadLine();
+
                     if (string.IsNullOrWhiteSpace(dataLine))
                     {
                         continue;
@@ -214,6 +218,7 @@ namespace MASIC
                     }
 
                     var dataValues = dataLine.Split(delimiterList);
+
                     if (dataValues.Length < 2)
                     {
                         continue;

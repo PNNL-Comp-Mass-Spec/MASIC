@@ -156,9 +156,11 @@ namespace MASIC.Plots
                 xAxisLabels.Add(dataPoint.Label);
 
                 OxyColor colorToUse;
+
                 if (colorMap.Count > 0 && maxIntensity > 0)
                 {
                     var colorIndex = (int)Math.Round(dataPoint.Value * colorMap.Count / maxIntensity, 0) - 1;
+
                     if (colorIndex < 0)
                     {
                         colorIndex = 0;
@@ -288,6 +290,7 @@ namespace MASIC.Plots
             {
                 DeleteTempFiles = Options.DeleteTempFiles
             };
+
             RegisterEvents(plotContainer);
 
             plotContainer.SetData(points);
@@ -343,6 +346,7 @@ namespace MASIC.Plots
                 };
 
                 var successCount = 0;
+
                 foreach (var colorGradient in colorGradients)
                 {
                     var yAxisInfo = new AxisInfo(YAxisLabel)
@@ -375,6 +379,7 @@ namespace MASIC.Plots
                     }
 
                     var success = barChart.SaveToPNG(pngFile, 1024, 600, 96);
+
                     if (success)
                         successCount++;
                 }
@@ -442,6 +447,7 @@ namespace MASIC.Plots
                 {
                     throw new Exception("Bar chart data list is empty; cannot retrieve data point at index " + index);
                 }
+
                 if (index < 0 || index >= DataPoints.Count)
                 {
                     throw new Exception("Bar chart data index out of range: " + index + "; should be between 0 and " + (DataPoints.Count - 1));

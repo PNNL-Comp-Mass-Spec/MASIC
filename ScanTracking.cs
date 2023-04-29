@@ -136,6 +136,7 @@ namespace MASIC
                 if (msSpectrum.IonsIntensity[index] < float.Epsilon)
                 {
                     var countCombined = 0;
+
                     for (var comparisonIndex = index + 1; comparisonIndex < msSpectrum.IonCount; comparisonIndex++)
                     {
                         if (msSpectrum.IonsIntensity[comparisonIndex] < float.Epsilon)

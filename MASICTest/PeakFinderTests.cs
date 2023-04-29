@@ -75,6 +75,7 @@ namespace MASICTest
 
             // Call the overloaded variant that accepts the number of data points
             values.Clear();
+
             for (var i = 1; i <= 20; i++)
             {
                 var intensity = i - 3.5;

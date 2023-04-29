@@ -92,6 +92,7 @@ namespace MASIC.DataOutput
                 // The first scan number is given by SICScanIndices(0)
 
                 byte[] SICDataScanIntervals;
+
                 if (sicDetails.SICDataCount == 0)
                 {
                     SICDataScanIntervals = new byte[1];
@@ -112,6 +113,7 @@ namespace MASIC.DataOutput
                 }
 
                 var writer = dataOutputHandler.OutputFileHandles.XMLFileForSICs;
+
                 if (writer == null)
                     return false;
 
@@ -247,6 +249,7 @@ namespace MASIC.DataOutput
 
                         lastGoodLoc = "Populate scanIntervalList";
                         var scanIntervalList = string.Empty;
+
                         if (SICDataScanIntervals != null)
                         {
                             for (var scanIntervalIndex = 0; scanIntervalIndex < sicDetails.SICDataCount; scanIntervalIndex++)
@@ -452,6 +455,7 @@ namespace MASIC.DataOutput
             float processingTimeSec)
         {
             var writer = dataOutputHandler.OutputFileHandles.XMLFileForSICs;
+
             if (writer == null)
                 return false;
 
@@ -683,10 +687,12 @@ namespace MASIC.DataOutput
 
             // Look for the "<" after the number
             var charIndex = work.IndexOf("<", StringComparison.Ordinal);
+
             if (charIndex > 0)
             {
                 // Isolate the number
                 work = work.Substring(0, charIndex);
+
                 if (Utilities.IsNumber(work))
                 {
                     var currentValue = int.Parse(work);
@@ -743,9 +749,11 @@ namespace MASIC.DataOutput
 
                     var parentIonIndex = -1;
                     var parentIonsProcessed = 0;
+
                     while (!reader.EndOfStream)
                     {
                         var dataLine = reader.ReadLine();
+
                         if (dataLine == null)
                             continue;
 
@@ -754,13 +762,16 @@ namespace MASIC.DataOutput
                         if (dataLineLCase.StartsWith(PARENT_ION_TAG_START_LOWER))
                         {
                             var charIndex = dataLineLCase.IndexOf(INDEX_ATTRIBUTE_LOWER, StringComparison.CurrentCultureIgnoreCase);
+
                             if (charIndex > 0)
                             {
                                 var work = dataLineLCase.Substring(charIndex + INDEX_ATTRIBUTE_LOWER.Length + 1);
                                 charIndex = work.IndexOf('"');
+
                                 if (charIndex > 0)
                                 {
                                     work = work.Substring(0, charIndex);
+
                                     if (Utilities.IsNumber(work))
                                     {
                                         parentIonIndex = int.Parse(work);

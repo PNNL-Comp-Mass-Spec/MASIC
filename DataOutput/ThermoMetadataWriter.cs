@@ -36,6 +36,7 @@ namespace MASIC.DataOutput
                 for (var index = 0; index < instMethodCount; index++)
                 {
                     string methodNum;
+
                     if (index == 0 && rawFileReader.FileInfo.InstMethods.Count == 1)
                     {
                         methodNum = string.Empty;
@@ -96,6 +97,7 @@ namespace MASIC.DataOutput
                 for (var index = 0; index < tuneMethodCount; index++)
                 {
                     string tuneInfoNum;
+
                     if (index == 0 && rawFileReader.FileInfo.TuneMethods.Count == 1)
                     {
                         tuneInfoNum = string.Empty;

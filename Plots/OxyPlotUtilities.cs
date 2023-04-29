@@ -19,6 +19,7 @@ namespace MASIC.Plots
             myPlot.Axes.Add(yAxis);
 
             string yAxisFormatString;
+
             if (yAxisInfo.TickLabelsArePercents)
             {
                 // The left y-axis ignores attempts to display values as a percentage

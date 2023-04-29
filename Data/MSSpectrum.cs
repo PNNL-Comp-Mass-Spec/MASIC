@@ -88,9 +88,11 @@ namespace MASIC.Data
         {
             IonsMZ.Clear();
             IonsIntensity.Clear();
+
             if (newCapacity > 0)
             {
                 var currentCapacity = IonsMZ.Capacity;
+
                 if (newCapacity < currentCapacity / 2)
                 {
                     currentCapacity = newCapacity;
@@ -127,6 +129,7 @@ namespace MASIC.Data
         public void ReplaceData(MSSpectrum spectrum, int scanNumberOverride)
         {
             ScanNumber = spectrum.ScanNumber;
+
             if (ScanNumber != scanNumberOverride)
             {
                 ScanNumber = scanNumberOverride;
@@ -157,6 +160,7 @@ namespace MASIC.Data
             }
 
             var countToRemove = IonsMZ.Count - ionCountNew;
+
             if (countToRemove == 0)
                 return;
 

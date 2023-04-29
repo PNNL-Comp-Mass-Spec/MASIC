@@ -106,11 +106,13 @@ namespace MASIC
             var rightDone = false;
 
             var indexMidpoint = (matchIndexStart + matchIndexEnd) / 2;
+
             if (indexMidpoint == matchIndexStart)
             {
                 // Min and Max are next to each other
                 if (Math.Abs(searchValue - mDataInt[matchIndexStart]) > toleranceHalfWidth)
                     matchIndexStart = matchIndexEnd;
+
                 if (Math.Abs(searchValue - mDataInt[matchIndexEnd]) > toleranceHalfWidth)
                     matchIndexEnd = indexMidpoint;
                 return;
@@ -132,9 +134,11 @@ namespace MASIC
             {
                 // Inside range; figure out the borders
                 var leftIndex = indexMidpoint;
+
                 do
                 {
                     leftIndex--;
+
                     if (leftIndex < matchIndexStart)
                     {
                         leftDone = true;
@@ -147,9 +151,11 @@ namespace MASIC
                 while (!leftDone);
 
                 var rightIndex = indexMidpoint;
+
                 do
                 {
                     rightIndex++;
+
                     if (rightIndex > matchIndexEnd)
                     {
                         rightDone = true;
@@ -179,11 +185,13 @@ namespace MASIC
             var rightDone = false;
 
             var indexMidpoint = (matchIndexStart + matchIndexEnd) / 2;
+
             if (indexMidpoint == matchIndexStart)
             {
                 // Min and Max are next to each other
                 if (Math.Abs(searchValue - mDataSingle[matchIndexStart]) > toleranceHalfWidth)
                     matchIndexStart = matchIndexEnd;
+
                 if (Math.Abs(searchValue - mDataSingle[matchIndexEnd]) > toleranceHalfWidth)
                     matchIndexEnd = indexMidpoint;
                 return;
@@ -205,9 +213,11 @@ namespace MASIC
             {
                 // Inside range; figure out the borders
                 var leftIndex = indexMidpoint;
+
                 do
                 {
                     leftIndex--;
+
                     if (leftIndex < matchIndexStart)
                     {
                         leftDone = true;
@@ -220,9 +230,11 @@ namespace MASIC
                 while (!leftDone);
 
                 var rightIndex = indexMidpoint;
+
                 do
                 {
                     rightIndex++;
+
                     if (rightIndex > matchIndexEnd)
                     {
                         rightDone = true;
@@ -252,11 +264,13 @@ namespace MASIC
             var rightDone = false;
 
             var indexMidpoint = (matchIndexStart + matchIndexEnd) / 2;
+
             if (indexMidpoint == matchIndexStart)
             {
                 // Min and Max are next to each other
                 if (Math.Abs(searchValue - mDataDouble[matchIndexStart]) > toleranceHalfWidth)
                     matchIndexStart = matchIndexEnd;
+
                 if (Math.Abs(searchValue - mDataDouble[matchIndexEnd]) > toleranceHalfWidth)
                     matchIndexEnd = indexMidpoint;
                 return;
@@ -278,9 +292,11 @@ namespace MASIC
             {
                 // Inside range; figure out the borders
                 var leftIndex = indexMidpoint;
+
                 do
                 {
                     leftIndex--;
+
                     if (leftIndex < matchIndexStart)
                     {
                         leftDone = true;
@@ -293,9 +309,11 @@ namespace MASIC
                 while (!leftDone);
 
                 var rightIndex = indexMidpoint;
+
                 do
                 {
                     rightIndex++;
+
                     if (rightIndex > matchIndexEnd)
                     {
                         rightDone = true;
@@ -767,6 +785,7 @@ namespace MASIC
             try
             {
                 var index = Array.IndexOf(mPointerIndices, indexOriginal);
+
                 if (index >= 0)
                 {
                     switch (mDataType)

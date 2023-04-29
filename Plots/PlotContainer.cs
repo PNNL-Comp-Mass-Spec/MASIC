@@ -163,6 +163,7 @@ namespace MASIC.Plots
                         }
 
                         var success = SaveToFile(newFileInfo, fileFormat, width, height, resolution);
+
                         if (success)
                             successOverall = true;
 
@@ -195,6 +196,7 @@ namespace MASIC.Plots
             var plotBitmap = ExportToBitMap(Plot, width, height, resolution);
 
             var drawVisual = new DrawingVisual();
+
             using (var drawContext = drawVisual.RenderOpen())
             {
                 var myCanvas = new Rect(0, 0, width, height);
@@ -257,6 +259,7 @@ namespace MASIC.Plots
             var colorGradients = new Dictionary<string, OxyPalette> {
                 {gradientName, colorGradient}
             };
+
             AddGradients(colorGradients);
         }
 

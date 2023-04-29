@@ -55,6 +55,7 @@ namespace MASIC.DataInput
             var chargeState = 0;
 
             scanInfo.TryGetScanEvent(SCAN_EVENT_CHARGE_STATE, out var chargeStateText, true);
+
             if (!string.IsNullOrWhiteSpace(chargeStateText))
             {
                 if (!int.TryParse(chargeStateText, out chargeState))
@@ -162,6 +163,7 @@ namespace MASIC.DataInput
             {
                 ScanInfoCacheMaxSize = 0    // Don't cache scanInfo objects
             };
+
             RegisterEvents(rawFileReader);
 
             mBpiUpdateCount = 0;
@@ -226,6 +228,7 @@ namespace MASIC.DataInput
                 var scanCountToRead = Math.Max(1, scanEnd - scanStart + 1);
 
                 var scansEst = mOptions.SICOptions.ScanRangeCount;
+
                 if (scansEst <= 0)
                 {
                     scansEst = scanCountToRead;
@@ -415,6 +418,7 @@ namespace MASIC.DataInput
             // Store the collision mode and possibly the scan filter text
             scanInfo.FragScanInfo.CollisionMode = thermoScanInfo.CollisionMode;
             StoreExtendedHeaderInfo(dataOutputHandler, scanInfo, ExtendedStatsWriter.EXTENDED_STATS_HEADER_COLLISION_MODE, thermoScanInfo.CollisionMode);
+
             if (mOptions.WriteExtendedStatsIncludeScanFilterText)
             {
                 StoreExtendedHeaderInfo(dataOutputHandler, scanInfo, ExtendedStatsWriter.EXTENDED_STATS_HEADER_SCAN_FILTER_TEXT, thermoScanInfo.FilterText);
@@ -515,6 +519,7 @@ namespace MASIC.DataInput
             if (scanList.FragScans.Count > 0)
             {
                 var prevFragScan = scanList.FragScans[scanList.FragScans.Count - 1];
+
                 if (prevFragScan.ScanNumber == scanInfo.ScanNumber - 1)
                 {
                     if (scanInfo.FragScanInfo.FragScanNumber <= prevFragScan.FragScanInfo.FragScanNumber)
@@ -658,6 +663,7 @@ namespace MASIC.DataInput
                 if (scanInfo.IonCountRaw > 0)
                 {
                     var ionCountVerified = VerifyDataSorted(scanInfo.ScanNumber, scanInfo.IonCountRaw, mzList, intensityList);
+
                     if (ionCountVerified != scanInfo.IonCountRaw)
                     {
                         scanInfo.IonCountRaw = ionCountVerified;
@@ -685,6 +691,7 @@ namespace MASIC.DataInput
                 for (var ionIndex = 0; ionIndex < scanInfo.IonCountRaw; ionIndex++)
                 {
                     totalIonIntensity += intensityList[ionIndex];
+
                     if (intensityList[ionIndex] > basePeakIntensity)
                     {
                         basePeakIntensity = intensityList[ionIndex];
@@ -871,9 +878,11 @@ namespace MASIC.DataInput
                     }
 
                     bool saveItem;
+
                     if (filterItems)
                     {
                         saveItem = false;
+
                         foreach (var item in keyNameFilterList)
                         {
                             if (statusEntry.Key.IndexOf(item, StringComparison.OrdinalIgnoreCase) >= 0)
