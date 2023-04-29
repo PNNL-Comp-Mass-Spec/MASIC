@@ -203,12 +203,10 @@ namespace MASIC
                 // Look for .MZ in the survey scan, using a tolerance of parentIonTolerance
                 // If found, update the mass to the matched ion
                 // This is done to determine the parent ion mass more precisely
-                if (sicOptions.RefineReportedParentIonMZ)
+                if (sicOptions.RefineReportedParentIonMZ &&
+                    FindClosestMZ(spectraCache, scanList.SurveyScans, surveyScanIndex, parentIonMZ, parentIonTolerance, out var parentIonMZMatch))
                 {
-                    if (FindClosestMZ(spectraCache, scanList.SurveyScans, surveyScanIndex, parentIonMZ, parentIonTolerance, out var parentIonMZMatch))
-                    {
-                        newParentIon.UpdateMz(parentIonMZMatch);
-                    }
+                    newParentIon.UpdateMz(parentIonMZMatch);
                 }
 
                 scanList.ParentIons.Add(newParentIon);
