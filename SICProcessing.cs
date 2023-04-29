@@ -55,7 +55,12 @@ namespace MASIC
             for (var parentIonIndex = 0; parentIonIndex < scanList.ParentIons.Count; parentIonIndex++)
             {
                 bool includeParentIon;
-                if (scanList.ParentIons[parentIonIndex].MRMDaughterMZ > 0)
+
+                if (scanList.ParentIons[parentIonIndex].IsDIA)
+                {
+                    includeParentIon = false;
+                }
+                else if (scanList.ParentIons[parentIonIndex].MRMDaughterMZ > 0)
                 {
                     includeParentIon = false;
                 }

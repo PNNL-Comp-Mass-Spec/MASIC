@@ -153,7 +153,7 @@ namespace MASIC
                 }
             }
 
-            if (parentIonMZ > 0)
+            if (parentIonMZ > 0 && !isDIA)
             {
                 var parentIonToleranceDa = GetParentIonToleranceDa(sicOptions, parentIonMZ, parentIonTolerance);
 
@@ -594,7 +594,11 @@ namespace MASIC
                 {
                     bool includeParentIon;
 
-                    if (scanList.ParentIons[index].MRMDaughterMZ > 0)
+                    if (scanList.ParentIons[index].IsDIA)
+                    {
+                        includeParentIon = false;
+                    }
+                    else if (scanList.ParentIons[index].MRMDaughterMZ > 0)
                     {
                         includeParentIon = false;
                     }
@@ -607,15 +611,15 @@ namespace MASIC
                         includeParentIon = true;
                     }
 
-                    if (includeParentIon)
-                    {
-                        similarParentIonsData.MZPointerArray[findSimilarIonsDataCount] = index;
-                        mzList[findSimilarIonsDataCount] = Math.Round(scanList.ParentIons[index].MZ, 2);
+                    if (!includeParentIon)
+                        continue;
 
-                        intensityPointerArray[findSimilarIonsDataCount] = index;
-                        intensityList[findSimilarIonsDataCount] = scanList.ParentIons[index].SICStats.Peak.MaxIntensityValue;
-                        findSimilarIonsDataCount++;
-                    }
+                    similarParentIonsData.MZPointerArray[findSimilarIonsDataCount] = index;
+                    mzList[findSimilarIonsDataCount] = Math.Round(scanList.ParentIons[index].MZ, 2);
+
+                    intensityPointerArray[findSimilarIonsDataCount] = index;
+                    intensityList[findSimilarIonsDataCount] = scanList.ParentIons[index].SICStats.Peak.MaxIntensityValue;
+                    findSimilarIonsDataCount++;
                 }
 
                 if (similarParentIonsData.MZPointerArray.Length != findSimilarIonsDataCount && findSimilarIonsDataCount > 0)
