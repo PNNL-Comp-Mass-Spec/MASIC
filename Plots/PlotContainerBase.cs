@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using PRISM;
-using PRISM.FileProcessor;
 
 namespace MASIC.Plots
 {

@@ -5,7 +5,6 @@ using System.Linq;
 using System.Threading;
 using MASIC.Options;
 using PRISM;
-using PRISM.FileProcessor;
 using PRISM.Logging;
 
 #if GUI
