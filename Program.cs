@@ -109,13 +109,7 @@ namespace MASIC
 
             try
             {
-                var proceed = false;
-
-                if (commandLineParser.ParseCommandLine())
-                {
-                    if (SetOptionsUsingCommandLineParameters(commandLineParser))
-                        proceed = true;
-                }
+                var proceed = commandLineParser.ParseCommandLine() && SetOptionsUsingCommandLineParameters(commandLineParser);
 
                 if (commandLineParser.ParameterCount + commandLineParser.NonSwitchParameterCount == 0 && !commandLineParser.NeedToShowHelp)
                 {
