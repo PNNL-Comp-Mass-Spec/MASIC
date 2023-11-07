@@ -34,7 +34,7 @@ import pandas as pd
 # Or we can use the uprint function shown below
 
 # Update the default font
-plt.rcParams['font.family'] = ['Arial', 'FreeSans', 'DejaVu Sans']
+plt.rcParams['font.family'] = ['Arial', 'Microsoft Sans Serif', 'Lucida Sans', 'Lucida Sans Unicode']
 
 
 def process_file(dataFilePath):
