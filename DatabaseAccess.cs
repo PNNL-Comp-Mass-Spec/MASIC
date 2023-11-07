@@ -114,7 +114,7 @@ namespace MASIC
 
                     if (string.IsNullOrEmpty(sqlQuery))
                     {
-                        sqlQuery = "Select dataset, id FROM V_Dataset_Export";
+                        sqlQuery = "SELECT dataset, id FROM V_Dataset_Export";
                     }
 
                     if (sqlQuery.StartsWith("SELECT dataset", StringComparison.OrdinalIgnoreCase))
