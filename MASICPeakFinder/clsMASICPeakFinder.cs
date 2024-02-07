@@ -125,7 +125,7 @@ namespace MASICPeakFinder
         /// 80%, 90%, 95%, 98%, 99%, 99.5%, 99.8%, 99.9%
         /// 1.886, 2.920, 4.303, 6.965, 9.925, 14.089, 22.327, 31.598
         /// </summary>
-        private readonly double[] TTestConfidenceLevels = new[] { 1.886, 2.92, 4.303, 6.965, 9.925, 14.089, 22.327, 31.598 };
+        private readonly double[] TTestConfidenceLevels = { 1.886, 2.92, 4.303, 6.965, 9.925, 14.089, 22.327, 31.598 };
 
         /// <summary>
         /// Program date

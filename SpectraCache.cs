@@ -595,11 +595,8 @@ namespace MASIC
 
             // All the spectra are stored in one large file
             // Lookup the byte offset for the given spectrum
-            if (ValidatePageFileIO(false) &&
-                mSpectrumByteOffset.ContainsKey(scanNumber))
+            if (ValidatePageFileIO(false) && mSpectrumByteOffset.TryGetValue(scanNumber, out var byteOffset))
             {
-                var byteOffset = mSpectrumByteOffset[scanNumber];
-
                 // Make sure all previous spectra are flushed to disk
                 mPageFileWriter.Flush();
 
