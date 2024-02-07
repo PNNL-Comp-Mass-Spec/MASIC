@@ -28,8 +28,7 @@
     <Optimize>false</Optimize>
     <OutputPath>bin\Console\Debug\</OutputPath>
     <DocumentationFile>bin\Console\Debug\MASIC_Console.xml</DocumentationFile>
-    <NoWarn>
-    </NoWarn>
+    <NoWarn>IDE0028, IDE0300</NoWarn>
     <Prefer32Bit>false</Prefer32Bit>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
@@ -41,8 +40,7 @@
     <Optimize>true</Optimize>
     <OutputPath>bin\Console\Release\</OutputPath>
     <DocumentationFile>bin\Console\Release\MASIC_Console.xml</DocumentationFile>
-    <NoWarn>
-    </NoWarn>
+    <NoWarn>IDE0028, IDE0300</NoWarn>
     <Prefer32Bit>false</Prefer32Bit>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
