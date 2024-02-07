@@ -9,7 +9,7 @@
 
         /// <summary>
         /// Area; Zeroth central moment (m0)
-        /// Using baseline-corrected intensities unless all of the data is below the baseline;
+        /// Using baseline-corrected intensities unless all the data is below the baseline;
         /// if that's the case, use the 3 points surrounding the peak apex
         /// </summary>
         public double Area { get; set; }

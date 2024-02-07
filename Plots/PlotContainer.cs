@@ -15,6 +15,8 @@ using LinearColorAxis = OxyPlot.Axes.LinearColorAxis;
 
 namespace MASIC.Plots
 {
+    // Ignore Spelling: JPG, MASIC
+
     /// <summary>
     /// OxyPlot container
     /// </summary>

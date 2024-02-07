@@ -16,6 +16,8 @@ namespace MASIC.DataOutput
     /// </summary>
     public class StatsSummarizer : EventNotifier
     {
+        // Ignore Spelling: MASIC
+
         private const string UNDEFINED_UNITS = "Undefined Units";
 
         private enum ReporterIonsColumns

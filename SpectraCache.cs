@@ -206,7 +206,7 @@ namespace MASIC
                 else if (cacheItem.CacheState == CacheStateConstants.NeverCached &&
                          ValidatePageFileIO(true))
                 {
-                    // Store all of the spectra in one large file
+                    // Store all the spectra in one large file
                     CacheSpectrumWork(cacheItem.Scan);
                 }
 
@@ -237,7 +237,7 @@ namespace MASIC
                     !DiskCachingAlwaysDisabled &&
                     ValidatePageFileIO(true))
                 {
-                    // Store all of the spectra in one large file
+                    // Store all the spectra in one large file
                     CacheSpectrumWork(spectrum);
 
                     CacheEventCount++;
@@ -593,7 +593,7 @@ namespace MASIC
             var success = false;
             msSpectrum.Clear();
 
-            // All of the spectra are stored in one large file
+            // All the spectra are stored in one large file
             // Lookup the byte offset for the given spectrum
             if (ValidatePageFileIO(false) &&
                 mSpectrumByteOffset.ContainsKey(scanNumber))

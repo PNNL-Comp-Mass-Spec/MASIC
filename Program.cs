@@ -34,7 +34,7 @@ namespace MASIC
     /// </summary>
     public static class Program
     {
-        // Ignore Spelling: bool
+        // Ignore Spelling: bool, MASIC
 
         /// <summary>
         /// Program date

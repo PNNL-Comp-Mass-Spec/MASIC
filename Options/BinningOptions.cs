@@ -49,7 +49,7 @@
         public bool Normalize { get; set; }
 
         /// <summary>
-        /// Sum all of the intensities for binned ions of the same bin together
+        /// Sum all the intensities for binned ions of the same bin together
         /// </summary>
         public bool SumAllIntensitiesForBin { get; set; }
 

@@ -31,7 +31,7 @@ namespace MASIC.DatasetStats
     /// </remarks>
     public class DatasetStatsSummarizer : EventNotifier
     {
-        // Ignore Spelling: AcqTime, yyyy-MM-dd, hh:mm:ss tt
+        // Ignore Spelling: AcqTime, MASIC, SEP, yyyy-MM-dd, hh:mm:ss tt
 
         /// <summary>
         /// Scan type stats separation character

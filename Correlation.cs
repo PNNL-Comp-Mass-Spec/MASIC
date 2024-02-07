@@ -138,7 +138,7 @@ namespace MASIC
         }
 
         /// <summary>
-        /// Sum all of the intensities for binned ions of the same bin together
+        /// Sum all the intensities for binned ions of the same bin together
         /// </summary>
         public bool SumAllIntensitiesForBin
         {
@@ -844,7 +844,7 @@ namespace MASIC
                 BinSize = 1,
                 IntensityPrecisionPercent = 1,
                 Normalize = false,
-                SumAllIntensitiesForBin = true,                     // Sum all of the intensities for binned ions of the same bin together
+                SumAllIntensitiesForBin = true,                     // Sum all the intensities for binned ions of the same bin together
                 MaximumBinCount = 100000
             };
         }

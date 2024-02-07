@@ -11,7 +11,7 @@ namespace MASIC
     /// </summary>
     public class DataAggregation : EventNotifier
     {
-        // Ignore Spelling: uncaching
+        // Ignore Spelling: MASIC, uncaching
 
         /// <summary>
         /// When returnMax is false, determine the sum of the data within the search mass tolerance

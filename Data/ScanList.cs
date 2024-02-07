@@ -9,6 +9,8 @@ namespace MASIC.Data
     /// </summary>
     public class ScanList : MasicEventNotifier
     {
+        // Ignore Spelling: frag, MASIC
+
         /// <summary>
         /// Scan types
         /// </summary>

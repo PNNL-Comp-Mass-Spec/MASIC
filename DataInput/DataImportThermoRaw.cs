@@ -16,6 +16,8 @@ namespace MASIC.DataInput
     /// </summary>
     public class DataImportThermoRaw : DataImport
     {
+        // Ignore Spelling: MASIC
+
         private const string SCAN_EVENT_CHARGE_STATE = "Charge State";
         private const string SCAN_EVENT_MONOISOTOPIC_MZ = "Monoisotopic M/Z";
         private const string SCAN_EVENT_MS2_ISOLATION_WIDTH = "MS2 Isolation Width";

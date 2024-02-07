@@ -13,6 +13,8 @@ namespace MASIC.DataOutput
     /// </summary>
     public class StatsPlotter : EventNotifier
     {
+        // Ignore Spelling: MASIC
+
         private readonly StatsSummarizer mStatsSummarizer;
 
         /// <summary>

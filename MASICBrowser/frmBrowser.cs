@@ -42,9 +42,9 @@ namespace MASICBrowser
     public partial class frmBrowser : Form
     {
         // ReSharper disable once CommentTypo
-        // Ignore Spelling: cancelled, const, Ctrl, frag, fragscan, Golay, Loc, resmooth, Savitzky, similarFragScan
+        // Ignore Spelling: cancelled, const, Ctrl, frag, fragscan, frm, Golay, Loc, resmooth, Savitzky, similarFragScan
 
-        private const string PROGRAM_DATE = "November 22, 2022";
+        private const string PROGRAM_DATE = "February 6, 2024";
 
         /// <summary>
         /// Constructor

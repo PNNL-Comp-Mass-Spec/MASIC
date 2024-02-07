@@ -42,8 +42,8 @@ namespace MASIC
     {
         // ReSharper disable CommentTypo
 
-        // Ignore Spelling: Acet, Acq, Acetylated, amine, Checkbox, Combobox, CrLf, csv, Da, dpi, fracking frmMain
-        // Ignore Spelling: Golay, immonium, iTraq, Lys, mzml, Orbitrap Savitzky, Textbox
+        // Ignore Spelling: Acet, Acq, Acetylated, amine, Checkbox, Combobox, CrLf, csv, Da, dpi, fracking frm, frmMain
+        // Ignore Spelling: Golay, immonium, iTraq, Lys, MASIC, mzml, Orbitrap Savitzky, Textbox
 
         // ReSharper restore CommentTypo
 

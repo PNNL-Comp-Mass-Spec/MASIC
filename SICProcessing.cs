@@ -13,6 +13,8 @@ namespace MASIC
     /// </summary>
     public class SICProcessing : MasicEventNotifier
     {
+        // Ignore Spelling: MASIC, mrm
+
         private const string CREATING_SICS = "Creating SIC's for parent ions";
 
         private readonly clsMASICPeakFinder mMASICPeakFinder;
@@ -715,7 +717,7 @@ namespace MASIC
                     {
                         // ---------------------------------------------------------
                         // Reached maxMZCountInChunk m/z value
-                        // Process all of the m/z values in udtMZSearchChunk
+                        // Process all the m/z values in udtMZSearchChunk
                         // ---------------------------------------------------------
 
                         var mzSearchChunkProgressFraction = mzSearchChunks.Count / (double)mzBinList.Count;

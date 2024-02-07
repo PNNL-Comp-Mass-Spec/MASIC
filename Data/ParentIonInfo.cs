@@ -7,6 +7,8 @@ namespace MASIC.Data
     /// </summary>
     public class ParentIonInfo
     {
+        // Ignore Spelling: acq, frag, MASIC
+
         /// <summary>
         /// Parent ion m/z value
         /// </summary>

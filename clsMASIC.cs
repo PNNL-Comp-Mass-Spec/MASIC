@@ -39,7 +39,7 @@ namespace MASIC
     /// </summary>
     public class clsMASIC : PRISM.FileProcessor.ProcessFilesBase
     {
-        // Ignore Spelling: Da, uncaching, OxyPlot, UnCache
+        // Ignore Spelling: cls, Da, Keypress, MASIC, MSMS, OxyPlot, UnCache, uncaching
 
         /// <summary>
         /// Constructor

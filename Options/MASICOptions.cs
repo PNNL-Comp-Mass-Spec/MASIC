@@ -14,7 +14,7 @@ namespace MASIC.Options
     /// <remarks>Set options through the Property Functions or by passing parameterFilePath to ProcessFile()</remarks>
     public class MASICOptions : MasicEventNotifier
     {
-        // Ignore Spelling: Butterworth, crosstab, Da, html, plex, SavitzkyGolay, Sql, Zeroes
+        // Ignore Spelling: Butterworth, crosstab, Da, html, MASIC, plex, SavitzkyGolay, Sql, Zeroes
 
         /// <summary>
         /// MASIC parameter file section with database settings

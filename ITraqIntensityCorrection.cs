@@ -1116,7 +1116,7 @@ namespace MASIC
                     throw new Exception("Invalid reporter ion mode in IntensityCorrection.InitializeCoefficients");
             }
 
-            // Now divide all of the weights by 100
+            // Now divide all the weights by 100
             for (var i = 0; i <= maxIndex; i++)
             {
                 for (var j = 0; j <= maxIndex; j++)

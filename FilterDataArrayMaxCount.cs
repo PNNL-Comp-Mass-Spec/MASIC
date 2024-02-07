@@ -14,6 +14,8 @@ namespace MASIC
     /// </remarks>
     public class FilterDataArrayMaxCount
     {
+        // Ignore Spelling: MASIC
+
         private const int INITIAL_MEMORY_RESERVE = 50000;
 
         private const float DEFAULT_SKIP_DATA_POINT_FLAG = -1;
@@ -443,7 +445,7 @@ namespace MASIC
                 {
                     // This shouldn't normally be necessary
 
-                    // We have to sort all of the data; this can be quite slow
+                    // We have to sort every data value; this can be quite slow
                     SortAndMarkPointsToSkip(mDataValues, mDataIndices, DataCount, MaximumDataCountToKeep, SUBTASK_STEP_COUNT);
                 }
 

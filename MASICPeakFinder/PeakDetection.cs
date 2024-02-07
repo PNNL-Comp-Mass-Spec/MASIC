@@ -260,13 +260,13 @@ namespace MASICPeakFinder
 
             if (thisPeakStartIndex < 0)
             {
-                // This will happen if the width is too large, or if not all of the peak's data was included in the data arrays
+                // This will happen if the width is too large, or if only a portion of the peak's data was included in the data arrays
                 thisPeakStartIndex = 0;
             }
 
             if (thisPeakEndIndex >= sourceDataCount)
             {
-                // This will happen if the width is too large, or if not all of the peak's data was included in the data arrays
+                // This will happen if the width is too large, or if only a portion of the peak's data was included in the data arrays
                 thisPeakEndIndex = sourceDataCount - 1;
             }
 

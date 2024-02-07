@@ -23,7 +23,7 @@ namespace MASICPeakFinder
     /// </summary>
     public class clsMASICPeakFinder : PRISM.EventNotifier
     {
-        // Ignore Spelling: Butterworth, fwhm, Golay, pdf, prepend, Savitzky, unsmoothed
+        // Ignore Spelling: Butterworth, cls, frag, fwhm, Golay, pdf, prepend, Savitzky, unsmoothed
 
         /// <summary>
         /// Program date
@@ -532,7 +532,7 @@ namespace MASICPeakFinder
         }
 
         /// <summary>
-        /// Computes the average of all of the data in dataList()
+        /// Computes the average of all the data in dataList()
         /// Next, discards the data above and below baselineNoiseOptions.DualTrimmedMeanStdDevLimits of the mean
         /// Finally, recomputes the average using the data that remains
         /// </summary>
@@ -1588,7 +1588,7 @@ namespace MASICPeakFinder
 
                     if (validDataIndexLeft >= dataCount - 1)
                     {
-                        // All of the data is <= intensityThreshold
+                        // All the data is <= intensityThreshold
                         useRawDataAroundMaximum = true;
                     }
                     else
@@ -2763,7 +2763,7 @@ namespace MASICPeakFinder
         /// <summary>
         /// Find peaks
         /// </summary>
-        /// <remarks>All of the identified peaks are returned in peaksContainer.Peaks(), regardless of whether they are valid or not</remarks>
+        /// <remarks>All the identified peaks are returned in peaksContainer.Peaks(), regardless of whether they are valid or not</remarks>
         /// <param name="peakDetector">peak detector object</param>
         /// <param name="scanNumbers">Scan numbers of the data tracked by peaksContainer</param>
         /// <param name="peaksContainer">Container object with XData, YData, SmoothedData, found Peaks, and various tracking properties</param>

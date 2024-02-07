@@ -8,6 +8,8 @@ namespace MASIC.Data
     /// </summary>
     public class ScanInfo
     {
+        // Ignore Spelling: frag, MASIC
+
         /// <summary>
         /// Ranges from 1 to the number of scans in the datafile
         /// </summary>
@@ -43,7 +45,7 @@ namespace MASIC.Data
         public double BasePeakIonIntensity { get; set; }
 
         /// <summary>
-        /// Intensity of all of the ions for this scan
+        /// Intensity of all the ions for this scan
         /// </summary>
         public double TotalIonIntensity { get; set; }
 
@@ -68,7 +70,7 @@ namespace MASIC.Data
         public MRMScanTypeConstants MRMScanType { get; set; }
 
         /// <summary>
-        /// For SIM scans, allows one to quickly find all of the SIM scans with the same mass range, since they'll all have the same SIMIndex
+        /// For SIM scans, allows one to quickly find all the SIM scans with the same mass range, since they'll all have the same SIMIndex
         /// </summary>
         public int SIMIndex { get; set; }
 

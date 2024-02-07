@@ -12,6 +12,8 @@ namespace MASIC
     /// </summary>
     public class ScanTracking : MasicEventNotifier
     {
+        // Ignore Spelling: MASIC
+
         /// <summary>
         /// Absolute maximum number of ions that will be tracked for a mass spectrum
         /// </summary>

@@ -6,7 +6,7 @@ namespace MASIC.Options
     /// </summary>
     public class PlotOptions
     {
-        // Ignore Spelling: \Username, usr
+        // Ignore Spelling: MASIC, \Username, usr
 
         /// <summary>
         /// When true, create plots using the SIC data

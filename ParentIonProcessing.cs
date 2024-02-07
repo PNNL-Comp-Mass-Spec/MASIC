@@ -11,7 +11,7 @@ namespace MASIC
     /// </summary>
     public class ParentIonProcessing : MasicEventNotifier
     {
-        // Ignore Spelling: Da, Daltons
+        // Ignore Spelling: Da, Daltons, frag, MASIC, mrm
 
         private readonly ReporterIons mReporterIons;
 

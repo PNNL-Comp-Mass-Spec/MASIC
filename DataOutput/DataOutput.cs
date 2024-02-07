@@ -13,7 +13,7 @@ namespace MASIC.DataOutput
     /// </summary>
     public class DataOutput : MasicEventNotifier
     {
-        // Ignore Spelling: crosstab
+        // Ignore Spelling: crosstab, frag, MASIC
 
         /// <summary>
         /// Scan stats file suffix
@@ -613,7 +613,7 @@ namespace MASIC.DataOutput
 
                         if (validExistingResultsFound)
                         {
-                            // All of the options match, make sure the other output files exist
+                            // All the options match, make sure the other output files exist
 
                             filePathToCheck = ConstructOutputFilePath(inputFilePathFull, outputDirectoryPath, OutputFileTypeConstants.ScanStatsFlatFile);
 

@@ -20,7 +20,7 @@ namespace MASIC.DataInput
     /// </summary>
     public class DataImportMSXml : DataImport
     {
-        // Ignore Spelling: centroided
+        // Ignore Spelling: centroided, MASIC
 
         // ReSharper disable once IdentifierTypo
         private readonly Centroider mCentroider;

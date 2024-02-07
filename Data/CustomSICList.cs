@@ -265,7 +265,7 @@ namespace MASIC.Data
 
                 if (scanOrAcqTimeSumCount == CustomMZSearchValues.Count && scanOrAcqTimeSumForAveraging > 0)
                 {
-                    // All of the entries had a custom scan or acq time tolerance defined
+                    // All the entries had a custom scan or acq time tolerance defined
                     // Update mScanOrAcqTimeTolerance to the average of the values
                     ScanOrAcqTimeTolerance = (float)(Math.Round(scanOrAcqTimeSumForAveraging / scanOrAcqTimeSumCount, 4));
                 }
@@ -609,7 +609,7 @@ namespace MASIC.Data
                 return;
             }
 
-            // Check whether all of the values are between 0 and 1
+            // Check whether all the values are between 0 and 1
             // If they are, auto-switch .ScanToleranceType to "Relative"
 
             var countBetweenZeroAndOne = 0;

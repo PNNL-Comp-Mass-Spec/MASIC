@@ -14,7 +14,7 @@ namespace MASIC.DataOutput
     {
         // ReSharper disable CommentTypo
 
-        // Ignore Spelling: Appodization, Extrel, fwhm, Hanning, Parzen, Welch, xtitle, ytitle
+        // Ignore Spelling: Abu, Appodization, Decon, Extrel, fwhm, Hanning, isos, MASIC, Parzen, Welch, xtitle, ytitle
 
         // ReSharper restore CommentTypo
 

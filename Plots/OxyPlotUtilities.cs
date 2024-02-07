@@ -10,7 +10,7 @@ namespace MASIC.Plots
     /// </summary>
     public static class OxyPlotUtilities
     {
-        // Ignore Spelling: Arial
+        // Ignore Spelling: Arial, MASIC, Oxy
 
         private static string AddAxes(PlotModel myPlot, Axis xAxis, Axis yAxis, AxisInfo yAxisInfo)
         {

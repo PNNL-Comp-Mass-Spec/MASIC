@@ -12,7 +12,9 @@ namespace MASIC.DataInput
     // ReSharper disable once IdentifierTypo
     public class DataImportMGFandCDF : DataImport
     {
-        // Ignore Spelling: Chemstation
+        // ReSharper disable once CommentTypo
+
+        // Ignore Spelling: Chemstation, Fand, MASIC
 
         /// <summary>
         /// Constructor
@@ -110,7 +112,7 @@ namespace MASIC.DataInput
                     return false;
                 }
 
-                // Reserve memory for all of the Survey Scan data
+                // Reserve memory for the Survey Scan data
                 scanList.Initialize();
                 var scanCount = mOptions.SICOptions.ScanRangeCount;
 
@@ -127,7 +129,7 @@ namespace MASIC.DataInput
                 UpdateProgress("Reading CDF/MGF data (" + msScanCount + " scans)" + Environment.NewLine + Path.GetFileName(filePath));
                 ReportMessage("Reading CDF/MGF data; Total MS scan count: " + msScanCount);
 
-                // Read all of the Survey scans from the CDF file
+                // Read all the Survey scans from the CDF file
                 // CDF files created by the Agilent XCT list the first scan number as 0; use scanNumberCorrection to correct for this
                 var scanNumberCorrection = 0;
 
@@ -237,7 +239,7 @@ namespace MASIC.DataInput
                             newSurveyScan.IonCountRaw = 0;
                         }
 
-                        // Note: Since we're reading all of the Survey Scan data, we cannot update .MasterScanOrder() at this time
+                        // Note: Since we're reading all Survey Scans, we cannot update .MasterScanOrder() at this time
                     }
 
                     // Note: We need to take msScanCount * 2 since we have to read two different files
@@ -270,7 +272,7 @@ namespace MASIC.DataInput
 
                 cdfReader.CloseMSCdfFile();
 
-                // We loaded all of the survey scan data above
+                // We loaded the survey scan data above
                 // We can now initialize .MasterScanOrder()
                 var lastSurveyScanIndex = 0;
 
@@ -510,7 +512,7 @@ namespace MASIC.DataInput
                 // Make sure that MasterScanOrder really is sorted by scan number
                 ValidateMasterScanOrderSorting(scanList);
 
-                // Now that all of the data has been read, write out to the scan stats file, in order of scan number
+                // Now that all the data has been read, write out to the scan stats file, in order of scan number
                 for (var scanIndex = 0; scanIndex < scanList.MasterScanOrderCount; scanIndex++)
                 {
                     var scanType = scanList.MasterScanOrder[scanIndex].ScanType;
