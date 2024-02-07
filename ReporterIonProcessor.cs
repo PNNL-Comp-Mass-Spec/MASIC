@@ -156,7 +156,7 @@ namespace MASIC
                 if (inputFilePathFull.EndsWith(DataInput.DataImport.THERMO_RAW_FILE_EXTENSION, StringComparison.OrdinalIgnoreCase))
                 {
                     // Processing a Thermo .Raw file
-                    // Check whether any of the fragmentation scans has IsFTMS true
+                    // Check whether any of the fragmentation scans has IsHighResolution true
                     for (var masterOrderIndex = 0; masterOrderIndex < scanList.MasterScanOrderCount; masterOrderIndex++)
                     {
                         var scanPointer = scanList.MasterScanOrder[masterOrderIndex].ScanIndexPointer;
@@ -167,7 +167,7 @@ namespace MASIC
                             continue;
                         }
 
-                        if (scanList.FragScans[scanPointer].IsFTMS)
+                        if (scanList.FragScans[scanPointer].IsHighResolution)
                         {
                             includeFtmsColumns = true;
                             break;
@@ -519,7 +519,7 @@ namespace MASIC
                 ion.LabelDataMZ = 0;
             }
 
-            if (includeFtmsColumns && currentScan.IsFTMS)
+            if (includeFtmsColumns && currentScan.IsHighResolution)
             {
                 // Retrieve the label data for this spectrum
 

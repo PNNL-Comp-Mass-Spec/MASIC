@@ -187,7 +187,7 @@ namespace MASICTest
                     newSurveyScan.LowMass = MZ_MINIMUM;
                     newSurveyScan.HighMass = Math.Max(newSurveyScan.BasePeakIonMZ * 1.1, MZ_MINIMUM * 10);
                     newSurveyScan.IsDIA = false;
-                    newSurveyScan.IsFTMS = false;
+                    newSurveyScan.IsHighResolution = false;
 
                     scanList.SurveyScans.Add(newSurveyScan);
 
@@ -230,7 +230,7 @@ namespace MASICTest
                     newFragScan.LowMass = MZ_MINIMUM;
                     newFragScan.HighMass = Math.Max(newFragScan.BasePeakIonMZ * 1.1, MZ_MINIMUM * 10);
                     newFragScan.IsDIA = false;
-                    newFragScan.IsFTMS = false;
+                    newFragScan.IsHighResolution = false;
 
                     scanList.FragScans.Add(newFragScan);
                     scanList.AddMasterScanEntry(ScanList.ScanTypeConstants.FragScan, scanList.FragScans.Count - 1);

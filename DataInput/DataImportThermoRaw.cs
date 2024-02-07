@@ -384,7 +384,7 @@ namespace MASIC.DataInput
                 LowMass = thermoScanInfo.LowMass,
                 HighMass = thermoScanInfo.HighMass,
                 IsDIA = false,
-                IsFTMS = thermoScanInfo.IsFTMS,
+                IsHighResolution = thermoScanInfo.IsHighResolution,
                 FragScanInfo =
                 {
                     // Survey scans typically lead to multiple parent ions; we do not record them here
@@ -554,7 +554,7 @@ namespace MASIC.DataInput
             scanInfo.LowMass = thermoScanInfo.LowMass;
             scanInfo.HighMass = thermoScanInfo.HighMass;
             scanInfo.IsDIA = thermoScanInfo.IsDIA;
-            scanInfo.IsFTMS = thermoScanInfo.IsFTMS;
+            scanInfo.IsHighResolution = thermoScanInfo.IsHighResolution;
             scanInfo.IsolationWindowWidthMZ = thermoScanInfo.IsolationWindowWidthMZ;
 
             // Store the ScanEvent values in .ExtendedHeaderInfo

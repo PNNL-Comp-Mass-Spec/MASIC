@@ -280,7 +280,7 @@ namespace MASIC.Data
                 LowMass = 0,
                 HighMass = 0,
                 IsDIA = false,
-                IsFTMS = false
+                IsHighResolution = false
             };
 
             // Survey scans typically lead to multiple parent ions; we do not record them here

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using ThermoRawFileReader;
 
 namespace MASIC.Data
@@ -92,7 +93,19 @@ namespace MASIC.Data
         /// <summary>
         /// True if the scan was collected in the FT cell of a Thermo instrument
         /// </summary>
-        public bool IsFTMS { get; set; }
+        /// <returns>True if acquired using a high resolution mass analyzer</returns>
+        [Obsolete("Use IsHighResolution instead")]
+        public bool IsFTMS
+        {
+            get => IsHighResolution;
+            set => IsHighResolution = value;
+        }
+
+        /// <summary>
+        /// High resolution mass spectrum flag (Orbitrap, Q-Exactive, Lumos, Astral, TOF, etc.)
+        /// </summary>
+        /// <returns>True if acquired using a high resolution mass analyzer</returns>
+        public bool IsHighResolution { get; set; }
 
         /// <summary>
         /// Isolation window width (m/z)

@@ -1049,7 +1049,7 @@ namespace MASIC.DataInput
 
             if (mzXmlSourceSpectrum != null && !string.IsNullOrWhiteSpace(mzXmlSourceSpectrum.FilterLine))
             {
-                scanInfo.IsFTMS = IsHighResolutionSpectrum(mzXmlSourceSpectrum.FilterLine);
+                scanInfo.IsHighResolution = IsHighResolutionSpectrum(mzXmlSourceSpectrum.FilterLine);
             }
 
             // Survey scans typically lead to multiple parent ions; we do not record them here
@@ -1120,7 +1120,7 @@ namespace MASIC.DataInput
                         sourceIntensities[i] = msSpectrum.IonsIntensity[i];
                     }
 
-                    var massResolution = mCentroider.EstimateResolution(1000, 0.5, scanInfo.IsFTMS);
+                    var massResolution = mCentroider.EstimateResolution(1000, 0.5, scanInfo.IsHighResolution);
 
                     var centroidSuccess = mCentroider.CentroidData(
                         scanInfo, sourceMzs, sourceIntensities,
@@ -1331,7 +1331,7 @@ namespace MASIC.DataInput
 
             if (mzXmlSourceSpectrum != null)
             {
-                scanInfo.IsFTMS = IsHighResolutionSpectrum(mzXmlSourceSpectrum.FilterLine);
+                scanInfo.IsHighResolution = IsHighResolutionSpectrum(mzXmlSourceSpectrum.FilterLine);
             }
 
             scanList.FragScans.Add(scanInfo);
