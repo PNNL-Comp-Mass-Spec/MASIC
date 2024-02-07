@@ -48,7 +48,7 @@ namespace MASIC.Data
             /// <summary>
             /// Show the scan index value and scan type
             /// </summary>
-            public override string ToString()
+            public readonly override string ToString()
             {
                 return ScanIndexPointer + ": " + ScanType;
             }
