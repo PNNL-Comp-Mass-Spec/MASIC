@@ -1623,7 +1623,13 @@ namespace MASIC.DataInput
 
         private bool IsHighResolutionSpectrum(string filterString)
         {
-            return filterString.IndexOf("FTMS", StringComparison.OrdinalIgnoreCase) >= 0;
+            // ReSharper disable StringLiteralTypo
+
+            return filterString.IndexOf("FTMS", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                   filterString.IndexOf("ASTMS", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                   filterString.IndexOf("MRTOF", StringComparison.OrdinalIgnoreCase) >= 0;
+
+            // ReSharper restore StringLiteralTypo
         }
 
         private static bool IsSrmChromatogram(SimpleMzMLReader.ParamData chromatogramItem)
