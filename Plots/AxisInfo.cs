@@ -124,7 +124,7 @@ namespace MASIC.Plots
         }
 
         /// <summary>
-        /// Get options as a semi colon separated list of key-value pairs
+        /// Get options as a semicolon separated list of key-value pairs
         /// </summary>
         public string GetOptions()
         {
@@ -132,7 +132,7 @@ namespace MASIC.Plots
         }
 
         /// <summary>
-        /// Get options as a semi colon separated list of key-value pairs
+        /// Get options as a semicolon separated list of key-value pairs
         /// This is used when plotting data with Python
         /// </summary>
         public string GetOptions(List<string> additionalOptions)
