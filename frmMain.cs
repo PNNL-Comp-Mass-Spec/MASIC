@@ -7,7 +7,7 @@ using System.Collections.Generic;
 // Copyright 2005, Battelle Memorial Institute.  All Rights Reserved.
 
 // E-mail: matthew.monroe@pnnl.gov or proteomics@pnnl.gov
-// Website: https://github.com/PNNL-Comp-Mass-Spec/ or https://panomics.pnnl.gov/ or https://www.pnnl.gov/integrative-omics
+// Website: https://github.com/PNNL-Comp-Mass-Spec/ or https://www.pnnl.gov/integrative-omics
 // -------------------------------------------------------------------------------
 //
 // Licensed under the 2-Clause BSD License; you may not use this file except
@@ -1839,7 +1839,7 @@ namespace MASIC
             message += "Using MASIC PeakFinder DLL version " + mMasic.MASICPeakFinderDllVersion + Environment.NewLine + Environment.NewLine;
 
             message += "E-mail: matthew.monroe@pnnl.gov or proteomics@pnnl.gov" + Environment.NewLine;
-            message += "Website: https://github.com/PNNL-Comp-Mass-Spec/ or https://panomics.pnnl.gov/ or https://www.pnnl.gov/integrative-omics" + Environment.NewLine + Environment.NewLine;
+            message += "Website: https://github.com/PNNL-Comp-Mass-Spec/ or https://www.pnnl.gov/integrative-omics" + Environment.NewLine + Environment.NewLine;
 
             message += "Licensed under the 2-Clause BSD License; you may not use this file except in compliance with the License.  ";
             message += "You may obtain a copy of the License at https://opensource.org/licenses/BSD-2-Clause" + Environment.NewLine + Environment.NewLine;
