@@ -106,6 +106,7 @@ namespace MASIC
                 var connectionStringToUse = DbToolsFactory.AddApplicationNameToConnectionString(masicOptions.DatabaseConnectionString, applicationName);
 
                 var dbTools = DbToolsFactory.GetDBTools(connectionStringToUse);
+                RegisterEvents(dbTools);
 
                 var queryingSingleDataset = false;
 
