@@ -420,7 +420,7 @@ namespace MASIC.Options
 
                 var reader = new XmlSettingsFileAccessor();
 
-                // Pass False to .LoadSettings() here to turn off case sensitive matching
+                // Pass False to .LoadSettings() here to turn off case-sensitive matching
                 if (!reader.LoadSettings(parameterFilePath, false))
                 {
                     ReportError("Error calling XmlSettingsFileAccessor.LoadSettings for " + parameterFilePath, clsMASIC.MasicErrorCodes.InputFileDataReadError);
