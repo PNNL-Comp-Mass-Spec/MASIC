@@ -19,7 +19,7 @@ namespace MASIC
         /// <remarks>
         /// The GUI uses this (see frmMain)
         /// </remarks>
-        public const string DATABASE_CONNECTION_STRING_DEFAULT = "Data Source=gigasax;Initial Catalog=DMS5;User=DMSReader;Password=dms4fun";
+        public const string DATABASE_CONNECTION_STRING_DEFAULT = "Host=prismdb2.emsl.pnl.gov;Port=5432;Database=dms;UserId=svc-dms";
 
         /// <summary>
         /// Query for obtaining dataset names and IDs
@@ -59,7 +59,8 @@ namespace MASIC
             int newDatasetID;
 
             // ReSharper disable once CommentTypo
-            // Data Source=gigasax;Initial Catalog=DMS5;User=DMSReader;Password=...
+            // SQL Server: Data Source=gigasax;Initial Catalog=DMS5;User=DMSReader;Password=...
+            // PostgreSQL: Host=prismdb2.emsl.pnl.gov;Port=5432;Database=dms;UserId=svc-dms
             if (!string.IsNullOrWhiteSpace(mOptions.DatabaseConnectionString))
             {
                 var datasetFoundInDB = GetDatasetIDFromDatabase(mOptions, datasetName, out newDatasetID);

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <sections>
   <section name="MasicDatabaseSettings">
-    <item key="ConnectionString" value="Data Source=gigasax;Initial Catalog=DMS5;User=DMSReader;Password=dms4fun" />
+    <item key="ConnectionString" value="Host=prismdb2.emsl.pnl.gov;Port=5432;Database=dms;UserId=svc-dms" />
     <item key="DatasetInfoQuerySql" value="Select Dataset, ID FROM V_Dataset_Export" />
   </section>
   <section name="MasicImportOptions">
