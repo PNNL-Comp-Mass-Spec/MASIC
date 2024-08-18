@@ -11,6 +11,8 @@ namespace MASIC
     /// </summary>
     public class DatabaseAccess : MasicEventNotifier
     {
+        // Ignore Spelling: MASIC
+
         // ReSharper disable UnusedMember.Global
 
         /// <summary>
