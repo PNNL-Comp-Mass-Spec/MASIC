@@ -87,7 +87,7 @@ namespace MASIC
         }
 
         /// <summary>
-        /// Attempt to lookup the Dataset ID in the database
+        /// Attempt to look up the Dataset ID in the database
         /// </summary>
         /// <param name="masicOptions"></param>
         /// <param name="datasetName"></param>
