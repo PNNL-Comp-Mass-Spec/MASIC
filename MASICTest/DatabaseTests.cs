@@ -2,6 +2,7 @@
 using MASIC;
 using MASIC.Options;
 using NUnit.Framework;
+using PRISMDatabaseUtils;
 
 namespace MASICTest
 {
@@ -49,7 +50,7 @@ namespace MASICTest
         {
             const string strDatasetLookupFilePath = "";
 
-            var connectionString = GetConnectionString("Gigasax", "DMS5", user, password);
+            var connectionString = GetConnectionString("prismdb2.emsl.pnl.gov", "dms", user, password);
 
             var options = new MASICOptions(mMasic.FileVersion, mMASICPeakFinder.ProgramVersion)
             {
@@ -65,8 +66,16 @@ namespace MASICTest
             Assert.AreEqual(expectedDatasetID, datasetID, "DatasetID Mismatch");
         }
 
-        private static string GetConnectionString(string server, string database, string user = "Integrated", string password = "")
+        private static string GetConnectionString(string server, string database, bool isPostgres, string user = "Integrated", string password = "")
         {
+            var dbType = isPostgres ? DbServerTypes.PostgreSQL : DbServerTypes.MSSQLServer;
+
+            var useIntegratedSecurity = string.Equals(user, "Integrated", StringComparison.OrdinalIgnoreCase);
+
+            return DbToolsFactory.GetConnectionString(
+                dbType, server, database, user, password,
+                "MASIC_DatabaseTests", useIntegratedSecurity);
+
             if (string.Equals(user, "Integrated", StringComparison.OrdinalIgnoreCase))
                 return string.Format("Data Source={0};Initial Catalog={1};Integrated Security=SSPI;", server, database);
 
