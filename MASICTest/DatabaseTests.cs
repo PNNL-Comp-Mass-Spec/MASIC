@@ -48,7 +48,7 @@ namespace MASICTest
 
         private void TestDatasetLookup(string datasetName, int expectedDatasetID, string user, string password)
         {
-            const string strDatasetLookupFilePath = "";
+            const string datasetLookupFilePath = "";
 
             var connectionString = GetConnectionString("prismdb2.emsl.pnl.gov", "dms", true, user, password);
 
@@ -59,7 +59,7 @@ namespace MASICTest
 
             var dbAccessor = new DatabaseAccess(options);
 
-            var datasetID = dbAccessor.LookupDatasetID(datasetName, strDatasetLookupFilePath, 1);
+            var datasetID = dbAccessor.LookupDatasetID(datasetName, datasetLookupFilePath, 1);
 
             Console.WriteLine("Data file " + datasetName + " is dataset ID " + datasetID);
 
