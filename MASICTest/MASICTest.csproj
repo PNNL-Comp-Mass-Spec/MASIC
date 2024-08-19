@@ -52,6 +52,9 @@
     <PackageReference Include="NUnit">
       <Version>3.13.3</Version>
     </PackageReference>
+    <PackageReference Include="PRISM-DatabaseUtils">
+      <Version>1.4.32</Version>
+    </PackageReference>
     <PackageReference Include="PRISM-Library">
       <Version>2.8.32</Version>
     </PackageReference>

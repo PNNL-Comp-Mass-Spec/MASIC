@@ -50,7 +50,7 @@ namespace MASICTest
         {
             const string strDatasetLookupFilePath = "";
 
-            var connectionString = GetConnectionString("prismdb2.emsl.pnl.gov", "dms", user, password);
+            var connectionString = GetConnectionString("prismdb2.emsl.pnl.gov", "dms", true, user, password);
 
             var options = new MASICOptions(mMasic.FileVersion, mMASICPeakFinder.ProgramVersion)
             {
@@ -75,11 +75,6 @@ namespace MASICTest
             return DbToolsFactory.GetConnectionString(
                 dbType, server, database, user, password,
                 "MASIC_DatabaseTests", useIntegratedSecurity);
-
-            if (string.Equals(user, "Integrated", StringComparison.OrdinalIgnoreCase))
-                return string.Format("Data Source={0};Initial Catalog={1};Integrated Security=SSPI;", server, database);
-
-            return string.Format("Data Source={0};Initial Catalog={1};User={2};Password={3};", server, database, user, password);
         }
     }
 }
