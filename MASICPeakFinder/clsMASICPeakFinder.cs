@@ -28,7 +28,7 @@ namespace MASICPeakFinder
         /// <summary>
         /// Program date
         /// </summary>
-        public string PROGRAM_DATE = "April 14, 2022";
+        public string PROGRAM_DATE = "August 18, 2024";
 
         /// <summary>
         /// Minimum peak width, in points
@@ -556,7 +556,7 @@ namespace MASICPeakFinder
                 baselineNoiseOptions.MinimumBaselineNoiseLevel,
                 NoiseThresholdModes.DualTrimmedMeanByAbundance);
 
-            if (dataList == null || indexEnd - indexStart < 0)
+            if (dataList == null || indexEnd < indexStart)
             {
                 return false;
             }
@@ -1945,7 +1945,7 @@ namespace MASICPeakFinder
             // Initialize baselineNoiseStats
             baselineNoiseStats = InitializeBaselineNoiseStats(baselineNoiseOptions.MinimumBaselineNoiseLevel, baselineNoiseOptions.BaselineNoiseMode);
 
-            if (dataList == null || indexEnd - indexStart < 0)
+            if (dataList == null || indexEnd < indexStart)
             {
                 return false;
             }
