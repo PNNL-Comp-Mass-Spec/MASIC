@@ -176,19 +176,19 @@
       <Version>2.1.2</Version>
     </PackageReference>
     <PackageReference Include="PRISM-DatabaseUtils">
-      <Version>1.4.32</Version>
+      <Version>1.4.35</Version>
     </PackageReference>
     <PackageReference Include="PRISM-Library">
-      <Version>2.8.32</Version>
+      <Version>2.8.36</Version>
     </PackageReference>
     <PackageReference Include="PRISMWin-Library">
-      <Version>1.1.18</Version>
+      <Version>1.1.19</Version>
     </PackageReference>
     <PackageReference Include="PSI_Interface">
-      <Version>2.6.2</Version>
+      <Version>2.6.4</Version>
     </PackageReference>
     <PackageReference Include="ThermoRawFileReader">
-      <Version>4.2.31</Version>
+      <Version>4.2.32</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
