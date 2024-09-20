@@ -165,8 +165,10 @@ The integer value corresponds to the number that appears in the MASIC settings f
 | 4             | TMT 6                   | 6-plex TMT                                  | 126.1283, 127.1316, 128.135, 129.1383, 130.1417, and 131.1387                                                                           |
 | 10            | TMT 10                  | 10-plex TMT                                 | 126.127726, 127.124761, 127.131081, 128.128116, 128.134436, 129.131471, 129.13779, 130.134825, 130.141145, and 131.138180               |
 | 16            | TMT 11                  | 11-plex TMT                                 | 126.127726, 127.124761, 127.131081, 128.128116, 128.134436, 129.131471, 129.13779, 130.134825, 130.141145, 131.138180, and 131.144499   |
-| 18            | TMT 16                  | 16-plex TMT (aka TMTpro)                    | 126.127726, 127.124761, 127.131081, 128.128116, 128.134436, 129.131471, 129.13779, 130.134825, 130.141145, 131.13818, 131.144499, 132.141535, 132.147855, 133.14489, 133.15121 and 134.148245 |
-| 20            | TMT 18                  | 18-plex TMT                                 | 126.127726, 127.124761, 127.131081, 128.128116, 128.134436, 129.131471, 129.13779, 130.134825, 130.141145, 131.13818, 131.144499, 132.141535, 132.147855, 133.14489, 133.15121, 134.148245, 134.154565, and 135.1516 |
+| 18            | TMT 16                  | 16-plex TMT (aka TMTpro)                    | 126.127726, 127.124761, 127.131081, 128.128116, 128.134436, 129.131471, 129.137791, 130.134826, 130.141146, 131.138181, 131.144501, 132.141536, 132.147856, 133.144891, 133.151211, 134.148246 |
+| 20            | TMT 18                  | 18-plex TMT (aka TMTpro 18plex)             | 126.127726, 127.124761, 127.131081, 128.128116, 128.134436, 129.131471, 129.137791, 130.134826, 130.141146, 131.138181, 131.144501, 132.141536, 132.147856, 133.144891, 133.151211, 134.148246, 134.154566, 135.151601 |
+| 21            | TMT 32                  | 32-plex TMT (aka TMTpro 32plex)             | 126.127726, 127.124761, 127.131081, 128.128116, 128.134436, 129.131471, 129.137791, 130.134826, 130.141146, 131.138181, 131.144501, 132.141536, 132.147856, 133.144891, 133.151211, 134.148246,                         127.134003, 128.131038, 128.137358, 129.134393, 129.140713, 130.137748, 130.144068, 131.141103, 131.147423, 132.144458, 132.150778, 133.147813, 133.154133, 134.151171, 134.157491, 135.154526 |
+| 22            | TMT 35                  | 35-plex TMT (aka TMTpro 35plex)             | 126.127726, 127.124761, 127.131081, 128.128116, 128.134436, 129.131471, 129.137791, 130.134826, 130.141146, 131.138181, 131.144501, 132.141536, 132.147856, 133.144891, 133.151211, 134.148246, 134.154566, 135.151601, 127.134003, 128.131038, 128.137358, 129.134393, 129.140713, 130.137748, 130.144068, 131.141103, 131.147423, 132.144458, 132.150778, 133.147813, 133.154133, 134.151171, 134.157491, 135.154526, 135.160846 |
 | 7             | PCGalnaz                | Custom reporter ions for Josh Alfaro        | 300.13 and 503.21 m/z                                                                                                                   |
 | 8             | HemeCFragment           | Custom reporter ions for Eric Merkley       | 616.1767 and 617.1845                                                                                                                   |
 | 9             | LycAcetFragment         | Custom reporter ions for Ernesto Nakayasu   | 126.09134 and 127.094695                                                                                                                |
@@ -177,6 +179,10 @@ The integer value corresponds to the number that appears in the MASIC settings f
 | 15            | FSFACustomHydroxyl      | Custom product ions from Chengdong Xu       | 151.063 and 166.087                                                                                                                     |
 | 17            | Acetylation             | Peptides with acetylated lysine residues    | 126.09134 and 143.11789                                                                                                                 |
 | 19            | NativeOGlcNAc           | Native O-GlcNAc                             | 126.055, 138.055, 144.065, 168.066, 186.076, 204.087, and 366.14                                                                        |
+
+TMT 32 and TMT 35 notes:
+* 32-plex TMT is a combination of non-deuterated 16-plex TMT and a deuterated 16-plex version, which requires a resolution of over 75,000 to resolve the reporter ions
+* 35-plex TMT is a combination of non-deuterated 18-plex TMT and a deuterated 17-plex version, which requires a resolution of over 75,000 to resolve the reporter ions
 
 For datasets with low resolution MS2 spectra but high resolution MS3 spectra, 
 MASIC will copy the reporter ion abundances from the MS3 spectra to the MS2 spectra
@@ -358,8 +364,7 @@ alternate output directory (if defined).
 Use `/L` to specify that a log file should be created. Use `/L:LogFilePath` to
 specify the name (or full path) for the log file.
 
-Use `/SF` to specify the name to use for the MASIC Status file (default is
-MasicStatus.xml).
+Use `/SF` to specify the name to use for the MASIC Status file (default is MasicStatus.xml)
 
 Use `/CreateParamFile` to create an example parameter file named MASIC_ExampleSettings.xml
 * Include a colon and a filename to customize the filename
