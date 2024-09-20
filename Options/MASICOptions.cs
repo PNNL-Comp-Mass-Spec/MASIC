@@ -537,7 +537,7 @@ namespace MASIC.Options
                         XML_SECTION_EXPORT_OPTIONS, "ReporterIonApplyAbundanceCorrection", ReporterIons.ReporterIonApplyAbundanceCorrection);
 
                     ReporterIons.ReporterIonITraq4PlexCorrectionFactorType =
-                        (ITraqIntensityCorrection.CorrectionFactorsiTRAQ4Plex)reader.GetParam(
+                        (ITraqIntensityCorrection.CorrectionFactorsITRAQ4Plex)reader.GetParam(
                             XML_SECTION_EXPORT_OPTIONS,
                             "ReporterIonITraq4PlexCorrectionFactorType",
                             (int)ReporterIons.ReporterIonITraq4PlexCorrectionFactorType);

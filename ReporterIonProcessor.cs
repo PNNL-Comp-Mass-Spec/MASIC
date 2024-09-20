@@ -408,7 +408,7 @@ namespace MASIC
 
         private readonly ITraqIntensityCorrection intensityCorrector = new(
             ReporterIons.ReporterIonMassModeConstants.CustomOrNone,
-            ITraqIntensityCorrection.CorrectionFactorsiTRAQ4Plex.ABSciex);
+            ITraqIntensityCorrection.CorrectionFactorsITRAQ4Plex.ABSciex);
 
         /// <summary>
         /// Looks for the reporter ion m/z values, +/- a tolerance

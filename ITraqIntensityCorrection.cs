@@ -39,7 +39,7 @@ namespace MASIC
         /// <summary>
         /// 4-plex iTRAQ correction factor type
         /// </summary>
-        public enum CorrectionFactorsiTRAQ4Plex
+        public enum CorrectionFactorsITRAQ4Plex
         {
             /// <summary>
             /// AB Sciex
@@ -89,7 +89,7 @@ namespace MASIC
         /// <summary>
         /// 4-plex iTRAQ correction factor type
         /// </summary>
-        public CorrectionFactorsiTRAQ4Plex ITraq4PlexCorrectionFactorType { get; private set; }
+        public CorrectionFactorsITRAQ4Plex ITraq4PlexCorrectionFactorType { get; private set; }
 
         /// <summary>
         /// Constructor that assumes iTraqCorrectionFactorType = ABSciex
@@ -97,7 +97,7 @@ namespace MASIC
         /// <param name="reporterIonMode">iTRAQ or TMT mode</param>
         // ReSharper disable once UnusedMember.Global
         public ITraqIntensityCorrection(ReporterIons.ReporterIonMassModeConstants reporterIonMode)
-            : this(reporterIonMode, CorrectionFactorsiTRAQ4Plex.ABSciex)
+            : this(reporterIonMode, CorrectionFactorsITRAQ4Plex.ABSciex)
         {
         }
 
@@ -107,7 +107,7 @@ namespace MASIC
         /// <remarks>The iTraqCorrectionFactorType parameter is only used if reporterIonMode is ITraqFourMZ</remarks>
         /// <param name="reporterIonMode">iTRAQ or TMT mode</param>
         /// <param name="iTraqCorrectionFactorType">Correction factor type for 4-plex iTRAQ</param>
-        public ITraqIntensityCorrection(ReporterIons.ReporterIonMassModeConstants reporterIonMode, CorrectionFactorsiTRAQ4Plex iTraqCorrectionFactorType)
+        public ITraqIntensityCorrection(ReporterIons.ReporterIonMassModeConstants reporterIonMode, CorrectionFactorsITRAQ4Plex iTraqCorrectionFactorType)
         {
             ReporterIonMode = reporterIonMode;
             ITraq4PlexCorrectionFactorType = iTraqCorrectionFactorType;
@@ -137,7 +137,7 @@ namespace MASIC
         /// </summary>
         /// <param name="reporterIonMode"></param>
         /// <param name="iTraqCorrectionFactorType"></param>
-        public void UpdateReporterIonMode(ReporterIons.ReporterIonMassModeConstants reporterIonMode, CorrectionFactorsiTRAQ4Plex iTraqCorrectionFactorType)
+        public void UpdateReporterIonMode(ReporterIons.ReporterIonMassModeConstants reporterIonMode, CorrectionFactorsITRAQ4Plex iTraqCorrectionFactorType)
         {
             if (ReporterIonMode != reporterIonMode || ITraq4PlexCorrectionFactorType != iTraqCorrectionFactorType)
             {
@@ -323,7 +323,7 @@ namespace MASIC
             switch (ReporterIonMode)
             {
                 case ReporterIons.ReporterIonMassModeConstants.ITraqFourMZ:
-                    if (ITraq4PlexCorrectionFactorType == CorrectionFactorsiTRAQ4Plex.ABSciex)
+                    if (ITraq4PlexCorrectionFactorType == CorrectionFactorsITRAQ4Plex.ABSciex)
                     {
                         // 4-plex ITraq, isotope contribution table
                         // Source percentages provided by Applied Biosystems
@@ -333,7 +333,7 @@ namespace MASIC
                         udtIsoPct116 = DefineIsotopeContribution(0, 3, 92.4F, 4.5F, 0.1F);
                         udtIsoPct117 = DefineIsotopeContribution(0.1F, 4, 92.3F, 3.5F, 0.1F);
                     }
-                    else if (ITraq4PlexCorrectionFactorType == CorrectionFactorsiTRAQ4Plex.BroadInstitute)
+                    else if (ITraq4PlexCorrectionFactorType == CorrectionFactorsITRAQ4Plex.BroadInstitute)
                     {
                         // 4-plex ITraq, isotope contribution table
                         // Source percentages provided by Philipp Mertins at the Broad Institute (pmertins@broadinstitute.org)

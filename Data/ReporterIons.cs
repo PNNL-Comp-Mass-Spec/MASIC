@@ -212,7 +212,7 @@ namespace MASIC.Data
         /// <summary>
         /// Correction factor to use when the reporter ion mass mode is ITraqFourMZ
         /// </summary>
-        public ITraqIntensityCorrection.CorrectionFactorsiTRAQ4Plex ReporterIonITraq4PlexCorrectionFactorType { get; set; }
+        public ITraqIntensityCorrection.CorrectionFactorsITRAQ4Plex ReporterIonITraq4PlexCorrectionFactorType { get; set; }
 
         /// <summary>
         /// This is ignored if mReporterIonApplyAbundanceCorrection is False
@@ -576,7 +576,7 @@ namespace MASIC.Data
 
             ReporterIonToleranceDaDefault = REPORTER_ION_TOLERANCE_DA_DEFAULT;
             ReporterIonApplyAbundanceCorrection = true;
-            ReporterIonITraq4PlexCorrectionFactorType = ITraqIntensityCorrection.CorrectionFactorsiTRAQ4Plex.ABSciex;
+            ReporterIonITraq4PlexCorrectionFactorType = ITraqIntensityCorrection.CorrectionFactorsITRAQ4Plex.ABSciex;
 
             ReporterIonSaveObservedMasses = false;
             ReporterIonSaveUncorrectedIntensities = false;
