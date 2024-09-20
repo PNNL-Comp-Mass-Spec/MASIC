@@ -33,6 +33,8 @@ namespace MASIC
         private const int ELEVEN_PLEX_TMT_MATRIX_LENGTH = 11;
         private const int SIXTEEN_PLEX_TMT_MATRIX_LENGTH = 16;
         private const int EIGHTEEN_PLEX_TMT_MATRIX_LENGTH = 18;
+        private const int THIRTY_TWO_PLEX_TMT_MATRIX_LENGTH = 32;
+        private const int THIRTY_FIVE_PLEX_TMT_MATRIX_LENGTH = 35;
 
         // ReSharper disable IdentifierTypo
 
@@ -67,7 +69,7 @@ namespace MASIC
             public float Plus1;
             public float Plus2;
 
-            public override string ToString()
+            public readonly override string ToString()
             {
                 return string.Format("{0:F2}  {1:F2}  {2:F2}  {3:F2}  {4:F2}", Minus2, Minus1, Zero, Plus1, Plus2);
             }
@@ -271,6 +273,8 @@ namespace MASIC
                 ReporterIons.ReporterIonMassModeConstants.TMTElevenMZ => ELEVEN_PLEX_TMT_MATRIX_LENGTH,
                 ReporterIons.ReporterIonMassModeConstants.TMTSixteenMZ => SIXTEEN_PLEX_TMT_MATRIX_LENGTH,
                 ReporterIons.ReporterIonMassModeConstants.TMTEighteenMZ => EIGHTEEN_PLEX_TMT_MATRIX_LENGTH,
+                ReporterIons.ReporterIonMassModeConstants.TMT32MZ => THIRTY_TWO_PLEX_TMT_MATRIX_LENGTH,
+                ReporterIons.ReporterIonMassModeConstants.TMT35MZ => THIRTY_FIVE_PLEX_TMT_MATRIX_LENGTH,
                 _ => throw new ArgumentOutOfRangeException("Invalid value for reporterIonMode in GetMatrixLength: " + reporterIonMode)
             };
         }
@@ -307,6 +311,7 @@ namespace MASIC
             IsotopeContributionType udtIsoPct131N;
             IsotopeContributionType udtIsoPct131C;
 
+            // 16-plex and 18-plex TMT ions
             IsotopeContributionType udtIsoPct132N;
             IsotopeContributionType udtIsoPct132C;
             IsotopeContributionType udtIsoPct133N;
@@ -314,6 +319,26 @@ namespace MASIC
             IsotopeContributionType udtIsoPct134N;
             IsotopeContributionType udtIsoPct134C;
             IsotopeContributionType udtIsoPct135N;
+
+            // 32-plex and 35-plex TMT ions
+            // ToDo: determine the coefficients for these ions
+            IsotopeContributionType udtIsoPct127D;
+            IsotopeContributionType udtIsoPct128ND;
+            IsotopeContributionType udtIsoPct128CD;
+            IsotopeContributionType udtIsoPct129ND;
+            IsotopeContributionType udtIsoPct129CD;
+            IsotopeContributionType udtIsoPct130ND;
+            IsotopeContributionType udtIsoPct130CD;
+            IsotopeContributionType udtIsoPct131ND;
+            IsotopeContributionType udtIsoPct131CD;
+            IsotopeContributionType udtIsoPct132ND;
+            IsotopeContributionType udtIsoPct132CD;
+            IsotopeContributionType udtIsoPct133ND;
+            IsotopeContributionType udtIsoPct133CD;
+            IsotopeContributionType udtIsoPct134ND;
+            IsotopeContributionType udtIsoPct134CD;
+            IsotopeContributionType udtIsoPct135ND;
+            IsotopeContributionType udtIsoPct135CD;
 
             // ReSharper restore TooWideLocalVariableScope
 
@@ -894,6 +919,8 @@ namespace MASIC
                     break;
 
                 case ReporterIons.ReporterIonMassModeConstants.TMTEighteenMZ:
+                case ReporterIons.ReporterIonMassModeConstants.TMT32MZ:
+                case ReporterIons.ReporterIonMassModeConstants.TMT35MZ:
                     // 18-plex TMT, isotope contribution table for High Res MS/MS
                     // Source percentages provided by Thermo
 

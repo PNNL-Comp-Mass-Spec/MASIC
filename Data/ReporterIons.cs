@@ -158,7 +158,7 @@ namespace MASIC.Data
             /// 16-plex TMT (aka TMT16 or TMTpro)
             /// </summary>
             /// <remarks>
-            /// Several of the reporter ion masses are just 49 ppm apart, thus you must use a very tight tolerance of +/-0.003 Da
+            /// Several of the reporter ion masses are just 47 ppm apart, thus you must use a very tight tolerance of +/-0.003 Da
             /// </remarks>
             TMTSixteenMZ = 18,
 
@@ -171,9 +171,25 @@ namespace MASIC.Data
             /// 18-plex TMT (aka TMT18)
             /// </summary>
             /// <remarks>
-            /// Several of the reporter ion masses are just 49 ppm apart, thus you must use a very tight tolerance of +/-0.003 Da
+            /// Several of the reporter ion masses are just 47 ppm apart, thus you must use a very tight tolerance of +/-0.003 Da
             /// </remarks>
-            TMTEighteenMZ = 20
+            TMTEighteenMZ = 20,
+
+            /// <summary>
+            /// 32-plex TMT (aka TMT32)
+            /// </summary>
+            /// <remarks>
+            /// Several of the reporter ion masses are just 47 ppm apart, thus you must use a very tight tolerance of +/-0.003 Da
+            /// </remarks>
+            TMT32MZ = 21,
+
+            /// <summary>
+            /// 35-plex TMT (aka TMT35)
+            /// </summary>
+            /// <remarks>
+            /// Several of the reporter ion masses are just 47 ppm apart, thus you must use a very tight tolerance of +/-0.003 Da
+            /// </remarks>
+            TMT35MZ = 22
         }
 
         private double mReporterIonToleranceDaDefault;
@@ -351,7 +367,7 @@ namespace MASIC.Data
                     // TMT 10-plex Isobaric tags (from Thermo), aka TMT10
                     // These mass values are for HCD spectra; ETD spectra are exactly 12 Da lighter
                     // Several of the reporter ion masses are just 49 ppm apart, thus you must use a very tight tolerance of +/-0.003 Da (which is +/-23 ppm)
-                    reporterIons.Add(new ReporterIonInfo(126.127726));
+                    reporterIons.Add(new ReporterIonInfo(126.127726));        // TMT10–zero
                     reporterIons.Add(new ReporterIonInfo(127.124761));        // 127N
                     reporterIons.Add(new ReporterIonInfo(127.131081));        // 127C
                     reporterIons.Add(new ReporterIonInfo(128.128116));        // 128N
@@ -367,7 +383,7 @@ namespace MASIC.Data
                     // TMT 11-plex Isobaric tags (from Thermo), aka TMT11
                     // These mass values are for HCD spectra; ETD spectra are exactly 12 Da lighter
                     // Several of the reporter ion masses are just 49 ppm apart, thus you must use a very tight tolerance of +/-0.003 Da (which is +/-23 ppm)
-                    reporterIons.Add(new ReporterIonInfo(126.127726));        //
+                    reporterIons.Add(new ReporterIonInfo(126.127726));        // TMT11–zero
                     reporterIons.Add(new ReporterIonInfo(127.124761));        // 127N
                     reporterIons.Add(new ReporterIonInfo(127.131081));        // 127C
                     reporterIons.Add(new ReporterIonInfo(128.128116));        // 128N
@@ -384,46 +400,126 @@ namespace MASIC.Data
                     // ReSharper disable once CommentTypo
                     // TMT 16-plex Isobaric tags (from Thermo), aka TMT16 or TMTpro
                     // Several of the reporter ion masses are just 49 ppm apart, thus you must use a very tight tolerance of +/-0.003 Da (which is +/-23 ppm)
-                    reporterIons.Add(new ReporterIonInfo(126.127726));        //
-                    reporterIons.Add(new ReporterIonInfo(127.124761));        // 127N
-                    reporterIons.Add(new ReporterIonInfo(127.131081));        // 127C
-                    reporterIons.Add(new ReporterIonInfo(128.128116));        // 128N
-                    reporterIons.Add(new ReporterIonInfo(128.134436));        // 128C
-                    reporterIons.Add(new ReporterIonInfo(129.131471));        // 129N
-                    reporterIons.Add(new ReporterIonInfo(129.13779));         // 129C
-                    reporterIons.Add(new ReporterIonInfo(130.134825));        // 130N
-                    reporterIons.Add(new ReporterIonInfo(130.141145));        // 130C
-                    reporterIons.Add(new ReporterIonInfo(131.13818));         // 131N
-                    reporterIons.Add(new ReporterIonInfo(131.144499));        // 131C
-                    reporterIons.Add(new ReporterIonInfo(132.141535));        // 132N
-                    reporterIons.Add(new ReporterIonInfo(132.147855));        // 132C
-                    reporterIons.Add(new ReporterIonInfo(133.14489));         // 133N
-                    reporterIons.Add(new ReporterIonInfo(133.15121));         // 133C
-                    reporterIons.Add(new ReporterIonInfo(134.148245));        // 134N
+                    // ReSharper disable once CommentTypo
+                    reporterIons.Add(new ReporterIonInfo(126.127726));      // TMTpro–zero
+                    reporterIons.Add(new ReporterIonInfo(127.124761));      // 127N
+                    reporterIons.Add(new ReporterIonInfo(127.131081));      // 127C
+                    reporterIons.Add(new ReporterIonInfo(128.128116));      // 128N
+                    reporterIons.Add(new ReporterIonInfo(128.134436));      // 128C
+                    reporterIons.Add(new ReporterIonInfo(129.131471));      // 129N
+                    reporterIons.Add(new ReporterIonInfo(129.137791));      // 129C
+                    reporterIons.Add(new ReporterIonInfo(130.134826));      // 130N
+                    reporterIons.Add(new ReporterIonInfo(130.141146));      // 130C
+                    reporterIons.Add(new ReporterIonInfo(131.138181));      // 131N
+                    reporterIons.Add(new ReporterIonInfo(131.144501));      // 131C
+                    reporterIons.Add(new ReporterIonInfo(132.141536));      // 132N
+                    reporterIons.Add(new ReporterIonInfo(132.147856));      // 132C
+                    reporterIons.Add(new ReporterIonInfo(133.144891));      // 133N
+                    reporterIons.Add(new ReporterIonInfo(133.151211));      // 133C
+                    reporterIons.Add(new ReporterIonInfo(134.148246));      // 134N
                     break;
 
                 case ReporterIonMassModeConstants.TMTEighteenMZ:
                     // ReSharper disable once CommentTypo
                     // TMT 18-plex Isobaric tags (from Thermo), aka TMT18
                     // Several of the reporter ion masses are just 49 ppm apart, thus you must use a very tight tolerance of +/-0.003 Da (which is +/-23 ppm)
-                    reporterIons.Add(new ReporterIonInfo(126.127726)); //
-                    reporterIons.Add(new ReporterIonInfo(127.124761)); // 127N
-                    reporterIons.Add(new ReporterIonInfo(127.131081)); // 127C
-                    reporterIons.Add(new ReporterIonInfo(128.128116)); // 128N
-                    reporterIons.Add(new ReporterIonInfo(128.134436)); // 128C
-                    reporterIons.Add(new ReporterIonInfo(129.131471)); // 129N
-                    reporterIons.Add(new ReporterIonInfo(129.13779));  // 129C
-                    reporterIons.Add(new ReporterIonInfo(130.134825)); // 130N
-                    reporterIons.Add(new ReporterIonInfo(130.141145)); // 130C
-                    reporterIons.Add(new ReporterIonInfo(131.13818));  // 131N
-                    reporterIons.Add(new ReporterIonInfo(131.144499)); // 131C
-                    reporterIons.Add(new ReporterIonInfo(132.141535)); // 132N
-                    reporterIons.Add(new ReporterIonInfo(132.147855)); // 132C
-                    reporterIons.Add(new ReporterIonInfo(133.14489));  // 133N
-                    reporterIons.Add(new ReporterIonInfo(133.15121));  // 133C
-                    reporterIons.Add(new ReporterIonInfo(134.148245)); // 134N
-                    reporterIons.Add(new ReporterIonInfo(134.154565)); // 134C
-                    reporterIons.Add(new ReporterIonInfo(135.1516));   // 135N
+                    reporterIons.Add(new ReporterIonInfo(126.127726));      // TMTpro–zero
+                    reporterIons.Add(new ReporterIonInfo(127.124761));      // 127N
+                    reporterIons.Add(new ReporterIonInfo(127.131081));      // 127C
+                    reporterIons.Add(new ReporterIonInfo(128.128116));      // 128N
+                    reporterIons.Add(new ReporterIonInfo(128.134436));      // 128C
+                    reporterIons.Add(new ReporterIonInfo(129.131471));      // 129N
+                    reporterIons.Add(new ReporterIonInfo(129.137791));      // 129C
+                    reporterIons.Add(new ReporterIonInfo(130.134826));      // 130N
+                    reporterIons.Add(new ReporterIonInfo(130.141146));      // 130C
+                    reporterIons.Add(new ReporterIonInfo(131.138181));      // 131N
+                    reporterIons.Add(new ReporterIonInfo(131.144501));      // 131C
+                    reporterIons.Add(new ReporterIonInfo(132.141536));      // 132N
+                    reporterIons.Add(new ReporterIonInfo(132.147856));      // 132C
+                    reporterIons.Add(new ReporterIonInfo(133.144891));      // 133N
+                    reporterIons.Add(new ReporterIonInfo(133.151211));      // 133C
+                    reporterIons.Add(new ReporterIonInfo(134.148246));      // 134N
+                    reporterIons.Add(new ReporterIonInfo(134.154566));      // 134C
+                    reporterIons.Add(new ReporterIonInfo(135.151601));      // 135N
+                    break;
+
+                case ReporterIonMassModeConstants.TMT32MZ:
+                    // ReSharper disable once CommentTypo
+                    // TMT 18-plex Isobaric tags (from Thermo), aka TMT18
+                    // Several of the reporter ion masses are just 49 ppm apart, thus you must use a very tight tolerance of +/-0.003 Da (which is +/-23 ppm)
+                    reporterIons.Add(new ReporterIonInfo(126.127726));      // TMTpro–zero
+                    reporterIons.Add(new ReporterIonInfo(127.124761));      // 127N
+                    reporterIons.Add(new ReporterIonInfo(127.131081));      // 127C
+                    reporterIons.Add(new ReporterIonInfo(128.128116));      // 128N
+                    reporterIons.Add(new ReporterIonInfo(128.134436));      // 128C
+                    reporterIons.Add(new ReporterIonInfo(129.131471));      // 129N
+                    reporterIons.Add(new ReporterIonInfo(129.137791));      // 129C
+                    reporterIons.Add(new ReporterIonInfo(130.134826));      // 130N
+                    reporterIons.Add(new ReporterIonInfo(130.141146));      // 130C
+                    reporterIons.Add(new ReporterIonInfo(131.138181));      // 131N
+                    reporterIons.Add(new ReporterIonInfo(131.144501));      // 131C
+                    reporterIons.Add(new ReporterIonInfo(132.141536));      // 132N
+                    reporterIons.Add(new ReporterIonInfo(132.147856));      // 132C
+                    reporterIons.Add(new ReporterIonInfo(133.144891));      // 133N
+                    reporterIons.Add(new ReporterIonInfo(133.151211));      // 133C
+                    reporterIons.Add(new ReporterIonInfo(134.148246));      // 134N
+                    reporterIons.Add(new ReporterIonInfo(127.134003));      // 127D
+                    reporterIons.Add(new ReporterIonInfo(128.131038));      // 128ND
+                    reporterIons.Add(new ReporterIonInfo(128.137358));      // 128CD
+                    reporterIons.Add(new ReporterIonInfo(129.134393));      // 129ND
+                    reporterIons.Add(new ReporterIonInfo(129.140713));      // 129CD
+                    reporterIons.Add(new ReporterIonInfo(130.137748));      // 130ND
+                    reporterIons.Add(new ReporterIonInfo(130.144068));      // 130CD
+                    reporterIons.Add(new ReporterIonInfo(131.141103));      // 131ND
+                    reporterIons.Add(new ReporterIonInfo(131.147423));      // 131CD
+                    reporterIons.Add(new ReporterIonInfo(132.144458));      // 132ND
+                    reporterIons.Add(new ReporterIonInfo(132.150778));      // 132CD
+                    reporterIons.Add(new ReporterIonInfo(133.147813));      // 133ND
+                    reporterIons.Add(new ReporterIonInfo(133.154133));      // 133CD
+                    reporterIons.Add(new ReporterIonInfo(134.151171));      // 134ND
+                    reporterIons.Add(new ReporterIonInfo(134.157491));      // 134CD
+                    reporterIons.Add(new ReporterIonInfo(135.154526));      // 135ND
+                    break;
+
+                case ReporterIonMassModeConstants.TMT35MZ:
+                    // ReSharper disable once CommentTypo
+                    // TMT 18-plex Isobaric tags (from Thermo), aka TMT18
+                    // Several of the reporter ion masses are just 49 ppm apart, thus you must use a very tight tolerance of +/-0.003 Da (which is +/-23 ppm)
+                    reporterIons.Add(new ReporterIonInfo(126.127726));      // TMTpro–zero
+                    reporterIons.Add(new ReporterIonInfo(127.124761));      // 127N
+                    reporterIons.Add(new ReporterIonInfo(127.131081));      // 127C
+                    reporterIons.Add(new ReporterIonInfo(128.128116));      // 128N
+                    reporterIons.Add(new ReporterIonInfo(128.134436));      // 128C
+                    reporterIons.Add(new ReporterIonInfo(129.131471));      // 129N
+                    reporterIons.Add(new ReporterIonInfo(129.137791));      // 129C
+                    reporterIons.Add(new ReporterIonInfo(130.134826));      // 130N
+                    reporterIons.Add(new ReporterIonInfo(130.141146));      // 130C
+                    reporterIons.Add(new ReporterIonInfo(131.138181));      // 131N
+                    reporterIons.Add(new ReporterIonInfo(131.144501));      // 131C
+                    reporterIons.Add(new ReporterIonInfo(132.141536));      // 132N
+                    reporterIons.Add(new ReporterIonInfo(132.147856));      // 132C
+                    reporterIons.Add(new ReporterIonInfo(133.144891));      // 133N
+                    reporterIons.Add(new ReporterIonInfo(133.151211));      // 133C
+                    reporterIons.Add(new ReporterIonInfo(134.148246));      // 134N
+                    reporterIons.Add(new ReporterIonInfo(134.154566));      // 134C
+                    reporterIons.Add(new ReporterIonInfo(135.151601));      // 135N
+                    reporterIons.Add(new ReporterIonInfo(127.134003));      // 127D
+                    reporterIons.Add(new ReporterIonInfo(128.131038));      // 128ND
+                    reporterIons.Add(new ReporterIonInfo(128.137358));      // 128CD
+                    reporterIons.Add(new ReporterIonInfo(129.134393));      // 129ND
+                    reporterIons.Add(new ReporterIonInfo(129.140713));      // 129CD
+                    reporterIons.Add(new ReporterIonInfo(130.137748));      // 130ND
+                    reporterIons.Add(new ReporterIonInfo(130.144068));      // 130CD
+                    reporterIons.Add(new ReporterIonInfo(131.141103));      // 131ND
+                    reporterIons.Add(new ReporterIonInfo(131.147423));      // 131CD
+                    reporterIons.Add(new ReporterIonInfo(132.144458));      // 132ND
+                    reporterIons.Add(new ReporterIonInfo(132.150778));      // 132CD
+                    reporterIons.Add(new ReporterIonInfo(133.147813));      // 133ND
+                    reporterIons.Add(new ReporterIonInfo(133.154133));      // 133CD
+                    reporterIons.Add(new ReporterIonInfo(134.151171));      // 134ND
+                    reporterIons.Add(new ReporterIonInfo(134.157491));      // 134CD
+                    reporterIons.Add(new ReporterIonInfo(135.154526));      // 135ND
+                    reporterIons.Add(new ReporterIonInfo(135.160846));      // 135CD
                     break;
 
                 case ReporterIonMassModeConstants.ITraqEightMZHighRes:
@@ -557,9 +653,12 @@ namespace MASIC.Data
                 ReporterIonMassModeConstants.TMTSixMZ => "6-plex TMT",
                 ReporterIonMassModeConstants.TMTTenMZ => "10-plex TMT",
                 ReporterIonMassModeConstants.TMTElevenMZ => "11-plex TMT",
-                // ReSharper disable once StringLiteralTypo
+                // ReSharper disable StringLiteralTypo
                 ReporterIonMassModeConstants.TMTSixteenMZ => "16-plex TMT (aka TMTpro)",
-                ReporterIonMassModeConstants.TMTEighteenMZ => "18-plex TMT",
+                ReporterIonMassModeConstants.TMTEighteenMZ => "18-plex TMT (aka TMTpro-18)",
+                ReporterIonMassModeConstants.TMT32MZ => "32-plex TMT (aka TMTpro-32)",
+                ReporterIonMassModeConstants.TMT35MZ => "35-plex TMT (aka TMTpro-35)",
+                // ReSharper restore StringLiteralTypo
                 ReporterIonMassModeConstants.ITraqEightMZHighRes => "8-plex iTraq (High Res MS/MS)",
                 ReporterIonMassModeConstants.ITraqEightMZLowRes => "8-plex iTraq (Low Res MS/MS)",
                 ReporterIonMassModeConstants.PCGalnaz => "PCGalnaz (300.13 m/z and 503.21 m/z)",

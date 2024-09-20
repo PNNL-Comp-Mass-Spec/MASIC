@@ -1251,6 +1251,8 @@ namespace MASIC
             AppendReporterIonMassMode(ReporterIons.ReporterIonMassModeConstants.TMTElevenMZ, "TMT 11: 126, 127N, 127C, ... 130C, 131N, 131C");
             AppendReporterIonMassMode(ReporterIons.ReporterIonMassModeConstants.TMTSixteenMZ, "TMT 16: 126, 127N, 127C, ... 133N, 133C, 134N");
             AppendReporterIonMassMode(ReporterIons.ReporterIonMassModeConstants.TMTEighteenMZ, "TMT 18: 126, 127N, 127C, ... 133N, 133C, 134N, 134C, 135N");
+            AppendReporterIonMassMode(ReporterIons.ReporterIonMassModeConstants.TMT32MZ, "TMT 32: 126, 127N, 127C, ... 133CD, 134ND, 134CD, 135ND");
+            AppendReporterIonMassMode(ReporterIons.ReporterIonMassModeConstants.TMT35MZ, "TMT 35: 126, 127N, 127C, ... 133CD, 134ND, 134CD, 135ND, 135CD");
 
             SelectedReporterIonMode = ReporterIons.ReporterIonMassModeConstants.CustomOrNone;
         }
