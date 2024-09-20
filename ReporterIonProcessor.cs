@@ -14,7 +14,7 @@ namespace MASIC
     /// </summary>
     public class ReporterIonProcessor : MasicEventNotifier
     {
-        // Ignore Spelling: plex, Uniquify
+        // Ignore Spelling: MASIC, plex, Uniquify
 
         /// <summary>
         /// Column prefix for reporter ion data in the output file
