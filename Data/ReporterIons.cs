@@ -42,9 +42,14 @@ namespace MASIC.Data
         public const double REPORTER_ION_TOLERANCE_DA_DEFAULT_TMT10 = 0.015;
 
         /// <summary>
-        /// Default reporter ion tolerance for 16-plex TMT reporter ions (also applies to 18-plex, 32-plex, and 35-plex TMT)
+        /// Default reporter ion tolerance for 16-plex TMT reporter ions (also applies to 18-plex TMT)
         /// </summary>
         public const double REPORTER_ION_TOLERANCE_DA_DEFAULT_TMT16 = 0.003;
+
+        /// <summary>
+        /// Default reporter ion tolerance for 32-plex and 35-plex TMT reporter ions
+        /// </summary>
+        public const double REPORTER_ION_TOLERANCE_DA_DEFAULT_TMT32 = 0.0015;
 
         /// <summary>
         /// Reporter ion mass modes
@@ -180,7 +185,7 @@ namespace MASIC.Data
             /// 32-plex TMT (aka TMT32)
             /// </summary>
             /// <remarks>
-            /// Several of the reporter ion masses are just 47 ppm apart, thus you must use a very tight tolerance of +/-0.003 Da
+            /// Requires instrumentation with a resolution of at least 75,000; use a tolerance of +/-0.0015 Da
             /// </remarks>
             TMT32MZ = 21,
 
@@ -188,7 +193,7 @@ namespace MASIC.Data
             /// 35-plex TMT (aka TMT35)
             /// </summary>
             /// <remarks>
-            /// Several of the reporter ion masses are just 47 ppm apart, thus you must use a very tight tolerance of +/-0.003 Da
+            /// Requires instrumentation with a resolution of at least 75,000; use a tolerance of +/-0.0015 Da
             /// </remarks>
             TMT35MZ = 22
         }
@@ -311,9 +316,11 @@ namespace MASIC.Data
                 case ReporterIonMassModeConstants.TMTTenMZ or ReporterIonMassModeConstants.TMTElevenMZ:
                     return GetDefaultReporterIons(reporterIonMassMode, REPORTER_ION_TOLERANCE_DA_DEFAULT_TMT10);
 
-                case ReporterIonMassModeConstants.TMTSixteenMZ or ReporterIonMassModeConstants.TMTEighteenMZ or
-                    ReporterIonMassModeConstants.TMT32MZ or ReporterIonMassModeConstants.TMT35MZ:
+                case ReporterIonMassModeConstants.TMTSixteenMZ or ReporterIonMassModeConstants.TMTEighteenMZ:
                     return GetDefaultReporterIons(reporterIonMassMode, REPORTER_ION_TOLERANCE_DA_DEFAULT_TMT16);
+
+                case ReporterIonMassModeConstants.TMT32MZ or ReporterIonMassModeConstants.TMT35MZ:
+                    return GetDefaultReporterIons(reporterIonMassMode, REPORTER_ION_TOLERANCE_DA_DEFAULT_TMT32);
 
                 case ReporterIonMassModeConstants.ITraqEightMZHighRes:
                     return GetDefaultReporterIons(reporterIonMassMode, REPORTER_ION_TOLERANCE_DA_DEFAULT_ITRAQ8_HIGH_RES);
@@ -720,9 +727,12 @@ namespace MASIC.Data
                     SetReporterIonMassMode(reporterIonMassMode, REPORTER_ION_TOLERANCE_DA_DEFAULT_TMT10);
                     break;
 
-                case ReporterIonMassModeConstants.TMTSixteenMZ or ReporterIonMassModeConstants.TMTEighteenMZ or
-                    ReporterIonMassModeConstants.TMT32MZ or ReporterIonMassModeConstants.TMT35MZ:
+                case ReporterIonMassModeConstants.TMTSixteenMZ or ReporterIonMassModeConstants.TMTEighteenMZ:
                     SetReporterIonMassMode(reporterIonMassMode, REPORTER_ION_TOLERANCE_DA_DEFAULT_TMT16);
+                    break;
+
+                case ReporterIonMassModeConstants.TMT32MZ or ReporterIonMassModeConstants.TMT35MZ:
+                    SetReporterIonMassMode(reporterIonMassMode, REPORTER_ION_TOLERANCE_DA_DEFAULT_TMT32);
                     break;
 
                 default:
