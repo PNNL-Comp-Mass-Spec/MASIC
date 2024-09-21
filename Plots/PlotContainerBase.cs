@@ -10,7 +10,7 @@ namespace MASIC.Plots
     /// </summary>
     public abstract class PlotContainerBase : EventNotifier
     {
-        // Ignore Spelling: yyyy-MM-dd hh:mm:ss
+        // Ignore Spelling: MASIC, png, yyyy-MM-dd hh:mm:ss
 
         /// <summary>
         /// Plot types

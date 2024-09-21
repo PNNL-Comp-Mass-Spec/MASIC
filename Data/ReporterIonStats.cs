@@ -7,6 +7,8 @@ namespace MASIC.Data
     /// </summary>
     internal class ReporterIonStats
     {
+        // Ignore Spelling: MASIC
+
         public List<string> DataColumns { get; }
 
         public int MSLevel { get; set; }
@@ -24,7 +26,7 @@ namespace MASIC.Data
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="scanNumber"></param>
+        /// <param name="scanNumber">Scan number</param>
         public ReporterIonStats(int scanNumber)
         {
             DataColumns = new List<string>();

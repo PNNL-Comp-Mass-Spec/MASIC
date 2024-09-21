@@ -52,16 +52,16 @@ namespace MASIC.Options
         /// <summary>
         /// Minimum Y-axis value for the Top N Pct based reporter ion observation rate plot
         /// </summary>
-        /// <remarks>Set this to a larger value to scale the y-axis to a range of this to 100</remarks>
+        /// <remarks>Set this to a larger value to scale the Y-axis to a range of this to 100</remarks>
         public int ReporterIonTopNPctObsRateYAxisMinimum { get; set; } = 0;
 
         /// <summary>
         /// When true, create text files of the peak area and peak width histograms
         /// </summary>
-        public bool SaveHistogramData { get; set; } = false;
+        public bool SaveHistogramData { get; set; }
 
         /// <summary>
-        /// When true, create a index.html file that shows the plots and includes a link to DMS
+        /// When true, create an index.html file that shows the plots and includes a link to DMS
         /// </summary>
         public bool SaveHtmlFile { get; set; } = true;
 

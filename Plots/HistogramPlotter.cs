@@ -14,14 +14,14 @@ namespace MASIC.Plots
     /// </summary>
     public class HistogramPlotter : EventNotifier
     {
-        // Ignore Spelling: autoscale
+        // Ignore Spelling: autoscale, MASIC, Zeroes
 
         private readonly HistogramInfo mHistogram;
 
         private readonly bool mWriteDebug;
 
         /// <summary>
-        /// When true, autoscale the Y axis
+        /// When true, autoscale the Y-axis
         /// </summary>
         public bool AutoMinMaxY { get; set; }
 
@@ -51,7 +51,7 @@ namespace MASIC.Plots
         public string XAxisLabel { get; set; } = "Bin";
 
         /// <summary>
-        /// y-axis label
+        /// Y-axis label
         /// </summary>
         public string YAxisLabel { get; set; } = "Bin Count";
 
@@ -222,7 +222,7 @@ namespace MASIC.Plots
 
             plotContainer.WriteDebugLog(string.Format("Instantiated plotContainer for plot {0}: {1} data points", plotTitle, points.Count));
 
-            // Override the auto-computed X axis range
+            // Override the auto-computed X-axis range
             if (Math.Abs(minBin - maxBin) < float.Epsilon)
             {
                 myPlot.Axes[0].Minimum = minBin - 1;
@@ -251,7 +251,7 @@ namespace MASIC.Plots
             }
             else
             {
-                // Override the auto-computed Y axis range
+                // Override the auto-computed Y-axis range
                 myPlot.Axes[1].Minimum = 0;
                 myPlot.Axes[1].Maximum = maxIntensity;
             }
@@ -301,7 +301,7 @@ namespace MASIC.Plots
             }
             else
             {
-                // Override the auto-computed Y axis range
+                // Override the auto-computed Y-axis range
                 plotContainer.XAxisInfo.SetRange(0, maxIntensity);
             }
 
@@ -392,7 +392,7 @@ namespace MASIC.Plots
             {
                 if (RemoveZeroesFromEnds)
                 {
-                    // Check whether the last few scans have values if 0; if they do, remove them
+                    // Check whether the last few scans have values of 0; if they do, remove them
                     RemoveZeroesAtFrontAndBack(mHistogram);
                 }
 

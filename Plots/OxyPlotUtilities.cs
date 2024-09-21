@@ -22,7 +22,7 @@ namespace MASIC.Plots
 
             if (yAxisInfo.TickLabelsArePercents)
             {
-                // The left y-axis ignores attempts to display values as a percentage
+                // The left Y-axis ignores attempts to display values as a percentage
                 // Furthermore, the values shown on the color axis are shown as values * 100, which is not what we want
                 // Thus, will use DEFAULT_AXIS_LABEL_FORMAT instead of yAxisFormatString = "0%";
                 yAxisFormatString = AxisInfo.DEFAULT_AXIS_LABEL_FORMAT;

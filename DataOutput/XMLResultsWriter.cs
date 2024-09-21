@@ -15,7 +15,7 @@ namespace MASIC.DataOutput
     public class XMLResultsWriter : MasicEventNotifier
     {
         // ReSharper disable once CommentTypo
-        // Ignore Spelling: frag, Da, UnCache, Butterworth, SavitzkyGolay, Zeroes, parention
+        // Ignore Spelling: Butterworth, Da, frag, MASIC, parention, SavitzkyGolay, UnCache, Zeroes
 
         private readonly MASICOptions mOptions;
 
@@ -241,8 +241,7 @@ namespace MASIC.DataOutput
                     else
                     {
                         // Save scan interval list as long list of numbers
-                        // There are no tab delimiters, since we require that all
-                        // of the SICDataScanInterval values be <= 61
+                        // There are no tab delimiters, since we require that SICDataScanInterval values be <= 61
                         // If the interval is <= 9, the interval is stored as a number
                         // For intervals between 10 and 35, uses letters A to Z
                         // For intervals between 36 and 61, uses letters A to Z
@@ -289,7 +288,7 @@ namespace MASIC.DataOutput
                     if (mOptions.UseBase64DataEncoding)
                     {
                         // Save intensity and mass data lists as base-64 encoded strings
-                        // Note that these field names are purposely different than the DataList names used below for comma separated lists
+                        // Note that these field names are purposely different from the DataList names used below for comma separated lists
                         lastGoodLoc = "Call SaveDataToXMLEncodeArray with SICIntensityData";
                         SaveDataToXMLEncodeArray(writer, "SICIntensityData", sicDetails.SICIntensitiesAsFloat);
 

@@ -14,14 +14,14 @@ namespace MASIC.Plots
     /// </summary>
     public class BarChartPlotter : EventNotifier
     {
-        // Ignore Spelling: autoscale
+        // Ignore Spelling: autoscale, MASIC
 
         private readonly BarChartInfo mBarChart;
 
         private readonly bool mWriteDebug;
 
         /// <summary>
-        /// When true, autoscale the Y axis
+        /// When true, autoscale the Y-axis
         /// </summary>
         public bool AutoMinMaxY { get; set; }
 
@@ -241,7 +241,7 @@ namespace MASIC.Plots
             }
             else
             {
-                // Override the auto-computed Y axis range
+                // Override the auto-computed Y-axis range
                 myPlot.Axes[1].Minimum = yAxisMinimum;
 
                 // If the yAxisMaximum is 102, assume this is a bar chart of percentage values between 0 and 100
@@ -301,7 +301,7 @@ namespace MASIC.Plots
             }
             else
             {
-                // Override the auto-computed Y axis range
+                // Override the auto-computed Y-axis range
                 plotContainer.YAxisInfo.SetRange(yAxisMinimum, yAxisMaximum);
             }
 

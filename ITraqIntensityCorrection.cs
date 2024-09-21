@@ -322,6 +322,9 @@ namespace MASIC
 
             // 32-plex and 35-plex TMT ions
             // ToDo: determine the coefficients for these ions
+
+#pragma warning disable CS0168 // Variable is declared but never used
+
             IsotopeContributionType udtIsoPct127D;
             IsotopeContributionType udtIsoPct128ND;
             IsotopeContributionType udtIsoPct128CD;
@@ -339,6 +342,8 @@ namespace MASIC
             IsotopeContributionType udtIsoPct134CD;
             IsotopeContributionType udtIsoPct135ND;
             IsotopeContributionType udtIsoPct135CD;
+
+#pragma warning restore CS0168 // Variable is declared but never used
 
             // ReSharper restore TooWideLocalVariableScope
 

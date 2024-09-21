@@ -7,7 +7,7 @@ namespace MASIC.DataOutput
     /// </summary>
     public class BoxPlotStats
     {
-        // Ignore Spelling: outlier
+        // Ignore Spelling: MASIC, outlier
 
         /// <summary>
         /// First quartile

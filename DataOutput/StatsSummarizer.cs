@@ -106,7 +106,7 @@ namespace MASIC.DataOutput
         public Dictionary<float, int> PeakWidthHistogram { get; }
 
         /// <summary>
-        /// X axis units for the peak width histogram
+        /// X-axis units for the peak width histogram
         /// </summary>
         public string PeakWidthHistogramUnits { get; private set; }
 

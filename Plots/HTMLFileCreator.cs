@@ -10,7 +10,7 @@ namespace MASIC.Plots
 {
     internal class HTMLFileCreator : EventNotifier
     {
-        // Ignore Spelling: href, html
+        // Ignore Spelling: href, html, MASIC
 
         public string DatasetName { get; }
 

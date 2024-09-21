@@ -23,7 +23,7 @@ namespace MASIC
     {
         // ReSharper disable once CommentTypo
 
-        // Ignore Spelling: Spearman, Spearman's, zd
+        // Ignore Spelling: MASIC, Spearman, Spearman's, zd
 
         /// <summary>
         /// Coefficients used by GammaLn

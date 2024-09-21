@@ -5,7 +5,7 @@
     /// </summary>
     public class ReporterIonInfo
     {
-        // Ignore Spelling: Daltons, immonium
+        // Ignore Spelling: Daltons, immonium, MASIC
 
         /// <summary>
         /// Reporter ion m/z

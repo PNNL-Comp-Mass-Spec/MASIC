@@ -7,7 +7,7 @@ namespace MASIC.Plots
 {
     internal class PythonPlotContainerBoxPlot : PythonPlotContainer
     {
-        // Ignore Spelling: Autoscale, Gridline
+        // Ignore Spelling: Autoscale, Gridline, png, MASIC
 
         public List<string> XAxisLabels { get; private set; }
 

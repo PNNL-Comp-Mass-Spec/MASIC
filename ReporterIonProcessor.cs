@@ -26,7 +26,7 @@ namespace MASIC
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="masicOptions"></param>
+        /// <param name="masicOptions">MASIC options</param>
         public ReporterIonProcessor(MASICOptions masicOptions)
         {
             mOptions = masicOptions;

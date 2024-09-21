@@ -12,6 +12,8 @@ namespace MASIC.Plots
 {
     internal class BoxPlotPlotter : EventNotifier
     {
+        // Ignore Spelling: MASIC, png
+
         private readonly BoxPlotInfo mBoxPlot;
 
         private readonly bool mWriteDebug;
@@ -128,7 +130,7 @@ namespace MASIC.Plots
                 // The first quartile (aka 25th percentile) is the median of the lower half of the dataset
                 boxPlotStats.FirstQuartile = GetMedian(values.Take(firstQuartileCount).ToList());
 
-                // The third quartile (aka the 75th percentile) is the is the median of the upper half of the dataset
+                // The third quartile (aka the 75th percentile) is the median of the upper half of the dataset
                 boxPlotStats.ThirdQuartile = GetMedian(values.Skip(thirdQuartilePreviousItemCount).ToList());
             }
 
@@ -277,7 +279,7 @@ namespace MASIC.Plots
             }
             else
             {
-                // Override the auto-computed Y axis range
+                // Override the auto-computed Y-axis range
                 myPlot.Axes[1].Minimum = 0;
                 myPlot.Axes[1].Maximum = boxPlotInfo.MaxIntensity;
             }
@@ -336,7 +338,7 @@ namespace MASIC.Plots
             }
             else
             {
-                // Override the auto-computed Y axis range
+                // Override the auto-computed Y-axis range
                 plotContainer.YAxisInfo.SetRange(0, boxPlotInfo.MaxIntensity);
             }
 
@@ -357,7 +359,7 @@ namespace MASIC.Plots
         /// <param name="datasetName"></param>
         /// <param name="outputDirectory"></param>
         /// <param name="outputFilePath">Output: the full path to the .png file created by this method</param>
-        /// <param name="logarithmicYAxis">When true, use logarithmic scaling for the y axis</param>
+        /// <param name="logarithmicYAxis">When true, use logarithmic scaling for the Y-axis</param>
         /// <param name="skipCreatingPngFile">When true, generate the plot in memory but do not actually save to disk</param>
         /// <param name="yAxisMinimum"></param>
         /// <returns>True if success, otherwise false</returns>
@@ -442,7 +444,7 @@ namespace MASIC.Plots
             public Dictionary<int, string> ReporterIonNames { get; }
 
             /// <summary>
-            /// Y axis info
+            /// Y-axis info
             /// </summary>
             public AxisInfo YAxisInfo { get; }
 
