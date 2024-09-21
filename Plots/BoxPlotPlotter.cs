@@ -70,7 +70,7 @@ namespace MASIC.Plots
             mBoxPlot.AddPoints(labelIndex, label, values);
         }
 
-        private void AddOxyPlotSeries(PlotModel myPlot, IEnumerable<double> points, out BoxPlotStats boxPlotStats)
+        private static void AddOxyPlotSeries(PlotModel myPlot, IEnumerable<double> points, out BoxPlotStats boxPlotStats)
         {
             var series = new BoxPlotSeries
             {
@@ -99,7 +99,7 @@ namespace MASIC.Plots
             myPlot.Series.Add(series);
         }
 
-        private BoxPlotStats ComputeBoxStats(IEnumerable<double> points)
+        private static BoxPlotStats ComputeBoxStats(IEnumerable<double> points)
         {
             var boxPlotStats = new BoxPlotStats();
 
@@ -163,7 +163,7 @@ namespace MASIC.Plots
         /// <param name="boxPlotInfo"></param>
         /// <param name="pointsByBox">List of lists; each item is the list of values for the given box</param>
         /// <returns>Labels for the bars</returns>
-        private Dictionary<int, string> GetDataToPlot(
+        private static Dictionary<int, string> GetDataToPlot(
             BoxPlotInfo boxPlotInfo,
             out List<List<double>> pointsByBox)
         {
@@ -190,7 +190,7 @@ namespace MASIC.Plots
             return xAxisLabels;
         }
 
-        private double GetMedian(ICollection<double> values, double valueIfEmptyList = 0)
+        private static double GetMedian(ICollection<double> values, double valueIfEmptyList = 0)
         {
             if (values.Count == 0)
                 return valueIfEmptyList;
@@ -198,7 +198,7 @@ namespace MASIC.Plots
             return MathNet.Numerics.Statistics.Statistics.Median(values);
         }
 
-        private List<int> GetXAxisLabelIndices(Dictionary<int, string> xAxisLabels)
+        private static List<int> GetXAxisLabelIndices(Dictionary<int, string> xAxisLabels)
         {
             return (from item in xAxisLabels.Keys orderby item select item).ToList();
         }
