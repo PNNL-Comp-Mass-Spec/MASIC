@@ -77,13 +77,13 @@ namespace MASIC.DataOutput
             IReadOnlyDictionary<string, int> columnWidths,
             string statNameSuffix)
         {
-            var boxPlotStats = reporterIonStats.ContainsKey(reporterIonIndex) ? reporterIonStats[reporterIonIndex] : new BoxPlotStats();
+            var boxPlotStats = reporterIonStats.TryGetValue(reporterIonIndex, out var existingStats) ? existingStats : new BoxPlotStats();
 
             dataLine.Add(string.Format("{0}", boxPlotStats.NonZeroCount).PadRight(columnWidths["NonZeroCount" + statNameSuffix]));
-            dataLine.Add(string.Format("{0:0}", boxPlotStats.Median).PadRight(columnWidths["Median" + statNameSuffix]));
-            dataLine.Add(string.Format("{0:0}", boxPlotStats.InterQuartileRange).PadRight(columnWidths["InterQuartileRange" + statNameSuffix]));
-            dataLine.Add(string.Format("{0:0}", boxPlotStats.LowerWhisker).PadRight(columnWidths["LowerWhisker" + statNameSuffix]));
-            dataLine.Add(string.Format("{0:0}", boxPlotStats.UpperWhisker).PadRight(columnWidths["UpperWhisker" + statNameSuffix]));
+            dataLine.Add(GetPaddedValue(boxPlotStats.Median, columnWidths["Median" + statNameSuffix]));
+            dataLine.Add(GetPaddedValue(boxPlotStats.InterQuartileRange, columnWidths["InterQuartileRange" + statNameSuffix]));
+            dataLine.Add(GetPaddedValue(boxPlotStats.LowerWhisker, columnWidths["LowerWhisker" + statNameSuffix]));
+            dataLine.Add(GetPaddedValue(boxPlotStats.UpperWhisker, columnWidths["UpperWhisker" + statNameSuffix]));
             dataLine.Add(string.Format("{0:0}", boxPlotStats.Outliers.Count).PadRight(columnWidths["NumberOfOutliers" + statNameSuffix]));
         }
 
@@ -359,6 +359,16 @@ namespace MASIC.DataOutput
             var barChartSuccess = CreateBarCharts(datasetName, outputDirectory, plotFiles);
 
             return barChartSuccess && boxPlotSuccess && histogramSuccess;
+        }
+
+        private static string GetPaddedValue(double value, int columnWidth)
+        {
+            if (double.IsNaN(value) || double.IsInfinity(value))
+            {
+                return string.Format("".PadRight(columnWidth));
+            }
+
+            return string.Format("{0:0}", value).PadRight(columnWidth);
         }
 
         /// <summary>

@@ -807,7 +807,7 @@ namespace MASIC
 
                 reporterIonIntensityValues.Add(reporterIonIntensity);
 
-                if (reporterIonIntensity > 0)
+                if (!double.IsNaN(reporterIonIntensity) && reporterIonIntensity > 0)
                     nonZeroIntensities.Add(reporterIonIntensity);
             }
 

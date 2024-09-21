@@ -321,7 +321,7 @@ namespace MASIC.DataOutput
                         var reporterIonIndex = reporterIon.Key;
                         var reporterIonAbundance = reporterIon.Value[scanNumber];
 
-                        if (reporterIonAbundance <= 0)
+                        if (reporterIonAbundance <= 0 || double.IsNaN(reporterIonAbundance) || double.IsInfinity(reporterIonAbundance))
                             continue;
 
                         NonZeroReporterIons[reporterIonIndex].Add(reporterIonAbundance);
