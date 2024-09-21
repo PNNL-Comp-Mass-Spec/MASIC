@@ -7,6 +7,8 @@ namespace MatrixDecompositionUtility
     {
         // Ignore Spelling: ludcmp, lubksb
 
+        private int mSingularMatrixWarnCount;
+
         public double[] ProcessData(double[,] a, int n, double[] b)
         {
             var index = new int[n];
@@ -113,7 +115,18 @@ namespace MatrixDecompositionUtility
 
                 if (Math.Abs(big) < double.Epsilon)
                 {
-                    Console.WriteLine("Singular matrix in method ludcmp!!");
+                    mSingularMatrixWarnCount++;
+
+                    if (mSingularMatrixWarnCount < 10)
+                    {
+                        Console.WriteLine("Singular matrix in method ludcmp!!");
+                    }
+                    else if (mSingularMatrixWarnCount < 1000 && mSingularMatrixWarnCount % 100 == 0 ||
+                             mSingularMatrixWarnCount is >= 1000 and < 10000 && mSingularMatrixWarnCount % 1000 == 0 ||
+                             mSingularMatrixWarnCount % 10000 == 0)
+                    {
+                        Console.WriteLine("Singular matrix encountered {0} times in method ludcmp!!", mSingularMatrixWarnCount);
+                    }
                 }
 
                 vv[i] = 1.0 / big;
