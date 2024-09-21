@@ -248,11 +248,15 @@ namespace MASIC
                         ReporterIons.ReporterIonMassModeConstants.TMTTenMZ or
                         ReporterIons.ReporterIonMassModeConstants.TMTElevenMZ or
                         ReporterIons.ReporterIonMassModeConstants.TMTSixteenMZ or
-                        ReporterIons.ReporterIonMassModeConstants.TMTEighteenMZ or
-                        ReporterIons.ReporterIonMassModeConstants.TMT32MZ or
-                        ReporterIons.ReporterIonMassModeConstants.TMT35MZ)
+                        ReporterIons.ReporterIonMassModeConstants.TMTEighteenMZ)
                     {
                         mzValue = reporterIon.MZ.ToString("#0.000");
+                    }
+                    else if (mOptions.ReporterIons.ReporterIonMassMode is
+                             ReporterIons.ReporterIonMassModeConstants.TMT32MZ or
+                             ReporterIons.ReporterIonMassModeConstants.TMT35MZ)
+                    {
+                        mzValue = reporterIon.MZ.ToString("#0.0000");
                     }
                     else
                     {
