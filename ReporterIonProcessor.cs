@@ -23,6 +23,8 @@ namespace MASIC
 
         private readonly MASICOptions mOptions;
 
+        private int mUnsupportedCorrectionWarningCount;
+
         /// <summary>
         /// Constructor
         /// </summary>
@@ -30,6 +32,7 @@ namespace MASIC
         public ReporterIonProcessor(MASICOptions masicOptions)
         {
             mOptions = masicOptions;
+            mUnsupportedCorrectionWarningCount = 0;
         }
 
         /// <summary>
@@ -572,43 +575,73 @@ namespace MASIC
 
             if (mOptions.ReporterIons.ReporterIonApplyAbundanceCorrection)
             {
-                if (mOptions.ReporterIons.ReporterIonMassMode is
-                    ReporterIons.ReporterIonMassModeConstants.ITraqFourMZ or
-                    ReporterIons.ReporterIonMassModeConstants.ITraqEightMZHighRes or
-                    ReporterIons.ReporterIonMassModeConstants.ITraqEightMZLowRes or
-                    ReporterIons.ReporterIonMassModeConstants.TMTTenMZ or
-                    ReporterIons.ReporterIonMassModeConstants.TMTElevenMZ or
-                    ReporterIons.ReporterIonMassModeConstants.TMTSixteenMZ or
-                    ReporterIons.ReporterIonMassModeConstants.TMTEighteenMZ or
-                    ReporterIons.ReporterIonMassModeConstants.TMT32MZ or
-                    ReporterIons.ReporterIonMassModeConstants.TMT35MZ)
+                // Correct the reporter ion intensities using the Reporter Ion Intensity Corrector class
+
+                switch (mOptions.ReporterIons.ReporterIonMassMode)
                 {
-                    // Correct the reporter ion intensities using the Reporter Ion Intensity Corrector class
+                    case ReporterIons.ReporterIonMassModeConstants.TMT32MZ:
+                    case ReporterIons.ReporterIonMassModeConstants.TMT35MZ:
+                        mUnsupportedCorrectionWarningCount++;
 
-                    if (intensityCorrector.ReporterIonMode != mOptions.ReporterIons.ReporterIonMassMode ||
-                        intensityCorrector.ITraq4PlexCorrectionFactorType != mOptions.ReporterIons.ReporterIonITraq4PlexCorrectionFactorType)
-                    {
-                        intensityCorrector.UpdateReporterIonMode(
-                            mOptions.ReporterIons.ReporterIonMassMode,
-                            mOptions.ReporterIons.ReporterIonITraq4PlexCorrectionFactorType);
-                    }
-
-                    // Count the number of non-zero data points in reporterIntensitiesCorrected()
-                    var positiveCount = 0;
-
-                    for (var reporterIonIndex = 0; reporterIonIndex < reporterIons.Count; reporterIonIndex++)
-                    {
-                        if (reporterIntensitiesCorrected[reporterIonIndex] > 0)
+                        if (mUnsupportedCorrectionWarningCount < 10)
                         {
-                            positiveCount++;
+                            OnWarningEvent("Reporter ion correction is not yet supported for 32-plex or 35-plex TMT (scan {0})", currentScan.ScanNumber);
                         }
-                    }
 
-                    // Apply the correction if 2 or more points are non-zero
-                    if (positiveCount >= 2)
-                    {
-                        intensityCorrector.ApplyCorrection(reporterIntensitiesCorrected);
-                    }
+                        break;
+
+                    case ReporterIons.ReporterIonMassModeConstants.ITraqFourMZ:
+                    case ReporterIons.ReporterIonMassModeConstants.ITraqEightMZHighRes:
+                    case ReporterIons.ReporterIonMassModeConstants.ITraqEightMZLowRes:
+                    case ReporterIons.ReporterIonMassModeConstants.TMTTenMZ:
+                    case ReporterIons.ReporterIonMassModeConstants.TMTElevenMZ:
+                    case ReporterIons.ReporterIonMassModeConstants.TMTSixteenMZ:
+                    case ReporterIons.ReporterIonMassModeConstants.TMTEighteenMZ:
+
+                        if (intensityCorrector.ReporterIonMode != mOptions.ReporterIons.ReporterIonMassMode ||
+                            intensityCorrector.ITraq4PlexCorrectionFactorType != mOptions.ReporterIons.ReporterIonITraq4PlexCorrectionFactorType)
+                        {
+                            intensityCorrector.UpdateReporterIonMode(
+                                mOptions.ReporterIons.ReporterIonMassMode,
+                                mOptions.ReporterIons.ReporterIonITraq4PlexCorrectionFactorType);
+                        }
+
+                        // Count the number of non-zero data points in reporterIntensitiesCorrected()
+                        var positiveCount = 0;
+
+                        for (var reporterIonIndex = 0; reporterIonIndex < reporterIons.Count; reporterIonIndex++)
+                        {
+                            if (reporterIntensitiesCorrected[reporterIonIndex] > 0)
+                            {
+                                positiveCount++;
+                            }
+                        }
+
+                        // Apply the correction if 2 or more points are non-zero
+                        if (positiveCount >= 2)
+                        {
+                            intensityCorrector.ApplyCorrection(reporterIntensitiesCorrected);
+                        }
+
+                        break;
+
+                    case ReporterIons.ReporterIonMassModeConstants.CustomOrNone:
+                    case ReporterIons.ReporterIonMassModeConstants.ITraqETDThreeMZ:
+                    case ReporterIons.ReporterIonMassModeConstants.TMTTwoMZ:
+                    case ReporterIons.ReporterIonMassModeConstants.TMTSixMZ:
+                    case ReporterIons.ReporterIonMassModeConstants.PCGalnaz:
+                    case ReporterIons.ReporterIonMassModeConstants.HemeCFragment:
+                    case ReporterIons.ReporterIonMassModeConstants.LycAcetFragment:
+                    case ReporterIons.ReporterIonMassModeConstants.OGlcNAc:
+                    case ReporterIons.ReporterIonMassModeConstants.FrackingAmine20160217:
+                    case ReporterIons.ReporterIonMassModeConstants.FSFACustomCarbonyl:
+                    case ReporterIons.ReporterIonMassModeConstants.FSFACustomCarboxylic:
+                    case ReporterIons.ReporterIonMassModeConstants.FSFACustomHydroxyl:
+                    case ReporterIons.ReporterIonMassModeConstants.Acetylation:
+                    case ReporterIons.ReporterIonMassModeConstants.NativeOGlcNAc:
+                    default:
+                        // Reporter ion correction is not supported for these reporter ion mass modes
+                        break;
                 }
             }
 
