@@ -267,7 +267,8 @@ def generate_bar_chart(columnNames, xLabels, barHeights, title, isPercentages, r
     dataMin = 0
     dataMax = 100
 
-    cmap = plt.cm.get_cmap('inferno_r')
+    # cmap = plt.cm.get_cmap('inferno_r')
+    cmap = mpl.colormaps['inferno_r']
 
     dataNormalizer = Normalize(vmin=dataMin, vmax=dataMax)
     normList = dataNormalizer(barHeights.tolist())
