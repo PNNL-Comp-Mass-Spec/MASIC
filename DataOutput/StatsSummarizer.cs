@@ -675,6 +675,8 @@ namespace MASIC.DataOutput
                         // If there is a name conflict due to two reporter ions having the same rounded mass,
                         // a uniquifier will have been appended, e.g. Ion_116_2
 
+                        var ionNumber = 0;
+
                         for (var columnIndex = 0; columnIndex < dataValues.Length; columnIndex++)
                         {
                             var columnName = dataValues[columnIndex];
@@ -695,8 +697,9 @@ namespace MASIC.DataOutput
                                 continue;
                             }
 
+                            ionNumber++;
                             var reporterIonMz = double.Parse(reporterIonMatch.Groups["Mz"].Value);
-                            var reporterIon = new ReporterIonInfo(reporterIonMz);
+                            var reporterIon = new ReporterIonInfo(reporterIonMz, ionNumber);
 
                             mReporterIonInfo.Add(columnIndex, reporterIon);
                             mReporterIonAbundances.Add(columnIndex, new Dictionary<int, double>());

@@ -189,14 +189,14 @@ namespace MASIC
                     mOptions.ReporterIons.SetReporterIonMassMode(ReporterIons.ReporterIonMassModeConstants.TMTElevenMZ);
                 }
 
-                // Populate array reporterIons, which we will sort by m/z
+                // Populate array reporterIons, which we will sort by IonNumber then m/z
                 var reporterIons = new ReporterIonInfo[mOptions.ReporterIons.ReporterIonList.Count];
 
                 var index = 0;
 
                 foreach (var reporterIon in mOptions.ReporterIons.ReporterIonList)
                 {
-                    reporterIons[index] = reporterIon;
+                    reporterIons[index] = reporterIon.Value;
                     index++;
                 }
 
@@ -211,6 +211,7 @@ namespace MASIC
 
                 // Write the file headers
                 var reporterIonMZsUnique = new SortedSet<string>();
+
                 var headerColumns = new List<string>(7 + reporterIons.Length + 1)
                 {
                     "Dataset",
@@ -850,7 +851,7 @@ namespace MASIC
         protected class ReportIonInfoComparer : IComparer<ReporterIonInfo>
         {
             /// <summary>
-            /// Compare the m/z values of two reporter ions
+            /// Compare the Ion Number and m/z values of two reporter ions
             /// </summary>
             /// <param name="x"></param>
             /// <param name="y"></param>
@@ -862,6 +863,16 @@ namespace MASIC
 
                 if (reporterIonInfoA == null || reporterIonInfoB == null)
                     return 0;
+
+                if (reporterIonInfoA.IonNumber > reporterIonInfoB.IonNumber)
+                {
+                    return 1;
+                }
+
+                if (reporterIonInfoA.IonNumber < reporterIonInfoB.IonNumber)
+                {
+                    return -1;
+                }
 
                 if (reporterIonInfoA.MZ > reporterIonInfoB.MZ)
                 {

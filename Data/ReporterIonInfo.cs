@@ -18,6 +18,12 @@
         public double MZToleranceDa { get; set; }
 
         /// <summary>
+        /// Ion number (1-based)
+        /// </summary>
+        /// <remarks>This is used for sorting the reporter ions when creating text files and plots</remarks>
+        public int IonNumber { get; }
+
+        /// <summary>
         /// Should be False for Reporter Ions and True for other ions, e.g. immonium loss from phenylalanine
         /// </summary>
         public bool ContaminantIon { get; set; }
@@ -41,19 +47,22 @@
         /// <summary>
         /// Constructor
         /// </summary>
-        public ReporterIonInfo(double ionMZ)
+        public ReporterIonInfo(double ionMZ, int ionNumber)
         {
             MZ = ionMZ;
+            IonNumber = ionNumber;
         }
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="ionMZ"></param>
+        /// <param name="ionNumber"></param>
         /// <param name="isContaminantIon"></param>
-        public ReporterIonInfo(double ionMZ, bool isContaminantIon)
+        public ReporterIonInfo(double ionMZ, int ionNumber, bool isContaminantIon)
         {
             MZ = ionMZ;
+            IonNumber = ionNumber;
             ContaminantIon = isContaminantIon;
         }
 
