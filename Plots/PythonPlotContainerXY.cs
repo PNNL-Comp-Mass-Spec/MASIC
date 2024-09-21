@@ -47,7 +47,7 @@ namespace MASIC.Plots
             if (pngFile == null)
                 throw new ArgumentNullException(nameof(pngFile), "PNG file instance cannot be blank");
 
-            var exportFile = new FileInfo(Path.ChangeExtension(pngFile.FullName, null) + TMP_FILE_SUFFIX + ".txt");
+            var exportFile = new FileInfo(Path.ChangeExtension(pngFile.FullName, null) + TEMP_FILE_SUFFIX + ".txt");
 
             try
             {

@@ -13,7 +13,7 @@ namespace MASIC.Plots
     {
         // Ignore Spelling: MASIC, usr
 
-        protected const string TMP_FILE_SUFFIX = "_TmpExportData";
+        protected const string TEMP_FILE_SUFFIX = "_TmpExportData";
 
         protected int mSeriesCount;
 
@@ -264,7 +264,7 @@ namespace MASIC.Plots
                 }
 
                 var baseFileName = Path.GetFileNameWithoutExtension(exportFile.Name);
-                newFileName = baseFileName.Substring(0, baseFileName.Length - TMP_FILE_SUFFIX.Length) + ".png";
+                newFileName = baseFileName.Substring(0, baseFileName.Length - TEMP_FILE_SUFFIX.Length) + ".png";
 
                 var finalPngFile = new FileInfo(Path.Combine(workDir.FullName, newFileName));
 
