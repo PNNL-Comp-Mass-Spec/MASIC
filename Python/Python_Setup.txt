@@ -1,24 +1,32 @@
 == Windows ==
 
-Install Python 3.6.2 or newer from https://www.python.org/downloads/
+Install Python 3.10 or newer from https://www.python.org/downloads/
 
 From an admin level command prompt:
-python-3.8.5.exe /passive InstallAllUsers=1 DefaultAllUsersTargetDir=C:\Python38 CompileAll=1
+python-3.10.11-amd64.exe /passive InstallAllUsers=1 DefaultAllUsersTargetDir=C:\Python3 CompileAll=1
 
 After that finishes, install these packages:
-C:\Python38\Scripts\pip install numpy matplotlib pandas
+C:\Python3\Scripts\pip install numpy matplotlib pandas
 
+The GUI installer prompts you to "Disable the path length limit"
+* This is a good thing to do, since it will allow long paths to be accessed by both Python and other programs
+
+Steps to manually disable the path length limit (in case Python was installed via the command line)
+* Start RegEdit (you may need to do this from an administrative level command prompt)
+* Navigate to HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\FileSystem
+* Change DWORD LongPathsEnabled from 0 to 1
+** If LongPathsEnabled does not exist, right click in the whitespace below the Name column and choose New, "DWORD (32-bit) Value"
 
 == Linux (Ubuntu) ==
 
 # Check if python3 is already installed
 python3 --version
 
-# If missing, install python 3.6 (or newer) using
+# If missing, install python 3.10 (or newer) using
 sudo apt-get update
 sudo apt-get install python3
 
-# Check the version of pip (use python3 if python3.6 does not resolve)
+# Check the version of pip (use python3 if python3.10 does not resolve)
 python3 -m pip --version
 
 # Install numpy, matplotlib, and pandas
@@ -34,13 +42,13 @@ chmod -R a+rx /usr/local/lib64/python3.8
 # Check if python3 is already installed
 python3 --version
 
-# If missing, install python 3.6 (or newer) using
+# If missing, install python 3.10 (or newer) using
 sudo yum install python36
 
-# Check the version of pip (use python3 if python3.6 does not resolve)
+# Check the version of pip (use python3 if python3.10 does not resolve)
 python3.6 -m pip --version
 
-# If pip is missing, install it (use python3 if python3.6 does not resolve)
+# If pip is missing, install it (use python3 if python3.10 does not resolve)
 sudo python3.6 -m ensurepip --default-pip
 
 # Alternative method to install pip:
@@ -50,6 +58,6 @@ sudo yum install python36-pip
 sudo python3 -m pip install -U numpy matplotlib pandas
 
 # Permission updates may be required using one of these commands
-chmod -R a+rx /usr/local/lib/python3.6/
-chmod -R a+rx /usr/local/lib64/python3.6
+chmod -R a+rx /usr/local/lib/python3.10/
+chmod -R a+rx /usr/local/lib64/python3.10
 
