@@ -393,7 +393,7 @@ namespace MASIC
                             // This code shouldn't be reached
                         }
 
-                        if (MaximumDataCountToKeep - dataCountImplicitlyIncluded - binToSortDataCount == 0)
+                        if (MaximumDataCountToKeep - dataCountImplicitlyIncluded == binToSortDataCount)
                         {
                             // No need to sort and examine the data for BinToSort since we'll ultimately include all of it
                         }

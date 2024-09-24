@@ -658,11 +658,8 @@ namespace MASICBrowser
                             if (Math.Abs(parentIonToCompare.MZ - parentIonMZ) > similarMZTolerance)
                                 continue;
 
-                            // Similar parent ion m/z found
-                            if (!similarFragScans.Contains(comparisonFragScanObserved))
-                            {
-                                similarFragScans.Add(comparisonFragScanObserved);
-                            }
+                            // Similar parent ion m/z found; add it if not yet present
+                            similarFragScans.Add(comparisonFragScanObserved);
                         }
                     }
 
