@@ -505,7 +505,8 @@ namespace MASIC
             IReadOnlyList<float> dataList1,
             IReadOnlyList<float> dataList2,
             out float rValue,
-            out float probabilityOfSignificance, out float fishersZ)
+            out float probabilityOfSignificance,
+            out float fishersZ)
         {
             // TINY is used to "regularize" the unusual case of complete correlation
             const double TINY = 1.0E-20;
@@ -665,19 +666,19 @@ namespace MASIC
         /// </summary>
         /// <param name="dataList1"></param>
         /// <param name="dataList2"></param>
-        /// <param name="DiffInRanks"></param>
-        /// <param name="ZD"></param>
+        /// <param name="diffInRanks"></param>
+        /// <param name="zd"></param>
         /// <param name="probabilityOfSignificance"></param>
-        /// <param name="RS"></param>
-        /// <param name="ProbRS"></param>
+        /// <param name="rs"></param>
+        /// <param name="rsProb"></param>
         private void CorrelateSpearman(
             IReadOnlyCollection<float> dataList1,
             IReadOnlyCollection<float> dataList2,
-            out float DiffInRanks,
-            out float ZD,
+            out float diffInRanks,
+            out float zd,
             out float probabilityOfSignificance,
-            out float RS,
-            out float ProbRS)
+            out float rs,
+            out float rsProb)
         {
             // Note: data1 and data2 are re-ordered by this function; thus, they are passed ByVal
 
@@ -691,13 +692,13 @@ namespace MASIC
             // zero as prob_rs. The external method CRank is used.  A small value of either prob_d or prob_rs indicates
             // a significant correlation (rs positive) or anti correlation (rs negative).
 
-            DiffInRanks = 0;
-            ZD = 0;
             // ReSharper restore GrammarMistakeInComment
 
+            diffInRanks = 0;
+            zd = 0;
             probabilityOfSignificance = 0;
-            RS = 0;
-            ProbRS = 0;
+            rs = 0;
+            rsProb = 0;
 
             var n = dataList1.Count;
 
@@ -728,7 +729,7 @@ namespace MASIC
                 DiffInRanksWork += SquareNum(data1[j] - data2[j]);
             }
 
-            DiffInRanks = (float)(DiffInRanksWork);
+            diffInRanks = (float)(DiffInRanksWork);
 
             double en = n;
 
@@ -739,22 +740,22 @@ namespace MASIC
             // ReSharper disable once IdentifierTypo
             var vard = (en - 1.0) * en * en * SquareNum(en + 1.0) / 36.0 * fac;
 
-            ZD = (float)((DiffInRanks - AvgD) / Math.Sqrt(vard));
+            zd = (float)((diffInRanks - AvgD) / Math.Sqrt(vard));
 
-            probabilityOfSignificance = (float)(ErfCC(Math.Abs(ZD) / 1.4142136));
-            RS = (float)((1.0 - 6.0 / en3n * (DiffInRanks + (sf + sg) / 12.0)) / Math.Sqrt(fac));
+            probabilityOfSignificance = (float)(ErfCC(Math.Abs(zd) / 1.4142136));
+            rs = (float)((1.0 - 6.0 / en3n * (diffInRanks + (sf + sg) / 12.0)) / Math.Sqrt(fac));
 
-            fac = (RS + 1.0) * (1.0 - RS);
+            fac = (rs + 1.0) * (1.0 - rs);
 
             if (fac > 0.0)
             {
-                var t = RS * Math.Sqrt((en - 2.0) / fac);
+                var t = rs * Math.Sqrt((en - 2.0) / fac);
                 var df = en - 2.0;
-                ProbRS = (float)(BetaI(0.5 * df, 0.5, df / (df + t * t)));
+                rsProb = (float)(BetaI(0.5 * df, 0.5, df / (df + t * t)));
             }
             else
             {
-                ProbRS = 0.0F;
+                rsProb = 0.0F;
             }
         }
 
