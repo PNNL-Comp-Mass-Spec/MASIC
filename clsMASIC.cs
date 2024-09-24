@@ -1375,12 +1375,11 @@ namespace MASIC
                 // Instantiate the SpectraCache
                 // ---------------------------------------------------------
 
-                using var spectraCache = new SpectraCache(Options.CacheOptions, instrumentDataFile)
-                {
-                    DiskCachingAlwaysDisabled = Options.CacheOptions.DiskCachingAlwaysDisabled,
-                    CacheDirectoryPath = Options.CacheOptions.DirectoryPath,
-                    CacheSpectraToRetainInMemory = Options.CacheOptions.SpectraToRetainInMemory
-                };
+                using var spectraCache = new SpectraCache(Options.CacheOptions, instrumentDataFile);
+
+                spectraCache.DiskCachingAlwaysDisabled = Options.CacheOptions.DiskCachingAlwaysDisabled;
+                spectraCache.CacheDirectoryPath = Options.CacheOptions.DirectoryPath;
+                spectraCache.CacheSpectraToRetainInMemory = Options.CacheOptions.SpectraToRetainInMemory;
 
                 RegisterEvents(spectraCache);
 
