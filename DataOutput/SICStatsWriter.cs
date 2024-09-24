@@ -139,6 +139,12 @@ namespace MASIC.DataOutput
                 UpdateProgress(0, "Saving SIC data to flat file");
 
                 SICStatsFilePath = DataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, DataOutput.OutputFileTypeConstants.SICStatsFlatFile);
+
+                if (string.IsNullOrWhiteSpace(SICStatsFilePath))
+                {
+                    throw new Exception("ConstructOutputFilePath returned an empty file path for the SIC stats flat file");
+                }
+
                 ReportMessage("Saving SIC flat file to disk: " + Path.GetFileName(SICStatsFilePath));
 
                 using var writer = new StreamWriter(SICStatsFilePath, false);
