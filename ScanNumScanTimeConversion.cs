@@ -234,14 +234,12 @@ namespace MASIC
 
                             return ScanOrAcqTimeToScanTime(scanList, relativeTime, CustomSICList.CustomSICScanTypeConstants.Relative, true);
                         }
-                        else
-                        {
-                            var masterScanIndex = FindNearestScanNumIndex(scanList, scanOrAcqTime, scanType);
 
-                            if (masterScanIndex >= 0 && scanList.MasterScanOrderCount > 0)
-                            {
-                                return scanList.MasterScanTimeList[masterScanIndex];
-                            }
+                        var masterScanIndex = FindNearestScanNumIndex(scanList, scanOrAcqTime, scanType);
+
+                        if (masterScanIndex >= 0 && scanList.MasterScanOrderCount > 0)
+                        {
+                            return scanList.MasterScanTimeList[masterScanIndex];
                         }
 
                         break;
@@ -256,10 +254,8 @@ namespace MASIC
 
                             return scanOrAcqTime * totalRunTime + scanList.MasterScanTimeList[0];
                         }
-                        else
-                        {
-                            return 0;
-                        }
+
+                        return 0;
 
                     case CustomSICList.CustomSICScanTypeConstants.AcquisitionTime:
                         // scanOrAcqTime is an elution time value (or elution time range)
