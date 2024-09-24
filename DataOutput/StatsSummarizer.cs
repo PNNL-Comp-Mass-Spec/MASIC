@@ -495,10 +495,11 @@ namespace MASIC.DataOutput
                             continue;
                         }
 
+                        // ReSharper disable once CanSimplifyDictionaryLookupWithTryGetValue
+
                         if (!mScanList.ContainsKey(endScan))
                         {
                             OnWarningEvent("EndScan {0} not found in the _ScanStats file; cannot use parent ion index {1} for the peak width histogram", endScan, parentIon.Key);
-
                             continue;
                         }
 
@@ -965,6 +966,8 @@ namespace MASIC.DataOutput
                     // Duplicate parent ion index
                     // This is not typically seen, but it is possible if the same parent ion is fragmented using multiple fragmentation modes
                     // For example, see Angiotensin_AllScans.raw at https://github.com/PNNL-Comp-Mass-Spec/MASIC/tree/master/ExampleData/Lumos_Example
+
+                    // ReSharper disable once CanSimplifySetAddingWithSingleCall
 
                     if (duplicateParentIonIndices.Contains(parentIonIndex))
                         continue;

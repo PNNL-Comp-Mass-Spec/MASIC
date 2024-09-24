@@ -120,6 +120,8 @@ namespace MASICBrowser
             SavitzkyGolay = 2
         }
 
+        // ReSharper disable UnusedMember.Local
+
         private enum MsMsSearchEngineResultColumns
         {
             RowIndex = 0,
@@ -138,10 +140,13 @@ namespace MASICBrowser
             RankXc,
             DelM,
             XcRatio,
+            // ReSharper disable once IdentifierTypo
             PassFilt,
             MScore,
             NTT
         }
+
+        // ReSharper restore UnusedMember.Local
 
         private enum CurrentXMLDataFileSectionConstants
         {

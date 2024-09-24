@@ -175,9 +175,13 @@ namespace MASIC.Plots
             writer.WriteLine("    table.DataTable {");
             writer.WriteLine("      margin: 10px 5px 5px 5px;");
 
+            // ReSharper disable GrammarMistakeInComment
+
             // Option 1: tight, with a border
             // writer.WriteLine("      border: 1px solid black;");
             // writer.WriteLine("      border-collapse: collapse;");
+
+            // ReSharper restore GrammarMistakeInComment
 
             // Option 2: no border, normal spacing
             writer.WriteLine("      border: none;");

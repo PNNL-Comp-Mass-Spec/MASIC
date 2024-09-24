@@ -17,6 +17,8 @@ namespace MASIC.Plots
 
         protected int mSeriesCount;
 
+        // ReSharper disable once GrammarMistakeInComment
+
         /// <summary>
         /// When true, delete the temporary text files that contain data for Python to plot
         /// </summary>

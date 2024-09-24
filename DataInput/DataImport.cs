@@ -367,6 +367,8 @@ namespace MASIC.DataInput
                     };
 
                     // ReSharper disable ConditionIsAlwaysTrueOrFalse
+                    // ReSharper disable HeuristicUnreachableCode
+
                     // ReSharper disable once RedundantAssignment
                     writeDebugData = false;
 
@@ -391,7 +393,9 @@ namespace MASIC.DataInput
                     {
                         writer.Close();
                     }
+
                     // ReSharper restore ConditionIsAlwaysTrueOrFalse
+                    // ReSharper restore HeuristicUnreachableCode
 
                     // Call .FilterData, which will determine which data points to keep
                     filterDataArray.FilterData();
@@ -432,6 +436,8 @@ namespace MASIC.DataInput
                 }
 
                 // ReSharper disable once ConditionIsAlwaysTrueOrFalse
+                // ReSharper disable HeuristicUnreachableCode
+
                 if (writeDebugData)
                 {
                     using var postFilterWriter = new StreamWriter(new FileStream(Path.Combine(mOptions.OutputDirectoryPath, "DataDump_" + msSpectrum.ScanNumber + "_PostFilter.txt"), FileMode.Create, FileAccess.Write, FileShare.Read));
@@ -444,6 +450,8 @@ namespace MASIC.DataInput
                         postFilterWriter.WriteLine("{0:F3}\t{1:F0}", msSpectrum.IonsMZ[ionIndex], msSpectrum.IonsIntensity[ionIndex]);
                     }
                 }
+
+                // ReSharper restore HeuristicUnreachableCode
             }
             catch (Exception ex)
             {

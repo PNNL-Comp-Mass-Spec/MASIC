@@ -175,6 +175,8 @@ namespace MASIC.DataInput
             return null;
         }
 
+        // ReSharper disable once UnusedMember.Global
+
         /// <summary>
         /// Check the free space on the drive with the given directory, logging a message if insufficient space
         /// </summary>

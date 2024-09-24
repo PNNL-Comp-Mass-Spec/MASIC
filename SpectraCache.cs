@@ -212,6 +212,8 @@ namespace MASIC
 
                 if (cacheItem.CacheState != CacheStateConstants.UnusedSlot)
                 {
+                    // ReSharper disable once GrammarMistakeInComment
+
                     // Reset .ScanNumber, .IonCount, and .CacheState
                     cacheItem.Scan.Clear(0);
                     cacheItem.CacheState = CacheStateConstants.UnusedSlot;

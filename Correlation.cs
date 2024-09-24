@@ -4,6 +4,7 @@ using System.Linq;
 using MASIC.Options;
 using PRISM;
 
+// ReSharper disable OutParameterValueIsAlwaysDiscarded.Local
 // ReSharper disable UnusedMember.Global
 
 namespace MASIC
@@ -680,16 +681,20 @@ namespace MASIC
         {
             // Note: data1 and data2 are re-ordered by this function; thus, they are passed ByVal
 
+            // ReSharper disable GrammarMistakeInComment
+            // ReSharper disable once CommentTypo
+
             // Given two data arrays, data1[0..n-1] and data2[0..n-1], this method returns their sum-squared
             // difference of ranks as D, the number of standard deviations by which D deviates from its null hypothesis
             // expected value as zd, the two-sided significance level of this deviation as prob_d,
-            // ReSharper disable once CommentTypo
             // Spearman's rank correlation rs as rs, and the two-sided significance level of its deviation from
             // zero as prob_rs. The external method CRank is used.  A small value of either prob_d or prob_rs indicates
             // a significant correlation (rs positive) or anti correlation (rs negative).
 
             DiffInRanks = 0;
             ZD = 0;
+            // ReSharper restore GrammarMistakeInComment
+
             probabilityOfSignificance = 0;
             RS = 0;
             ProbRS = 0;

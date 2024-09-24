@@ -379,6 +379,8 @@ namespace MASIC.DataInput
                     {
                         lastSurveyScanIndex++;
 
+                        // ReSharper disable once CanSimplifySetAddingWithSingleCall
+
                         // Add the given SurveyScan to .MasterScanOrder, though only if it hasn't yet been added
                         if (!surveyScansRecorded.Contains(lastSurveyScanIndex))
                         {
@@ -499,6 +501,8 @@ namespace MASIC.DataInput
                     // Note that scanTime is the scan time of the most recent survey scan processed in the above Do loop, so it's not accurate
                     if (mScanTracking.CheckScanInRange(scanList.SurveyScans[lastSurveyScanIndex].ScanNumber, scanTime, sicOptions))
                     {
+                        // ReSharper disable once CanSimplifySetAddingWithSingleCall
+
                         // Add the given SurveyScan to .MasterScanOrder, though only if it hasn't yet been added
                         if (!surveyScansRecorded.Contains(lastSurveyScanIndex))
                         {
