@@ -391,12 +391,13 @@ namespace MASIC
 
                 var success = statsPlotter.ProcessFile(sicStatsFile.FullName, outputDirectoryPath);
 
-                if (!success)
-                {
-                    SetLocalErrorCode(MasicErrorCodes.OutputFileWriteError);
-                }
+                if (success)
+                    return true;
 
-                return success;
+                ShowErrorMessage(string.Format("statsPlotter.ProcessFile returned false for {0}", sicStatsFile.Name));
+                SetLocalErrorCode(MasicErrorCodes.OutputFileWriteError);
+
+                return false;
             }
             catch (Exception ex)
             {
@@ -1274,12 +1275,12 @@ namespace MASIC
                 }
                 else if (LocalErrorCode == MasicErrorCodes.NoError)
                 {
-                    StatusMessage = "Error Code " + ErrorCode + ": " + GetErrorMessage();
+                    StatusMessage = "Error code ProcessFilesErrorCodes." + ErrorCode + ": " + GetErrorMessage();
                     ShowErrorMessage(StatusMessage);
                 }
                 else
                 {
-                    StatusMessage = "Error Code " + LocalErrorCode + ": " + GetErrorMessage();
+                    StatusMessage = "Error code MasicErrorCodes." + LocalErrorCode + ": " + GetErrorMessage();
                     ShowErrorMessage(StatusMessage);
                 }
 

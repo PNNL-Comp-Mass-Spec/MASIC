@@ -117,6 +117,11 @@ namespace MASIC.DataOutput
 
                 var success = histogramPlotter.SavePlotFile(datasetName, outputDirectory, out var outputFilePath);
 
+                if (!success)
+                {
+                    ReportPlottingError("histogram plot", plotTitle, outputFilePath);
+                }
+
                 AppendPlotFile(plotFiles, outputFilePath, plotCategory, plotDescription);
 
                 return success;
@@ -196,6 +201,11 @@ namespace MASIC.DataOutput
                 }
 
                 var success = barChartPlotter.SavePlotFile(datasetName, outputDirectory, out var outputFilePath, yAxisMinimum, yAxisMaximum);
+
+                if (!success)
+                {
+                    ReportPlottingError("bar chart", plotTitle, outputFilePath);
+                }
 
                 AppendPlotFile(plotFiles, outputFilePath, plotCategory, plotDescription);
 
@@ -328,6 +338,11 @@ namespace MASIC.DataOutput
                     datasetName, outputDirectory, out var outputFilePath,
                     logarithmicYAxis, skipCreatingPngFile, yAxisMinimum);
 
+                if (!success)
+                {
+                    ReportPlottingError("box plot", plotTitle, outputFilePath);
+                }
+
                 foreach (var item in boxPlotPlotter.BoxPlotStatistics)
                 {
                     boxPlotStats.Add(item.Key, item.Value);
@@ -400,6 +415,16 @@ namespace MASIC.DataOutput
                 OnErrorEvent("Exception in StatsPlotter.ProcessFile", ex);
                 return false;
             }
+        }
+
+        private void ReportPlottingError(string plotDescription, string plotTitle, string outputFilePath)
+        {
+            OnErrorEvent("Error creating {0} \"{1}\"{2}",
+                plotDescription,
+                plotTitle,
+                string.IsNullOrWhiteSpace(outputFilePath)
+                    ? string.Empty
+                    : string.Format(", file {0}", Path.GetFileName(outputFilePath)));
         }
 
         private bool SaveIndexHTML(string datasetName, string outputDirectory, List<PlotFileInfo> plotFiles)
