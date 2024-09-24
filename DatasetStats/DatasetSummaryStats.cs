@@ -7,6 +7,8 @@ namespace MASIC.DatasetStats
     /// </summary>
     public class DatasetSummaryStats
     {
+        // Ignore Spelling: MASIC
+
         /// <summary>
         /// Number of DIA spectra
         /// </summary>

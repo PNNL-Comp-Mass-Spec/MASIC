@@ -237,7 +237,7 @@ namespace MASIC.DataOutput
                 for (var scanIndex = 0; scanIndex < scanCount; scanIndex++)
                 {
                     var scan = scanList[scanIndex];
-                    // Note: Using (float) to assure that we write out single precision numbers
+                    // Note: Using (float) to assure that we write single precision numbers
 
                     if (saveElutionTimeInsteadOfScan)
                     {
@@ -343,7 +343,7 @@ namespace MASIC.DataOutput
         /// <param name="writer"></param>
         public void WriteDecon2LSScanFileHeaders(StreamWriter writer)
         {
-            // Old Headers:      "scan_num,time,type,num_isotopic_signatures,num_peaks,tic,bpi_mz,bpi,time_domain_signal,peak_intensity_threshold,peptide_intensity_threshold")
+            // Old Headers:      "scan_num,time,type,num_isotopic_signatures,num_peaks,tic,bpi_mz,bpi,time_domain_signal,peak_intensity_threshold,peptide_intensity_threshold"
 
             var headerNames = new List<string>
             {

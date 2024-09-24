@@ -14,7 +14,7 @@ namespace MASIC.DataOutput
     /// </summary>
     public class SICStatsWriter : MasicEventNotifier
     {
-        // Ignore Spelling: Frag
+        // Ignore Spelling: Frag, MASIC
 
         /// <summary>
         /// SIC stats file path
@@ -339,8 +339,8 @@ namespace MASIC.DataOutput
 
             var currentPeak = currentSIC.Peak;
             dataValues.Add(StringUtilities.ValueToString(currentPeak.MaxIntensityValue, 5));          // Peak Intensity
-            dataValues.Add(StringUtilities.ValueToString(currentPeak.SignalToNoiseRatio, 4));         // Peak signal to noise ratio
-            dataValues.Add(currentPeak.FWHMScanWidth.ToString());                                                   // Full width at half max (in scans)
+            dataValues.Add(StringUtilities.ValueToString(currentPeak.SignalToNoiseRatio, 4));         // Peak signal-to-noise ratio
+            dataValues.Add(currentPeak.FWHMScanWidth.ToString());                                                    // Full width at half max (in scans)
             dataValues.Add(StringUtilities.ValueToString(currentPeak.Area, 5));                       // Peak area
 
             dataValues.Add(StringUtilities.ValueToString(currentPeak.ParentIonIntensity, 5));         // Intensity of the parent ion (just before the fragmentation scan)

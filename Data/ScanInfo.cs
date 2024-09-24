@@ -9,7 +9,7 @@ namespace MASIC.Data
     /// </summary>
     public class ScanInfo
     {
-        // Ignore Spelling: frag, MASIC
+        // Ignore Spelling: Exactive, frag, Lumos, MASIC
 
         /// <summary>
         /// Ranges from 1 to the number of scans in the datafile

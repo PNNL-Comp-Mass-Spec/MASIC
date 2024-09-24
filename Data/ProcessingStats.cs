@@ -7,7 +7,7 @@ namespace MASIC.Data
     /// </summary>
     public class ProcessingStats
     {
-        // Ignore Spelling: uncache
+        // Ignore Spelling: MASIC, uncache
 
         /// <summary>
         /// Peak memory usage, in MB

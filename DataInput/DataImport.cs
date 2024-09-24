@@ -14,7 +14,7 @@ namespace MASIC.DataInput
     /// </summary>
     public abstract class DataImport : MasicEventNotifier
     {
-        // Ignore Spelling: centroided
+        // Ignore Spelling: centroided, frag, MASIC, MSMS
 
         /// <summary>
         /// Thermo .raw file extension
@@ -593,7 +593,7 @@ namespace MASIC.DataInput
             scanStatsEntry.BasePeakIntensity = StringUtilities.ValueToString(currentScan.BasePeakIonIntensity, 5);
             scanStatsEntry.BasePeakMZ = StringUtilities.DblToString(currentScan.BasePeakIonMZ, 4);
 
-            // Base peak signal to noise ratio
+            // Base peak signal-to-noise ratio
             scanStatsEntry.BasePeakSignalToNoiseRatio = StringUtilities.ValueToString(MASICPeakFinder.clsMASICPeakFinder.ComputeSignalToNoise(currentScan.BasePeakIonIntensity, currentScan.BaselineNoiseStats.NoiseLevel), 4);
 
             scanStatsEntry.IonCount = currentScan.IonCount;
@@ -610,7 +610,7 @@ namespace MASIC.DataInput
                 scanStatsEntry.TotalIonIntensity,           // Total ion intensity
                 scanStatsEntry.BasePeakIntensity,           // Base peak ion intensity
                 scanStatsEntry.BasePeakMZ,                  // Base peak ion m/z
-                scanStatsEntry.BasePeakSignalToNoiseRatio,  // Base peak signal to noise ratio
+                scanStatsEntry.BasePeakSignalToNoiseRatio,  // Base peak signal-to-noise ratio
                 scanStatsEntry.IonCount.ToString(),         // Number of peaks (aka ions) in the spectrum
                 scanStatsEntry.IonCountRaw.ToString(),      // Number of peaks (aka ions) in the spectrum prior to any filtering
                 scanStatsEntry.ScanTypeName                 // Scan type name

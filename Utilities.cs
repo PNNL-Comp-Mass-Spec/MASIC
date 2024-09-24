@@ -8,6 +8,8 @@ namespace MASIC
     /// </summary>
     public static class Utilities
     {
+        // Ignore Spelling: MASIC
+
         // CHARGE_CARRIER_MASS_AVG As Double = 1.00739
 
         /// <summary>

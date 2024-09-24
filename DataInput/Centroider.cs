@@ -9,7 +9,7 @@ namespace MASIC.DataInput
     /// </summary>
     public class Centroider
     {
-        // Ignore Spelling: amu, centroiding, mmu, Orbitrap
+        // Ignore Spelling: amu, centroided, Centroider, centroiding, MASIC, mmu, Orbitrap
 
         // ReSharper disable once UnusedMember.Global
 

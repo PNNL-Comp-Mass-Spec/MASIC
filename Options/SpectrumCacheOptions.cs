@@ -5,6 +5,8 @@
     /// </summary>
     public class SpectrumCacheOptions
     {
+        // Ignore Spelling: MASIC
+
         /// <summary>
         /// Default number of spectra to cache in memory
         /// </summary>

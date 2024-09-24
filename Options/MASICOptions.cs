@@ -99,6 +99,9 @@ namespace MASIC.Options
         /// <summary>
         /// Dataset lookup file path
         /// </summary>
+        /// <remarks>
+        /// This is a comma, space, or tab delimited file with two columns: Dataset Name and Dataset ID
+        /// </remarks>
         public string DatasetLookupFilePath { get; set; } = string.Empty;
 
         /// <summary>

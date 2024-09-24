@@ -173,7 +173,7 @@ namespace MASIC
                 }
 
                 // Note: targetIndex will be the same as index until the first time that data is combined (countCombined > 0)
-                // After that, targetIndex will always be less than index and we will thus always need to copy data
+                // After that, targetIndex will always be less than index, and we will thus always need to copy data
                 else if (targetIndex != index)
                 {
                     msSpectrum.IonsMZ[targetIndex] = msSpectrum.IonsMZ[index];
@@ -233,7 +233,7 @@ namespace MASIC
                 }
 
                 // Note: targetIndex will be the same as index until the first time that data is combined (countCombined > 0)
-                // After that, targetIndex will always be less than index and we will thus always need to copy data
+                // After that, targetIndex will always be less than index, and we will thus always need to copy data
                 if (targetIndex != index || countCombined > 0)
                 {
                     msSpectrum.IonsMZ[targetIndex] = bestMz;
@@ -287,7 +287,7 @@ namespace MASIC
         /// <param name="compressData"></param>
         /// <param name="msDataResolution"></param>
         /// <param name="keepRawSpectrum"></param>
-        /// <returns>True if success false if an error</returns>
+        /// <returns>True if success, false if an error</returns>
         public bool ProcessAndStoreSpectrum(
             ScanInfo scanInfo,
             DataInput.DataImport dataImportUtilities,

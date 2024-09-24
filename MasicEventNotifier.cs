@@ -8,7 +8,7 @@ namespace MASIC
     /// </summary>
     public abstract class MasicEventNotifier : EventNotifier
     {
-        // Ignore Spelling: uncache
+        // Ignore Spelling: MASIC, uncache
 
         private short mLastPercentComplete;
 
@@ -42,7 +42,7 @@ namespace MASIC
         public event UpdateErrorCodeEventEventHandler UpdateErrorCodeEvent;
 
         /// <summary>
-        /// Delete fro the update error code event
+        /// Delegate for the update error code event
         /// </summary>
         /// <param name="newErrorCode"></param>
         /// <param name="leaveExistingErrorCodeUnchanged"></param>

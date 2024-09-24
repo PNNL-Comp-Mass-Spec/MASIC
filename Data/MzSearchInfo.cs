@@ -7,7 +7,7 @@ namespace MASIC.Data
     /// </summary>
     public class MzSearchInfo
     {
-        // Ignore Spelling: Da
+        // Ignore Spelling: Da, MASIC
 
         /// <summary>
         /// m/z value to find

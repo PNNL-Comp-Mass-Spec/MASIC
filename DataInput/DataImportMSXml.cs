@@ -1890,7 +1890,7 @@ namespace MASIC.DataInput
 
                 if (scanInfo.ScanTypeName == "HCD-MSn")
                 {
-                    // HCD spectra are always high res; auto-update things
+                    // HCD spectra are always high-res; auto-update things
                     scanInfo.ScanTypeName = "HCD-HMSn";
                 }
             }

@@ -509,10 +509,14 @@ namespace MASIC
             // TINY is used to "regularize" the unusual case of complete correlation
             const double TINY = 1.0E-20;
 
-            // Given two arrays x[1..n] and y[1..n], this method computes their correlation coefficient
-            // r (returned as r), the significance level at which the null hypothesis of zero correlation is
-            // disproved (prob whose small value indicates a significant correlation), and Fisher's z (returned
-            // as z), whose value can be used in further statistical tests as described above.
+            // ReSharper disable GrammarMistakeInComment
+
+            // Given two arrays x[1..n] and y[1..n], this method computes their correlation coefficient r (returned as r),
+            // the significance level at which the null hypothesis of zero correlation is disproved
+            // (probability whose small value indicates a significant correlation), and Fisher's z (returned as z),
+            // whose value can be used in further statistical tests as described above.
+
+            // ReSharper restore GrammarMistakeInComment
 
             var syy = 0.0;
             var sxy = 0.0;
@@ -584,10 +588,13 @@ namespace MASIC
             out float z,
             out float probabilityOfSignificance)
         {
+            // ReSharper disable GrammarMistakeInComment
+
             // Given data arrays data1[1..n] and data2[1..n], this program returns Kendall's tau as tau,
             // its number of standard deviations from zero as z, and its two-sided significance level as prob.
-            // Small values of prob indicate a significant correlation (tau positive) or anti correlation (tau
-            // negative).
+            // Small values of prob indicate a significant correlation (tau positive) or anti correlation (tau negative).
+
+            // ReSharper restore GrammarMistakeInComment
 
             long n2 = 0;
             long n1 = 0;
@@ -746,6 +753,8 @@ namespace MASIC
             }
         }
 
+        // ReSharper disable GrammarMistakeInComment
+
         /// <summary>
         /// Given a zero-based sorted array w(0..n-1), replaces the elements by their rank (1 .. n), including mid-ranking of ties,
         /// and returns as s the sum of f^3 - f, where f is the number of elements in each tie.
@@ -753,6 +762,7 @@ namespace MASIC
         /// <param name="n"></param>
         /// <param name="w"></param>
         /// <param name="s"></param>
+        // ReSharper restore GrammarMistakeInComment
         private void CRank(int n, IList<float> w, out float s)
         {
             s = 0;

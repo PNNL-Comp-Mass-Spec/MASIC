@@ -12,7 +12,7 @@ namespace MASIC
     /// </summary>
     public class SpectraCache : MasicEventNotifier, IDisposable
     {
-        // Ignore Spelling: uncache, uncached
+        // Ignore Spelling: MASIC, uncache, uncached
 
         /// <summary>
         /// Constructor

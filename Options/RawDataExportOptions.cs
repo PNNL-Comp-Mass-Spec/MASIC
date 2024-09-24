@@ -5,6 +5,8 @@
     /// </summary>
     public class RawDataExportOptions
     {
+        // Ignore Spelling: MASIC
+
         /// <summary>
         /// Raw data export file formats
         /// </summary>

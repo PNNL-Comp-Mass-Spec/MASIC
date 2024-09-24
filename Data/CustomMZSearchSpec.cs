@@ -5,6 +5,8 @@
     /// </summary>
     public class CustomMZSearchSpec
     {
+        // Ignore Spelling: acq, MASIC
+
         /// <summary>
         /// m/z to find
         /// </summary>

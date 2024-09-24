@@ -9,6 +9,8 @@ namespace MASIC.DataOutput
     /// </summary>
     public class ThermoMetadataWriter : MasicEventNotifier
     {
+        // Ignore Spelling: MASIC
+
         /// <summary>
         /// Write the instrument method file to disk
         /// </summary>

@@ -669,7 +669,7 @@ namespace MASIC
                 ReportMessage("FindSimilarParentIons: Populate searchRange");
 
                 // Populate searchRange
-                // Set UsePointerIndexArray to false to prevent .FillWithData trying to sort mzList
+                // To prevent .FillWithData trying to sort mzList, set UsePointerIndexArray to false
                 // (the data was already sorted above)
                 var searchRange = new SearchRange
                 {

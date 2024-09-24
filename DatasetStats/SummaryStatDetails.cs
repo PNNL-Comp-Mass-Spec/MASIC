@@ -5,6 +5,8 @@
     /// </summary>
     public class SummaryStatDetails
     {
+        // Ignore Spelling: MASIC
+
         /// <summary>
         /// Scan count
         /// </summary>

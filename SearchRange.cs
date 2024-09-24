@@ -14,6 +14,8 @@ namespace MASIC
     /// </summary>
     public class SearchRange
     {
+        // Ignore Spelling: MASIC
+
         /// <summary>
         /// Constructor
         /// </summary>
@@ -89,7 +91,7 @@ namespace MASIC
 
         /// <summary>
         /// When true, keep track of the original index of each data point
-        /// Set this to false to conserve memory usage
+        /// To conserve memory usage, set this to false
         /// </summary>
         public bool UsePointerIndexArray { get; set; }
 

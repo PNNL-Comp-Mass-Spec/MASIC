@@ -7,6 +7,8 @@ namespace MASIC.DatasetStats
     /// </summary>
     public class DatasetFileInfo
     {
+        // Ignore Spelling: acq, MASIC
+
         /// <summary>
         /// File creation time (local time)
         /// </summary>

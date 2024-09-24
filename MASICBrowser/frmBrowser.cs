@@ -250,7 +250,7 @@ namespace MASICBrowser
 
                 chkSortDescending.Checked = sortOrder switch
                 {
-                    // Set SortDescending to false to sort these ascending
+                    // When chkSortDescending.Checked is false, data is sorted ascending
                     SortOrderConstants.SortByMz => false,
                     SortOrderConstants.SortByPeakIndex => false,
                     SortOrderConstants.SortByScanOptimalPeakCenter => false,
@@ -458,7 +458,7 @@ namespace MASICBrowser
                 {
                     if (sicPotentialStats.PeakCountBasisForMinimumPotentialArea > potentialAreaStatsForRegion.PeakCountBasisForMinimumPotentialArea)
                     {
-                        // The non valid peak count value is larger than the one associated with the current
+                        // The non-valid peak count value is larger than the one associated with the current
                         // minimum potential peak area; update the minimum peak area to potentialPeakArea
                         potentialAreaStatsForRegion.MinimumPotentialPeakArea = sicPotentialStats.MinimumPotentialPeakArea;
                         potentialAreaStatsForRegion.PeakCountBasisForMinimumPotentialArea = sicPotentialStats.PeakCountBasisForMinimumPotentialArea;

@@ -15,7 +15,7 @@ namespace MASIC
     /// </summary>
     public class MRMProcessing : MasicEventNotifier
     {
-        // Ignore Spelling: crosstab, mrm, srm
+        // Ignore Spelling: crosstab, MASIC, mrm, srm
 
         private struct SRMListType
         {

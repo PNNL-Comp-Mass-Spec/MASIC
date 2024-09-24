@@ -9,7 +9,7 @@ namespace MASIC.Plots
     /// </summary>
     public class AxisInfo
     {
-        // Ignore Spelling: Autoscale
+        // Ignore Spelling: Autoscale, MASIC
 
         /// <summary>
         /// Default axis label format
@@ -168,7 +168,7 @@ namespace MASIC.Plots
         /// <summary>
         /// Set the axis range
         /// </summary>
-        /// <remarks>Set min and max to 0 (or double.NaN) to enable auto scaling</remarks>
+        /// <remarks>Set min and max to 0 (or double.NaN) to enable auto-scaling</remarks>
         /// <param name="min"></param>
         /// <param name="max"></param>
         public void SetRange(double min, double max)

@@ -10,6 +10,8 @@ namespace MASIC
     /// </summary>
     public class ScanNumScanTimeConversion : EventNotifier
     {
+        // Ignore Spelling: acq, MASIC
+
         /// <summary>
         /// Find the index of the scan closest to scanOrAcqTime (searching both Survey and Fragmentation Scans using the MasterScanList)
         /// </summary>

@@ -1362,7 +1362,7 @@ namespace MASICPeakFinder
                 for (var dataIndex = 0; dataIndex < areaDataCount - 1; dataIndex++)
                 {
                     // Use the Trapezoid area formula to compute the area slice to add to sicPeak.Area
-                    // Area = 0.5 * DeltaX * (Y1 + Y2)
+                    // Peak Area = 0.5 * DeltaX * (Y1 + Y2)
                     var scanDelta = scanNumbers[dataIndex + 1] - scanNumbers[dataIndex];
                     peakArea += 0.5 * scanDelta * (intensities[dataIndex] + intensities[dataIndex + 1]);
                 }
@@ -1906,7 +1906,7 @@ namespace MASICPeakFinder
         }
 
         /// <summary>
-        /// Compute the signal to noise ratio
+        /// Compute the signal-to-noise ratio
         /// </summary>
         /// <param name="signal"></param>
         /// <param name="noiseThresholdIntensity"></param>
@@ -2432,7 +2432,7 @@ namespace MASICPeakFinder
                 }
 
                 // Determine the initial value for .PeakWidthPointsMinimum
-                // We will use maximumIntensity and minimumPeakIntensity to compute a S/N value to help pick .PeakWidthPointsMinimum
+                // We will use maximumIntensity and minimumPeakIntensity to compute a signal-to-noise value to help pick .PeakWidthPointsMinimum
 
                 // Old: if (sicPeakFinderOptions.SICNoiseThresholdIntensity < 1)
                 //          sicPeakFinderOptions.SICNoiseThresholdIntensity = 1;
@@ -2589,7 +2589,7 @@ namespace MASICPeakFinder
                                 {
                                     if (peakItem.PeakLocation >= peakIndexStart && peakItem.PeakLocation <= peakIndexEnd)
                                     {
-                                        // The peak at i has a peak center between the "official" peak's boundaries
+                                        // The current peak has a peak center between the "official" peak's boundaries
                                         // Make sure it's not the same peak as the "official" peak
                                         if (peakItem.PeakLocation != peakLocationIndex)
                                         {
@@ -3508,25 +3508,25 @@ namespace MASICPeakFinder
                                 sicPeakFinderOptions.SICBaselineNoiseOptions);
                         }
 
-                        //// Compute the trimmed median of the data in SICData (replacing non positive values with the minimum)
-                        //// If the median is less than sicPeak.BaselineNoiseStats.NoiseLevel then update sicPeak.BaselineNoiseStats.NoiseLevel
-                        //noiseOptionsOverride.BaselineNoiseMode = NoiseThresholdModes.TrimmedMedianByAbundance;
-                        //noiseOptionsOverride.TrimmedMeanFractionLowIntensityDataToAverage = 0.75;
+                        // // Compute the trimmed median of the data in SICData (replacing non-positive values with the minimum)
+                        // // If the median is less than sicPeak.BaselineNoiseStats.NoiseLevel, update sicPeak.BaselineNoiseStats.NoiseLevel
+                        // noiseOptionsOverride.BaselineNoiseMode = NoiseThresholdModes.TrimmedMedianByAbundance;
+                        // noiseOptionsOverride.TrimmedMeanFractionLowIntensityDataToAverage = 0.75;
                         //
-                        //success = ComputeNoiseLevelForSICData[sicData, noiseOptionsOverride, noiseStatsCompare];
-                        //if (noiseStatsCompare.PointsUsed >= MINIMUM_NOISE_SCANS_REQUIRED)
-                        //{
+                        // success = ComputeNoiseLevelForSICData[sicData, noiseOptionsOverride, noiseStatsCompare];
+                        // if (noiseStatsCompare.PointsUsed >= MINIMUM_NOISE_SCANS_REQUIRED)
+                        // {
                         //    // Check whether the comparison noise level is less than the existing noise level times 0.75
                         //    if (noiseStatsCompare.NoiseLevel < sicPeak.BaselineNoiseStats.NoiseLevel * 0.75)
                         //    {
                         //        // Yes, the comparison noise level is lower
-                        //        // Use a T-Test to see if the comparison noise level is significantly different than the primary noise level
+                        //        // Use a T-Test to see if the comparison noise level is significantly different from the primary noise level
                         //        if (TestSignificanceUsingTTest[noiseStatsCompare.NoiseLevel, sicPeak.BaselineNoiseStats.NoiseLevel, noiseStatsCompare.NoiseStDev, sicPeak.BaselineNoiseStats.NoiseStDev, noiseStatsCompare.PointsUsed, sicPeak.BaselineNoiseStats.PointsUsed, TTestConfidenceLevelConstants.Conf95Pct, tCalculated])
                         //        {
                         //            sicPeak.BaselineNoiseStats = noiseStatsCompare;
                         //        }
                         //    }
-                        //}
+                        // }
 
                         // If smoothing was enabled, see if the smoothed value is larger than sicPeak.MaxIntensityValue
                         // If it is, use the smoothed value for sicPeak.MaxIntensityValue
@@ -3547,7 +3547,7 @@ namespace MASICPeakFinder
                             }
                         }
 
-                        // Compute the signal to noise ratio for the peak
+                        // Compute the signal-to-noise ratio for the peak
                         sicPeak.SignalToNoiseRatio = ComputeSignalToNoise(sicPeak.MaxIntensityValue, sicPeak.BaselineNoiseStats.NoiseLevel);
 
                         // Compute the Full Width at Half Max (fwhm) value, this time subtracting the noise level from the baseline

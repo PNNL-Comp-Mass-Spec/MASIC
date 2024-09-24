@@ -12,7 +12,7 @@ namespace MASIC.Data
     /// </summary>
     public class CustomSICList : EventNotifier
     {
-        // Ignore Spelling: frag, acq, Da
+        // Ignore Spelling: acq, Da, frag, MASIC
 
         /// <summary>
         /// Keyword corresponding to CustomSICScanTypeConstants.Absolute

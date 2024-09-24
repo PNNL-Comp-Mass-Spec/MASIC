@@ -12,6 +12,8 @@ namespace MASIC.DataInput
     /// </summary>
     public class DirectorySpaceTools : EventNotifier
     {
+        // Ignore Spelling: MASIC
+
         /// <summary>
         /// When true, log errors and warnings using the LogTools class
         /// Otherwise, use EventNotifier events

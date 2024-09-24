@@ -8,6 +8,8 @@ namespace MASIC.DataOutput
     /// </summary>
     public class OutputFileHandles : MasicEventNotifier
     {
+        // Ignore Spelling: MASIC
+
         /// <summary>
         /// Scan stats file
         /// </summary>
@@ -15,10 +17,12 @@ namespace MASIC.DataOutput
 
         // ReSharper disable CommentTypo
 
+        // ReSharper disable once GrammarMistakeInComment
+
         /// <summary>
         /// SIC details file
         /// </summary>
-        /// <remarks>This is different than _SICstats.txt file</remarks>
+        /// <remarks>This is different than the _SICstats.txt file</remarks>
         public StreamWriter SICDataFile { get; set; }
 
         // ReSharper restore CommentTypo

@@ -74,7 +74,7 @@ namespace MASIC
                 }
                 else
                 {
-                    // Use processingSIMScans and .SIMScan to decide whether or not to include the entry
+                    // Use processingSIMScans and .SIMScan to decide whether to include the entry
                     var surveyScan = scanList.SurveyScans[scanList.ParentIons[parentIonIndex].SurveyScanIndex];
 
                     if (processSIMScans)

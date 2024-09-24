@@ -4,6 +4,8 @@ namespace MASIC.Plots
 {
     internal class PlotFileInfo
     {
+        // Ignore Spelling: MASIC
+
         /// <summary>
         /// File description
         /// </summary>

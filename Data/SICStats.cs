@@ -5,7 +5,7 @@
     /// </summary>
     public class SICStats
     {
-        // Ignore Spelling: frag
+        // Ignore Spelling: frag, MASIC
 
         /// <summary>
         /// SIC peak

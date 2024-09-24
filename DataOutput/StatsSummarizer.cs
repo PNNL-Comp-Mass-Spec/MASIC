@@ -673,7 +673,7 @@ namespace MASIC.DataOutput
                         // Ion_126.128 or Ion_116
 
                         // If there is a name conflict due to two reporter ions having the same rounded mass,
-                        // a uniquifier will have been appended, e.g. Ion_116_2
+                        // a unique number will have been appended, e.g. Ion_116_2
 
                         var ionNumber = 0;
 

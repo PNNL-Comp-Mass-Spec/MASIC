@@ -7,6 +7,8 @@ namespace MASIC.Data
     /// </summary>
     public class SimilarParentIonsData
     {
+        // Ignore Spelling: MASIC
+
         /// <summary>
         /// Pointer array of index values in the original data
         /// </summary>

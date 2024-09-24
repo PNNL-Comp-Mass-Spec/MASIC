@@ -10,6 +10,8 @@ namespace MASIC.DataOutput
     /// </summary>
     public class SpectrumDataWriter : MasicEventNotifier
     {
+        // Ignore Spelling: MASIC
+
         private readonly BPIWriter mBPIWriter;
         private readonly MASICOptions mOptions;
 

@@ -12,6 +12,8 @@ namespace MASIC.DataOutput
     /// </summary>
     public class ExtendedStatsWriter : MasicEventNotifier
     {
+        // Ignore Spelling: frag, MASIC
+
         /// <summary>
         /// Collision mode column name
         /// </summary>

@@ -5,6 +5,8 @@
     /// </summary>
     public class BinningOptions
     {
+        // Ignore Spelling: MASIC
+
         /// <summary>
         /// X-value of the first bin
         /// </summary>

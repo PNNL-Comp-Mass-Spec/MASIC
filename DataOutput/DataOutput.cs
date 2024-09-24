@@ -1059,7 +1059,7 @@ namespace MASIC.DataOutput
 
                 for (var fragScanIndex = 0; fragScanIndex < scanList.ParentIons[parentIonIndex].FragScanIndices.Count; fragScanIndex++)
                 {
-                    // "Dataset  ParentIonIndex  FragScanIndex  ParentIonMZ
+                    // Dataset  ParentIonIndex  FragScanIndex  ParentIonMZ
                     var prefix = string.Format("{0}\t{1}\t{2}\t{3}",
                         sicOptions.DatasetID,
                         parentIonIndex,

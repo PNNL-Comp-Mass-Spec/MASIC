@@ -8,6 +8,8 @@ namespace MASIC.Data
     /// </summary>
     public class MRMScanInfo
     {
+        // Ignore Spelling: MASIC
+
         /// <summary>
         /// Parent ion m/z
         /// </summary>

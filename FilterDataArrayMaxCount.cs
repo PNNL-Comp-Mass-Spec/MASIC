@@ -402,7 +402,7 @@ namespace MASIC
                             SortAndMarkPointsToSkip(binToSortAbundances, binToSortDataIndices, binToSortDataCount, MaximumDataCountToKeep - dataCountImplicitlyIncluded, SUBTASK_STEP_COUNT);
                         }
 
-                        // Synchronize the data in binToSortAbundances and binToSortDataIndices with mDataValues and mDataValues
+                        // Synchronize the data in binToSortAbundances and binToSortDataIndices with mDataValues and mDataIndices
                         // mDataValues and mDataIndices have not been sorted and therefore mDataIndices should currently be sorted ascending on "valid data point index"
                         // binToSortDataIndices should also currently be sorted ascending on "valid data point index" so the following Do Loop within a For Loop should sync things up
 
@@ -460,7 +460,7 @@ namespace MASIC
         /// <summary>
         /// This method uses a full sort to filter the data
         /// </summary>
-        /// <remarks>Sorting will be slow for large arrays and you should therefore use FilterDataByMaxDataCountToKeep if possible</remarks>
+        /// <remarks>Sorting will be slow for large arrays, and you should therefore use FilterDataByMaxDataCountToKeep if possible</remarks>
         /// <param name="abundances"></param>
         /// <param name="dataIndices"></param>
         /// <param name="dataCount"></param>

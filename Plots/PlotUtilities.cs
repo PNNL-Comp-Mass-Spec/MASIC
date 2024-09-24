@@ -6,6 +6,8 @@ namespace MASIC.Plots
 {
     internal static class PlotUtilities
     {
+        // Ignore Spelling: MASIC
+
         public static void GetAxisFormatInfo(
             IList<double> dataPoints,
             bool integerData,

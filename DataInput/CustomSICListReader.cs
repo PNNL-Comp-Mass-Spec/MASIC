@@ -11,6 +11,8 @@ namespace MASIC.DataInput
     /// </summary>
     public class CustomSICListReader : MasicEventNotifier
     {
+        // Ignore Spelling: MASIC
+
         private const string CUSTOM_SIC_COLUMN_MZ = "MZ";
 
         private const string CUSTOM_SIC_COLUMN_MZ_TOLERANCE = "MZToleranceDa";

@@ -8,6 +8,8 @@ namespace MASIC.Data
     /// </summary>
     public class MSSpectrum
     {
+        // Ignore Spelling: MASIC
+
         /// <summary>
         /// Scan number
         /// </summary>

@@ -5,6 +5,8 @@
     /// </summary>
     public class SampleInfo
     {
+        // Ignore Spelling: MASIC
+
         /// <summary>
         /// Sample name
         /// </summary>

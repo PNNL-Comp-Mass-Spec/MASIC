@@ -8,6 +8,8 @@ namespace MASIC.Data
     /// <remarks>Used when comparing spectra</remarks>
     public class BinnedData
     {
+        // Ignore Spelling: MASIC
+
         /// <summary>
         /// X value of the first bin
         /// </summary>

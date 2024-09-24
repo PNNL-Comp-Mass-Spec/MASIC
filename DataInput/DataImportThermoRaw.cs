@@ -516,6 +516,8 @@ namespace MASIC.DataInput
                 }
             };
 
+            // ReSharper disable once GrammarMistakeInComment
+
             // The .EventNumber value is sometimes wrong; need to check for this
             // For example, if the dataset only has MS2 scans and no parent-ion scan, .EventNumber will be 2 for every MS2 scan
             if (scanList.FragScans.Count > 0)

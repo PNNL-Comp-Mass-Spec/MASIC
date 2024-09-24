@@ -9,6 +9,8 @@ namespace MASIC.Data
     /// </summary>
     public class SICDetails
     {
+        // Ignore Spelling: MASIC
+
         /// <summary>
         /// Indicates the type of scans that the SICScanIndices() array points to. Will normally be "SurveyScan", but for MRM data will be "FragScan"
         /// </summary>

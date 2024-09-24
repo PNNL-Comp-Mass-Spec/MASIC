@@ -652,7 +652,7 @@ namespace MASIC.DatasetStats
                     // Base peak ion m/z
                     dataValues.Add(scanStatsEntry.BasePeakMZ);
 
-                    // Base peak signal to noise ratio
+                    // Base peak signal-to-noise ratio
                     dataValues.Add(scanStatsEntry.BasePeakSignalToNoiseRatio);
 
                     // Number of peaks (aka ions) in the spectrum

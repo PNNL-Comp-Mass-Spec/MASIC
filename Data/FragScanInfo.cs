@@ -7,6 +7,8 @@ namespace MASIC.Data
     /// </summary>
     public class FragScanInfo
     {
+        // Ignore Spelling: frag, MASIC
+
         /// <summary>
         /// Collision mode
         /// </summary>

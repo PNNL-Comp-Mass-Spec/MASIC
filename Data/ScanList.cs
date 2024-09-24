@@ -197,6 +197,7 @@ namespace MASIC.Data
                 ReportError("Programming error: unknown value for scanType: " + scanType);
             }
         }
+        // ReSharper disable GrammarMistakeInComment
 
         /// <summary>
         /// Adds a new entry to .MasterScanOrder, .MasterScanNumList and, .MasterScanTimeList
@@ -205,6 +206,7 @@ namespace MASIC.Data
         /// <param name="scanIndex"></param>
         /// <param name="scanNumber"></param>
         /// <param name="scanTime"></param>
+        // ReSharper restore GrammarMistakeInComment
         public void AddMasterScanEntry(
             ScanTypeConstants scanType,
             int scanIndex,

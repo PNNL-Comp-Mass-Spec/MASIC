@@ -7,6 +7,8 @@ namespace MASIC.Data
     /// </summary>
     public class UniqueMZListItem
     {
+        // Ignore Spelling: MASIC
+
         /// <summary>
         /// Average m/z
         /// </summary>

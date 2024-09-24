@@ -315,7 +315,7 @@ namespace MASIC
                     }
                     else if (!string.IsNullOrWhiteSpace(datasetIdOrLookupFile))
                     {
-                        // Assume the user specified a dataset number lookup file comma, space, or tab delimited file specifying the dataset number for each input file)
+                        // Assume the user specified a dataset number lookup file specifying the dataset number for each input file
                         mDatasetLookupFilePath = datasetIdOrLookupFile;
                         mDatasetID = 0;
                     }
