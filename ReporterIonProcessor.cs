@@ -254,16 +254,19 @@ namespace MASIC
                         ReporterIons.ReporterIonMassModeConstants.TMTSixteenMZ or
                         ReporterIons.ReporterIonMassModeConstants.TMTEighteenMZ)
                     {
+                        // Round to three decimal places
                         mzValue = reporterIon.MZ.ToString("#0.000");
                     }
                     else if (mOptions.ReporterIons.ReporterIonMassMode is
                              ReporterIons.ReporterIonMassModeConstants.TMT32MZ or
                              ReporterIons.ReporterIonMassModeConstants.TMT35MZ)
                     {
+                        // Round to four decimal places
                         mzValue = reporterIon.MZ.ToString("#0.0000");
                     }
                     else
                     {
+                        // Round to the nearest integer
                         mzValue = ((int)Math.Round(reporterIon.MZ, 0)).ToString();
                     }
 
