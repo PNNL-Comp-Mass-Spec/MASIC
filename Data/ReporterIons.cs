@@ -22,6 +22,11 @@ namespace MASIC.Data
         public const double REPORTER_ION_TOLERANCE_DA_DEFAULT = 0.5;
 
         /// <summary>
+        /// Default reporter ion tolerance for cyclic immonium (156.1025)
+        /// </summary>
+        public const double REPORTER_ION_TOLERANCE_DA_DEFAULT_CYCLIC_IMMONIUM = 0.02;
+
+        /// <summary>
         /// Default minimum allowed reporter ion tolerance, in Da
         /// </summary>
         public const double REPORTER_ION_TOLERANCE_DA_MINIMUM = 0.001;
@@ -195,7 +200,15 @@ namespace MASIC.Data
             /// <remarks>
             /// Requires instrumentation with a resolution of at least 75,000; use a tolerance of +/-0.0015 Da
             /// </remarks>
-            TMT35MZ = 22
+            TMT35MZ = 22,
+
+            /// <summary>
+            /// Cyclic immonium diagnostic ion at 156.1025 m/z
+            /// </summary>
+            /// <remarks>
+            /// Use a tolerance of +/-0.020 Da
+            /// </remarks>
+            CyclicImmonium = 23
         }
 
         private double mReporterIonToleranceDaDefault;
@@ -324,6 +337,9 @@ namespace MASIC.Data
 
                 case ReporterIonMassModeConstants.ITraqEightMZHighRes:
                     return GetDefaultReporterIons(reporterIonMassMode, REPORTER_ION_TOLERANCE_DA_DEFAULT_ITRAQ8_HIGH_RES);
+
+                case ReporterIonMassModeConstants.CyclicImmonium:
+                    return GetDefaultReporterIons(reporterIonMassMode, REPORTER_ION_TOLERANCE_DA_DEFAULT_CYCLIC_IMMONIUM);
 
                 default:
                     return GetDefaultReporterIons(reporterIonMassMode, REPORTER_ION_TOLERANCE_DA_DEFAULT);
@@ -639,6 +655,11 @@ namespace MASIC.Data
                     AddReporterIon(reporterIons, 366.14, 7);
                     break;
 
+                case ReporterIonMassModeConstants.CyclicImmonium:
+                    // Cyclic Immonium
+                    AddReporterIon(reporterIons, 156.1025, 1);
+                    break;
+
                 default:
                     // Includes ReporterIonMassModeConstants.CustomOrNone
                     reporterIons.Clear();
@@ -686,6 +707,7 @@ namespace MASIC.Data
                 ReporterIonMassModeConstants.FSFACustomCarboxylic => "FSFA Custom Carboxylic (171.104, 234.058, 336.174 m/z)",
                 ReporterIonMassModeConstants.FSFACustomHydroxyl => "FSFA Custom Hydroxyl (151.063 and 166.087 m/z)",
                 ReporterIonMassModeConstants.Acetylation => "Acetylated K (126.091 and 143.118 m/z)",
+                ReporterIonMassModeConstants.CyclicImmonium => "Cyclic Immonium (156.1025 m/z)",
                 _ => throw new ArgumentOutOfRangeException(nameof(reporterIonMode), reporterIonMode, null)
             };
         }
@@ -733,6 +755,10 @@ namespace MASIC.Data
 
                 case ReporterIonMassModeConstants.TMT32MZ or ReporterIonMassModeConstants.TMT35MZ:
                     SetReporterIonMassMode(reporterIonMassMode, REPORTER_ION_TOLERANCE_DA_DEFAULT_TMT32);
+                    break;
+
+                case ReporterIonMassModeConstants.CyclicImmonium:
+                    SetReporterIonMassMode(reporterIonMassMode, REPORTER_ION_TOLERANCE_DA_DEFAULT_CYCLIC_IMMONIUM);
                     break;
 
                 default:
