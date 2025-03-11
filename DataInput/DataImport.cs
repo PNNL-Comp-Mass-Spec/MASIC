@@ -596,7 +596,7 @@ namespace MASIC.DataInput
 
             scanStatsEntry.ScanFilterText = currentScan.ScanHeaderText;
 
-            scanStatsEntry.ElutionTime = currentScan.ScanTime.ToString("0.0000");
+            scanStatsEntry.ElutionTime = currentScan.ScanTime.ToString("0.0000###");
             scanStatsEntry.TotalIonIntensity = StringUtilities.ValueToString(currentScan.TotalIonIntensity, 5);
             scanStatsEntry.BasePeakIntensity = StringUtilities.ValueToString(currentScan.BasePeakIonIntensity, 5);
             scanStatsEntry.BasePeakMZ = StringUtilities.DblToString(currentScan.BasePeakIonMZ, 4);
