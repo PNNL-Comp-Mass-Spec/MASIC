@@ -139,7 +139,7 @@ namespace MASIC
 
                     if (success)
                     {
-                        // Find the row in the lstResults that matches fileNameCompare
+                        // Find the row in the results that matches fileNameCompare
                         foreach (var datasetItem in results)
                         {
                             if (string.Equals(datasetItem[0], datasetName, StringComparison.OrdinalIgnoreCase))
