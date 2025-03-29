@@ -260,7 +260,7 @@ namespace MASIC.DataOutput
                             }
                             else
                             {
-                                // Value differs; remove key from consolidatedValuesByID
+                                // Value differs; remove key from consolidatedValuesByID (if present)
                                 consolidatedValuesByID.Remove(item.Key);
                             }
                         }

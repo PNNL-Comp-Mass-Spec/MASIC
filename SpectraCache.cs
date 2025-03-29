@@ -17,8 +17,8 @@ namespace MASIC
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="cacheOptions"></param>
-        /// <param name="instrumentDataFile"></param>
+        /// <param name="cacheOptions">Cache options</param>
+        /// <param name="instrumentDataFile">Instrument data file</param>
         public SpectraCache(SpectrumCacheOptions cacheOptions, FileInfo instrumentDataFile)
         {
             mCacheOptions = cacheOptions ?? new SpectrumCacheOptions();
@@ -148,8 +148,8 @@ namespace MASIC
         /// <summary>
         /// Add the directory to the list if its drive letter (or network share) does not match any of the entries in the list
         /// </summary>
-        /// <param name="directoryList"></param>
-        /// <param name="comparisonDirectory"></param>
+        /// <param name="directoryList">List of directories</param>
+        /// <param name="comparisonDirectory">Comparison directory</param>
         private void AddDirectoryIfNewDrive(List<DirectoryInfo> directoryList, DirectoryInfo comparisonDirectory)
         {
             try
@@ -226,12 +226,10 @@ namespace MASIC
         /// <summary>
         /// Adds spectrum to the spectrum pool
         /// </summary>
-        /// <param name="spectrum"></param>
-        /// <param name="scanNumber"></param>
+        /// <param name="spectrum">Mass spectrum</param>
+        /// <param name="scanNumber">Scan number</param>
         /// <returns>Index of the spectrum in the pool in targetPoolIndex</returns>
-        public bool AddSpectrumToPool(
-            MSSpectrum spectrum,
-            int scanNumber)
+        public bool AddSpectrumToPool(MSSpectrum spectrum, int scanNumber)
         {
             try
             {
@@ -729,7 +727,7 @@ namespace MASIC
         /// Validates that we can read and write from a Page file
         /// Opens the page file reader and writer if not yet opened
         /// </summary>
-        /// <param name="createIfUninitialized"></param>
+        /// <param name="createIfUninitialized">When true, create the page file if unitialized</param>
         private bool ValidatePageFileIO(bool createIfUninitialized)
         {
             if (mPageFileReader != null)
@@ -845,8 +843,8 @@ namespace MASIC
             /// <summary>
             /// Constructor
             /// </summary>
-            /// <param name="scan"></param>
-            /// <param name="cacheState"></param>
+            /// <param name="scan">Mass spectrum</param>
+            /// <param name="cacheState">Cache state</param>
             public ScanMemoryCacheItem(MSSpectrum scan, CacheStateConstants cacheState = CacheStateConstants.NeverCached)
             {
                 Scan = scan;
@@ -877,8 +875,8 @@ namespace MASIC
             /// <summary>
             /// Retrieve the item for the scan number
             /// </summary>
-            /// <param name="scanNumber"></param>
-            /// <param name="item"></param>
+            /// <param name="scanNumber">Scan number</param>
+            /// <param name="item">Output: Mass spectrum</param>
             /// <returns>True if item available in cache</returns>
             bool GetItem(int scanNumber, out ScanMemoryCacheItem item);
 
@@ -909,7 +907,7 @@ namespace MASIC
             /// <summary>
             /// Constructor
             /// </summary>
-            /// <param name="initialCapacity"></param>
+            /// <param name="initialCapacity">Initial capacity</param>
             public MemoryCacheArray(int initialCapacity)
             {
                 mCapacity = initialCapacity;
@@ -945,8 +943,8 @@ namespace MASIC
             /// <summary>
             /// Get the spectrum for the given scan
             /// </summary>
-            /// <param name="scanNumber"></param>
-            /// <param name="item"></param>
+            /// <param name="scanNumber">Scan number</param>
+            /// <param name="item">Output: mass spectrum</param>
             public bool GetItem(int scanNumber, out ScanMemoryCacheItem item)
             {
                 if (!mScanNumberToIndexMap.TryGetValue(scanNumber, out var index))
@@ -962,8 +960,8 @@ namespace MASIC
             /// <summary>
             /// Add a new spectrum (and remove the oldest one if the cache is at capacity)
             /// </summary>
-            /// <param name="newItem"></param>
-            /// <param name="removedItem"></param>
+            /// <param name="newItem">Mass spectrum to add</param>
+            /// <param name="removedItem">Output: removed mass spectrum (or null if nothing removed)</param>
             public bool AddNew(ScanMemoryCacheItem newItem, out ScanMemoryCacheItem removedItem)
             {
                 var itemRemoved = RemoveOldestItem(out removedItem);
@@ -975,7 +973,7 @@ namespace MASIC
             /// <summary>
             /// Add an item to the cache.
             /// </summary>
-            /// <param name="newItem"></param>
+            /// <param name="newItem">Mass spectrum to add</param>
             /// <returns>True if the item could be added, false otherwise (like if the cache is already full)</returns>
             private bool Add(ScanMemoryCacheItem newItem)
             {
@@ -1070,7 +1068,7 @@ namespace MASIC
             /// <summary>
             /// Constructor
             /// </summary>
-            /// <param name="initialCapacity"></param>
+            /// <param name="initialCapacity">Initial capacity</param>
             public MemoryCacheLRU(int initialCapacity)
             {
                 mCapacity = initialCapacity;
@@ -1103,8 +1101,8 @@ namespace MASIC
             /// <summary>
             /// Get the spectrum for the given scan
             /// </summary>
-            /// <param name="scanNumber"></param>
-            /// <param name="item"></param>
+            /// <param name="scanNumber">Scan number</param>
+            /// <param name="item">Output: mass spectrum</param>
             public bool GetItem(int scanNumber, out ScanMemoryCacheItem item)
             {
                 if (!mScanNumberToNodeMap.TryGetValue(scanNumber, out var node))
@@ -1125,8 +1123,8 @@ namespace MASIC
             /// <summary>
             /// Add a new spectrum (and remove the oldest one if the cache is at capacity)
             /// </summary>
-            /// <param name="newItem"></param>
-            /// <param name="removedItem"></param>
+            /// <param name="newItem">Mass spectrum to add</param>
+            /// <param name="removedItem">Output: removed mass spectrum (or null if nothing removed)</param>
             public bool AddNew(ScanMemoryCacheItem newItem, out ScanMemoryCacheItem removedItem)
             {
                 var itemRemoved = RemoveOldestItem(out removedItem);
@@ -1138,7 +1136,7 @@ namespace MASIC
             /// <summary>
             /// Add an item to the cache.
             /// </summary>
-            /// <param name="newItem"></param>
+            /// <param name="newItem">Mass spectrum to add</param>
             /// <returns>True if the item could be added, false otherwise (like if the cache is already full)</returns>
             private bool Add(ScanMemoryCacheItem newItem)
             {

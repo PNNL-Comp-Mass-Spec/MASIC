@@ -1908,8 +1908,8 @@ namespace MASICPeakFinder
         /// <summary>
         /// Compute the signal-to-noise ratio
         /// </summary>
-        /// <param name="signal"></param>
-        /// <param name="noiseThresholdIntensity"></param>
+        /// <param name="signal">Signal intensity</param>
+        /// <param name="noiseThresholdIntensity">Noise threshold intensity</param>
         public static double ComputeSignalToNoise(double signal, double noiseThresholdIntensity)
         {
             if (noiseThresholdIntensity > 0)

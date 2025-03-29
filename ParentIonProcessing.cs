@@ -18,7 +18,7 @@ namespace MASIC
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="reporterIons"></param>
+        /// <param name="reporterIons">Reporter ions</param>
         public ParentIonProcessing(ReporterIons reporterIons)
         {
             mReporterIons = reporterIons;
@@ -27,13 +27,13 @@ namespace MASIC
         /// <summary>
         /// Add the parent ion, or associate the fragmentation scan with an existing parent ion
         /// </summary>
-        /// <param name="scanList"></param>
-        /// <param name="surveyScanIndex"></param>
-        /// <param name="parentIonMZ"></param>
-        /// <param name="fragScanIndex"></param>
-        /// <param name="spectraCache"></param>
-        /// <param name="sicOptions"></param>
-        /// <param name="isDIA"></param>
+        /// <param name="scanList">Scan list</param>
+        /// <param name="surveyScanIndex">Survey scan index</param>
+        /// <param name="parentIonMZ">Parent ion m/z</param>
+        /// <param name="fragScanIndex">Fragmentation scan index</param>
+        /// <param name="spectraCache">Spectra cache</param>
+        /// <param name="sicOptions">SIC options</param>
+        /// <param name="isDIA">True if DIA data</param>
         public void AddUpdateParentIons(
             ScanList scanList,
             int surveyScanIndex,
@@ -49,12 +49,12 @@ namespace MASIC
         /// <summary>
         /// Add the parent ion, or associate the fragmentation scan with an existing parent ion
         /// </summary>
-        /// <param name="scanList"></param>
-        /// <param name="surveyScanIndex"></param>
-        /// <param name="parentIonMZ"></param>
-        /// <param name="mrmInfo"></param>
-        /// <param name="spectraCache"></param>
-        /// <param name="sicOptions"></param>
+        /// <param name="scanList">Scan list</param>
+        /// <param name="surveyScanIndex">Survey scan index</param>
+        /// <param name="parentIonMZ">Parent ion m/z</param>
+        /// <param name="mrmInfo">MRM info</param>
+        /// <param name="spectraCache">Spectra cache</param>
+        /// <param name="sicOptions">SIC options</param>
         public void AddUpdateParentIons(
             ScanList scanList,
             int surveyScanIndex,
@@ -90,18 +90,18 @@ namespace MASIC
         /// If it does not exist, adds a new entry to .ParentIons()
         /// </para>
         /// </summary>
-        /// <param name="scanList"></param>
+        /// <param name="scanList">Scan list</param>
         /// <param name="surveyScanIndex">
         /// If this is less than 0 the first MS2 scan(s) in the file occurred before we encountered a survey scan
         /// In this case, we cannot properly associate the fragmentation scan with a survey scan
         /// </param>
-        /// <param name="parentIonMZ"></param>
-        /// <param name="mrmDaughterMZ"></param>
-        /// <param name="mrmToleranceHalfWidth"></param>
+        /// <param name="parentIonMZ">Parent ion m/z</param>
+        /// <param name="mrmDaughterMZ">MRM daughter m/z</param>
+        /// <param name="mrmToleranceHalfWidth">MRM tolerance half width</param>
         /// <param name="fragScanIndex">This is typically equal to scanList.FragScans.Count - 1</param>
-        /// <param name="spectraCache"></param>
-        /// <param name="sicOptions"></param>
-        /// <param name="isDIA"></param>
+        /// <param name="spectraCache">Spectra cache</param>
+        /// <param name="sicOptions">SIC options</param>
+        /// <param name="isDIA">True if a DIA spectrum</param>
         private void AddUpdateParentIons(
             ScanList scanList,
             int surveyScanIndex,
@@ -561,11 +561,11 @@ namespace MASIC
         /// Look for parent ions that have similar m/z values and are nearby one another in time
         /// For the groups of similar ions, assign the scan number of the highest intensity parent ion to the other similar parent ions
         /// </summary>
-        /// <param name="scanList"></param>
-        /// <param name="spectraCache"></param>
-        /// <param name="masicOptions"></param>
-        /// <param name="dataImportUtilities"></param>
-        /// <param name="ionUpdateCount"></param>
+        /// <param name="scanList">Scan list</param>
+        /// <param name="spectraCache">Spectra cache</param>
+        /// <param name="masicOptions">MASIC options</param>
+        /// <param name="dataImportUtilities">Data import utilities</param>
+        /// <param name="ionUpdateCount">Output: number of updated parent ions</param>
         public bool FindSimilarParentIons(
             ScanList scanList,
             SpectraCache spectraCache,
@@ -930,8 +930,9 @@ namespace MASIC
         /// <summary>
         /// Get the parent ion tolerance, in Daltons
         /// </summary>
-        /// <param name="sicOptions"></param>
-        /// <param name="parentIonMZ"></param>
+        /// <param name="sicOptions">SIC options</param>
+        /// <param name="parentIonMZ">Parent ion m/z</param>
+        /// <returns>Parent ion tolerance, in Daltons</returns>
         public static double GetParentIonToleranceDa(SICOptions sicOptions, double parentIonMZ)
         {
             return GetParentIonToleranceDa(sicOptions, parentIonMZ, sicOptions.SICTolerance);
@@ -941,9 +942,10 @@ namespace MASIC
         /// Get the parent ion tolerance specified by parentIonTolerance, in Daltons
         /// Will convert from ppm to Da if sicOptions.SICToleranceIsPPM is true
         /// </summary>
-        /// <param name="sicOptions"></param>
-        /// <param name="parentIonMZ"></param>
-        /// <param name="parentIonTolerance"></param>
+        /// <param name="sicOptions">SIC options</param>
+        /// <param name="parentIonMZ">Parent ion m/z</param>
+        /// <param name="parentIonTolerance">Parent ion tolerance</param>
+        /// <returns>Parent ion tolerance, in Daltons</returns>
         public static double GetParentIonToleranceDa(SICOptions sicOptions, double parentIonMZ, double parentIonTolerance)
         {
             if (sicOptions.SICToleranceIsPPM)

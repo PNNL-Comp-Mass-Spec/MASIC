@@ -27,10 +27,10 @@ namespace MASIC.DataOutput
         /// <summary>
         /// Export raw data to a .pek file or .csv file
         /// </summary>
-        /// <param name="scanList"></param>
-        /// <param name="spectraCache"></param>
-        /// <param name="inputFileName"></param>
-        /// <param name="outputDirectoryPath"></param>
+        /// <param name="scanList">Scan list</param>
+        /// <param name="spectraCache">Spectra cache</param>
+        /// <param name="inputFileName">Input file name</param>
+        /// <param name="outputDirectoryPath">Output directory path</param>
         public bool ExportRawDataToDisk(
             ScanList scanList,
             SpectraCache spectraCache,

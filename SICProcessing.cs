@@ -126,12 +126,12 @@ namespace MASIC
         /// <summary>
         /// Create selected ion chromatograms for the parent ions
         /// </summary>
-        /// <param name="scanList"></param>
-        /// <param name="spectraCache"></param>
-        /// <param name="masicOptions"></param>
-        /// <param name="dataOutputHandler"></param>
-        /// <param name="sicProcessor"></param>
-        /// <param name="xmlResultsWriter"></param>
+        /// <param name="scanList">Scan list</param>
+        /// <param name="spectraCache">Spectra cache</param>
+        /// <param name="masicOptions">MASIC options</param>
+        /// <param name="dataOutputHandler">Data output handler</param>
+        /// <param name="sicProcessor">SIC processor</param>
+        /// <param name="xmlResultsWriter">XML results writer</param>
         public bool CreateParentIonSICs(
             ScanList scanList,
             SpectraCache spectraCache,
@@ -1194,12 +1194,12 @@ namespace MASIC
         /// <summary>
         /// Store a selected ion chromatogram peak in a parent ion
         /// </summary>
-        /// <param name="scanList"></param>
-        /// <param name="parentIonIndex"></param>
-        /// <param name="sicDetails"></param>
-        /// <param name="potentialAreaStatsForPeak"></param>
-        /// <param name="sicPeak"></param>
-        /// <param name="peakIsValid"></param>
+        /// <param name="scanList">Scan list</param>
+        /// <param name="parentIonIndex">Parent ion index</param>
+        /// <param name="sicDetails">SIC details</param>
+        /// <param name="potentialAreaStatsForPeak">Potential area stats for the peak</param>
+        /// <param name="sicPeak">SIC peak</param>
+        /// <param name="peakIsValid">When true, the peak is valid</param>
         public bool StorePeakInParentIon(
             ScanList scanList,
             int parentIonIndex,

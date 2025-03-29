@@ -43,7 +43,7 @@ namespace MASIC
         /// If mOptions.ReporterIons.AlwaysUseMS3ReporterIonsForParents is true, always copy
         /// If false (the default), examine reporter ions in the parent MS2 spectra and copy if the median intensity is less than the MS3 scan's median intensity
         /// </remarks>
-        /// <param name="cachedDataToWrite"></param>
+        /// <param name="cachedDataToWrite">Reporter ion stats to write</param>
         private void CopyReporterIonsToParentIfRequired(SortedDictionary<int, ReporterIonStats> cachedDataToWrite)
         {
             foreach (var item in cachedDataToWrite)
@@ -128,10 +128,10 @@ namespace MASIC
         /// <summary>
         /// Looks for the reporter ion peaks using FindReporterIonsWork
         /// </summary>
-        /// <param name="scanList"></param>
-        /// <param name="spectraCache"></param>
+        /// <param name="scanList">Scan list</param>
+        /// <param name="spectraCache">Spectra cache</param>
         /// <param name="inputFilePathFull">Full path to the input file</param>
-        /// <param name="outputDirectoryPath"></param>
+        /// <param name="outputDirectoryPath">Output directory path</param>
         public bool FindReporterIons(
             ScanList scanList,
             SpectraCache spectraCache,
@@ -427,17 +427,17 @@ namespace MASIC
         /// Looks for the reporter ion m/z values, +/- a tolerance
         /// Calls AggregateIonsInRange with returnMax = True, meaning we're reporting the maximum ion abundance for each reporter ion m/z
         /// </summary>
-        /// <param name="rawFileReader"></param>
-        /// <param name="dataAggregation"></param>
-        /// <param name="includeFtmsColumns"></param>
-        /// <param name="sicOptions"></param>
-        /// <param name="scanList"></param>
-        /// <param name="spectraCache"></param>
-        /// <param name="currentScan"></param>
-        /// <param name="cachedDataToWrite"></param>
-        /// <param name="reporterIons"></param>
-        /// <param name="saveUncorrectedIntensities"></param>
-        /// <param name="saveObservedMasses"></param>
+        /// <param name="rawFileReader">Thermo .raw file reader</param>
+        /// <param name="dataAggregation">Data aggregation instance</param>
+        /// <param name="includeFtmsColumns">When true, include FTMS columns</param>
+        /// <param name="sicOptions">SIC options</param>
+        /// <param name="scanList">Scan list</param>
+        /// <param name="spectraCache">Spectra cache</param>
+        /// <param name="currentScan">Current scan</param>
+        /// <param name="cachedDataToWrite">Cached reporter ion stats</param>
+        /// <param name="reporterIons">Reporter ions</param>
+        /// <param name="saveUncorrectedIntensities">When true, save uncorrected intensities</param>
+        /// <param name="saveObservedMasses">When true, save observed masses</param>
         private void FindReporterIonsWork(
             XRawFileIO rawFileReader,
             DataAggregation dataAggregation,
@@ -790,8 +790,8 @@ namespace MASIC
         /// <summary>
         /// Compute the median reporter ion value
         /// </summary>
-        /// <param name="scanDescription"></param>
-        /// <param name="reporterIonIntensities"></param>
+        /// <param name="scanDescription">Scan description</param>
+        /// <param name="reporterIonIntensities">List of reporter ion intensities</param>
         /// <param name="medianIgnoringZeros">Median value, ignoring zeros</param>
         /// <returns>Median value, including zeros</returns>
         private double GetMedianReporterIonIntensity(string scanDescription, List<string> reporterIonIntensities, out double medianIgnoringZeros)
@@ -832,8 +832,8 @@ namespace MASIC
         /// <summary>
         /// Compute the median value for a list of doubles
         /// </summary>
-        /// <param name="scanDescription"></param>
-        /// <param name="values"></param>
+        /// <param name="scanDescription">Scan description</param>
+        /// <param name="values">Values</param>
         /// <returns>Median value, or 0 if an empty list or the computed median is NaN</returns>
         private double GetMedianValue(string scanDescription, IReadOnlyCollection<double> values)
         {
@@ -858,8 +858,8 @@ namespace MASIC
             /// <summary>
             /// Compare the Ion Number and m/z values of two reporter ions
             /// </summary>
-            /// <param name="x"></param>
-            /// <param name="y"></param>
+            /// <param name="x">First reporter ion</param>
+            /// <param name="y">Second reporter ion</param>
             /// <returns>-1, 0, or 1</returns>
             public int Compare(ReporterIonInfo x, ReporterIonInfo y)
             {

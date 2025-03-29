@@ -15,19 +15,22 @@ namespace MASIC
 
         /// <summary>
         /// When returnMax is false, determine the sum of the data within the search mass tolerance
-        /// When returnMaxis true, determine the maximum of the data within the search mass tolerance
+        /// When returnMax is true, determine the maximum of the data within the search mass tolerance
         /// </summary>
         /// <remarks>
         /// Note that this function performs a recursive search of msSpectrum.IonsMZ
         /// It is therefore very efficient regardless of the number of data points in the spectrum
         /// For sparse spectra, you can alternatively use FindMaxValueInMZRange
         /// </remarks>
-        /// <param name="msSpectrum"></param>
-        /// <param name="searchMZ"></param>
-        /// <param name="searchToleranceHalfWidth"></param>
-        /// <param name="ionMatchCount"></param>
-        /// <param name="closestMZ"></param>
-        /// <param name="returnMax"></param>
+        /// <param name="msSpectrum">MS spectrum</param>
+        /// <param name="searchMZ">Target m/z</param>
+        /// <param name="searchToleranceHalfWidth">Search tolerance half width</param>
+        /// <param name="ionMatchCount">Output: matching ion count</param>
+        /// <param name="closestMZ">Output: closest m/z</param>
+        /// <param name="returnMax">
+        /// When true, determine the maximum of the data within the search mass tolerance,
+        /// otherwise determine the sum of the data within the search mass tolerance
+        /// </param>
         /// <returns>The sum or maximum of the matching data; 0 if no matches</returns>
         public double AggregateIonsInRange(
             MSSpectrum msSpectrum,
@@ -102,10 +105,10 @@ namespace MASIC
         /// It is therefore good for spectra with less than 10 data points and bad for spectra with more than 10 data points
         /// As an alternative to this function, use AggregateIonsInRange
         /// </remarks>
-        /// <param name="spectraCache"></param>
-        /// <param name="currentScan"></param>
-        /// <param name="mzStart"></param>
-        /// <param name="mzEnd"></param>
+        /// <param name="spectraCache">Spectra cache</param>
+        /// <param name="currentScan">Current scan</param>
+        /// <param name="mzStart">m/z start</param>
+        /// <param name="mzEnd">m/z end</param>
         /// <param name="bestMatchMZ">Output: m/z of the most intense ion in the given range</param>
         /// <param name="matchIntensity">Output: intensity of the most intense ion in the given range</param>
         /// <returns>True if a match is found, false if no data exists within the m/z range (or if the spectrum could not be obtained)</returns>
