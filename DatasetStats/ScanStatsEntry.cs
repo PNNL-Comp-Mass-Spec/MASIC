@@ -5,7 +5,7 @@
     /// </summary>
     public class ScanStatsEntry
     {
-        // Ignore Spelling: centroiding
+        // Ignore Spelling: centroiding, MASIC
 
         /// <summary>
         /// Scan number
