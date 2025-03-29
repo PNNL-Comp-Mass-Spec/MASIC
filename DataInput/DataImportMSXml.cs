@@ -1439,12 +1439,22 @@ namespace MASIC.DataInput
 
             var precursorSpectrumReference = mzMLSpectrum.Precursors[0].PrecursorSpectrumRef;
 
+            // Note that precursorSpectrumReference is an empty string for DIA spectra (which also have parentIonMonoisotopicMZ = 0.0000)
+            if (string.IsNullOrEmpty(precursorSpectrumReference))
+            {
+                if (parentIonMonoisotopicMZ is 0.0)
+                    return 0;
+
+                OnWarningEvent("Precursor spectrum reference is an empty string for scan " + mzMLSpectrum.ScanNumber);
+                return 0;
+            }
+
             // Parse out scan number from the precursor spectrum reference
             // "controllerType=0 controllerNumber=1 scan=1"
             if (NativeIdConversion.TryGetScanNumberInt(precursorSpectrumReference, out var precursorScan))
                 return precursorScan;
 
-            OnWarningEvent("Invalid spectrum reference: " + precursorSpectrumReference);
+            OnWarningEvent("Invalid precursor spectrum reference: " + precursorSpectrumReference);
             return 0;
         }
 
