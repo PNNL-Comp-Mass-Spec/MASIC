@@ -721,7 +721,7 @@ namespace MASIC.DatasetStats
 
             foreach (var item in windowWidthList.Where(item => item > 0))
             {
-                windowWidthsToShow.Add(item);
+                windowWidthsToShow.Add(Math.Round(item, 5));
             }
 
             return string.Join(", ", windowWidthsToShow);
