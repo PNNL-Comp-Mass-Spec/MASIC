@@ -601,8 +601,17 @@ namespace MASIC.DataInput
             scanStatsEntry.BasePeakIntensity = StringUtilities.ValueToString(currentScan.BasePeakIonIntensity, 5);
             scanStatsEntry.BasePeakMZ = StringUtilities.DblToString(currentScan.BasePeakIonMZ, 4);
 
-            // Base peak signal-to-noise ratio
-            scanStatsEntry.BasePeakSignalToNoiseRatio = StringUtilities.ValueToString(MASICPeakFinder.clsMASICPeakFinder.ComputeSignalToNoise(currentScan.BasePeakIonIntensity, currentScan.BaselineNoiseStats.NoiseLevel), 4);
+            if (currentScan.BaselineNoiseStats == null)
+            {
+                OnWarningEvent("Baseline noise stats are null for scan " + currentScan.ScanNumber);
+            }
+            else
+            {
+                // Base peak signal-to-noise ratio
+                scanStatsEntry.BasePeakSignalToNoiseRatio = StringUtilities.ValueToString(
+                    MASICPeakFinder.clsMASICPeakFinder.ComputeSignalToNoise(
+                        currentScan.BasePeakIonIntensity, currentScan.BaselineNoiseStats.NoiseLevel), 4);
+            }
 
             scanStatsEntry.IonCount = currentScan.IonCount;
             scanStatsEntry.IonCountRaw = currentScan.IonCountRaw;
