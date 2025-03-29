@@ -1065,7 +1065,7 @@ namespace MASIC.DataInput
 
             scanList.SurveyScans.Add(scanInfo);
 
-            UpdateMSXmlScanType(scanInfo, spectrumInfo.MSLevel, "MS", mzXmlSourceSpectrum);
+            UpdateMSXmlScanType(scanInfo, spectrumInfo.MSLevel, "MS", mzXmlSourceSpectrum, null);
 
             if (!scanInfo.ZoomScan)
             {
@@ -1165,10 +1165,13 @@ namespace MASIC.DataInput
             int parentScan;
             bool isDIA;
             double isolationWindowMZ;
+            double? parentIonMonoisotopicMZ;
 
             if (mzMLSpectrum != null)
             {
-                parentScan = GetParentScan(mzMLSpectrum);
+                parentIonMonoisotopicMZ = GetParentIonMonoisotopicMz(mzMLSpectrum);
+
+                parentScan = GetParentScan(mzMLSpectrum, parentIonMonoisotopicMZ);
 
                 if (mzMLSpectrum.Precursors.Count > 0)
                 {
@@ -1188,12 +1191,14 @@ namespace MASIC.DataInput
                 parentScan = mzXmlSourceSpectrum.PrecursorScanNum;
                 isDIA = mzXmlSourceSpectrum.MSLevel > 1 && mzXmlSourceSpectrum.IsolationWindow >= 6.5;
                 isolationWindowMZ = mzXmlSourceSpectrum.IsolationWindow;
+                parentIonMonoisotopicMZ = null;
             }
             else if (spectrumInfo is SpectrumInfoMzData mzDataSpectrum)
             {
                 parentScan = mzDataSpectrum.ParentIonSpectrumID;
                 isDIA = false;
                 isolationWindowMZ = 0;
+                parentIonMonoisotopicMZ = null;
             }
             else if (scanList.SurveyScans.Count > 0)
             {
@@ -1201,12 +1206,14 @@ namespace MASIC.DataInput
                 parentScan = scanList.SurveyScans.Last().ScanNumber;
                 isDIA = false;
                 isolationWindowMZ = 0;
+                parentIonMonoisotopicMZ = null;
             }
             else
             {
                 parentScan = 0;
                 isDIA = false;
                 isolationWindowMZ = 0;
+                parentIonMonoisotopicMZ = null;
             }
 
             var scanInfo = new ScanInfo(parentScan, spectrumInfo.ParentIonMZ)
@@ -1247,7 +1254,7 @@ namespace MASIC.DataInput
             // Determine the minimum positive intensity in this scan
             scanInfo.MinimumPositiveIntensity = mPeakFinder.FindMinimumPositiveValue(msSpectrum.IonsIntensity, 0);
 
-            UpdateMSXmlScanType(scanInfo, spectrumInfo.MSLevel, "MSn", mzXmlSourceSpectrum);
+            UpdateMSXmlScanType(scanInfo, spectrumInfo.MSLevel, "MSn", mzXmlSourceSpectrum, parentIonMonoisotopicMZ);
 
             var mrmScanType = scanInfo.MRMScanType;
 
@@ -1409,7 +1416,21 @@ namespace MASIC.DataInput
             return filterStrings.First().Value;
         }
 
-        private int GetParentScan(SimpleMzMLReader.SimpleSpectrum mzMLSpectrum)
+        private static double? GetParentIonMonoisotopicMz(SimpleMzMLReader.ParamData mzMLSpectrum)
+        {
+            foreach (var item in mzMLSpectrum.UserParams)
+            {
+                if (item.Name.StartsWith("[Thermo Trailer Extra]Monoisotopic M/Z", StringComparison.OrdinalIgnoreCase) &&
+                    double.TryParse(item.Value, out var parentIonMonoisotopicMZ))
+                {
+                    return parentIonMonoisotopicMZ;
+                }
+            }
+
+            return null;
+        }
+
+        private int GetParentScan(SimpleMzMLReader.SimpleSpectrum mzMLSpectrum, double? parentIonMonoisotopicMZ)
         {
             if (mzMLSpectrum.Precursors.Count == 0)
             {
@@ -1479,6 +1500,8 @@ namespace MASIC.DataInput
 
             bool isDIA;
 
+            var parentIonMonoisotopicMZ = GetParentIonMonoisotopicMz(mzMLSpectrum);
+
             if (mzXmlSourceSpectrum.MSLevel > 1 && mzMLSpectrum.Precursors.Count > 0)
             {
                 var firstPrecursor = mzMLSpectrum.Precursors[0];
@@ -1488,7 +1511,7 @@ namespace MASIC.DataInput
 
                 mzXmlSourceSpectrum.ParentIonMZ = firstPrecursor.IsolationWindow.TargetMz;
 
-                mzXmlSourceSpectrum.PrecursorScanNum = GetParentScan(mzMLSpectrum);
+                mzXmlSourceSpectrum.PrecursorScanNum = GetParentScan(mzMLSpectrum, parentIonMonoisotopicMZ);
 
                 var precursorParams = firstPrecursor.CVParams;
 
@@ -1587,7 +1610,7 @@ namespace MASIC.DataInput
                     var includeParentMZ = isDIA;
 
                     mzXmlSourceSpectrum.FilterLine = XRawFileIO.MakeGenericThermoScanFilter(filterString, includeParentMZ);
-                    mzXmlSourceSpectrum.ScanType = XRawFileIO.GetScanTypeNameFromThermoScanFilterText(filterString, isDIA);
+                    mzXmlSourceSpectrum.ScanType = XRawFileIO.GetScanTypeNameFromThermoScanFilterText(filterString, isDIA, parentIonMonoisotopicMZ);
                 }
                 else
                 {
@@ -1805,11 +1828,13 @@ namespace MASIC.DataInput
         /// <param name="msLevel"></param>
         /// <param name="defaultScanType"></param>
         /// <param name="mzXmlSourceSpectrum"></param>
+        /// <param name="parentIonMonoisotopicMZ"></param>
         private void UpdateMSXmlScanType(
             ScanInfo scanInfo,
             int msLevel,
             string defaultScanType,
-            SpectrumInfoMzXML mzXmlSourceSpectrum)
+            SpectrumInfoMzXML mzXmlSourceSpectrum,
+            double? parentIonMonoisotopicMZ)
         {
             if (mzXmlSourceSpectrum == null)
             {
@@ -1832,7 +1857,7 @@ namespace MASIC.DataInput
             if (!string.IsNullOrEmpty(scanInfo.ScanHeaderText))
             {
                 // This is a Thermo file; auto define .ScanTypeName using the FilterLine text
-                scanInfo.ScanTypeName = XRawFileIO.GetScanTypeNameFromThermoScanFilterText(scanInfo.ScanHeaderText, scanInfo.IsDIA);
+                scanInfo.ScanTypeName = XRawFileIO.GetScanTypeNameFromThermoScanFilterText(scanInfo.ScanHeaderText, scanInfo.IsDIA, parentIonMonoisotopicMZ);
 
                 // Now populate .SIMScan, .MRMScanType and .ZoomScan
 
