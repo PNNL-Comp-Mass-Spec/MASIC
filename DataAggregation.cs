@@ -121,6 +121,7 @@ namespace MASIC
             matchIntensity = 0;
             try
             {
+                // ReSharper disable once RedundantArgumentDefaultValue
                 if (!spectraCache.GetSpectrum(currentScan.ScanNumber, out var spectrum, true))
                 {
                     OnErrorEvent("Error uncaching scan " + currentScan.ScanNumber);

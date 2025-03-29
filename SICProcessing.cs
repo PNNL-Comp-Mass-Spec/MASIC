@@ -575,6 +575,7 @@ namespace MASIC
                             sicPeak.IndexObserved = sicDetails.SICDataCount - 1;
                         }
                     }
+                    // ReSharper disable once RedundantIfElseBlock
                     else
                     {
                         // This shouldn't happen
@@ -833,6 +834,7 @@ namespace MASIC
                     continue;
                 }
 
+                // ReSharper disable once RedundantArgumentDefaultValue
                 if (!spectraCache.GetSpectrum(scanList.SurveyScans[surveyScanIndex].ScanNumber, out var spectrum, true))
                 {
                     SetLocalErrorCode(clsMASIC.MasicErrorCodes.ErrorUncachingSpectrum);
@@ -1150,6 +1152,7 @@ namespace MASIC
                 // Use this for debugging
                 if (parentIonIndices[parentIonIndexPointer] == debugParentIonIndexToFind)
                 {
+                    // ReSharper disable once RedundantAssignment
                     storePeak = false;
                 }
 

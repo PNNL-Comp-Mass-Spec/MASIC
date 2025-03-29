@@ -373,6 +373,7 @@ namespace MASIC.DataOutput
             }
             else
             {
+                // ReSharper disable once RedundantArgumentDefaultValue
                 if (!spectraCache.GetSpectrum(currentScan.ScanNumber, out var spectrum, true))
                 {
                     SetLocalErrorCode(clsMASIC.MasicErrorCodes.ErrorUncachingSpectrum);

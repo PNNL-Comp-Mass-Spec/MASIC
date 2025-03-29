@@ -479,6 +479,7 @@ namespace MASIC.DataInput
                 mDatasetFileInfo.ScanCount = 0;
 
                 // Open a handle to the data file
+                // ReSharper disable once RedundantArgumentDefaultValue
                 var mzMLReader = new SimpleMzMLReader(mzMLFile.FullName, false);
                 fileOpened = true;
 
@@ -522,6 +523,7 @@ namespace MASIC.DataInput
                     mScanTracking.ReserveListCapacity(scansEst);
                     spectraCache.SpectrumCount = Math.Max(spectraCache.SpectrumCount, scansEst);
 
+                    // ReSharper disable once RedundantArgumentDefaultValue
                     foreach (var mzMLSpectrum in mzMLReader.ReadAllSpectra(true))
                     {
                         if (mzMLSpectrum == null)
@@ -731,6 +733,7 @@ namespace MASIC.DataInput
             var chromatogramNumber = 0;
             var scanTimeDiffs = new List<double>(200);
 
+            // ReSharper disable once RedundantArgumentDefaultValue
             foreach (var chromatogramItem in mzMLReader.ReadAllChromatograms(true))
             {
                 if (chromatogramItem == null)
@@ -887,6 +890,7 @@ namespace MASIC.DataInput
             var simulatedSpectraTimes = new Dictionary<int, double>();
 
             // Open the file with a new reader
+            // ReSharper disable once RedundantArgumentDefaultValue
             var mzMLReader2 = new SimpleMzMLReader(mzMLFile.FullName, false);
 
             var scanTimeLookupErrors = 0;
@@ -895,6 +899,7 @@ namespace MASIC.DataInput
             mScanTracking.ReserveListCapacity(elutionTimeToScanMapMaster.Count);
             spectraCache.SpectrumCount = Math.Max(spectraCache.SpectrumCount, elutionTimeToScanMapMaster.Count);
 
+            // ReSharper disable once RedundantArgumentDefaultValue
             foreach (var chromatogramItem in mzMLReader2.ReadAllChromatograms(true))
             {
                 var isSRM = IsSrmChromatogram(chromatogramItem);

@@ -130,6 +130,7 @@ namespace MASIC.DataOutput
         {
             int scanNumber;
 
+            // ReSharper disable once RedundantArgumentDefaultValue
             if (!spectraCache.GetSpectrum(currentScan.ScanNumber, out var spectrum, true))
             {
                 SetLocalErrorCode(clsMASIC.MasicErrorCodes.ErrorUncachingSpectrum);
@@ -247,6 +248,7 @@ namespace MASIC.DataOutput
         {
             var exportCount = 0;
 
+            // ReSharper disable once RedundantArgumentDefaultValue
             if (!spectraCache.GetSpectrum(currentScan.ScanNumber, out var spectrum, true))
             {
                 SetLocalErrorCode(clsMASIC.MasicErrorCodes.ErrorUncachingSpectrum);
@@ -383,6 +385,7 @@ namespace MASIC.DataOutput
                     SaveCSVFilesToDiskWork(dataWriter, scanInfoWriter, currentScan, spectraCache, fragmentationScan, ref spectrumExportCount);
                     break;
 
+                // ReSharper disable once RedundantEmptySwitchSection
                 default:
                     // Unknown format
                     // This code should never be reached
