@@ -800,6 +800,9 @@ namespace MASIC.Options
                 PlotOptions.CreatePlots = reader.GetParam(
                     XML_SECTION_PLOT_OPTIONS, "CreatePlots", PlotOptions.CreatePlots);
 
+                PlotOptions.DeleteTempFiles = reader.GetParam(
+                    XML_SECTION_PLOT_OPTIONS, "DeleteTempFiles", PlotOptions.DeleteTempFiles);
+
                 PlotOptions.PlotWithPython = reader.GetParam(
                     XML_SECTION_PLOT_OPTIONS, "PlotWithPython", PlotOptions.PlotWithPython);
 
