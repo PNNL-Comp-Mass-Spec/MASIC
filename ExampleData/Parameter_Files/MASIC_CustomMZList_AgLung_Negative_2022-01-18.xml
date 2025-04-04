@@ -63,7 +63,7 @@
     <item key="CompressMSMSSpectraData" value="True" />
     <item key="CompressToleranceDivisorForDa" value="5" />
     <item key="CompressToleranceDivisorForPPM" value="3" />
-    <!-- Use 0.75 instead the default of 5 since several of the metabolites have the same m/z but a different expected elution time, separated by 1 to 2 minutes -->
+    <!-- Use 0.75 instead of the default of 5 since several of the metabolites have the same m/z but a different expected elution time, separated by 1 to 2 minutes -->
     <item key="MaxSICPeakWidthMinutesBackward" value="0.75" />
     <item key="MaxSICPeakWidthMinutesForward" value="0.75" />
     <item key="IntensityThresholdFractionMax" value="0.01" />

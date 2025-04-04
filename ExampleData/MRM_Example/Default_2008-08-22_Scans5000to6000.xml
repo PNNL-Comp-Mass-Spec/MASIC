@@ -99,6 +99,7 @@
   </section>
   <section name="PlotOptions">
     <item key="CreatePlots" value="True" />
+    <item key="DeleteTempFiles" value="True" />
     <item key="PlotWithPython" value="True" />
     <item key="SaveHistogramData" value="False" />
     <item key="SaveReporterIonObservationRateData" value="True" />

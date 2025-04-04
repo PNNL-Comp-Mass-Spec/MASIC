@@ -27,7 +27,6 @@
     <item key="WriteMRMDataList" value="False" />
     <item key="WriteMRMIntensityCrosstab" value="True" />
     <item key="FastExistingXMLFileTest" value="False" />
-
     <item key="ReporterIonStatsEnabled" value="False" />
     <item key="ReporterIonMassMode" value="0" />
     <item key="ReporterIonToleranceDa" value="0.5" />
@@ -37,7 +36,6 @@
     <item key="ReporterIonSaveUncorrectedIntensities" value="False" />
     <item key="UseMS3ReporterIonsForParentMS2Spectra" value="True" />
     <item key="AlwaysUseMS3ReporterIonsForParents" value="False" />
-
     <item key="ExportRawSpectraData" value="False" />
     <item key="ExportRawDataFileFormat" value="1" />
     <item key="ExportRawDataIncludeMSMS" value="False" />
@@ -106,6 +104,7 @@
   </section>
   <section name="PlotOptions">
     <item key="CreatePlots" value="True" />
+    <item key="DeleteTempFiles" value="True" />
     <item key="PlotWithPython" value="True" />
     <item key="SaveHistogramData" value="False" />
     <item key="SaveHtmlFile" value="True" />
