@@ -8,6 +8,8 @@ namespace MASICBrowser
     /// </summary>
     public class clsSICStats
     {
+        // Ignore Spelling: cls
+
         /// <summary>
         /// Largest peak in the selected ion chromatogram
         /// </summary>

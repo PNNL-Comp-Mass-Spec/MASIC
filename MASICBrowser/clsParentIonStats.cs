@@ -8,6 +8,8 @@ namespace MASICBrowser
     /// </summary>
     public class clsParentIonStats
     {
+        // Ignore Spelling: cls, frag
+
         /// <summary>
         /// Scan types
         /// </summary>
@@ -53,7 +55,7 @@ namespace MASICBrowser
         /// Optimal peak apex scan number
         /// </summary>
         /// <remarks>
-        /// This will be different than the survey scan number if the parent ion was combined with another parent ion due to similar m/z
+        /// This will be different from the survey scan number if the parent ion was combined with another parent ion due to similar m/z
         /// </remarks>
         public int OptimalPeakApexScanNumber { get; set; }
 

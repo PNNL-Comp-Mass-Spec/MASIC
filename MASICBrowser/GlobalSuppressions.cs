@@ -9,6 +9,8 @@ using System.Diagnostics.CodeAnalysis;
 [assembly: SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "Keep for reference", Scope = "member", Target = "~M:MASICBrowser.frmBrowser.TestValueToString")]
 [assembly: SuppressMessage("Design", "RCS1075:Avoid empty catch clause that catches System.Exception.", Justification = "This design pattern is used to silently handle several types of non-fatal errors", Scope = "module")]
 [assembly: SuppressMessage("Readability", "RCS1123:Add parentheses when necessary.", Justification = "Parentheses are not needed", Scope = "module")]
+[assembly: SuppressMessage("Style", "IDE0305:Simplify collection initialization", Justification = "Prefer to use .ToList()", Scope = "member", Target = "~M:MASICBrowser.Program.SetOptionsUsingCommandLineParameters(PRISM.clsParseCommandLine)~System.Boolean")]
+[assembly: SuppressMessage("Style", "IDE0305:Simplify collection initialization", Justification = "Prefer to use .ToList()", Scope = "member", Target = "~M:MASICBrowser.clsSICStats.Clone~MASICBrowser.clsSICStats")]
 [assembly: SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "Allowed legacy name", Scope = "member", Target = "~M:MASICBrowser.frmBrowser.cboSICsTypeFilter_SelectedIndexChanged(System.Object,System.EventArgs)")]
 [assembly: SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "Allowed legacy name", Scope = "member", Target = "~M:MASICBrowser.frmBrowser.cboSortOrder_SelectedIndexChanged(System.Object,System.EventArgs)")]
 [assembly: SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "Allowed legacy name", Scope = "member", Target = "~M:MASICBrowser.frmBrowser.chkFilterByIntensity_CheckedChanged(System.Object,System.EventArgs)")]
