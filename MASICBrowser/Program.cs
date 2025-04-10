@@ -98,7 +98,7 @@ namespace MASICBrowser
                 if (commandLineParser.InvalidParametersPresent(validParameters))
                 {
                     ShowErrorMessage("Invalid command line parameters",
-                        (from item in commandLineParser.InvalidParameters(validParameters) select ("/" + item)).ToList());
+                        (from item in commandLineParser.InvalidParameters(validParameters) select "/" + item).ToList());
                     return false;
                 }
 
