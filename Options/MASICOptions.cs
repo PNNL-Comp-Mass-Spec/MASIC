@@ -1081,6 +1081,7 @@ namespace MASIC.Options
 
                 // Plot options
                 writer.SetParam(XML_SECTION_PLOT_OPTIONS, "CreatePlots", PlotOptions.CreatePlots);
+                writer.SetParam(XML_SECTION_PLOT_OPTIONS, "DeleteTempFiles", PlotOptions.DeleteTempFiles);
                 writer.SetParam(XML_SECTION_PLOT_OPTIONS, "PlotWithPython", PlotOptions.PlotWithPython);
                 writer.SetParam(XML_SECTION_PLOT_OPTIONS, "SaveHistogramData", PlotOptions.SaveHistogramData);
                 writer.SetParam(XML_SECTION_PLOT_OPTIONS, "SaveHtmlFile", PlotOptions.SaveHtmlFile);
