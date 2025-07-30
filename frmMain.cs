@@ -321,7 +321,7 @@ namespace MASIC
         /// <param name="confirmReplaceExistingResults"></param>
         /// <returns>
         /// True if the CUSTOM_SIC_VALUES_DATA_TABLE is empty or if it was cleared
-        /// False if the user is queried about clearing and they do not click Yes
+        /// False if the user is queried about clearing, and they do not click Yes
         /// </returns>
         private bool ClearCustomSICList(bool confirmReplaceExistingResults)
         {
@@ -1012,7 +1012,7 @@ namespace MASIC
             var tabDelimiter = new[] { '\t' };
             var commaDelimiter = new[] { ',' };
 
-            // Auto-determine the column delimiter by counting the number of lines that are tab-delimited and counting the number that are comma delimited
+            // Auto-determine the column delimiter by counting the number of lines that are tab-delimited and counting the number that are comma-delimited
 
             // Keys in these dictionaries are the number of columns in a line, values are the number of lines with the given column count
             var tabStats = new Dictionary<int, int>();

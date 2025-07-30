@@ -255,6 +255,7 @@ namespace MASIC
                             return scanOrAcqTime * totalRunTime + scanList.MasterScanTimeList[0];
                         }
 
+                        // ReSharper disable once DuplicatedStatements
                         return 0;
 
                     case CustomSICList.CustomSICScanTypeConstants.AcquisitionTime:

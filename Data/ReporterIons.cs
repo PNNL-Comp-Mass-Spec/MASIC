@@ -22,7 +22,7 @@ namespace MASIC.Data
         public const double REPORTER_ION_TOLERANCE_DA_DEFAULT = 0.5;
 
         /// <summary>
-        /// Default reporter ion tolerance for ampylation
+        /// Default reporter ion tolerance for AMPylation
         /// </summary>
         public const double REPORTER_ION_TOLERANCE_DA_DEFAULT_AMPYLATION = 0.02;
 

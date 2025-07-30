@@ -275,6 +275,7 @@ namespace MASIC
             // See if the given spectrum is already present in the page file
             var scanNumber = spectrumToCache.ScanNumber;
 
+            // ReSharper disable once CanSimplifyDictionaryRemovingWithSingleCall
             if (mSpectrumByteOffset.ContainsKey(scanNumber))
             {
                 // Page file already contains the given scan;
@@ -727,7 +728,7 @@ namespace MASIC
         /// Validates that we can read and write from a Page file
         /// Opens the page file reader and writer if not yet opened
         /// </summary>
-        /// <param name="createIfUninitialized">When true, create the page file if unitialized</param>
+        /// <param name="createIfUninitialized">When true, create the page file if uninitialized</param>
         private bool ValidatePageFileIO(bool createIfUninitialized)
         {
             if (mPageFileReader != null)

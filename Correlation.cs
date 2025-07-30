@@ -365,7 +365,7 @@ namespace MASIC
                     }
                     else
                     {
-                        // Bin is Out of range; ignore the value
+                        // Bin is out of range; ignore the value
                     }
                 }
 
