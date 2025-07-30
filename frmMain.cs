@@ -1232,19 +1232,19 @@ namespace MASIC
             AppendReporterIonMassMode(ReporterIons.ReporterIonMassModeConstants.CustomOrNone, "None");
 
             AppendReporterIonMassMode(ReporterIons.ReporterIonMassModeConstants.Acetylation, "Acetylated K");
-            AppendReporterIonMassMode(ReporterIons.ReporterIonMassModeConstants.FrackingAmine20160217, "Fracking Amine 20160217: 157.089, 170.097, and 234.059");
+            AppendReporterIonMassMode(ReporterIons.ReporterIonMassModeConstants.FrackingAmine20160217, "Fracking Amine 20160217: 157.089, 170.097, and 234.059 m/z");
             AppendReporterIonMassMode(ReporterIons.ReporterIonMassModeConstants.FSFACustomCarbonyl, "FSFACustomCarbonyl");
             AppendReporterIonMassMode(ReporterIons.ReporterIonMassModeConstants.FSFACustomCarboxylic, "FSFACustomCarboxylic");
             AppendReporterIonMassMode(ReporterIons.ReporterIonMassModeConstants.FSFACustomHydroxyl, "FSFACustomHydroxyl");
-            AppendReporterIonMassMode(ReporterIons.ReporterIonMassModeConstants.HemeCFragment, "Heme C: 616.18 and 617.19");
+            AppendReporterIonMassMode(ReporterIons.ReporterIonMassModeConstants.HemeCFragment, "Heme C: 616.18 and 617.19 m/z");
             AppendReporterIonMassMode(ReporterIons.ReporterIonMassModeConstants.ITraqETDThreeMZ, "iTraq ETD: 101, 102, and 104");
             AppendReporterIonMassMode(ReporterIons.ReporterIonMassModeConstants.ITraqFourMZ, "iTraq: 114, 115, 116, and 117");
             AppendReporterIonMassMode(ReporterIons.ReporterIonMassModeConstants.ITraqEightMZHighRes, "iTraq 8 for High Res MS/MS: 113, 114, ... 121");
             AppendReporterIonMassMode(ReporterIons.ReporterIonMassModeConstants.ITraqEightMZLowRes, "iTraq 8 for Low Res MS/MS (Considers 120 m/z for immonium loss from phenylalanine)");
-            AppendReporterIonMassMode(ReporterIons.ReporterIonMassModeConstants.LycAcetFragment, "Lys Acet: 126.091 and 127.095");
-            AppendReporterIonMassMode(ReporterIons.ReporterIonMassModeConstants.NativeOGlcNAc, "Native OGlcNAc: 126.055, 138.055, 144.065, 168.066, 186.076, 204.087, and 366.14");
-            AppendReporterIonMassMode(ReporterIons.ReporterIonMassModeConstants.OGlcNAc, "OGlcNAc: 204.087, 300.13, and 503.21");
-            AppendReporterIonMassMode(ReporterIons.ReporterIonMassModeConstants.PCGalnaz, "PCGalnaz: 300.13 and 503.21");
+            AppendReporterIonMassMode(ReporterIons.ReporterIonMassModeConstants.LycAcetFragment, "Lys Acet: 126.091 and 127.095 m/z");
+            AppendReporterIonMassMode(ReporterIons.ReporterIonMassModeConstants.NativeOGlcNAc, "Native OGlcNAc: 126.055, 138.055, 144.065, 168.066, 186.076, 204.087, and 366.14 m/z");
+            AppendReporterIonMassMode(ReporterIons.ReporterIonMassModeConstants.OGlcNAc, "OGlcNAc: 204.087, 300.13, and 503.21 m/z");
+            AppendReporterIonMassMode(ReporterIons.ReporterIonMassModeConstants.PCGalnaz, "PCGalnaz: 300.13 and 503.21 m/z");
             AppendReporterIonMassMode(ReporterIons.ReporterIonMassModeConstants.TMTTwoMZ, "TMT 2: 126, 127");
             AppendReporterIonMassMode(ReporterIons.ReporterIonMassModeConstants.TMTSixMZ, "TMT 6: 126, 127, 128, 129, 130, 131");
             AppendReporterIonMassMode(ReporterIons.ReporterIonMassModeConstants.TMTTenMZ, "TMT 10: 126, 127N, 127C, ... 130C, 131");
@@ -1253,6 +1253,9 @@ namespace MASIC
             AppendReporterIonMassMode(ReporterIons.ReporterIonMassModeConstants.TMTEighteenMZ, "TMT 18: 126, 127N, 127C, ... 133N, 133C, 134N, 134C, 135N");
             AppendReporterIonMassMode(ReporterIons.ReporterIonMassModeConstants.TMT32MZ, "TMT 32: 126, 127N, 127C, ... 133CD, 134ND, 134CD, 135ND");
             AppendReporterIonMassMode(ReporterIons.ReporterIonMassModeConstants.TMT35MZ, "TMT 35: 126, 127N, 127C, ... 133CD, 134ND, 134CD, 135ND, 135CD");
+            AppendReporterIonMassMode(ReporterIons.ReporterIonMassModeConstants.CyclicImmonium, "Cyclic Immonium: 156.1025 m/z");
+            // ReSharper disable once StringLiteralTypo
+            AppendReporterIonMassMode(ReporterIons.ReporterIonMassModeConstants.AMPylation, "AMPylation: 136.1, 250.1, and 348.1 m/z");
 
             SelectedReporterIonMode = ReporterIons.ReporterIonMassModeConstants.CustomOrNone;
         }
