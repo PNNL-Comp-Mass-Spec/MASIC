@@ -645,6 +645,7 @@ namespace MASIC
                     case ReporterIons.ReporterIonMassModeConstants.Acetylation:
                     case ReporterIons.ReporterIonMassModeConstants.NativeOGlcNAc:
                     case ReporterIons.ReporterIonMassModeConstants.CyclicImmonium:
+                    case ReporterIons.ReporterIonMassModeConstants.AMPylation:
                     default:
                         // Reporter ion correction is not supported for these reporter ion mass modes
                         break;

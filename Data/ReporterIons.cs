@@ -11,7 +11,7 @@ namespace MASIC.Data
     {
         // ReSharper disable CommentTypo
 
-        // Ignore Spelling: acet, acetylated, Acetylation, Alfaro, Amine, Carboxylic, Chengdong, Da, Du, Fracking, ITraq
+        // Ignore Spelling: acet, acetylated, Acetylation, Alfaro, Amine, ampylation, Carboxylic, Chengdong, Da, Du, Fracking, ITraq
         // Ignore Spelling: Galnaz, immonium, Lys, MASIC, Merkley, Nakayasu, plex, TMT, Traq. Xu
 
         // ReSharper restore CommentTypo
@@ -20,6 +20,11 @@ namespace MASIC.Data
         /// Default reporter ion tolerance, in Da
         /// </summary>
         public const double REPORTER_ION_TOLERANCE_DA_DEFAULT = 0.5;
+
+        /// <summary>
+        /// Default reporter ion tolerance for ampylation
+        /// </summary>
+        public const double REPORTER_ION_TOLERANCE_DA_DEFAULT_AMPYLATION = 0.02;
 
         /// <summary>
         /// Default reporter ion tolerance for cyclic immonium (156.1025)
@@ -208,7 +213,15 @@ namespace MASIC.Data
             /// <remarks>
             /// Use a tolerance of +/-0.020 Da
             /// </remarks>
-            CyclicImmonium = 23
+            CyclicImmonium = 23,
+
+            /// <summary>
+            /// AMPylation diagnostic ions at 136.1, 250.1, and 348.1 m/z
+            /// </summary>
+            /// <remarks>
+            /// Use a tolerance of +/-0.020 Da
+            /// </remarks>
+            AMPylation = 24
         }
 
         private double mReporterIonToleranceDaDefault;
@@ -340,6 +353,9 @@ namespace MASIC.Data
 
                 case ReporterIonMassModeConstants.CyclicImmonium:
                     return GetDefaultReporterIons(reporterIonMassMode, REPORTER_ION_TOLERANCE_DA_DEFAULT_CYCLIC_IMMONIUM);
+
+                case ReporterIonMassModeConstants.AMPylation:
+                    return GetDefaultReporterIons(reporterIonMassMode, REPORTER_ION_TOLERANCE_DA_DEFAULT_AMPYLATION);
 
                 default:
                     return GetDefaultReporterIons(reporterIonMassMode, REPORTER_ION_TOLERANCE_DA_DEFAULT);
@@ -660,6 +676,13 @@ namespace MASIC.Data
                     AddReporterIon(reporterIons, 156.1025, 1);
                     break;
 
+                case ReporterIonMassModeConstants.AMPylation:
+                    // AMPylation
+                    AddReporterIon(reporterIons, 136.1, 1);
+                    AddReporterIon(reporterIons, 250.1, 2);
+                    AddReporterIon(reporterIons, 348.1, 3);
+                    break;
+
                 default:
                     // Includes ReporterIonMassModeConstants.CustomOrNone
                     reporterIons.Clear();
@@ -703,11 +726,12 @@ namespace MASIC.Data
                 ReporterIonMassModeConstants.OGlcNAc => "O-GlcNAc (204.087, 300.13, and 503.21 m/z)",
                 ReporterIonMassModeConstants.NativeOGlcNAc => "Native O-GlcNAc (126.055, 138.055, 144.065, 168.066, 186.076, 204.087, and 366.14 m/z)",
                 ReporterIonMassModeConstants.FrackingAmine20160217 => "Fracking Amine 20160217 (157.089, 170.097, and 234.059 m/z)",
-                ReporterIonMassModeConstants.FSFACustomCarbonyl => "FSFA Custom Carbonyl (171.104, 236.074, 157.088 m/z)",
-                ReporterIonMassModeConstants.FSFACustomCarboxylic => "FSFA Custom Carboxylic (171.104, 234.058, 336.174 m/z)",
+                ReporterIonMassModeConstants.FSFACustomCarbonyl => "FSFA Custom Carbonyl (171.104, 236.074, and 157.088 m/z)",
+                ReporterIonMassModeConstants.FSFACustomCarboxylic => "FSFA Custom Carboxylic (171.104, 234.058, and 336.174 m/z)",
                 ReporterIonMassModeConstants.FSFACustomHydroxyl => "FSFA Custom Hydroxyl (151.063 and 166.087 m/z)",
                 ReporterIonMassModeConstants.Acetylation => "Acetylated K (126.091 and 143.118 m/z)",
                 ReporterIonMassModeConstants.CyclicImmonium => "Cyclic Immonium (156.1025 m/z)",
+                ReporterIonMassModeConstants.AMPylation => "AMPylation (136.1, 250.1, and 348.1 m/z)",
                 _ => throw new ArgumentOutOfRangeException(nameof(reporterIonMode), reporterIonMode, null)
             };
         }
@@ -760,6 +784,11 @@ namespace MASIC.Data
                 case ReporterIonMassModeConstants.CyclicImmonium:
                     SetReporterIonMassMode(reporterIonMassMode, REPORTER_ION_TOLERANCE_DA_DEFAULT_CYCLIC_IMMONIUM);
                     break;
+
+                case ReporterIonMassModeConstants.AMPylation:
+                    SetReporterIonMassMode(reporterIonMassMode, REPORTER_ION_TOLERANCE_DA_DEFAULT_AMPYLATION);
+                    break;
+
 
                 default:
                     SetReporterIonMassMode(reporterIonMassMode, REPORTER_ION_TOLERANCE_DA_DEFAULT);
