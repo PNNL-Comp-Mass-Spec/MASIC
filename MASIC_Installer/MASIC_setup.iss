@@ -13,8 +13,10 @@ WelcomeLabel2=This will install [name/ver] on your computer.
 
 [Files]
 Source: ..\bin\Release\MASIC.exe                                                 ; DestDir: {app}
+Source: ..\bin\Release\MASIC.exe.config                                          ; DestDir: {app}
 Source: ..\bin\Release\MASIC.pdb                                                 ; DestDir: {app}
 Source: ..\bin\Console\Release\MASIC_Console.exe                                 ; DestDir: {app}
+Source: ..\bin\Console\Release\MASIC_Console.exe.config                          ; DestDir: {app}
 Source: ..\bin\Console\Release\MASIC_Console.pdb                                 ; DestDir: {app}
 Source: ..\bin\Release\Azure.Core.dll                                            ; DestDir: {app}
 Source: ..\bin\Release\Azure.Identity.dll                                        ; DestDir: {app}
@@ -81,6 +83,7 @@ Source: ..\bin\Release\ThermoFisher.CommonCore.RawFileReader.dll                
 Source: ..\bin\Release\ThermoRawFileReader.dll                                   ; DestDir: {app}
 
 Source: ..\MASICBrowser\bin\Release\MASICBrowser.exe                             ; DestDir: {app}
+Source: ..\MASICBrowser\bin\Release\MASICBrowser.exe.config                      ; DestDir: {app}
 Source: ..\MASICBrowser\bin\Release\C5.dll                                       ; DestDir: {app}
 Source: ..\MASICBrowser\bin\Release\ExCSS.dll                                    ; DestDir: {app}
 Source: ..\MASICBrowser\bin\Release\OxyDataPlotter.dll                           ; DestDir: {app}
