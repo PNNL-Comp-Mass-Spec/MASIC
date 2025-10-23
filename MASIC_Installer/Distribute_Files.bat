@@ -19,7 +19,7 @@ xcopy ..\bin\Console\Release\MASIC_Console.*     \\floyd\software\MASIC\Exe_Only
 @echo off
 echo.
 echo.
-echo Copying to \\pnl\projects\OmicsSW\DMS_Programs\AnalysisToolManagerDistribution
+echo Copying to \\Proto-3\DMS_Programs_Dist\AnalysisToolManagerDistribution
 pause
 
 pushd ..\bin\

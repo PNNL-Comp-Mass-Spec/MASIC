@@ -16,15 +16,15 @@ xcopy ..\RevisionHistory.txt            C:\DMS_Programs\MASIC /D /Y
 
 @echo off
 echo.
-echo Copying to \\pnl\projects\OmicsSW\DMS_Programs\AnalysisToolManagerDistribution
+echo Copying to \\Proto-3\DMS_Programs_Dist\AnalysisToolManagerDistribution
 @echo on
 
-xcopy Console\Release\MASIC_Console.exe \\pnl\projects\OmicsSW\DMS_Programs\AnalysisToolManagerDistribution\MASIC /D /Y
-xcopy Console\Release\MASIC_Console.pdb \\pnl\projects\OmicsSW\DMS_Programs\AnalysisToolManagerDistribution\MASIC /D /Y
-xcopy Console\Release\*.dll             \\pnl\projects\OmicsSW\DMS_Programs\AnalysisToolManagerDistribution\MASIC /D /Y
-xcopy Console\Release\*.py              \\pnl\projects\OmicsSW\DMS_Programs\AnalysisToolManagerDistribution\MASIC /D /Y
-xcopy ..\Readme.md                      \\pnl\projects\OmicsSW\DMS_Programs\AnalysisToolManagerDistribution\MASIC /D /Y
-xcopy ..\RevisionHistory.txt            \\pnl\projects\OmicsSW\DMS_Programs\AnalysisToolManagerDistribution\MASIC /D /Y
+xcopy Console\Release\MASIC_Console.exe \\Proto-3\DMS_Programs_Dist\AnalysisToolManagerDistribution\MASIC /D /Y
+xcopy Console\Release\MASIC_Console.pdb \\Proto-3\DMS_Programs_Dist\AnalysisToolManagerDistribution\MASIC /D /Y
+xcopy Console\Release\*.dll             \\Proto-3\DMS_Programs_Dist\AnalysisToolManagerDistribution\MASIC /D /Y
+xcopy Console\Release\*.py              \\Proto-3\DMS_Programs_Dist\AnalysisToolManagerDistribution\MASIC /D /Y
+xcopy ..\Readme.md                      \\Proto-3\DMS_Programs_Dist\AnalysisToolManagerDistribution\MASIC /D /Y
+xcopy ..\RevisionHistory.txt            \\Proto-3\DMS_Programs_Dist\AnalysisToolManagerDistribution\MASIC /D /Y
 
 echo.
 if not "%1"=="NoPause" pause
