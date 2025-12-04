@@ -39,7 +39,7 @@ namespace MASIC
         /// <summary>
         /// Program date
         /// </summary>
-        public const string PROGRAM_DATE = "July 30, 2025";
+        public const string PROGRAM_DATE = "December 3, 2025";
 
         private static string mInputFilePath;
         private static string mOutputDirectoryPath;                         // Optional

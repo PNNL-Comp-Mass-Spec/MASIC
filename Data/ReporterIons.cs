@@ -24,7 +24,7 @@ namespace MASIC.Data
         /// <summary>
         /// Default reporter ion tolerance for AMPylation
         /// </summary>
-        public const double REPORTER_ION_TOLERANCE_DA_DEFAULT_AMPYLATION = 0.02;
+        public const double REPORTER_ION_TOLERANCE_DA_DEFAULT_AMPYLATION = 0.05;
 
         /// <summary>
         /// Default reporter ion tolerance for cyclic immonium (156.1025)
@@ -216,10 +216,10 @@ namespace MASIC.Data
             CyclicImmonium = 23,
 
             /// <summary>
-            /// AMPylation diagnostic ions at 136.1, 250.1, and 348.1 m/z
+            /// AMPylation diagnostic ions at 136.0623, 250.0940, and 348.0709 m/z
             /// </summary>
             /// <remarks>
-            /// Use a tolerance of +/-0.020 Da
+            /// Use a tolerance of +/-0.050 Da
             /// </remarks>
             AMPylation = 24
         }
@@ -678,9 +678,9 @@ namespace MASIC.Data
 
                 case ReporterIonMassModeConstants.AMPylation:
                     // AMPylation
-                    AddReporterIon(reporterIons, 136.1, 1);
-                    AddReporterIon(reporterIons, 250.1, 2);
-                    AddReporterIon(reporterIons, 348.1, 3);
+                    AddReporterIon(reporterIons, 136.062320, 1);
+                    AddReporterIon(reporterIons, 250.094015, 2);
+                    AddReporterIon(reporterIons, 348.070913, 3);
                     break;
 
                 default:
